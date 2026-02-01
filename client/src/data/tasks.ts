@@ -87,6 +87,36 @@ export const CONSTRUCTION_TASKS: TaskType[] = [
         cost: 50,
         reward: 1500,
         difficulty: 2
+    },
+
+    // PREP / MANAGEMENT (Low Cost, for Starvation/Delay days)
+    {
+        id: 'prep_1',
+        title: 'Inspect Formwork',
+        description: 'Verify forms while waiting for concrete.',
+        type: 'Management',
+        cost: 0,
+        reward: 200,
+        difficulty: 1,
+        leanTip: 'Use downtime to ensure quality.'
+    },
+    {
+        id: 'prep_2',
+        title: 'Safety Audit',
+        description: 'Review site safety protocols.',
+        type: 'Management',
+        cost: 0,
+        reward: 300,
+        difficulty: 1
+    },
+    {
+        id: 'prep_3',
+        title: 'Organize Tool Crib',
+        description: 'Sort and maintain equipment.',
+        type: 'Management',
+        cost: 5,
+        reward: 150,
+        difficulty: 1
     }
 ];
 
