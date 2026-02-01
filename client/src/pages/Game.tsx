@@ -11,6 +11,7 @@ import { WEEK_1_SCHEDULE } from '@/data/chapters/chapter1';
 import { DecisionModal } from '@/components/game/DecisionModal';
 import { CharacterCreationModal } from '@/components/game/CharacterCreationModal';
 import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
+import { DayBriefingModal } from '@/components/game/DayBriefingModal';
 
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
@@ -223,6 +224,7 @@ export default function Game() {
 
         <CharacterCreationModal />
         <ChapterIntroModal />
+        <DayBriefingModal />
 
         {/* Modals & Screens */}
         <AnimatePresence>
