@@ -167,8 +167,9 @@ export class MainScene extends Phaser.Scene {
 
         // Create a "building" (using a tinted box or sprite for now if asset missing)
         // Since we don't have a building asset yet, lets use a particle burst or a 'foundation' sprite
-        const building = this.add.rectangle(x, y, 64, 64, 0x6366f1) // Indigo block
-            .setOrigin(0.5, 1)
+        // Create a "building"
+        const building = this.add.sprite(x, y, 'house_complete')
+            .setOrigin(0.5, 0.75) // Adjusted origin for aesthetic grounding
             .setAlpha(0)
             .setDepth(y); // Sorting
 

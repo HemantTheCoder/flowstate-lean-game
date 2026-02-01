@@ -21,6 +21,9 @@ export class BootScene extends Phaser.Scene {
         this.load.svg('worker_blue', '/assets/worker_blue.svg', { width: 64, height: 64 });
         this.load.svg('worker_orange', '/assets/worker_orange.svg', { width: 64, height: 64 });
         this.load.svg('worker_green', '/assets/worker_green.svg', { width: 64, height: 64 });
+
+        // Buildings
+        this.load.image('house_complete', '/assets/house_complete.png');
     }
 
     create() {
