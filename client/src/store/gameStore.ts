@@ -207,10 +207,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     const sourceCol = state.columns.find(c => c.id === sourceColId);
     const destCol = state.columns.find(c => c.id === destColId);
 
-    if (!sourceCol || !destCol) return false;
+    if (!sourceCol || !destCol || sourceColId === destColId) return false;
 
-    // 1. Check WIP Limit
-    if (destColId !== 'done' && destColId !== 'backlog' && destCol.tasks.length >= destCol.wipLimit) {
+    // 1. Check WIP Limit (Only for Ready and Doing)
+    if ((destColId === 'ready' || destColId === 'doing') && destCol.tasks.length >= destCol.wipLimit) {
       return false; // WIP Violation
     }
 
@@ -222,18 +222,27 @@ export const useGameStore = create<GameState>((set, get) => ({
     let newMaterials = state.materials;
     let newFunds = state.funds;
 
-    // Moving to DOING consumes Materials
+    // Moving TO DOING consumes Materials (unless coming from Doing)
     if (destColId === 'doing' && sourceColId !== 'doing') {
       if (state.materials < task.cost) {
-        // Not enough materials!
         return false;
       }
       newMaterials -= task.cost;
     }
 
-    // Moving to DONE rewards Funds
+    // Moving FROM DOING to anything else (except Done) refunds materials (Undo logic)
+    if (sourceColId === 'doing' && destColId !== 'doing' && destColId !== 'done') {
+      newMaterials += task.cost;
+    }
+
+    // Moving TO DONE rewards Funds (unless already coming from Done)
     if (destColId === 'done' && sourceColId !== 'done') {
       newFunds += task.reward;
+    }
+
+    // Moving FROM DONE to anything else (Undo logic) removes funds
+    if (sourceColId === 'done' && destColId !== 'done') {
+      newFunds = Math.max(0, newFunds - task.reward);
     }
 
     set({
@@ -248,12 +257,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
         return col;
       }),
-      // Tutorial Progression: 2->3 (To Ready), 3->4 (To Doing), 4->5 (To Done)
-      tutorialStep:
-        state.tutorialActive && state.tutorialStep === 2 && destColId === 'ready' ? 3 :
-          state.tutorialActive && state.tutorialStep === 3 && destColId === 'doing' ? 4 :
-            state.tutorialActive && state.tutorialStep === 4 && destColId === 'done' ? 5 :
-              state.tutorialStep
+      // Tutorial Progression logic can be refined later if needed
     });
 
     return true;

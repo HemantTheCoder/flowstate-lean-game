@@ -48,12 +48,22 @@ export default function Game() {
     // Choose BGM based on situation
     if (day === 3) {
       soundManager.playBGM('rain', audioSettings.bgmVolume);
-    } else if (columns.find(c => c.id === 'doing')?.tasks.length || 0 >= 2) {
+    } else if (columns.find(c => c.id === 'doing')?.tasks.length || 0 >= 3) {
       soundManager.playBGM('tense', audioSettings.bgmVolume);
     } else {
-      soundManager.playBGM('cozy', audioSettings.bgmVolume);
+      soundManager.playBGM('construction', audioSettings.bgmVolume);
     }
   }, [day, columns, audioSettings.bgmVolume]);
+
+  // Unlock Audio on first interaction
+  useEffect(() => {
+    const handleInteraction = () => {
+      soundManager.resumeAudio();
+      window.removeEventListener('click', handleInteraction);
+    };
+    window.addEventListener('click', handleInteraction);
+    return () => window.removeEventListener('click', handleInteraction);
+  }, []);
 
   const handleSave = async (silent = false) => {
     try {

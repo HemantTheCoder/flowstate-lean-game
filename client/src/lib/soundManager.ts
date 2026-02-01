@@ -7,15 +7,16 @@ interface SoundManifest {
 
 const MANIFEST: SoundManifest = {
     bgm: {
-        cozy: 'https://assets.mixkit.co/music/preview/mixkit-house-design-158.mp3', // Relaxed/Planning
-        tense: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibe-130.mp3', // High WIP / Tangled
-        rain: 'https://assets.mixkit.co/music/preview/mixkit-rain-light-01-2495.mp3', // Ambience for Day 3
+        cozy: 'https://cdn.pixabay.com/audio/2022/02/22/audio_d0c0d87f5a.mp3', // Chill/Planning
+        tense: 'https://cdn.pixabay.com/audio/2022/03/10/audio_5076413248.mp3', // More urgent
+        rain: 'https://cdn.pixabay.com/audio/2021/08/09/audio_6a2039c366.mp3', // Rain ambience
+        construction: 'https://cdn.pixabay.com/audio/2022/10/30/audio_5914652972.mp3', // Construction site ambience
     },
     sfx: {
-        click: 'https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3',
-        money: 'https://assets.mixkit.co/sfx/preview/mixkit-clinking-coins-720.mp3',
-        alert: 'https://assets.mixkit.co/sfx/preview/mixkit-interface-hint-notification-911.mp3',
-        storm: 'https://assets.mixkit.co/sfx/preview/mixkit-thunder-and-rainstorm-2396.mp3',
+        click: 'https://cdn.pixabay.com/audio/2022/03/15/audio_c8b911c751.mp3',
+        money: 'https://cdn.pixabay.com/audio/2021/08/04/audio_06256f6805.mp3',
+        alert: 'https://cdn.pixabay.com/audio/2022/03/24/audio_3338350616.mp3',
+        storm: 'https://cdn.pixabay.com/audio/2022/01/21/audio_ac6a64b971.mp3',
     }
 };
 
@@ -59,6 +60,12 @@ class SoundManager {
             this.bgm.volume(bgmVol * multiplier);
         }
         Howler.volume(sfxVol * multiplier);
+    }
+
+    resumeAudio() {
+        if (Howler.ctx && Howler.ctx.state === 'suspended') {
+            Howler.ctx.resume();
+        }
     }
 }
 

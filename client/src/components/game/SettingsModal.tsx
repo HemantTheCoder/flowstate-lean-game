@@ -15,6 +15,11 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
             type === 'sfx' ? value : audioSettings.sfxVolume,
             audioSettings.isMuted
         );
+
+        // Play test sound for SFX move
+        if (type === 'sfx') {
+            soundManager.playSFX('click', value);
+        }
     };
 
     const handleToggleMute = () => {
@@ -81,8 +86,8 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
                         <button
                             onClick={handleToggleMute}
                             className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-3 border-4 ${audioSettings.isMuted
-                                    ? 'bg-red-50 border-red-200 text-red-600'
-                                    : 'bg-green-50 border-green-200 text-green-600'
+                                ? 'bg-red-50 border-red-200 text-red-600'
+                                : 'bg-green-50 border-green-200 text-green-600'
                                 }`}
                         >
                             <span className="text-2xl">{audioSettings.isMuted ? '🔇' : '🔊'}</span>
