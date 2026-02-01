@@ -7,57 +7,68 @@ import { DialogueBox } from '@/components/game/DialogueBox';
 import { TutorialOverlay } from '@/components/game/TutorialOverlay';
 import { DailySummary } from '@/components/game/DailySummary'; // Import
 import { useGameStore } from '@/store/gameStore';
-import { CHAPTER_1_INTRO, CHAPTER_1_MID, CHAPTER_1_END } from '@/data/story';
+import { WEEK_1_SCHEDULE } from '@/data/chapters/chapter1';
+import { DecisionModal } from '@/components/game/DecisionModal';
 
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
-  const [showSummary, setShowSummary] = useState(false); // Summary State
+  const [showSummary, setShowSummary] = useState(false);
   const [completedToday, setCompletedToday] = useState(0);
+
+  // Decision State
+  const [showDecision, setShowDecision] = useState(false);
+  const [decisionProps, setDecisionProps] = useState<any>(null);
 
   const { startDialogue, currentDialogue, day, advanceDay, week, tutorialStep, setTutorialStep, flags, setFlag } = useGameStore();
   const [_, navigate] = useLocation();
 
-  // Tutorial Hook
-  React.useEffect(() => {
-    if (showKanban && tutorialStep === 1) {
-      setTutorialStep(2);
-    }
-  }, [showKanban, tutorialStep, setTutorialStep]);
-
-  // Intro Dialogue Hook
+  // Daily Event & Story Loader
   useEffect(() => {
-    // Check if we haven't seen intro yet
-    if (!flags['intro_seen'] && day === 1) {
+    // Check if we have config for this day
+    const dayConfig = WEEK_1_SCHEDULE.find(d => d.day === day);
+    const dayKey = `day_${day}_started`;
+
+    if (dayConfig && !flags[dayKey]) {
+      // 1. Play Dialogue
       setTimeout(() => {
-        startDialogue(CHAPTER_1_INTRO);
-        setFlag('intro_seen', true);
+        startDialogue(dayConfig.dialogue);
+        setFlag(dayKey, true);
+
+        // 2. Trigger Event Effects
+        if (dayConfig.event === 'supply_delay') {
+          useGameStore.setState({ materials: 0 }); // Hard constraint!
+        }
+        if (dayConfig.event === 'decision_push') {
+          // Trigger decision AFTER dialogue? Or parallel. 
+          // Let's trigger it after a short delay or checking dialogue end.
+          // For simplicity, we'll trigger it via a separate effect or timeout
+          setTimeout(() => triggerPushDecision(), 5000);
+        }
       }, 1000);
     }
-  }, [flags, day, startDialogue, setFlag]);
+  }, [day, flags, startDialogue, setFlag]);
 
-  // Story Progression Hook (Chapter 1 End)
-  useEffect(() => {
-    if (tutorialStep === 99 && !currentDialogue && !flags['ch1_end_seen']) {
-      // Tutorial finished, trigger end of chapter dialogue
-      setTimeout(() => {
-        startDialogue(CHAPTER_1_END);
-        setFlag('ch1_end_seen', true);
-      }, 500);
-    }
-  }, [tutorialStep, currentDialogue, startDialogue, flags, setFlag]);
-
-  // Educational Moment: Bottleneck Warning (Mid-Chapter)
-  useEffect(() => {
-    const state = useGameStore.getState();
-    const doingCount = state.columns.find(c => c.id === 'doing')?.tasks.length || 0;
-
-    if (tutorialStep === 99 && doingCount >= 2 && !flags['ch1_mid_seen'] && !currentDialogue) {
-      setTimeout(() => {
-        startDialogue(CHAPTER_1_MID);
-        setFlag('ch1_mid_seen', true);
-      }, 1000);
-    }
-  }, [day, tutorialStep, currentDialogue, startDialogue, flags, setFlag]); // Check on day change or updates
+  const triggerPushDecision = () => {
+    setDecisionProps({
+      title: "Rao's Ultimatum",
+      prompt: "Rao is furious about the client visit. He wants to push unready tasks to 'Doing' to look busy. This violates WIP limits.",
+      options: [
+        { id: 'push', text: "Allow Push (Risky)", type: 'risky', description: "Morale drops, but Rao is happy. Generates Waste." },
+        { id: 'pull', text: "Enforce Pull (Safe)", type: 'safe', description: "Rao is angry, but Flow remains stable." }
+      ],
+      onSelect: (id: string) => {
+        if (id === 'push') {
+          useGameStore.getState().addLog("Decision: Pushed work. created Waste.");
+          setFlag('decision_push_made', true);
+          // Add penalty logic here later
+        } else {
+          useGameStore.getState().addLog("Decision: Enforced Pull. Flow protected.");
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
 
   const handleEndDay = () => {
     const todaysCompleted = useGameStore.getState().columns.find(c => c.id === 'done')?.tasks.length || 0;
@@ -191,6 +202,14 @@ export default function Game() {
         <DialogueBox />
 
         <TutorialOverlay showKanban={showKanban} />
+
+        <DecisionModal
+          isOpen={showDecision}
+          title={decisionProps?.title || ''}
+          prompt={decisionProps?.prompt || ''}
+          options={decisionProps?.options || []}
+          onSelect={decisionProps?.onSelect || (() => { })}
+        />
 
         {/* Modals & Screens */}
         <AnimatePresence>
