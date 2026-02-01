@@ -90,6 +90,7 @@ export default function Game() {
   const handleNextDayStart = () => {
     setShowSummary(false);
     advanceDay();
+    useGameStore.getState().addDailyTasks(3); // Refill backlog so user has work
     // Check for Friday
     const isFriday = day % 5 === 0;
     if (isFriday) {

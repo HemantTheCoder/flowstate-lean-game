@@ -87,6 +87,7 @@ export interface GameState {
   // Resource Actions
   addMaterials: (amount: number) => void; // For debug or events
   injectWaste: () => void;
+  addDailyTasks: (count: number) => void;
 }
 
 const INITIAL_COLUMNS: Column[] = [
@@ -281,6 +282,23 @@ export const useGameStore = create<GameState>((set, get) => ({
         col.id === 'doing' ? { ...col, tasks: [wasteTask, ...col.tasks] } : col
       ),
       lpi: { ...state.lpi, teamMorale: Math.max(0, state.lpi.teamMorale - 10) }
+    };
+  }),
+
+  // Gameplay Loop - Day 2+ Refill
+  addDailyTasks: (count: number) => set((state) => {
+    const newTasks: Task[] = Array.from({ length: count }, () => ({
+      ...getRandomTask(),
+      id: uuidv4(),
+      status: 'backlog'
+    }));
+
+    return {
+      columns: state.columns.map(col =>
+        col.id === 'backlog'
+          ? { ...col, tasks: [...col.tasks, ...newTasks] }
+          : col
+      )
     };
   })
 }));
