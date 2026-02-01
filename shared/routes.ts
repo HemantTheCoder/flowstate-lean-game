@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { insertGameStateSchema, gameStates } from './schema';
+export type { UpdateGameRequest } from './schema';
 
 // ============================================
 // SHARED ERROR SCHEMAS

@@ -282,14 +282,12 @@ export const useGameStore = create<GameState>((set, get) => ({
   }),
 
   // Gameplay Loop - Day 2+ Refill
-  // Gameplay Loop - Day 2+ Refill
   addDailyTasks: (count: number, currentDay?: number) => set((state) => {
-    // Spawn a MIX of tasks to challenge the user's selection
-    // We do NOT filter by day anymore, allowing "wrong" tasks to appear in Backlog.
-    // The Constraint Logic (Rain/Materials) will happen in KanbanBoard interactions.
+    // User Request: "All tasks in backlog... let user select".
+    // We ignore 'count' and spawn the full catalog so the user has the full menu.
 
-    const newTasks: Task[] = Array.from({ length: count }, () => ({
-      ...getRandomTask(),
+    const newTasks: Task[] = CONSTRUCTION_TASKS.map(template => ({
+      ...template,
       id: uuidv4(),
       status: 'backlog'
     }));

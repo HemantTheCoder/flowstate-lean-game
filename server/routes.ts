@@ -8,17 +8,17 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  
+
   // Load Game State
   app.get(api.game.load.path, async (req, res) => {
     try {
-      const { sessionId } = req.params;
+      const { sessionId } = req.params as { sessionId: string };
       const gameState = await storage.getGameState(sessionId);
-      
+
       if (!gameState) {
         return res.status(404).json({ message: "Save file not found" });
       }
-      
+
       res.json(gameState);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
@@ -30,10 +30,10 @@ export async function registerRoutes(
     try {
       const input = api.game.save.input.parse(req.body);
       const gameState = await storage.createOrUpdateGameState(input);
-      
+
       // Determine if created (201) or updated (200) - simplified to 200 for now or strictly following REST
       // Since our storage handles both, we'll return 200 usually, but let's check
-      res.status(200).json(gameState); 
+      res.status(200).json(gameState);
     } catch (err) {
       if (err instanceof z.ZodError) {
         return res.status(400).json({
@@ -49,9 +49,9 @@ export async function registerRoutes(
   // Update Game State (Partial)
   app.patch(api.game.update.path, async (req, res) => {
     try {
-      const { sessionId } = req.params;
+      const { sessionId } = req.params as { sessionId: string };
       const input = api.game.update.input.parse(req.body);
-      
+
       const gameState = await storage.updateGameState(sessionId, input);
       res.json(gameState);
     } catch (err) {
@@ -69,7 +69,7 @@ export async function registerRoutes(
   // Reset/Delete Game
   app.delete(api.game.reset.path, async (req, res) => {
     try {
-      const { sessionId } = req.params;
+      const { sessionId } = req.params as { sessionId: string };
       await storage.deleteGameState(sessionId);
       res.status(204).send();
     } catch (error) {
