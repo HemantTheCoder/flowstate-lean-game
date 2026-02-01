@@ -1,0 +1,406 @@
+Build a single-player, story-driven, anime-style web game called:
+
+FLOWSTATE: Saga of the Flow Architect
+
+This is an interactive Lean-learning management game that teaches Lean concepts (Kanban, Last Planner System, 5S, Pull System, Waste/MUDA) through gameplay, storytelling, visual feedback, and player choices — not lectures.
+
+The game must feel like a real indie game: fun, emotional, visually appealing, and interactive.
+
+Target platform: Web (HTML/CSS/JS or framework-based)
+Camera: Isometric or top-down 2.5D
+Art style: Anime / soft pastel / cozy indie management game
+
+CORE PREMISE
+
+The player becomes a “Flow Architect” hired to fix broken projects in a struggling city called Flowstate.
+
+Projects are chaotic:
+
+People are busy but nothing finishes
+
+Materials pile up
+
+Workers walk endlessly
+
+Deadlines are missed
+
+The player restores flow using Lean tools.
+
+Learning happens by seeing cause → effect, not reading theory.
+
+GAME STRUCTURE
+Home Screen
+
+Include:
+
+Start Game
+
+Continue
+
+Settings
+
+Coming Soon: Multiplayer
+
+Credits (visible on home page)
+
+On the home page clearly display:
+
+Made by Hemant Kumar
+With clickable link:
+https://www.linkedin.com/in/hemantkumar2430/
+
+This credit must always be visible on the home screen footer.
+
+Background: animated anime city skyline.
+
+CORE GAME LOOP
+
+Story introduction (visual novel style dialogue)
+
+Player enters project site
+
+Player observes chaos visually
+
+Player chooses Lean actions
+
+One in-game “week” simulates
+
+Results appear visually + via metrics
+
+Characters react emotionally
+
+Player reflects and continues
+
+Repeat per chapter.
+
+VISUAL STYLE
+
+Anime-inspired characters (portrait dialogue boxes)
+
+Isometric construction/factory sites
+
+Cute workers walking around
+
+Floating Kanban cards
+
+Soft shadows
+
+Rounded UI
+
+Pastel color palette
+
+Smooth animations
+
+Use:
+
+Subtle background music
+
+Soft click sounds
+
+“Flow” whoosh sound when systems improve
+
+Congestion sounds when overloaded
+
+Tone: calming, thoughtful, satisfying.
+
+CHARACTERS
+
+Include at least:
+
+Mira (Site Engineer – overworked but smart)
+
+Rao (Contractor – pushes work aggressively)
+
+Isha (Planner – plans too much)
+
+Old Foreman (traditional mindset)
+
+They speak via dialogue boxes and react dynamically to player decisions.
+
+They have emotional states:
+
+Morale
+
+Stress
+
+Trust
+
+These change based on gameplay.
+
+GAMEPLAY SYSTEMS (LEAN AS MECHANICS)
+1. Kanban System (Core)
+
+Display an animated Kanban board:
+
+Columns:
+
+Backlog
+
+Ready
+
+In Progress
+
+Review
+
+Done
+
+Each column has adjustable WIP limits.
+
+Gameplay:
+
+Tasks are cards.
+
+Workers pull cards only if WIP allows.
+
+Exceeding WIP creates visual congestion (queues, slow movement).
+
+Balanced WIP creates smooth flow.
+
+Player directly sets WIP limits.
+
+2. Last Planner System (Weekly Planning)
+
+Once per in-game week:
+
+Player enters planning room scene.
+
+Tasks show constraint icons:
+
+Material missing
+
+Crew unavailable
+
+Approval pending
+
+Weather risk
+
+Player must remove constraints BEFORE committing.
+
+Then player selects tasks to promise.
+
+Calculate:
+PPC (Percent Plan Complete)
+
+Display PPC as progress bar + character reactions.
+
+3. 5S Mini-Game
+
+Player performs site organization:
+
+Drag tools to racks
+
+Label areas
+
+Create walking paths
+
+Clean clutter
+
+Before/after visuals.
+
+Rewards:
+
+Faster workers
+
+Reduced errors
+
+Brighter site visuals
+
+4. Pull System
+
+Downstream teams send glowing pull signals.
+
+Upstream teams cannot work unless pulled.
+
+If player pushes work manually:
+
+Inventory piles appear
+
+Waste gremlins spawn
+
+Space shrinks
+
+Pull creates smooth animation lines.
+
+5. Waste (MUDA)
+
+Seven wastes represented as little shadow gremlins/clouds:
+
+Waiting
+
+Motion
+
+Inventory
+
+Overproduction
+
+Transportation
+
+Defects
+
+Overprocessing
+
+Hovering gives hint.
+
+Applying correct Lean tool removes them with satisfying animation.
+
+PEOPLE SYSTEM
+
+Every action affects:
+
+Productivity
+
+Morale
+
+Stress
+
+Trust
+
+Example:
+Pushing work = short-term speed, long-term morale loss + defects.
+
+Characters visibly react.
+
+SCORING
+
+Create Lean Performance Index (LPI):
+
+Combine:
+
+Flow efficiency
+
+PPC
+
+WIP compliance
+
+Waste removed
+
+Inventory level
+
+Team morale
+
+Player does NOT win by speed.
+Player wins by stability and flow.
+
+CHAPTER PROGRESSION
+
+At least 5 chapters:
+
+Welcome to Flowstate (Kanban basics)
+
+The Overpromised Mall (Last Planner + PPC)
+
+Tangled Depot (5S)
+
+Assembly Alley (Pull System)
+
+Grand Transit (all systems combined)
+
+Each chapter:
+
+New constraints
+
+New story
+
+Harder decisions
+
+Multiple endings per chapter.
+
+DEBRIEF SCREEN
+
+After each chapter show:
+
+Before vs After site image
+
+Lean Performance Index
+
+Short explanation (simple language) mapping player actions → Lean concepts
+
+Character quotes
+
+Unlock badges:
+
+Kanban Master
+
+5S Champion
+
+Pull Strategist
+
+Flow Architect
+
+Keep explanations under ~120 words.
+
+UI REQUIREMENTS
+
+Friendly rounded panels
+
+Minimal jargon
+
+Tooltips appear as character dialogue
+
+Undo / retry allowed
+
+Save & continue
+
+MULTIPLAYER
+
+Do NOT implement now.
+
+Add Home Screen button:
+
+“Multiplayer — Coming Soon”
+
+TECH EXPECTATIONS
+
+Web-based game.
+
+Prefer:
+
+Canvas or game engine rendering
+
+Modular JS
+
+Simple backend optional (local save)
+
+Include:
+
+Save/load
+
+Audio toggle
+
+Performance metrics panel
+
+EDUCATIONAL GOAL
+
+User must learn Lean by:
+
+Feeling flow vs congestion
+
+Seeing visual cause-effect
+
+Making choices
+
+Observing consequences
+
+Reflecting via debrief
+
+No textbook explanations.
+
+FINAL REQUIREMENTS
+
+Must feel like a real game, not corporate training
+
+Anime-ish visuals
+
+Story-driven
+
+Choice-based
+
+Interactive
+
+Visually satisfying
+
+Lean concepts embedded in mechanics
+
+Credit “Made by Hemant Kumar” with LinkedIn link on home page
+
+Multiplayer marked as Coming Soon
