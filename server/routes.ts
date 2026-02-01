@@ -1,16 +1,81 @@
 import type { Express } from "express";
-import { createServer, type Server } from "http";
+import type { Server } from "http";
 import { storage } from "./storage";
+import { api } from "@shared/routes";
+import { z } from "zod";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  // put application routes here
-  // prefix all routes with /api
+  
+  // Load Game State
+  app.get(api.game.load.path, async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const gameState = await storage.getGameState(sessionId);
+      
+      if (!gameState) {
+        return res.status(404).json({ message: "Save file not found" });
+      }
+      
+      res.json(gameState);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
-  // use storage to perform CRUD operations on the storage interface
-  // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
+  // Save Game State (Create or Overwrite)
+  app.post(api.game.save.path, async (req, res) => {
+    try {
+      const input = api.game.save.input.parse(req.body);
+      const gameState = await storage.createOrUpdateGameState(input);
+      
+      // Determine if created (201) or updated (200) - simplified to 200 for now or strictly following REST
+      // Since our storage handles both, we'll return 200 usually, but let's check
+      res.status(200).json(gameState); 
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      console.error(err);
+      res.status(500).json({ message: "Failed to save game" });
+    }
+  });
+
+  // Update Game State (Partial)
+  app.patch(api.game.update.path, async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const input = api.game.update.input.parse(req.body);
+      
+      const gameState = await storage.updateGameState(sessionId, input);
+      res.json(gameState);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      // If not found in storage, it throws
+      res.status(404).json({ message: "Game session not found" });
+    }
+  });
+
+  // Reset/Delete Game
+  app.delete(api.game.reset.path, async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      await storage.deleteGameState(sessionId);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to reset game" });
+    }
+  });
 
   return httpServer;
 }
