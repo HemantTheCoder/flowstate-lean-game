@@ -120,6 +120,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                         <div
                                             {...provided.droppableProps}
                                             ref={provided.innerRef}
+                                            id={`col-${col.id}`}
                                             className={`min-w-[280px] md:w-[320px] flex flex-col h-full bg-slate-50 rounded-2xl border-2 transition-all ${highlightClass} ${snapshot.isDraggingOver ? 'bg-blue-50/50 border-blue-300' : ''} overflow-hidden shrink-0`}
                                         >
                                             {/* Column Header */}

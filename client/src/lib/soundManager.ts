@@ -1,4 +1,4 @@
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
 
 interface SoundManifest {
     bgm: Record<string, string>;
