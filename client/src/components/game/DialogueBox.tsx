@@ -3,7 +3,7 @@ import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const DialogueBox: React.FC = () => {
-    const { currentDialogue, dialogueIndex, advanceDialogue } = useGameStore();
+    const { currentDialogue, dialogueIndex, advanceDialogue, playerName, playerGender } = useGameStore();
 
     if (!currentDialogue) return null;
 
@@ -11,6 +11,10 @@ export const DialogueBox: React.FC = () => {
 
     // Logic to determine character side (Left/Right) or Color based on name
     const isPlayer = line.character === 'Architect';
+
+    // Dynamic Name Display
+    const displayName = isPlayer ? playerName : line.character;
+
     const colorMap: Record<string, string> = {
         'Architect': 'bg-blue-500',
         'Mira': 'bg-pink-500',
@@ -25,7 +29,7 @@ export const DialogueBox: React.FC = () => {
     const imageMap: Record<string, string> = {
         'Mira': 'mira.png',
         'Rao': 'rao.png',
-        'Architect': 'architect.png',
+        'Architect': playerGender === 'female' ? 'architect_female.png' : 'architect.png', // Default or male
         'Isha': 'mira.png', // Placeholder (Junior Planner)
         'Old Foreman': 'rao.png' // Placeholder fallback
     };
@@ -69,7 +73,7 @@ export const DialogueBox: React.FC = () => {
                     >
                         {/* Character Name Tag */}
                         <div className={`absolute -top-5 left-8 px-6 py-2 rounded-xl text-white font-black text-lg shadow-lg transform -rotate-1 ${bgColor}`}>
-                            {line.character.toUpperCase()}
+                            {displayName.toUpperCase()}
                         </div>
 
                         {/* Text Content */}

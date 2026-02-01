@@ -9,6 +9,7 @@ import { DailySummary } from '@/components/game/DailySummary'; // Import
 import { useGameStore } from '@/store/gameStore';
 import { WEEK_1_SCHEDULE } from '@/data/chapters/chapter1';
 import { DecisionModal } from '@/components/game/DecisionModal';
+import { CharacterCreationModal } from '@/components/game/CharacterCreationModal';
 
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
