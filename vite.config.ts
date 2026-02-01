@@ -4,7 +4,7 @@ import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 export default defineConfig({
-  base: '/flowstate-lean-game/', // Deployment Base URL
+  base: process.env.BASE_URL || '/', // Dynamic Base URL: GHP uses env, others use root
   plugins: [
     react(),
     runtimeErrorOverlay(),
