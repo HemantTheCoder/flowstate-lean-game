@@ -12,6 +12,7 @@ import { DecisionModal } from '@/components/game/DecisionModal';
 import { CharacterCreationModal } from '@/components/game/CharacterCreationModal';
 import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
 import { DayBriefingModal } from '@/components/game/DayBriefingModal';
+import { useGame } from '@/hooks/use-game';
 
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
@@ -22,8 +23,50 @@ export default function Game() {
   const [showDecision, setShowDecision] = useState(false);
   const [decisionProps, setDecisionProps] = useState<any>(null);
 
-  const { startDialogue, currentDialogue, day, advanceDay, week, tutorialStep, setTutorialStep, flags, setFlag } = useGameStore();
+  const {
+    startDialogue, currentDialogue, day, advanceDay, week,
+    tutorialStep, setTutorialStep, flags, setFlag, importState,
+    playerName, playerGender, funds, materials, columns, lpi
+  } = useGameStore();
+  const { saveGame, gameState, isLoading: isServerLoading } = useGame();
   const [_, navigate] = useLocation();
+
+  // 1. Hydrate Store from Server on Load
+  useEffect(() => {
+    if (gameState && !flags['hydrated']) {
+      importState(gameState);
+      setFlag('hydrated', true);
+    }
+  }, [gameState, flags, importState, setFlag]);
+
+  const handleSave = async (silent = false) => {
+    try {
+      await saveGame.mutateAsync({
+        sessionId: '', // Handled by hook
+        playerName,
+        chapter: useGameStore.getState().chapter,
+        week,
+        resources: {
+          morale: lpi.teamMorale,
+          stress: 0,
+          trust: 50,
+          productivity: 40,
+          quality: 80,
+          budget: funds
+        },
+        kanbanState: { columns } as any,
+        flags,
+        metrics: lpi as any,
+        completedChapters: [],
+        unlockedBadges: []
+      });
+      if (!silent) {
+        alert("Game Saved Successfully! 💾");
+      }
+    } catch (err) {
+      console.error("Save failed:", err);
+    }
+  };
 
   // Daily Event & Story Loader
   useEffect(() => {
@@ -90,6 +133,8 @@ export default function Game() {
   const handleNextDayStart = () => {
     setShowSummary(false);
     advanceDay();
+    // Auto-save progress
+    handleSave(true);
     // Use NEXT day (current day + 1) logic, but 'day' state updates in advanceDay?
     // advanceDay updates store, but 'day' local var here is old?
     // Better to use getState().day inside the action or pass calculated next day.
@@ -196,8 +241,16 @@ export default function Game() {
             </div>
             <div className="text-center">
               <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Morale</div>
-              <div className="font-mono font-bold text-green-500 text-sm md:text-base">{useGameStore(s => s.lpi.teamMorale)}%</div>
+              <div className="font-mono font-bold text-green-500 text-sm md:text-base">{lpi.teamMorale}%</div>
             </div>
+            <button
+              onClick={() => handleSave()}
+              disabled={saveGame.isPending}
+              className="bg-white hover:bg-slate-50 border-2 border-slate-200 p-2 rounded-lg shadow-sm transition-all active:scale-95"
+              title="Save Game"
+            >
+              {saveGame.isPending ? '⏳' : '💾'}
+            </button>
           </div>
         </motion.div>
 

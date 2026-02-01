@@ -88,6 +88,9 @@ export interface GameState {
   addMaterials: (amount: number) => void; // For debug or events
   injectWaste: () => void;
   addDailyTasks: (count: number, currentDay?: number) => void;
+
+  // Persistence
+  importState: (data: any) => void;
 }
 
 const INITIAL_COLUMNS: Column[] = [
@@ -299,5 +302,18 @@ export const useGameStore = create<GameState>((set, get) => ({
           : col
       )
     };
-  })
+  }),
+
+  importState: (data: any) => set((state) => ({
+    chapter: data.chapter ?? state.chapter,
+    day: data.day ?? state.day,
+    week: data.week ?? state.week,
+    playerName: data.playerName ?? state.playerName,
+    playerGender: data.playerGender ?? state.playerGender,
+    funds: data.resources?.budget ?? state.funds,
+    materials: data.materials ?? state.materials,
+    flags: data.flags ?? state.flags,
+    columns: data.kanbanState?.columns ?? state.columns,
+    lpi: data.metrics ?? state.lpi,
+  }))
 }));
