@@ -216,6 +216,25 @@ export class MainScene extends Phaser.Scene {
         });
     }
 
+    spawnGremlin() {
+        if (this.workers.length === 0) return;
+        const worker = Phaser.Utils.Array.GetRandom(this.workers);
+
+        // Gremlin: A small dark smoke puff (or "Muda" spirit)
+        const gremlin = this.add.circle(worker.x + (Math.random() * 40 - 20), worker.y - 20, 10, 0x1f2937, 0.8);
+        gremlin.setDepth(1000);
+
+        // Animation: Rise and fade
+        this.tweens.add({
+            targets: gremlin,
+            y: gremlin.y - 40,
+            scale: 1.5,
+            alpha: 0,
+            duration: 1500,
+            onComplete: () => gremlin.destroy()
+        });
+    }
+
     update() {
         // Get State from Zustand
         const state = useGameStore.getState();
@@ -226,6 +245,12 @@ export class MainScene extends Phaser.Scene {
         if (wipRatio > 1) {
             this.flowText.setText('Workflow: CONGESTED! (Over WIP)');
             this.flowText.setColor('#ef4444');
+
+            // Spawn Gremlins (Visual Waste)
+            if (Math.random() > 0.95) {
+                this.spawnGremlin();
+            }
+
         } else if (wipRatio > 0.8) {
             this.flowText.setText('Workflow: Busy');
             this.flowText.setColor('#f59e0b');
