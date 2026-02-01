@@ -29,7 +29,7 @@ export default function Game() {
     const dayConfig = WEEK_1_SCHEDULE.find(d => d.day === day);
     const dayKey = `day_${day}_started`;
 
-    if (dayConfig && !flags[dayKey]) {
+    if (dayConfig && !flags[dayKey] && flags['character_created']) {
       // 1. Play Dialogue
       setTimeout(() => {
         startDialogue(dayConfig.dialogue);
@@ -211,6 +211,8 @@ export default function Game() {
           options={decisionProps?.options || []}
           onSelect={decisionProps?.onSelect || (() => { })}
         />
+
+        <CharacterCreationModal />
 
         {/* Modals & Screens */}
         <AnimatePresence>
