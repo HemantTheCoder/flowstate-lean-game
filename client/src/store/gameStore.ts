@@ -94,11 +94,7 @@ const INITIAL_COLUMNS: Column[] = [
   {
     id: 'backlog',
     title: 'Backlog',
-    tasks: [
-      { ...CONSTRUCTION_TASKS[0], id: 'init-1', status: 'backlog' },
-      { ...CONSTRUCTION_TASKS[3], id: 'init-2', status: 'backlog' },
-      { ...CONSTRUCTION_TASKS[6], id: 'init-3', status: 'backlog' }
-    ],
+    tasks: CONSTRUCTION_TASKS.map(t => ({ ...t, id: uuidv4(), status: 'backlog' })),
     wipLimit: 0
   },
   { id: 'ready', title: 'Ready', tasks: [], wipLimit: 3 },
