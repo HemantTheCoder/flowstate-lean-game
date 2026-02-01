@@ -1,172 +1,192 @@
-import { useEffect } from "react";
-import { useGame } from "@/hooks/use-game";
-import { useGameStore } from "@/store/gameStore";
-import { ResourceBar } from "@/components/ResourceBar";
-import { DialogueBox, DialogueStep } from "@/components/DialogueBox";
-import { KanbanBoard } from "@/components/KanbanBoard";
-import { motion, AnimatePresence } from "framer-motion";
-import { useLocation } from "wouter";
-import { Loader2, AlertCircle } from "lucide-react";
-import { GameState } from "@shared/schema";
-
-// --- MOCK DIALOGUE DATA (In real app, fetch this or move to separate file) ---
-const CHAPTER_1_DIALOGUE: Record<string, DialogueStep> = {
-  "intro-1": {
-    id: "intro-1",
-    speaker: "Mira",
-    text: "So this is the new site... It's quieter than I expected.",
-    nextId: "intro-2"
-  },
-  "intro-2": {
-    id: "intro-2",
-    speaker: "Rao",
-    text: "Quiet? Hah! Wait until the materials arrive. If they arrive.",
-    expression: "angry",
-    options: [
-      { id: "opt1", text: "We have a schedule, Rao.", nextId: "intro-3a" },
-      { id: "opt2", text: "What seems to be the problem?", nextId: "intro-3b" }
-    ]
-  },
-  "intro-3a": {
-    id: "intro-3a",
-    speaker: "Rao",
-    text: "Schedules don't move steel beams, Architect. People do. And right now, my people are confused.",
-    nextId: "intro-kanban-tutorial"
-  },
-  "intro-3b": {
-    id: "intro-3b",
-    speaker: "Rao",
-    text: "Confusion. Nobody knows what to do next. We're stepping on each other's toes.",
-    nextId: "intro-kanban-tutorial"
-  },
-  "intro-kanban-tutorial": {
-    id: "intro-kanban-tutorial",
-    speaker: "System",
-    text: "Tutorial: Use the Kanban board to visualize work. Don't overload your team.",
-    options: [
-      { id: "start", text: "Open Board", nextId: "END_DIALOGUE", effect: () => {} }
-    ]
-  }
-};
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'wouter';
+import { GameCanvas } from '@/components/game/GameCanvas';
+import { motion, AnimatePresence } from 'framer-motion';
+import { KanbanBoard } from '@/components/game/KanbanBoard';
+import { DialogueBox } from '@/components/game/DialogueBox';
+import { TutorialOverlay } from '@/components/game/TutorialOverlay';
+import { DailySummary } from '@/components/game/DailySummary'; // Import
+import { useGameStore } from '@/store/gameStore';
+import { CHAPTER_1_INTRO, CHAPTER_1_MID, CHAPTER_1_END } from '@/data/story';
 
 export default function Game() {
-  const [, setLocation] = useLocation();
-  const { gameState, isLoading, updateGame } = useGame();
-  const { view, setView, currentDialogueId, setDialogue } = useGameStore();
+  const [showKanban, setShowKanban] = React.useState(false);
+  const [showSummary, setShowSummary] = useState(false); // Summary State
+  const [completedToday, setCompletedToday] = useState(0);
 
-  // Redirect if no game
-  useEffect(() => {
-    if (!isLoading && !gameState) {
-      setLocation("/");
+  const { startDialogue, currentDialogue, day, advanceDay, week, tutorialStep, setTutorialStep, flags, setFlag } = useGameStore();
+  const [_, navigate] = useLocation();
+
+  // Tutorial Hook
+  React.useEffect(() => {
+    if (showKanban && tutorialStep === 1) {
+      setTutorialStep(2);
     }
-  }, [isLoading, gameState, setLocation]);
+  }, [showKanban, tutorialStep, setTutorialStep]);
 
-  // Initial setup for new game
+  // Intro Dialogue Hook
   useEffect(() => {
-    if (gameState && gameState.chapter === 1 && !gameState.flags?.tutorialComplete) {
-      setDialogue("intro-1");
-      setView("visual-novel");
+    // Check if we haven't seen intro yet
+    if (!flags['intro_seen'] && day === 1) {
+      setTimeout(() => {
+        startDialogue(CHAPTER_1_INTRO);
+        setFlag('intro_seen', true);
+      }, 1000);
     }
-  }, [gameState, setDialogue, setView]);
+  }, [flags, day, startDialogue, setFlag]);
 
-  if (isLoading || !gameState) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-10 h-10 animate-spin text-primary" />
-      </div>
-    );
-  }
+  // Story Progression Hook (Chapter 1 End)
+  useEffect(() => {
+    if (tutorialStep === 99 && !currentDialogue && !flags['ch1_end_seen']) {
+      // Tutorial finished, trigger end of chapter dialogue
+      setTimeout(() => {
+        startDialogue(CHAPTER_1_END);
+        setFlag('ch1_end_seen', true);
+      }, 500);
+    }
+  }, [tutorialStep, currentDialogue, startDialogue, flags, setFlag]);
 
-  const handleDialogueNext = (nextId: string) => {
-    if (nextId === "END_DIALOGUE") {
-      setDialogue(null);
-      setView("management");
-      // Could trigger a flag update here
-      if (!gameState.flags?.tutorialComplete) {
-         updateGame.mutate({ 
-           flags: { ...gameState.flags, tutorialComplete: true },
-           // Initialize Kanban for Chapter 1 if empty
-           kanbanState: gameState.kanbanState || {
-             columns: [
-               { id: "todo", title: "To Do", wipLimit: 5, taskIds: ["t1", "t2"] },
-               { id: "doing", title: "In Progress", wipLimit: 3, taskIds: [] },
-               { id: "done", title: "Done", wipLimit: 10, taskIds: [] }
-             ],
-             tasks: {
-               "t1": { id: "t1", title: "Site Survey", type: "task", difficulty: 1, status: "todo" },
-               "t2": { id: "t2", title: "Material Check", type: "task", difficulty: 1, status: "todo" }
-             }
-           }
-         });
-      }
-    } else {
-      setDialogue(nextId);
+  // Educational Moment: Bottleneck Warning (Mid-Chapter)
+  useEffect(() => {
+    const state = useGameStore.getState();
+    const doingCount = state.columns.find(c => c.id === 'doing')?.tasks.length || 0;
+
+    if (tutorialStep === 99 && doingCount >= 2 && !flags['ch1_mid_seen'] && !currentDialogue) {
+      setTimeout(() => {
+        startDialogue(CHAPTER_1_MID);
+        setFlag('ch1_mid_seen', true);
+      }, 1000);
+    }
+  }, [day, tutorialStep, currentDialogue, startDialogue, flags, setFlag]); // Check on day change or updates
+
+  const handleEndDay = () => {
+    const todaysCompleted = useGameStore.getState().columns.find(c => c.id === 'done')?.tasks.length || 0;
+    setCompletedToday(todaysCompleted);
+    setShowSummary(true); // Show Modal instead of immediate advance
+  };
+
+  const handleNextDayStart = () => {
+    setShowSummary(false);
+    advanceDay();
+    // Check for Friday
+    const isFriday = day % 5 === 0;
+    if (isFriday) {
+      navigate('/debrief');
     }
   };
 
-  const handleKanbanUpdate = (newKanbanState: NonNullable<GameState["kanbanState"]>) => {
-    // Optimistic update would go here if we were syncing real-time
-    updateGame.mutate({ kanbanState: newKanbanState });
+  // Smart Advisor Logic
+  const getSmartObjective = () => {
+    if (tutorialStep < 99) return "Follow the Tutorial arrows to learn the basics! ⬇️";
+
+    const cols = useGameStore.getState().columns;
+    const doing = cols.find(c => c.id === 'doing');
+    const ready = cols.find(c => c.id === 'ready');
+
+    if (doing && doing.tasks.length >= doing.wipLimit) {
+      return "⛔ BOTTLENECK detected! Finish tasks in 'Doing' to clear space.";
+    }
+    if (ready && ready.tasks.length === 0) {
+      return "⚠️ STARVATION risk! Pull a task from Backlog to 'Ready'.";
+    }
+    if (doing && doing.tasks.length === 0 && ready && ready.tasks.length > 0) {
+      return "📉 IDLE CREWS! Move a task from 'Ready' to 'Doing'.";
+    }
+
+    return "✅ Flow is stable. Keep moving tasks to 'Done' to earn funds!";
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-background">
-      {/* Persistent Resource Bar */}
-      {gameState.resources && <ResourceBar resources={gameState.resources} />}
+    <div className="w-full h-screen relative overflow-hidden">
+      {/* 1. Phaser Layer (Background) */}
+      <GameCanvas />
 
-      {/* Main Content Area */}
-      <AnimatePresence mode="wait">
-        
-        {/* Visual Novel View */}
-        {view === "visual-novel" && currentDialogueId && (
-          <motion.div
-            key="vn-view"
-            className="absolute inset-0 z-20"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            {/* Background Image for VN */}
-            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=1920&q=80')] bg-cover bg-center opacity-50" />
-            
-            <DialogueBox 
-              dialogue={CHAPTER_1_DIALOGUE[currentDialogueId] || { id: "err", speaker: "Error", text: "Missing dialogue ID" }} 
-              onNext={handleDialogueNext}
-            />
-          </motion.div>
-        )}
+      {/* 2. UI Overlay Layer (HUD, Dialogues, Windows) */}
+      <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-4">
 
-        {/* Management View (Kanban) */}
-        {view === "management" && gameState.kanbanState && (
-          <motion.div
-            key="mgmt-view"
-            className="absolute inset-0 pt-20 pb-4 bg-gradient-to-br from-blue-50 to-indigo-50/50"
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 1.05, opacity: 0 }}
-          >
-            <div className="container mx-auto h-full flex flex-col">
-              <div className="px-8 mb-4 flex justify-between items-end">
-                <div>
-                  <h2 className="text-2xl font-display font-bold text-gray-800">Site Management</h2>
-                  <p className="text-muted-foreground">Week {gameState.week} • {gameState.chapter === 1 ? "Basics" : "Advanced"}</p>
-                </div>
-                <div className="bg-white/50 px-4 py-2 rounded-xl text-sm font-bold text-primary border border-white/50">
-                   Target: Complete all "To Do" items
-                </div>
-              </div>
-              
-              <div className="flex-1 overflow-hidden">
-                <KanbanBoard 
-                  kanbanState={gameState.kanbanState} 
-                  onUpdate={handleKanbanUpdate} 
-                />
+        {/* Top Bar: Resources & Stats */}
+        <motion.div
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="flex justify-between items-start pointer-events-auto"
+        >
+          <div className="flex gap-4">
+            <div className="bg-white/90 backdrop-blur-md p-4 rounded-xl shadow-md border-2 border-slate-100 min-w-[300px]">
+              <h3 className="font-bold text-slate-700">Week {week} | Day {day}</h3>
+              <div className="text-sm text-slate-500 font-medium">Current Focus:</div>
+              <div className="text-sm text-blue-600 animate-pulse font-bold mt-1">
+                {getSmartObjective()}
               </div>
             </div>
-          </motion.div>
-        )}
 
-      </AnimatePresence>
+            <button
+              onClick={handleEndDay}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 py-2 rounded-xl shadow-md transition-colors h-fit self-center border-b-4 border-blue-700 active:border-b-0 active:translate-y-1"
+            >
+              End Day ☀️
+            </button>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur-md p-4 rounded-xl shadow-md border-2 border-slate-100 flex gap-6">
+            <div className="text-center">
+              <div className="text-xs font-bold text-slate-400 uppercase">Funds</div>
+              <div className="font-mono font-bold text-blue-600">${useGameStore(s => s.funds)}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xs font-bold text-slate-400 uppercase">Morale</div>
+              <div className="font-mono font-bold text-green-500">{useGameStore(s => s.lpi.teamMorale)}%</div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Bottom Bar: Toolbar */}
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="flex justify-center pointer-events-auto pb-4"
+        >
+          <div className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-2xl shadow-lg border-2 border-slate-100">
+            <div className="flex gap-4 items-center">
+              <button
+                id="btn-kanban"
+                onClick={() => setShowKanban(true)}
+                className="bg-white/90 backdrop-blur-sm p-4 rounded-2xl shadow-xl hover:scale-105 transition-transform group relative"
+              >
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                  📊
+                </div>
+                <span className="text-xs font-bold text-slate-600">Kanban</span>
+              </button>
+              <button
+                onClick={() => setShowKanban(false)}
+                className="flex flex-col items-center gap-1 group"
+              >
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                  🏗️
+                </div>
+                <span className="text-xs font-bold text-slate-600">Site</span>
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Overlays */}
+        <DialogueBox />
+
+        <TutorialOverlay showKanban={showKanban} />
+
+        {/* Modals & Screens */}
+        <AnimatePresence>
+          {showKanban && <KanbanBoard onClose={() => setShowKanban(false)} />}
+        </AnimatePresence>
+
+        <DailySummary
+          isOpen={showSummary}
+          onClose={handleNextDayStart}
+          completedTasks={completedToday}
+        />
+
+      </div>
     </div>
   );
 }
