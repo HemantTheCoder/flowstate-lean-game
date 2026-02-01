@@ -5,6 +5,7 @@ export class MainScene extends Phaser.Scene {
     private workers: Phaser.GameObjects.Sprite[] = [];
     private flowText!: Phaser.GameObjects.Text;
     private ground!: Phaser.GameObjects.TileSprite;
+    private rainEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
 
     constructor() {
         super('MainScene');
@@ -40,6 +41,27 @@ export class MainScene extends Phaser.Scene {
             }
         }
 
+        // Rain Particles (initially paused)
+        this.rainEmitter = this.add.particles(0, 0, 'rain_drop', {
+            x: { min: 0, max: width },
+            y: 0,
+            lifespan: 1000,
+            speedY: { min: 400, max: 600 },
+            speedX: { min: -50, max: 50 },
+            scale: { start: 0.5, end: 0.5 },
+            quantity: 4,
+            blendMode: 'ADD',
+            emitting: false
+        });
+
+        // Generate a tiny rect for rain if missing
+        if (!this.textures.exists('rain_drop')) {
+            const g = this.make.graphics({ x: 0, y: 0, add: false });
+            g.fillStyle(0xa5f3fc, 0.6);
+            g.fillRect(0, 0, 2, 10);
+            g.generateTexture('rain_drop', 2, 10);
+        }
+
         // 3. Add Workers - Distributed across the screen
         const workerTypes = ['worker_blue', 'worker_orange', 'worker_green'];
 
@@ -50,7 +72,16 @@ export class MainScene extends Phaser.Scene {
             const type = Phaser.Math.RND.pick(workerTypes);
 
             const worker = this.add.sprite(startX, startY, type);
-            worker.setScale(1.2); // SVGs are small (64x64), scale up slightly
+            worker.setScale(1.2);
+
+            // Interactivity
+            worker.setInteractive({ cursor: 'pointer' });
+            worker.on('pointerover', () => worker.setScale(1.4));
+            worker.on('pointerout', () => worker.setScale(1.2));
+            worker.on('pointerdown', () => {
+                this.spawnWorkerBark("I'm fast!");
+                this.tweens.add({ targets: worker, y: '-=10', duration: 100, yoyo: true });
+            });
 
             // Random velocity
             (worker as any).vx = (Math.random() - 0.5) * 1.5;
@@ -238,6 +269,16 @@ export class MainScene extends Phaser.Scene {
     update() {
         // Get State from Zustand
         const state = useGameStore.getState();
+
+        // Weather Check
+        if (state.flags['weather_rain']) {
+            this.rainEmitter.start();
+            this.ground.setTint(0x888888); // Darken ground
+        } else {
+            this.rainEmitter.stop();
+            this.ground.clearTint();
+        }
+
         const doingCol = state.columns.find(c => c.id === 'doing');
         const wipRatio = doingCol ? doingCol.tasks.length / doingCol.wipLimit : 0.5;
 
