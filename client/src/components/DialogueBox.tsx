@@ -76,17 +76,17 @@ export function DialogueBox({ dialogue, onNext }: DialogueBoxProps) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end pointer-events-none">
       {/* Character Portraits Area */}
-      <div className="flex justify-center items-end h-full pb-24 space-x-8 pointer-events-none">
+      <div className="flex justify-start items-end h-full pb-32 pl-12 space-x-8 pointer-events-none">
         <AnimatePresence mode="wait">
           {dialogue.speaker && getSpeakerImage(dialogue.speaker) && (
             <motion.img
               key={dialogue.speaker}
-              initial={{ y: 50, opacity: 0, scale: 0.9 }}
-              animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 50, opacity: 0, scale: 0.9 }}
+              initial={{ x: -50, opacity: 0, scale: 0.9 }}
+              animate={{ x: 0, opacity: 1, scale: 1 }}
+              exit={{ x: -50, opacity: 0, scale: 0.9 }}
               src={getSpeakerImage(dialogue.speaker)!}
               alt={dialogue.speaker}
-              className="h-[40vh] md:h-[50vh] object-contain drop-shadow-2xl"
+              className="h-[45vh] md:h-[55vh] object-contain drop-shadow-2xl mix-blend-multiply"
             />
           )}
         </AnimatePresence>
@@ -97,14 +97,14 @@ export function DialogueBox({ dialogue, onNext }: DialogueBoxProps) {
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
-        className="pointer-events-auto w-full max-w-4xl mx-auto mb-8 px-4"
+        className="pointer-events-auto w-full max-w-5xl mx-auto mb-8 px-4"
       >
         <div 
-          className="bg-white/90 backdrop-blur-xl border-2 border-white/50 shadow-xl rounded-3xl p-6 md:p-8 relative overflow-hidden"
+          className="bg-white/95 backdrop-blur-xl border-2 border-white/50 shadow-2xl rounded-3xl p-6 md:p-8 relative overflow-visible"
           onClick={handleSkip}
         >
           {/* Speaker Name Tag */}
-          <div className={`absolute -top-6 left-8 bg-white px-6 py-2 rounded-full border-2 shadow-sm font-display font-bold text-lg z-10 ${getSpeakerColor(dialogue.speaker)}`}>
+          <div className={`absolute -top-4 left-8 bg-white px-6 py-1.5 rounded-full border-2 shadow-sm font-display font-bold text-lg z-20 ${getSpeakerColor(dialogue.speaker)}`}>
             {dialogue.speaker}
           </div>
 
