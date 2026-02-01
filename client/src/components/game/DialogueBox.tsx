@@ -80,7 +80,7 @@ export const DialogueBox: React.FC = () => {
 
                         {/* Text Content */}
                         <p className="text-xl md:text-2xl text-slate-800 font-medium leading-relaxed font-sans mt-2">
-                            {line.text}
+                            {line.text.replace(/Engineer/g, playerName)}
                         </p>
 
                         {/* Continue Indicator */}

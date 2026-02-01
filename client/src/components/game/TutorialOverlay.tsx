@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+// Reading file to check for IDs...
 import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -37,10 +37,13 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
             }
         };
 
-        // Update on mount, resize, and step change
-        updateSpotlight();
+        // Update with short delay to allow DOM (KanbanBoard) to mount
+        const timer = setTimeout(updateSpotlight, 300);
         window.addEventListener('resize', updateSpotlight);
-        return () => window.removeEventListener('resize', updateSpotlight);
+        return () => {
+            window.removeEventListener('resize', updateSpotlight);
+            clearTimeout(timer);
+        };
     }, [tutorialStep, tutorialActive, showKanban]);
 
 
