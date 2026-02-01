@@ -110,7 +110,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   week: 1,
   phase: 'action',
 
-  playerName: 'Architect',
+  playerName: 'Engineer',
   playerGender: 'male',
   setPlayerProfile: (name, gender) => set({ playerName: name, playerGender: gender }),
 
