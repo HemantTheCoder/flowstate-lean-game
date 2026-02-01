@@ -63,11 +63,33 @@ export function DialogueBox({ dialogue, onNext }: DialogueBoxProps) {
     }
   };
 
+  const getSpeakerImage = (speaker: string) => {
+    switch (speaker) {
+      case "Mira": return "/images/mira.png";
+      case "Rao": return "/images/rao.png";
+      case "Isha": return "/images/isha.png";
+      case "Old Foreman": return "/images/foreman.png";
+      default: return null;
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end pointer-events-none">
-      {/* Character Portraits Area - Placeholder for now */}
-      <div className="flex justify-center items-end h-full pb-32 space-x-8 pointer-events-none">
-         {/* Could animate portraits in/out here */}
+      {/* Character Portraits Area */}
+      <div className="flex justify-center items-end h-full pb-24 space-x-8 pointer-events-none">
+        <AnimatePresence mode="wait">
+          {dialogue.speaker && getSpeakerImage(dialogue.speaker) && (
+            <motion.img
+              key={dialogue.speaker}
+              initial={{ y: 50, opacity: 0, scale: 0.9 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 50, opacity: 0, scale: 0.9 }}
+              src={getSpeakerImage(dialogue.speaker)!}
+              alt={dialogue.speaker}
+              className="h-[40vh] md:h-[50vh] object-contain drop-shadow-2xl"
+            />
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Dialogue UI */}
@@ -82,7 +104,7 @@ export function DialogueBox({ dialogue, onNext }: DialogueBoxProps) {
           onClick={handleSkip}
         >
           {/* Speaker Name Tag */}
-          <div className={`absolute -top-5 left-8 bg-white px-6 py-2 rounded-full border-2 shadow-sm font-display font-bold text-lg ${getSpeakerColor(dialogue.speaker)}`}>
+          <div className={`absolute -top-6 left-8 bg-white px-6 py-2 rounded-full border-2 shadow-sm font-display font-bold text-lg z-10 ${getSpeakerColor(dialogue.speaker)}`}>
             {dialogue.speaker}
           </div>
 
