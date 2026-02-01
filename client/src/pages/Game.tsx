@@ -121,7 +121,7 @@ export default function Game() {
 
             <button
               onClick={handleEndDay}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center border-b-4 border-blue-700 text-sm md:text-base whitespace-nowrap"
+              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center border-b-4 border-blue-700 text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') ? 'animate-bounce ring-4 ring-yellow-400' : ''}`}
             >
               End Day ☀️
             </button>
