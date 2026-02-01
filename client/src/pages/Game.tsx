@@ -108,33 +108,33 @@ export default function Game() {
         <motion.div
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="flex justify-between items-start pointer-events-auto"
+          className="flex flex-col md:flex-row justify-between items-start pointer-events-auto gap-4 w-full md:w-auto"
         >
-          <div className="flex gap-4">
-            <div className="bg-white/90 backdrop-blur-md p-4 rounded-xl shadow-md border-2 border-slate-100 min-w-[300px]">
-              <h3 className="font-bold text-slate-700">Week {week} | Day {day}</h3>
-              <div className="text-sm text-slate-500 font-medium">Current Focus:</div>
-              <div className="text-sm text-blue-600 animate-pulse font-bold mt-1">
+          <div className="flex gap-4 w-full md:w-auto">
+            <div className="bg-white/90 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border-2 border-slate-100 w-full md:min-w-[300px] md:w-auto flex-1">
+              <h3 className="font-bold text-slate-700 text-sm md:text-base">Week {week} | Day {day}</h3>
+              <div className="text-xs md:text-sm text-slate-500 font-medium">Current Focus:</div>
+              <div className="text-xs md:text-sm text-blue-600 animate-pulse font-bold mt-1 leading-tight">
                 {getSmartObjective()}
               </div>
             </div>
 
             <button
               onClick={handleEndDay}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 py-2 rounded-xl shadow-md transition-colors h-fit self-center border-b-4 border-blue-700 active:border-b-0 active:translate-y-1"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center border-b-4 border-blue-700 text-sm md:text-base whitespace-nowrap"
             >
               End Day ☀️
             </button>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-md p-4 rounded-xl shadow-md border-2 border-slate-100 flex gap-6">
+          <div className="bg-white/90 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border-2 border-slate-100 flex gap-4 md:gap-6 w-full md:w-auto justify-around">
             <div className="text-center">
-              <div className="text-xs font-bold text-slate-400 uppercase">Funds</div>
-              <div className="font-mono font-bold text-blue-600">${useGameStore(s => s.funds)}</div>
+              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Funds</div>
+              <div className="font-mono font-bold text-blue-600 text-sm md:text-base">${useGameStore(s => s.funds)}</div>
             </div>
             <div className="text-center">
-              <div className="text-xs font-bold text-slate-400 uppercase">Morale</div>
-              <div className="font-mono font-bold text-green-500">{useGameStore(s => s.lpi.teamMorale)}%</div>
+              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Morale</div>
+              <div className="font-mono font-bold text-green-500 text-sm md:text-base">{useGameStore(s => s.lpi.teamMorale)}%</div>
             </div>
           </div>
         </motion.div>

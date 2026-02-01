@@ -20,36 +20,36 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-8"
+            className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 md:p-8"
             onClick={(e) => {
                 // Close if clicking outside
                 if (e.target === e.currentTarget) onClose();
             }}
         >
-            <div className="bg-slate-100 w-full h-full max-w-6xl rounded-3xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto">
+            <div className="bg-slate-100 w-full h-full max-w-6xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto">
 
                 {/* Header */}
-                <div className="bg-white p-6 shadow-sm flex justify-between items-center z-10">
+                <div className="bg-white p-4 md:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center z-10 gap-4">
                     <div>
-                        <h2 className="text-3xl font-black text-slate-800">Project Board</h2>
+                        <h2 className="text-2xl md:text-3xl font-black text-slate-800">Project Board</h2>
                         <div className="flex gap-4 mt-2">
-                            <div className="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg font-mono font-bold border border-blue-100">
+                            <div className="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg font-mono font-bold border border-blue-100 text-xs md:text-sm">
                                 Funds: ${funds}
                             </div>
-                            <div className="px-3 py-1 bg-amber-50 text-amber-700 rounded-lg font-mono font-bold border border-amber-100">
+                            <div className="px-3 py-1 bg-amber-50 text-amber-700 rounded-lg font-mono font-bold border border-amber-100 text-xs md:text-sm">
                                 Materials: {materials}
                             </div>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2 rounded-xl font-bold transition-colors"
+                        className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2 rounded-xl font-bold transition-colors w-full md:w-auto"
                     >
                         Close
                     </button>
                 </div>
                 {/* Columns Grid */}
-                <div className="flex-1 flex gap-6 p-6 overflow-x-auto">
+                <div className="flex-1 flex flex-col md:flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-auto">
                     {columns.map(col => {
                         // Advisor Logic for Visual Cues
                         let highlightClass = "border-slate-200";
@@ -65,7 +65,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                         }
 
                         return (
-                            <div key={col.id} id={`col-${col.id}`} className={`min-w-[280px] w-full max-w-sm flex flex-col h-full bg-slate-50 rounded-2xl border-2 transition-all ${highlightClass} overflow-hidden`}>
+                            <div key={col.id} id={`col-${col.id}`} className={`min-w-full md:min-w-[280px] md:max-w-sm flex flex-col h-auto md:h-full bg-slate-50 rounded-2xl border-2 transition-all ${highlightClass} overflow-hidden shrink-0`}>
                                 {/* Column Header */}
                                 <div className={`${col.id === 'done' ? 'bg-green-100' : 'bg-white'} p-4 border-b border-slate-100`}>
                                     <div className="flex justify-between items-center mb-1">
