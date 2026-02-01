@@ -56,7 +56,7 @@ export class MainScene extends Phaser.Scene {
 
         // Generate a tiny rect for rain if missing
         if (!this.textures.exists('rain_drop')) {
-            const g = this.make.graphics({ x: 0, y: 0, add: false });
+            const g = this.make.graphics({ x: 0, y: 0 });
             g.fillStyle(0xa5f3fc, 0.6);
             g.fillRect(0, 0, 2, 10);
             g.generateTexture('rain_drop', 2, 10);

@@ -30,7 +30,7 @@ export class BootScene extends Phaser.Scene {
         // Generate Placeholder Textures if assets missing (Fallback)
         // 1. Ground
         if (!this.textures.exists('ground')) {
-            const g = this.make.graphics({ x: 0, y: 0, add: false });
+            const g = this.make.graphics({ x: 0, y: 0 });
             g.fillStyle(0xe5e7eb, 1); // Slate-200
             g.fillRect(0, 0, 64, 64);
             g.generateTexture('ground', 64, 64);
@@ -40,7 +40,7 @@ export class BootScene extends Phaser.Scene {
         const colors = { 'worker_blue': 0x3b82f6, 'worker_orange': 0xf97316, 'worker_green': 0x22c55e };
         Object.entries(colors).forEach(([key, color]) => {
             if (!this.textures.exists(key)) {
-                const g = this.make.graphics({ x: 0, y: 0, add: false });
+                const g = this.make.graphics({ x: 0, y: 0 });
                 g.fillStyle(color, 1);
                 g.fillCircle(32, 32, 20); // Circle body
                 g.fillStyle(0xffffff, 1); // Helmet
