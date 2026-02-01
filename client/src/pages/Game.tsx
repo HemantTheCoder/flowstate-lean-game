@@ -222,6 +222,7 @@ export default function Game() {
         />
 
         <CharacterCreationModal />
+        <ChapterIntroModal />
 
         {/* Modals & Screens */}
         <AnimatePresence>

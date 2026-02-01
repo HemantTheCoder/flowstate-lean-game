@@ -272,7 +272,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       reward: 0,
       status: 'doing',
       type: 'defect' as any, // Cast if not in TaskType union yet
-      leanTip: "Pushing work creates defects!"
+      leanTip: "Pushing work creates defects!",
+      difficulty: 2 // Difficulty is a number (1-3)
     };
 
     return {
