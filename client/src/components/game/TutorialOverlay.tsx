@@ -11,8 +11,11 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
     const [spotlightPos, setSpotlightPos] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
 
     // Dynamic Spotlight Logic
+    // Dynamic Spotlight Logic
     useEffect(() => {
         if (!tutorialActive) return;
+
+        let animationFrameId: number;
 
         const updateSpotlight = () => {
             let targetId = '';
@@ -35,14 +38,16 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
             } else {
                 setSpotlightPos(null);
             }
+
+            // Loop
+            animationFrameId = requestAnimationFrame(updateSpotlight);
         };
 
-        // Update with short delay to allow DOM (KanbanBoard) to mount
-        const timer = setTimeout(updateSpotlight, 300);
-        window.addEventListener('resize', updateSpotlight);
+        // Start loop
+        updateSpotlight();
+
         return () => {
-            window.removeEventListener('resize', updateSpotlight);
-            clearTimeout(timer);
+            cancelAnimationFrame(animationFrameId);
         };
     }, [tutorialStep, tutorialActive, showKanban]);
 
