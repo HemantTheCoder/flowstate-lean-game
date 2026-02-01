@@ -3,7 +3,7 @@ import { useGameStore, Column, Task } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-    const { columns, moveTask, setWipLimit, funds, materials, tutorialStep, setTutorialStep } = useGameStore();
+    const { columns, moveTask, setWipLimit, funds, materials, tutorialStep, setTutorialStep, day } = useGameStore();
 
     const handleTaskClick = (task: Task, currentColumn: Column) => {
         // Simple logic: move to next column if possible
