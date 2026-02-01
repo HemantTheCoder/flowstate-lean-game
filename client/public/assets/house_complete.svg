@@ -1,0 +1,24 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(32, 48)">
+    <!-- Shadow -->
+    <ellipse cx="0" cy="4" rx="20" ry="10" fill="rgba(0,0,0,0.2)" />
+    
+    <!-- Left Wall (Base) -->
+    <path d="M0,0 L-16,-8 L-16,-24 L0,-16 Z" fill="#d97706" />
+    <!-- Right Wall (Base) -->
+    <path d="M0,0 L16,-8 L16,-24 L0,-16 Z" fill="#b45309" />
+    <!-- Roof Base (Ceiling) -->
+    <path d="M0,-16 L16,-24 L0,-32 L-16,-24 Z" fill="#fcd34d" />
+    
+    <!-- Roof Left -->
+    <path d="M0,-32 L-16,-24 L0,-44 Z" fill="#ef4444" />
+    <!-- Roof Right -->
+    <path d="M0,-32 L16,-24 L0,-44 Z" fill="#dc2626" />
+    
+    <!-- Door -->
+    <path d="M-10,-5 L-10,-18 L-4,-15 L-4,-2 Z" fill="#78350f" />
+    
+    <!-- Side Window -->
+    <path d="M6,-14 L12,-17 L12,-21 L6,-18 Z" fill="#bfdbfe" />
+  </g>
+</svg>

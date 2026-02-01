@@ -3,6 +3,7 @@ import { useGameStore } from '@/store/gameStore';
 
 export class MainScene extends Phaser.Scene {
     private workers: Phaser.GameObjects.Sprite[] = [];
+    private unsubscribe?: () => void;
     private flowText!: Phaser.GameObjects.Text;
     private ground!: Phaser.GameObjects.TileSprite;
     private rainEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -103,7 +104,7 @@ export class MainScene extends Phaser.Scene {
         const store = useGameStore;
 
         // Subscribe to task changes to spawn buildings & show insights
-        store.subscribe((state, prevState) => {
+        this.unsubscribe = store.subscribe((state, prevState) => {
             const prevDone = prevState.columns.find(c => c.id === 'done')?.tasks.length || 0;
             const currDone = state.columns.find(c => c.id === 'done')?.tasks.length || 0;
 
@@ -134,6 +135,14 @@ export class MainScene extends Phaser.Scene {
         this.scale.on('resize', this.resize, this);
 
         this.setupFlowText();
+
+        // Cleanup on shutdown
+        this.events.on('shutdown', () => {
+            if (this.unsubscribe) {
+                this.unsubscribe();
+                this.unsubscribe = undefined;
+            }
+        });
     }
 
     resize(gameSize: Phaser.Structs.Size) {
@@ -181,13 +190,23 @@ export class MainScene extends Phaser.Scene {
             duration: 1000,
             ease: 'Back.out',
             onComplete: () => {
-                // Settle down
+                // Settle down then fade out
                 this.tweens.add({
                     targets: building,
                     y: y,
                     scaleY: 1,
                     duration: 500,
-                    ease: 'Bounce.out'
+                    ease: 'Bounce.out',
+                    onComplete: () => {
+                        // Fade out after a delay to prevent clutter
+                        this.tweens.add({
+                            targets: building,
+                            alpha: 0,
+                            delay: 2000,
+                            duration: 1000,
+                            onComplete: () => building.destroy()
+                        });
+                    }
                 });
             }
         });
