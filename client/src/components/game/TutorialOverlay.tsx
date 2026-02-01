@@ -102,7 +102,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 <div className="text-5xl animate-bounce mb-2 text-center">⬇️</div>
                                 <div className="bg-orange-500 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
                                     <p className="font-bold text-lg">Step 1: PULL</p>
-                                    <p className="text-sm">Click a task here to move it to <b>Ready</b>.</p>
+                                    <p className="text-sm"><b>Drag</b> a task from here to <b>Ready</b>.</p>
                                 </div>
                             </motion.div>
                         )}
@@ -117,7 +117,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 <div className="text-5xl animate-bounce mb-2 text-center">⬇️</div>
                                 <div className="bg-purple-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
                                     <p className="font-bold text-lg">Step 2: START</p>
-                                    <p className="text-sm">Move to <b>Doing</b> to start work. <br />(Commits Materials)</p>
+                                    <p className="text-sm"><b>Drag</b> it to <b>Doing</b> to start work. <br />(Commits Materials)</p>
                                 </div>
                             </motion.div>
                         )}
@@ -132,7 +132,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 <div className="text-5xl animate-bounce mb-2 text-center">⬇️</div>
                                 <div className="bg-green-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
                                     <p className="font-bold text-lg">Step 3: FINISH</p>
-                                    <p className="text-sm">Move to <b>Done</b> to get Paid! <br />(Value Added)</p>
+                                    <p className="text-sm"><b>Drag</b> it to <b>Done</b> to get Paid! <br />(Value Added)</p>
                                 </div>
                             </motion.div>
                         )}
