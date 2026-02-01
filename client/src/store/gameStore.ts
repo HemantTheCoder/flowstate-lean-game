@@ -24,7 +24,12 @@ export interface GameState {
   chapter: number;
   day: number;
   week: number;
-  phase: 'planning' | 'action' | 'review'; // New: Daily Cycle Phase
+  phase: 'planning' | 'action' | 'review';
+
+  // Player Profile
+  playerName: string;
+  playerGender: 'male' | 'female';
+  setPlayerProfile: (name: string, gender: 'male' | 'female') => void;
 
   // Tutorial
   tutorialActive: boolean;
@@ -103,7 +108,11 @@ export const useGameStore = create<GameState>((set, get) => ({
   chapter: 1,
   day: 1,
   week: 1,
-  phase: 'action', // Default start in Action mode
+  phase: 'action',
+
+  playerName: 'Architect',
+  playerGender: 'male',
+  setPlayerProfile: (name, gender) => set({ playerName: name, playerGender: gender }),
 
   tutorialActive: true,
   tutorialStep: 0,
