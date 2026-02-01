@@ -134,8 +134,26 @@ export default function Game() {
     }
 
     // 4. Prep Work
+    // 4. Prep Work
     if (readyCount === 0 && backlogCount > 0) {
-      return "📋 PLAN NEXT: Pull a task from Backlog to 'Ready'.";
+      // Check if we can actually PULL anything
+      const affordAnything = backlog?.tasks.some(t => materials >= t.cost);
+      if (affordAnything) {
+        return "📋 PLAN NEXT: Pull a task from Backlog to 'Ready'.";
+      }
+    }
+
+    // 5. RESOURCE/STORY LOCK (The user requests this prompt)
+    // If we have no affordable tasks and nothing in progress, force End Day.
+    const allPending = [...(backlog?.tasks || []), ...(ready?.tasks || [])];
+    const canPlayAny = allPending.some(t => {
+      const isAffordable = materials >= t.cost;
+      const isRainBlocked = day === 3 && t.type === 'Structural';
+      return isAffordable && !isRainBlocked;
+    });
+
+    if (!canPlayAny && doingCount === 0) {
+      return "⛔ NO MOVES LEFT! (Materials/Weather). End the Day to continue. 🌙";
     }
 
     return "✅ Flow is stable. Keep moving tasks to 'Done' to earn funds!";
