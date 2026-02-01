@@ -3,15 +3,25 @@ import { useGameStore, Column, Task } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-    const { columns, moveTask, setWipLimit, funds, materials } = useGameStore();
+    const { columns, moveTask, setWipLimit, funds, materials, tutorialStep, setTutorialStep } = useGameStore();
 
     const handleTaskClick = (task: Task, currentColumn: Column) => {
         // Simple logic: move to next column if possible
-        // In a real game, this might be drag and drop.
         const colIndex = columns.findIndex(c => c.id === currentColumn.id);
         if (colIndex < columns.length - 1) {
             const nextCol = columns[colIndex + 1];
             moveTask(task.id, currentColumn.id, nextCol.id);
+
+            // Tutorial Logic: Advance Steps based on moves
+            if (tutorialStep === 2 && currentColumn.id === 'backlog' && nextCol.id === 'ready') {
+                setTutorialStep(3); // Moved to Ready
+            }
+            if (tutorialStep === 3 && currentColumn.id === 'ready' && nextCol.id === 'doing') {
+                setTutorialStep(4); // Moved to Doing
+            }
+            if (tutorialStep === 4 && currentColumn.id === 'doing' && nextCol.id === 'done') {
+                setTutorialStep(5); // Moved to Done (Finish)
+            }
         }
     };
 
