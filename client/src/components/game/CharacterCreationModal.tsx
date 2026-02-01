@@ -17,7 +17,7 @@ export const CharacterCreationModal: React.FC = () => {
     };
 
     return (
-        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-900 px-4">
+        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-900/95 px-4 pointer-events-auto">
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -25,13 +25,13 @@ export const CharacterCreationModal: React.FC = () => {
             >
                 <div className="bg-blue-600 p-8 text-white text-center">
                     <h1 className="text-3xl font-black uppercase tracking-widest">New Hire</h1>
-                    <p className="opacity-80 mt-2">Create your Architect Profile</p>
+                    <p className="opacity-80 mt-2">Create your Engineer Profile</p>
                 </div>
 
                 <div className="p-8 space-y-8">
                     {/* Name Input */}
                     <div>
-                        <label className="block text-sm font-bold text-slate-500 uppercase mb-2">Architect Name</label>
+                        <label className="block text-sm font-bold text-slate-500 uppercase mb-2">Engineer Name</label>
                         <input
                             type="text"
                             value={name}

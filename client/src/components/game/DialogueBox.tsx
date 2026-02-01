@@ -10,12 +10,13 @@ export const DialogueBox: React.FC = () => {
     const line = currentDialogue[dialogueIndex];
 
     // Logic to determine character side (Left/Right) or Color based on name
-    const isPlayer = line.character === 'Architect';
+    const isPlayer = line.character === 'Engineer' || line.character === 'Architect';
 
     // Dynamic Name Display
     const displayName = isPlayer ? playerName : line.character;
 
     const colorMap: Record<string, string> = {
+        'Engineer': 'bg-blue-500',
         'Architect': 'bg-blue-500',
         'Mira': 'bg-pink-500',
         'Rao': 'bg-orange-600',
@@ -29,7 +30,8 @@ export const DialogueBox: React.FC = () => {
     const imageMap: Record<string, string> = {
         'Mira': 'mira.png',
         'Rao': 'rao.png',
-        'Architect': playerGender === 'female' ? 'architect_female.png' : 'architect.png', // Default or male
+        'Engineer': playerGender === 'female' ? 'architect_female.png' : 'architect.png',
+        'Architect': playerGender === 'female' ? 'architect_female.png' : 'architect.png',
         'Isha': 'mira.png', // Placeholder (Junior Planner)
         'Old Foreman': 'rao.png' // Placeholder fallback
     };
