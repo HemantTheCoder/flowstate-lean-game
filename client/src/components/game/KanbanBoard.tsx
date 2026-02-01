@@ -134,9 +134,16 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                 <p className="text-xs text-slate-400 line-clamp-2 mt-1">{task.description}</p>
 
                                                 {/* Economy Tags */}
-                                                <div className="mt-2 flex gap-2 text-xs font-mono font-bold">
-                                                    <span className="text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded">-{task.cost} Mat</span>
-                                                    <span className="text-green-600 bg-green-50 px-1.5 py-0.5 rounded">+${task.reward}</span>
+                                                <div className="mt-2 flex flex-wrap gap-2 text-xs font-mono font-bold">
+                                                    {/* Type Tag */}
+                                                    <span className={`px-1.5 py-0.5 rounded border ${task.type === 'Structural' ? 'bg-orange-100 text-orange-800 border-orange-200' :
+                                                            task.type === 'Management' ? 'bg-purple-100 text-purple-800 border-purple-200' :
+                                                                'bg-sky-100 text-sky-800 border-sky-200'
+                                                        }`}>
+                                                        {task.type}
+                                                    </span>
+                                                    <span className="text-slate-600 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded">-{task.cost} Mat</span>
+                                                    <span className="text-green-600 bg-green-50 border border-green-200 px-1.5 py-0.5 rounded">+${task.reward}</span>
                                                 </div>
 
                                                 {/* Lean Tip */}
