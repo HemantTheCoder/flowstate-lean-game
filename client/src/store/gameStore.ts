@@ -24,6 +24,7 @@ export interface GameState {
   chapter: number;
   day: number;
   week: number;
+  phase: 'planning' | 'action' | 'review'; // New: Daily Cycle Phase
 
   // Tutorial
   tutorialActive: boolean;
@@ -56,6 +57,10 @@ export interface GameState {
   setChapter: (chapter: number) => void;
   advanceDay: () => void;
   updateLPI: (metric: keyof GameState['lpi'], value: number) => void;
+
+  // Logs
+  log: string[];
+  addLog: (msg: string) => void;
 
   setFlag: (key: string, value: boolean) => void; // Generic flag setter
   updateMorale: (delta: number) => void;
@@ -98,6 +103,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   chapter: 1,
   day: 1,
   week: 1,
+  phase: 'action', // Default start in Action mode
 
   tutorialActive: true,
   tutorialStep: 0,
@@ -131,6 +137,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   updateLPI: (metric, value) => set((state) => ({
     lpi: { ...state.lpi, [metric]: value }
   })),
+
+  log: [],
+
+  addLog: (msg) => set((state) => ({ log: [msg, ...state.log].slice(0, 50) })),
 
   setFlag: (key, value) => set((state) => ({
     flags: { ...state.flags, [key]: value }
