@@ -10,6 +10,7 @@ import { useGameStore } from '@/store/gameStore';
 import { WEEK_1_SCHEDULE } from '@/data/chapters/chapter1';
 import { DecisionModal } from '@/components/game/DecisionModal';
 import { CharacterCreationModal } from '@/components/game/CharacterCreationModal';
+import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
 
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
@@ -29,7 +30,7 @@ export default function Game() {
     const dayConfig = WEEK_1_SCHEDULE.find(d => d.day === day);
     const dayKey = `day_${day}_started`;
 
-    if (dayConfig && !flags[dayKey] && flags['character_created']) {
+    if (dayConfig && !flags[dayKey] && flags['character_created'] && flags['chapter_intro_seen']) {
       // 1. Play Dialogue
       setTimeout(() => {
         startDialogue(dayConfig.dialogue);
