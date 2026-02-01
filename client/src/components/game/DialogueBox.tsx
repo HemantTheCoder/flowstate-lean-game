@@ -22,67 +22,68 @@ export const DialogueBox: React.FC = () => {
     const bgColor = colorMap[line.character] || 'bg-slate-700';
 
     // Mapping for character images (filenames in public/assets)
-    'Mira': 'mira.png',
+    const imageMap: Record<string, string> = {
+        'Mira': 'mira.png',
         'Rao': 'rao.png',
-            'Architect': 'architect.png',
-                'Isha': 'mira.png', // Placeholder (Junior Planner)
-                    'Old Foreman': 'rao.png' // Placeholder fallback
-};
+        'Architect': 'architect.png',
+        'Isha': 'mira.png', // Placeholder (Junior Planner)
+        'Old Foreman': 'rao.png' // Placeholder fallback
+    };
 
-const portrait = imageMap[line.character];
+    const portrait = imageMap[line.character];
 
-return (
-    <AnimatePresence>
-        <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 50, opacity: 0 }}
-            className="absolute bottom-4 left-4 right-4 md:left-20 md:right-20 z-50 pointer-events-auto flex items-end justify-center"
-        >
-            {/* Character Portrait (Left or Right based on speaker?) 
+    return (
+        <AnimatePresence>
+            <motion.div
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 50, opacity: 0 }}
+                className="absolute bottom-4 left-4 right-4 md:left-20 md:right-20 z-50 pointer-events-auto flex items-end justify-center"
+            >
+                {/* Character Portrait (Left or Right based on speaker?) 
                  For now, let's keep it simple: Image pops up behind the text box
              */}
-            <div className="relative w-full max-w-4xl">
+                <div className="relative w-full max-w-4xl">
 
-                {/* Portrait Image */}
-                {portrait && (
-                    <motion.div
-                        key={line.character}
-                        initial={{ opacity: 0, x: -20, scale: 0.95 }}
-                        animate={{ opacity: 1, x: 0, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className={`absolute bottom-24 ${isPlayer ? 'right-10' : 'left-0 md:-left-10'} z-0`}
+                    {/* Portrait Image */}
+                    {portrait && (
+                        <motion.div
+                            key={line.character}
+                            initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className={`absolute bottom-24 ${isPlayer ? 'right-10' : 'left-0 md:-left-10'} z-0`}
+                        >
+                            <img
+                                src={`/assets/${portrait}`}
+                                alt={line.character}
+                                className="h-64 md:h-80 object-contain drop-shadow-xl"
+                            />
+                        </motion.div>
+                    )}
+
+                    {/* Text Box Container */}
+                    <div
+                        className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border-4 border-slate-100 p-6 md:p-8 cursor-pointer z-10 min-h-[160px] flex flex-col justify-center"
+                        onClick={advanceDialogue}
                     >
-                        <img
-                            src={`/assets/${portrait}`}
-                            alt={line.character}
-                            className="h-64 md:h-80 object-contain drop-shadow-xl"
-                        />
-                    </motion.div>
-                )}
+                        {/* Character Name Tag */}
+                        <div className={`absolute -top-5 left-8 px-6 py-2 rounded-xl text-white font-black text-lg shadow-lg transform -rotate-1 ${bgColor}`}>
+                            {line.character.toUpperCase()}
+                        </div>
 
-                {/* Text Box Container */}
-                <div
-                    className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border-4 border-slate-100 p-6 md:p-8 cursor-pointer z-10 min-h-[160px] flex flex-col justify-center"
-                    onClick={advanceDialogue}
-                >
-                    {/* Character Name Tag */}
-                    <div className={`absolute -top-5 left-8 px-6 py-2 rounded-xl text-white font-black text-lg shadow-lg transform -rotate-1 ${bgColor}`}>
-                        {line.character.toUpperCase()}
-                    </div>
+                        {/* Text Content */}
+                        <p className="text-xl md:text-2xl text-slate-800 font-medium leading-relaxed font-sans mt-2">
+                            {line.text}
+                        </p>
 
-                    {/* Text Content */}
-                    <p className="text-xl md:text-2xl text-slate-800 font-medium leading-relaxed font-sans mt-2">
-                        {line.text}
-                    </p>
-
-                    {/* Continue Indicator */}
-                    <div className="absolute bottom-4 right-6 text-slate-400 text-sm animate-pulse font-bold tracking-widest uppercase flex items-center gap-2">
-                        Next <span className="text-lg">▶</span>
+                        {/* Continue Indicator */}
+                        <div className="absolute bottom-4 right-6 text-slate-400 text-sm animate-pulse font-bold tracking-widest uppercase flex items-center gap-2">
+                            Next <span className="text-lg">▶</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </motion.div>
-    </AnimatePresence>
-);
+            </motion.div>
+        </AnimatePresence>
+    );
 };
