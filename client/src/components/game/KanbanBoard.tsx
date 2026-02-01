@@ -10,7 +10,22 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         const colIndex = columns.findIndex(c => c.id === currentColumn.id);
         if (colIndex < columns.length - 1) {
             const nextCol = columns[colIndex + 1];
-            moveTask(task.id, currentColumn.id, nextCol.id);
+            // User Guidance: Check constraints before move
+            if (nextCol.id === 'doing' && materials < task.cost) {
+                // Shortage detected! Prompt user with a solution.
+                alert(`⛔ MATERIAL SHORTAGE!\n\nYou need ${task.cost} Materials, but only have ${materials}.\n\n✅ WHAT TO DO: You cannot start this task yet. Check if you have tasks in 'Done' to finish, or wait for tomorrow's delivery.`);
+                return;
+            }
+
+            const success = moveTask(task.id, currentColumn.id, nextCol.id);
+            if (!success) {
+                // Generic fallback if move failed (e.g. WIP limit) - though WIP usually blocked by UI logic or store
+                // If we want to be safe:
+                if (nextCol.id !== 'done') {
+                    alert("Cannot move task! Check WIP limits or constraints.");
+                }
+                return;
+            }
 
             // Tutorial Logic: Advance Steps based on moves
             if (tutorialStep === 2 && currentColumn.id === 'backlog' && nextCol.id === 'ready') {
