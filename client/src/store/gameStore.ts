@@ -286,37 +286,17 @@ export const useGameStore = create<GameState>((set, get) => ({
   }),
 
   // Gameplay Loop - Day 2+ Refill
+  // Gameplay Loop - Day 2+ Refill
   addDailyTasks: (count: number, currentDay?: number) => set((state) => {
-    // 1. Determine constraints based on Day
-    let allowedTypes: string[] = ['Structural', 'Systems', 'Interior', 'Management']; // Default all
+    // Spawn a MIX of tasks to challenge the user's selection
+    // We do NOT filter by day anymore, allowing "wrong" tasks to appear in Backlog.
+    // The Constraint Logic (Rain/Materials) will happen in KanbanBoard interactions.
 
-    // Day 1 = All types (intro)
-    if (currentDay === 2) {
-      // Day 2: Supply Shortage -> Prep tasks (Low cost 0-5)
-      allowedTypes = ['Management'];
-    } else if (currentDay === 3) {
-      // Day 3: Rain -> INDOOR ONLY (No Structural)
-      allowedTypes = ['Systems', 'Interior'];
-    } else if (currentDay === 4) {
-      // Day 4: Rao's Push -> He WANTS Outdoor visuals (Structural)
-      allowedTypes = ['Structural'];
-    }
-
-    // 2. Filter available tasks
-    const relevantTasks = CONSTRUCTION_TASKS.filter(t => allowedTypes.includes(t.type));
-
-    // 3. Pick randoms from filtered list
-    const newTasks: Task[] = Array.from({ length: count }, () => {
-      const template = relevantTasks.length > 0
-        ? relevantTasks[Math.floor(Math.random() * relevantTasks.length)]
-        : getRandomTask(); // Fallback
-
-      return {
-        ...template,
-        id: uuidv4(),
-        status: 'backlog'
-      };
-    });
+    const newTasks: Task[] = Array.from({ length: count }, () => ({
+      ...getRandomTask(),
+      id: uuidv4(),
+      status: 'backlog'
+    }));
 
     return {
       columns: state.columns.map(col =>

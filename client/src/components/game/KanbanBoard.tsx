@@ -10,10 +10,18 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         const colIndex = columns.findIndex(c => c.id === currentColumn.id);
         if (colIndex < columns.length - 1) {
             const nextCol = columns[colIndex + 1];
-            // User Guidance: Check constraints before move
+            // 1. STORY CONSTRAINT: Day 3 Rain (Blocks Structural)
+            if (day === 3 && task.type === 'Structural' && nextCol.id === 'doing') {
+                alert("🌧️ STORM WARNING!\n\nIt is raining heavily! Structural work (Outdoor) is unsafe and impossible right now.\n\n✅ ACTION: Focus on 'Indoor' or 'System' tasks until the weather clears.");
+                return;
+            }
+
+            // 2. STORY CONSTRAINT: Material Shortage (Day 2 or general)
             if (nextCol.id === 'doing' && materials < task.cost) {
-                // Shortage detected! Prompt user with a solution.
-                alert(`⛔ MATERIAL SHORTAGE!\n\nYou need ${task.cost} Materials, but only have ${materials}.\n\n✅ WHAT TO DO: You cannot start this task yet. Check if you have tasks in 'Done' to finish, or wait for tomorrow's delivery.`);
+                const isDay2 = day === 2;
+                const reason = isDay2 ? "The Concrete Truck 🚚 is delayed!" : "Insufficient resources.";
+
+                alert(`⛔ MATERIAL SHORTAGE!\n\n${reason}\nNeed ${task.cost}, Have ${materials}.\n\n✅ ACTION: You cannot start this task. Pull 'Prep' or 'Management' tasks (0 Cost) instead!`);
                 return;
             }
 
@@ -137,8 +145,8 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                 <div className="mt-2 flex flex-wrap gap-2 text-xs font-mono font-bold">
                                                     {/* Type Tag */}
                                                     <span className={`px-1.5 py-0.5 rounded border ${task.type === 'Structural' ? 'bg-orange-100 text-orange-800 border-orange-200' :
-                                                            task.type === 'Management' ? 'bg-purple-100 text-purple-800 border-purple-200' :
-                                                                'bg-sky-100 text-sky-800 border-sky-200'
+                                                        task.type === 'Management' ? 'bg-purple-100 text-purple-800 border-purple-200' :
+                                                            'bg-sky-100 text-sky-800 border-sky-200'
                                                         }`}>
                                                         {task.type}
                                                     </span>
