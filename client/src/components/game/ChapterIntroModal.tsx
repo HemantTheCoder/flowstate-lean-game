@@ -28,7 +28,7 @@ export const ChapterIntroModal: React.FC = () => {
     }[chapter] || { title: "Unknown Chapter", subtitle: "", description: "", objectives: [] };
 
     return (
-        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-900/95 backdrop-blur-md px-4">
+        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-900/95 backdrop-blur-md px-4 pointer-events-auto">
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
