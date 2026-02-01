@@ -1,4 +1,4 @@
-// Reading file to check for IDs...
+import React, { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
