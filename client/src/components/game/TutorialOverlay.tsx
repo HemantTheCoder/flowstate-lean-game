@@ -17,7 +17,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
         const updateSpotlight = () => {
             let targetId = '';
             if (tutorialStep === 0 || tutorialStep === 1) targetId = 'btn-kanban';
-            // Add more targets here
+            if (tutorialStep === 2) targetId = 'col-backlog';
+            if (tutorialStep === 3) targetId = 'col-ready';
+            if (tutorialStep === 4) targetId = 'col-doing';
 
             if (targetId) {
                 const el = document.getElementById(targetId);
@@ -79,50 +81,54 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                     </motion.div>
                 )}
 
-                {/* Board Open - Guidance */}
-                {showKanban && (
-                    <div className="absolute inset-0 flex items-center justify-center p-8 z-[80]">
-                        <div className="w-full h-full max-w-6xl flex flex-col pointer-events-none">
-                            <div className="h-[100px] w-full" />
-                            <div className="flex-1 flex gap-6 px-6">
-                                {/* Backlog Column Overlay */}
-                                <div className="flex-1 relative flex flex-col items-center justify-center">
-                                    {tutorialStep === 2 && (
-                                        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-                                            <div className="text-5xl animate-bounce mb-2">⬇️</div>
-                                            <div className="bg-orange-500 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
-                                                <p className="font-bold text-lg">Step 1: PULL Work</p>
-                                                <p className="text-sm opacity-90">Click a card to move it to <b>Ready</b>.</p>
-                                            </div>
-                                        </motion.div>
-                                    )}
+                {/* Board Open - Guidance (Steps 2-4) */}
+                {showKanban && spotlightPos && (
+                    <>
+                        {/* Step 2: Backlog -> Ready */}
+                        {tutorialStep === 2 && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                                style={{ top: spotlightPos.y - 100, left: spotlightPos.x }}
+                                className="absolute z-[90] w-64 pointer-events-none"
+                            >
+                                <div className="text-5xl animate-bounce mb-2 text-center">⬇️</div>
+                                <div className="bg-orange-500 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
+                                    <p className="font-bold text-lg">Step 1: PULL</p>
+                                    <p className="text-sm">Click a task here to move it to <b>Ready</b>.</p>
                                 </div>
-                                <div className="flex-1 relative flex flex-col items-center justify-center">
-                                    {tutorialStep === 3 && (
-                                        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-                                            <div className="text-5xl animate-bounce mb-2">⬇️</div>
-                                            <div className="bg-purple-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
-                                                <p className="font-bold text-lg">Step 2: START Work</p>
-                                                <p className="text-sm opacity-90">Move to <b>Doing</b>. <br />This commits Materials.</p>
-                                            </div>
-                                        </motion.div>
-                                    )}
+                            </motion.div>
+                        )}
+
+                        {/* Step 3: Ready -> Doing */}
+                        {tutorialStep === 3 && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                                style={{ top: spotlightPos.y - 120, left: spotlightPos.x }}
+                                className="absolute z-[90] w-64 pointer-events-none"
+                            >
+                                <div className="text-5xl animate-bounce mb-2 text-center">⬇️</div>
+                                <div className="bg-purple-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
+                                    <p className="font-bold text-lg">Step 2: START</p>
+                                    <p className="text-sm">Move to <b>Doing</b> to start work. <br />(Commits Materials)</p>
                                 </div>
-                                <div className="flex-1 relative flex flex-col items-center justify-center">
-                                    {tutorialStep === 4 && (
-                                        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-                                            <div className="text-5xl animate-bounce mb-2">⬇️</div>
-                                            <div className="bg-green-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
-                                                <p className="font-bold text-lg">Step 3: FINISH Work</p>
-                                                <p className="text-sm opacity-90">Move to <b>Done</b> to get Paid!</p>
-                                            </div>
-                                        </motion.div>
-                                    )}
+                            </motion.div>
+                        )}
+
+                        {/* Step 4: Doing -> Done */}
+                        {tutorialStep === 4 && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                                style={{ top: spotlightPos.y - 120, left: spotlightPos.x }}
+                                className="absolute z-[90] w-64 pointer-events-none"
+                            >
+                                <div className="text-5xl animate-bounce mb-2 text-center">⬇️</div>
+                                <div className="bg-green-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
+                                    <p className="font-bold text-lg">Step 3: FINISH</p>
+                                    <p className="text-sm">Move to <b>Done</b> to get Paid! <br />(Value Added)</p>
                                 </div>
-                                <div className="flex-1"></div>
-                            </div>
-                        </div>
-                    </div>
+                            </motion.div>
+                        )}
+                    </>
                 )}
 
                 {/* Step 5: Complete */}
