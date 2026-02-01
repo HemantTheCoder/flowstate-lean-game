@@ -87,7 +87,7 @@ export interface GameState {
   // Resource Actions
   addMaterials: (amount: number) => void; // For debug or events
   injectWaste: () => void;
-  addDailyTasks: (count: number) => void;
+  addDailyTasks: (count: number, currentDay?: number) => void;
 }
 
 const INITIAL_COLUMNS: Column[] = [

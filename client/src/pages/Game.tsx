@@ -90,7 +90,12 @@ export default function Game() {
   const handleNextDayStart = () => {
     setShowSummary(false);
     advanceDay();
-    useGameStore.getState().addDailyTasks(3); // Refill backlog so user has work
+    // Use NEXT day (current day + 1) logic, but 'day' state updates in advanceDay?
+    // advanceDay updates store, but 'day' local var here is old?
+    // Better to use getState().day inside the action or pass calculated next day.
+    // simpler: allow addDailyTasks to read state.day if not passed, OR pass day + 1.
+    useGameStore.getState().addDailyTasks(3, day + 1);
+
     // Check for Friday
     const isFriday = day % 5 === 0;
     if (isFriday) {
