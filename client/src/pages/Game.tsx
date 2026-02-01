@@ -170,9 +170,8 @@ export default function Game() {
     // simpler: allow addDailyTasks to read state.day if not passed, OR pass day + 1.
     useGameStore.getState().addDailyTasks(3, day + 1);
 
-    // Check for Friday
-    const isFriday = day % 5 === 0;
-    if (isFriday) {
+    // Check for Friday end (End of Chapter 1)
+    if (day === 5) {
       navigate('/debrief');
     }
   };
@@ -202,6 +201,10 @@ export default function Game() {
         return "🌧️ RAIN WARNING: You have Structural work in 'Ready', but it is BLOCKED. Switch to Systems/Interior!";
       }
       return "🌧️ RAIN: Outdoor work is blocked. Focus on Indoor 'System' or 'Interior' tasks.";
+    }
+
+    if (day === 4 && !state.flags.decision_push_made) {
+      return "🛑 DISCIPLINE! Rao wants to push unready work. Enforce 'Pull' logic to keep the flow stable.";
     }
 
     // 1. End Day Condition

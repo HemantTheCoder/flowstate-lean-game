@@ -31,6 +31,10 @@ export async function registerRoutes(
       const input = api.game.save.input.parse(req.body);
       const gameState = await storage.createOrUpdateGameState(input);
 
+      if (!gameState) {
+        throw new Error("Failed to persist game state");
+      }
+
       // Determine if created (201) or updated (200) - simplified to 200 for now or strictly following REST
       // Since our storage handles both, we'll return 200 usually, but let's check
       res.status(200).json(gameState);

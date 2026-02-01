@@ -31,8 +31,8 @@ export function useGame() {
     },
     // Don't retry on 404, just return null so we can show "New Game"
     retry: (failureCount, error: any) => {
-       if (error?.message?.includes("404")) return false;
-       return failureCount < 3;
+      if (error?.message?.includes("404")) return false;
+      return failureCount < 3;
     }
   });
 
@@ -45,11 +45,19 @@ export function useGame() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Failed to save game");
+
+      const text = await res.text();
+      let jsonData;
+      try {
+        jsonData = text ? JSON.parse(text) : {};
+      } catch (e) {
+        throw new Error("Invalid server response formatting");
       }
-      return api.game.save.responses[200].parse(await res.json());
+
+      if (!res.ok) {
+        throw new Error(jsonData.message || "Failed to save game");
+      }
+      return api.game.save.responses[200].parse(jsonData);
     },
     onSuccess: (data) => {
       queryClient.setQueryData([api.game.load.path, sessionId], data);
