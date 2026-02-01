@@ -68,6 +68,7 @@ export default function Game() {
         if (id === 'push') {
           useGameStore.getState().addLog("Decision: Pushed work. created Waste.");
           setFlag('decision_push_made', true);
+          useGameStore.getState().injectWaste();
           // Add penalty logic here later
         } else {
           useGameStore.getState().addLog("Decision: Enforced Pull. Flow protected.");

@@ -86,6 +86,7 @@ export interface GameState {
 
   // Resource Actions
   addMaterials: (amount: number) => void; // For debug or events
+  injectWaste: () => void;
 }
 
 const INITIAL_COLUMNS: Column[] = [
@@ -260,5 +261,25 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   setTutorialStep: (step) => set({ tutorialStep: step }),
   completeTutorial: () => set({ tutorialActive: false, tutorialStep: 99 }),
-  addMaterials: (amount) => set((s) => ({ materials: s.materials + amount }))
+  addMaterials: (amount) => set((s) => ({ materials: s.materials + amount })),
+
+  injectWaste: () => set((state) => {
+    const wasteTask: Task = {
+      id: `waste-${Date.now()}`,
+      title: "⚠️ Rework",
+      description: "Defects caused by rushing.",
+      cost: 0,
+      reward: 0,
+      status: 'doing',
+      type: 'defect' as any, // Cast if not in TaskType union yet
+      leanTip: "Pushing work creates defects!"
+    };
+
+    return {
+      columns: state.columns.map(col =>
+        col.id === 'doing' ? { ...col, tasks: [wasteTask, ...col.tasks] } : col
+      ),
+      lpi: { ...state.lpi, teamMorale: Math.max(0, state.lpi.teamMorale - 10) }
+    };
+  })
 }));
