@@ -58,7 +58,16 @@ export interface GameState {
   // Flags
   flags: Record<string, boolean>;
 
+  // Audio Preferences
+  audioSettings: {
+    bgmVolume: number;
+    sfxVolume: number;
+    isMuted: boolean;
+  };
+
   // Actions
+  setAudioVolume: (type: 'bgm' | 'sfx', volume: number) => void;
+  toggleMute: () => void;
   setChapter: (chapter: number) => void;
   advanceDay: () => void;
   updateLPI: (metric: keyof GameState['lpi'], value: number) => void;
@@ -135,6 +144,20 @@ export const useGameStore = create<GameState>((set, get) => ({
   materials: 300,
 
   flags: {},
+
+  audioSettings: {
+    bgmVolume: 0.5,
+    sfxVolume: 0.7,
+    isMuted: false,
+  },
+
+  setAudioVolume: (type, volume) => set((state) => ({
+    audioSettings: { ...state.audioSettings, [`${type}Volume`]: volume }
+  })),
+
+  toggleMute: () => set((state) => ({
+    audioSettings: { ...state.audioSettings, isMuted: !state.audioSettings.isMuted }
+  })),
 
   setChapter: (chapter) => set({ chapter }),
 

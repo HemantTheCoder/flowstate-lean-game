@@ -12,11 +12,14 @@ import { DecisionModal } from '@/components/game/DecisionModal';
 import { CharacterCreationModal } from '@/components/game/CharacterCreationModal';
 import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
 import { DayBriefingModal } from '@/components/game/DayBriefingModal';
+import { SettingsModal } from '@/components/game/SettingsModal';
 import { useGame } from '@/hooks/use-game';
+import soundManager from '@/lib/soundManager';
 
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
   const [showSummary, setShowSummary] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [completedToday, setCompletedToday] = useState(0);
 
   // Decision State
@@ -38,6 +41,19 @@ export default function Game() {
       setFlag('hydrated', true);
     }
   }, [gameState, flags, importState, setFlag]);
+
+  // Audio Control Loop
+  const audioSettings = useGameStore(s => s.audioSettings);
+  useEffect(() => {
+    // Choose BGM based on situation
+    if (day === 3) {
+      soundManager.playBGM('rain', audioSettings.bgmVolume);
+    } else if (columns.find(c => c.id === 'doing')?.tasks.length || 0 >= 2) {
+      soundManager.playBGM('tense', audioSettings.bgmVolume);
+    } else {
+      soundManager.playBGM('cozy', audioSettings.bgmVolume);
+    }
+  }, [day, columns, audioSettings.bgmVolume]);
 
   const handleSave = async (silent = false) => {
     try {
@@ -83,6 +99,9 @@ export default function Game() {
         // 2. Trigger Event Effects
         if (dayConfig.event === 'supply_delay') {
           useGameStore.setState({ materials: 0 }); // Hard constraint!
+        }
+        if (dayConfig.day === 3) {
+          soundManager.playSFX('storm', audioSettings.sfxVolume);
         }
         if (dayConfig.event === 'decision_push') {
           // Trigger decision AFTER dialogue? Or parallel. 
@@ -162,6 +181,18 @@ export default function Game() {
     const readyCount = ready?.tasks.length || 0;
     const backlogCount = backlog?.tasks.length || 0;
     const doingLimit = doing?.wipLimit || 3;
+
+    // 0. NARRATIVE SPECIFIC ADVICE (User requested better guidance)
+    if (day === 2 && state.materials === 0) {
+      return "🚚 SUPPLY DELAY: Material is 0! Pull 'Prep' or 'Management' tasks (0 Cost) to keep the flow moving.";
+    }
+    if (day === 3) {
+      const hasStructuralReady = ready?.tasks.some(t => t.type === 'Structural');
+      if (hasStructuralReady) {
+        return "🌧️ RAIN WARNING: You have Structural work in 'Ready', but it is BLOCKED. Switch to Systems/Interior!";
+      }
+      return "🌧️ RAIN: Outdoor work is blocked. Focus on Indoor 'System' or 'Interior' tasks.";
+    }
 
     // 1. End Day Condition
     if (doingCount === 0 && readyCount === 0 && backlogCount === 0) {
@@ -251,6 +282,16 @@ export default function Game() {
             >
               {saveGame.isPending ? '⏳' : '💾'}
             </button>
+            <button
+              onClick={() => {
+                soundManager.playSFX('click', audioSettings.sfxVolume);
+                setShowSettings(true);
+              }}
+              className="bg-white hover:bg-slate-50 border-2 border-slate-200 p-2 rounded-lg shadow-sm transition-all active:scale-95 pointer-events-auto"
+              title="Settings"
+            >
+              ⚙️
+            </button>
           </div>
         </motion.div>
 
@@ -301,6 +342,7 @@ export default function Game() {
         <CharacterCreationModal />
         <ChapterIntroModal />
         <DayBriefingModal />
+        <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
 
         {/* Modals & Screens */}
         <AnimatePresence>
@@ -313,7 +355,7 @@ export default function Game() {
           completedTasks={completedToday}
         />
 
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }

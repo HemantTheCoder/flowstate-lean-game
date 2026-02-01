@@ -1,9 +1,10 @@
 import React from 'react';
 import { useGameStore, Column, Task } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import soundManager from '@/lib/soundManager';
 
 export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-    const { columns, moveTask, setWipLimit, funds, materials, tutorialStep, setTutorialStep, day } = useGameStore();
+    const { columns, moveTask, setWipLimit, funds, materials, tutorialStep, setTutorialStep, day, audioSettings } = useGameStore();
 
     const handleTaskClick = (task: Task, currentColumn: Column) => {
         // Simple logic: move to next column if possible
@@ -12,27 +13,37 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             const nextCol = columns[colIndex + 1];
             // 1. STORY CONSTRAINT: Day 3 Rain (Blocks Structural)
             if (day === 3 && task.type === 'Structural' && nextCol.id === 'doing') {
-                alert("🌧️ STORM WARNING!\n\nIt is raining heavily! Structural work (Outdoor) is unsafe and impossible right now.\n\n✅ ACTION: Focus on 'Indoor' or 'System' tasks until the weather clears.");
+                soundManager.playSFX('alert', audioSettings.sfxVolume);
+                alert("🌧️ WEATHER VARIATION DETECTED!\n\nIt is raining heavily! Structural work (Outdoor) like this is unsafe and will result in quality defects if forced.\n\n✅ LEAN ACTION: Pivot to 'Indoor' or 'System' tasks in the Ready column until the weather clears.");
                 return;
             }
 
             // 2. STORY CONSTRAINT: Material Shortage (Day 2 or general)
             if (nextCol.id === 'doing' && materials < task.cost) {
+                soundManager.playSFX('alert', audioSettings.sfxVolume);
                 const isDay2 = day === 2;
                 const reason = isDay2 ? "The Concrete Truck 🚚 is delayed!" : "Insufficient resources.";
 
-                alert(`⛔ MATERIAL SHORTAGE!\n\n${reason}\nNeed ${task.cost}, Have ${materials}.\n\n✅ ACTION: You cannot start this task. Pull 'Prep' or 'Management' tasks (0 Cost) instead!`);
+                alert(`⛔ CONSTRAINT ALERT: MATERIAL SHORTAGE!\n\n${reason}\nNeed ${task.cost}, Have ${materials}.\n\n✅ LEAN ACTION: You cannot start this task. Use this 'Waste' time to pull 'Prep' or 'Management' tasks (0 Cost) into Ready!`);
                 return;
             }
 
             const success = moveTask(task.id, currentColumn.id, nextCol.id);
             if (!success) {
+                soundManager.playSFX('alert', audioSettings.sfxVolume);
                 // Generic fallback if move failed (e.g. WIP limit) - though WIP usually blocked by UI logic or store
                 // If we want to be safe:
                 if (nextCol.id !== 'done') {
                     alert("Cannot move task! Check WIP limits or constraints.");
                 }
                 return;
+            }
+
+            // Success SFX
+            if (nextCol.id === 'done') {
+                soundManager.playSFX('money', audioSettings.sfxVolume);
+            } else {
+                soundManager.playSFX('click', audioSettings.sfxVolume);
             }
 
             // Tutorial Logic: Advance Steps based on moves
