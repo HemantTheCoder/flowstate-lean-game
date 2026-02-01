@@ -1,15 +1,12 @@
 import { DialogueLine } from '@/store/gameStore';
 
 export const CHAPTER_1_INTRO: DialogueLine[] = [
-    { character: 'Mira', text: "Thank goodness you're here, Architect! The site is a chaos. We are behind schedule!", emotion: 'stressed' },
-    { character: 'Architect', text: "Chaos is just 'Waste' in disguise, Mira. Tell me, what are the workers doing?", emotion: 'neutral' },
-    { character: 'Rao', text: "Working!! We are pouring concrete, fixing steel, moving bricks! Everyone is busy 100% of the time!", emotion: 'angry' },
-    { character: 'Architect', text: "That is the problem, Rao. 'Busy' does not mean 'Productive'.", emotion: 'neutral' },
-    { character: 'Architect', text: "In Lean Construction, we focus on FLOW, not just busyness. If a worker builds a wall but the painter isn't ready, that wall is just inventory. It's waste.", emotion: 'neutral' },
-    { character: 'Mira', text: "So... we shouldn't work hard?", emotion: 'neutral' },
-    { character: 'Architect', text: "Work smart. We need a KANBAN system. It visualizes the work.", emotion: 'happy' },
-    { character: 'Architect', text: "It stops us from starting too many things (WIP) and forces us to finish what we started.", emotion: 'neutral' },
-    { character: 'Architect', text: "Let's open the Board. I'll show you how to 'Pull' value.", emotion: 'happy' }
+    { character: 'Mira', text: "We’ve been busy two weeks straight, but… look. The site is a mess.", emotion: 'stressed' },
+    { character: 'Rao', text: "Mess? We are building! Client wants it open for the summer festival—two weeks!", emotion: 'angry' },
+    { character: 'Isha', text: "I scheduled everything in the plan, Rao. We’ll be fine if we just follow the dates.", emotion: 'happy' },
+    { character: 'Old Foreman', text: "Plans on paper are thin like rice paper. On site... it’s mud.", emotion: 'neutral' },
+    { character: 'Architect', text: "Foreman is right. A schedule isn't reality. We need to visualize the actual constraints.", emotion: 'neutral' },
+    { character: 'Architect', text: "Let's open the Kanban Board. It will show us the truth.", emotion: 'happy' }
 ];
 
 export const CHAPTER_1_MID: DialogueLine[] = [
