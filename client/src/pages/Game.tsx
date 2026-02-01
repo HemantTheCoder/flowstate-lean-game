@@ -134,10 +134,9 @@ export default function Game() {
     }
 
     // 4. Prep Work
-    // 4. Prep Work
     if (readyCount === 0 && backlogCount > 0) {
       // Check if we can actually PULL anything
-      const affordAnything = backlog?.tasks.some(t => materials >= t.cost);
+      const affordAnything = backlog?.tasks.some(t => state.materials >= t.cost);
       if (affordAnything) {
         return "📋 PLAN NEXT: Pull a task from Backlog to 'Ready'.";
       }
@@ -147,7 +146,7 @@ export default function Game() {
     // If we have no affordable tasks and nothing in progress, force End Day.
     const allPending = [...(backlog?.tasks || []), ...(ready?.tasks || [])];
     const canPlayAny = allPending.some(t => {
-      const isAffordable = materials >= t.cost;
+      const isAffordable = state.materials >= t.cost;
       const isRainBlocked = day === 3 && t.type === 'Structural';
       return isAffordable && !isRainBlocked;
     });
