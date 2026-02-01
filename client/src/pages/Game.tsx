@@ -79,18 +79,35 @@ export default function Game() {
   const getSmartObjective = () => {
     if (tutorialStep < 99) return "Follow the Tutorial arrows to learn the basics! ⬇️";
 
-    const cols = useGameStore.getState().columns;
+    const state = useGameStore.getState();
+    const cols = state.columns;
     const doing = cols.find(c => c.id === 'doing');
     const ready = cols.find(c => c.id === 'ready');
+    const backlog = cols.find(c => c.id === 'backlog');
 
-    if (doing && doing.tasks.length >= doing.wipLimit) {
+    const doingCount = doing?.tasks.length || 0;
+    const readyCount = ready?.tasks.length || 0;
+    const backlogCount = backlog?.tasks.length || 0;
+    const doingLimit = doing?.wipLimit || 3;
+
+    // 1. End Day Condition
+    if (doingCount === 0 && readyCount === 0 && backlogCount === 0) {
+      return "All tasks complete! Click 'End Day' to rest. 🌙";
+    }
+
+    // 2. Starvation
+    if (doingCount === 0 && readyCount > 0) {
+      return "⚠️ IDLE CREWS! Move a task from 'Ready' to 'Doing'.";
+    }
+
+    // 3. Bottleneck
+    if (doingCount >= doingLimit) {
       return "⛔ BOTTLENECK detected! Finish tasks in 'Doing' to clear space.";
     }
-    if (ready && ready.tasks.length === 0) {
-      return "⚠️ STARVATION risk! Pull a task from Backlog to 'Ready'.";
-    }
-    if (doing && doing.tasks.length === 0 && ready && ready.tasks.length > 0) {
-      return "📉 IDLE CREWS! Move a task from 'Ready' to 'Doing'.";
+
+    // 4. Prep Work
+    if (readyCount === 0 && backlogCount > 0) {
+      return "📋 PLAN NEXT: Pull a task from Backlog to 'Ready'.";
     }
 
     return "✅ Flow is stable. Keep moving tasks to 'Done' to earn funds!";
