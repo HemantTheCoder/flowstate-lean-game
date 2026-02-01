@@ -43,7 +43,7 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         event: 'supply_delay',
         briefing: {
             objective: "Survivability.",
-            action: "You have 0 Materials. Clear existing work from 'Doing' to 'Done' to generate cash."
+            action: "Materials are ZERO due to the truck breakdown 🚚. Use this downtime to pull 'Prep' tasks (0 Cost) like Safety Audits to keep the crew busy!"
         }
     },
     {
@@ -59,7 +59,7 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         event: 'rain',
         briefing: {
             objective: "Adapt to Variation.",
-            action: "Rain slows down work. Don't start new outdoor tasks. Focus on finishing what you can."
+            action: "Heavy rain 🌧️ blocks outdoor work. Only pull 'Indoor' tasks (Systems/Interior) to the Doing column. Avoid Structural tasks!"
         }
     },
     {
@@ -74,7 +74,7 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         event: 'decision_push',
         briefing: {
             objective: "Maintain Discipline.",
-            action: "Rao will ask to 'Push' work. Refuse him to avoid Defects (Waste)."
+            action: "Rao wants to 'Push' outdoor work for the client visit. Refuse him! Pushing unready work creates 'Defects' (Waste) and hurts morale."
         }
     },
     {
