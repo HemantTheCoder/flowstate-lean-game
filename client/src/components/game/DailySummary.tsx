@@ -42,7 +42,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                     <div className="bg-red-50 p-4 rounded-xl border border-red-100">
                         <div className="flex justify-between items-center mb-1">
                             <span className="text-red-800 font-bold">Daily Overhead</span>
-                            <span className="text-red-600 font-mono font-bold">-$150</span>
+                            <span className="text-red-600 font-mono font-bold">-$250</span>
                         </div>
                         <p className="text-xs text-red-600">Salaries, Equipment, Rent.</p>
                     </div>

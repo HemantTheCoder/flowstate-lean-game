@@ -70,22 +70,23 @@ export default function Game() {
 
   const handleSave = async (silent = false) => {
     try {
+      const state = useGameStore.getState();
       await saveGame.mutateAsync({
         sessionId: '', // Handled by hook
-        playerName,
-        chapter: useGameStore.getState().chapter,
-        week,
+        playerName: state.playerName,
+        chapter: state.chapter,
+        week: state.week,
         resources: {
-          morale: lpi.teamMorale,
+          morale: state.lpi.teamMorale,
           stress: 0,
           trust: 50,
           productivity: 40,
           quality: 80,
-          budget: funds
+          budget: state.funds
         },
-        kanbanState: { columns } as any,
-        flags,
-        metrics: lpi as any,
+        kanbanState: { columns: state.columns } as any,
+        flags: state.flags,
+        metrics: state.lpi as any,
         completedChapters: [],
         unlockedBadges: []
       });
@@ -232,12 +233,14 @@ export default function Game() {
       ],
       onSelect: (id: string) => {
         if (id === 'push') {
-          useGameStore.getState().addLog("Decision: Pushed work. created Waste.");
+          useGameStore.getState().addLog("Decision: Pushed work. Created Waste.");
+          useGameStore.getState().addLog("NEXT STEP: A 'Rework' task was added. Finish it IMMEDIATELY to clear the waste!");
           setFlag('decision_push_made', true);
           useGameStore.getState().injectWaste();
           // Add penalty logic here later
         } else {
           useGameStore.getState().addLog("Decision: Enforced Pull. Flow protected.");
+          useGameStore.getState().addLog("NEXT STEP: Maintain flow. Move tasks to 'Doing' ONLY when space is free.");
         }
         setShowDecision(false);
       }
@@ -291,16 +294,23 @@ export default function Game() {
       return isAffordable && !isRainBlocked;
     });
 
-    // 0. NARRATIVE SPECIFIC ADVICE (User requested better guidance)
+    // 0. NARRATIVE SPECIFIC ADVICE
+    if (flags['decision_push_made']) {
+      const hasWaste = doing?.tasks.some(t => t.id.includes('waste'));
+      if (hasWaste) {
+        return "⚠️ REWORK DETECTED: Move the 'Rework' task to 'Done' immediately to stop the waste!";
+      }
+    }
+
     if (day === 2 && state.materials === 0) {
       return "🚚 SUPPLY DELAY: Material is 0! Pull 'Prep' or 'Management' tasks (0 Cost) to keep the flow moving.";
     }
+
     if (day === 3) {
       const hasStructuralReady = ready?.tasks.some(t => t.type === 'Structural');
       if (hasStructuralReady) {
-        return "🌧️ RAIN WARNING: You have Structural work in 'Ready', but it is BLOCKED. Switch to Systems/Interior!";
+        return "🌧️ RAIN ALERT: Structural tasks (Steel/Rebar) are BLOCKED. Work on Finishing or Management tasks instead!";
       }
-      return "🌧️ RAIN: Outdoor work is blocked. Focus on Indoor 'System' or 'Interior' tasks.";
     }
 
     if (day === 4 && !state.flags.decision_push_made) {
@@ -308,20 +318,17 @@ export default function Game() {
     }
 
     // 1. END DAY & NARRATIVE COMPLETION CHECKS
-    // Day 1: Narrative says "Stop starting new things". If 'Doing' is empty, we are done, even if Backlog has items.
     if (day === 1 && doingCount === 0) {
       return "🌙 Day 1 Complete! You stabilized the flow by finishing active work. Click 'End Day'.";
     }
 
-    // Day 2 (Supply Delay): If we have no materials and no 0-cost (Prep) tasks left, we are done.
-    if (day === 2 && state.materials < 10 && doingCount === 0) { // <10 buffer
+    if (day === 2 && state.materials < 10 && doingCount === 0) {
       const hasPrep = allPending.some(t => t.cost === 0);
       if (!hasPrep) {
         return "🌙 Day 2 Complete! No more Prep tasks available. Supply truck arrives tomorrow. End Day.";
       }
     }
 
-    // Day 3 (Rain): If we have no Indoor tasks left and Outdoor is blocked.
     if (day === 3 && doingCount === 0) {
       const hasIndoor = allPending.some(t => t.type !== 'Structural' && state.materials >= t.cost);
       if (!hasIndoor) {
@@ -329,22 +336,21 @@ export default function Game() {
       }
     }
 
-    // Generic "All Done" (Total Empty)
     if (doingCount === 0 && readyCount === 0 && backlogCount === 0) {
       return "🌙 All tasks complete! Click 'End Day' to rest and get paid.";
     }
 
-    // 2. Resource/Constraint Lock (Generic)
+    // 2. Resource/Constraint Lock
     if (!canPlayAny && doingCount === 0) {
       return "🌙 Day Complete! No actvity possible (Materials/Weather). Click 'End Day'.";
     }
 
-    // 3. Bottleneck (High Priority Alert)
+    // 3. Bottleneck
     if (doingCount >= doingLimit) {
-      return "⛔ BOTTLENECK: The 'Doing' column is full! You cannot start new cards. Focus on finishing current work.";
+      return "⛔ BOTTLENECK: The 'Doing' column is full! Focus on finishing current work.";
     }
 
-    // 4. Starvation (Alert)
+    // 4. Starvation
     if (doingCount === 0 && readyCount > 0) {
       return "⚠️ STARVATION: 'Doing' is empty! Workers are idle. Pull a card from 'Ready' to keep flow moving.";
     }

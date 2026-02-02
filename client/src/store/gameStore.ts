@@ -141,7 +141,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   columns: INITIAL_COLUMNS,
 
-  funds: 5000,
+  funds: 2500,
   materials: 300,
 
   flags: {},
@@ -164,7 +164,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   advanceDay: () => set((state) => {
     const nextDay = state.day + 1;
-    const dailyCost = 150; // Daily Overhead (Salaries, Rent)
+    const dailyCost = 250; // Daily Overhead (Salaries, Rent)
     return {
       day: nextDay,
       week: Math.ceil(nextDay / 5),
