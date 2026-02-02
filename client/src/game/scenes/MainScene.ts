@@ -100,40 +100,17 @@ export class MainScene extends Phaser.Scene {
             this.workers.push(worker);
         }
 
-
-
         // React to Store Changes (Zustand subscription)
         const store = useGameStore;
 
-        // 3.5. Add Player Avatar (The Engineer)
-        const playerGender = store.getState().playerGender;
-        const playerTexture = playerGender === 'female' ? 'architect_female' : 'architect';
+        // 3.1 Spawn Initial Buildings (Persistent)
+        const initialDone = store.getState().columns.find(c => c.id === 'done')?.tasks.length || 0;
+        for (let i = 0; i < initialDone; i++) {
+            this.spawnBuildingEffect();
+        }
 
-        // Check if texture exists, else fallback
-        const textureKey = this.textures.exists(playerTexture) ? playerTexture : 'worker_blue';
-
-        const player = this.add.sprite(width / 2, height - 100, textureKey);
-        player.setScale(1.5);
-        player.setDepth(2000); // On top
-
-        // Label
-        const label = this.add.text(player.x, player.y - 50, "YOU", {
-            fontSize: '14px',
-            fontStyle: 'bold',
-            color: '#ffffff',
-            backgroundColor: '#000000'
-        }).setOrigin(0.5).setDepth(2001);
-
-        // Store subscription for Gender Sync
+        // Store subscription for Store Sync
         this.unsubscribe = store.subscribe((state, prevState) => {
-            // Gender Change
-            if (state.playerGender !== prevState.playerGender) {
-                const newKey = state.playerGender === 'female' ? 'architect_female' : 'architect';
-                if (this.textures.exists(newKey)) {
-                    player.setTexture(newKey);
-                }
-            }
-
             // Rest of subscription logic...
             const prevDone = prevState.columns.find(c => c.id === 'done')?.tasks.length || 0;
             const currDone = state.columns.find(c => c.id === 'done')?.tasks.length || 0;
@@ -239,23 +216,13 @@ export class MainScene extends Phaser.Scene {
             duration: 1000,
             ease: 'Back.out',
             onComplete: () => {
-                // Settle down then fade out
+                // Settle down
                 this.tweens.add({
                     targets: building,
                     y: y,
                     scaleY: 1,
                     duration: 500,
-                    ease: 'Bounce.out',
-                    onComplete: () => {
-                        // Fade out after a delay to prevent clutter
-                        this.tweens.add({
-                            targets: building,
-                            alpha: 0,
-                            delay: 2000,
-                            duration: 1000,
-                            onComplete: () => building.destroy()
-                        });
-                    }
+                    ease: 'Bounce.out'
                 });
             }
         });

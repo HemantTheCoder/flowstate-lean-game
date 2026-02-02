@@ -13,7 +13,6 @@ export class BootScene extends Phaser.Scene {
         this.load.image('mira', '/assets/mira.png');
         this.load.image('rao', '/assets/rao.png');
         this.load.image('architect', '/assets/architect.png');
-        this.load.image('architect_female', '/assets/architect_female.png'); // Add this
 
         // Environment
         this.load.image('ground', '/assets/ground.png');
@@ -46,20 +45,6 @@ export class BootScene extends Phaser.Scene {
                 g.fillCircle(32, 32, 20); // Circle body
                 g.fillStyle(0xffffff, 1); // Helmet
                 g.fillCircle(32, 25, 12);
-                g.generateTexture(key, 64, 64);
-            }
-        });
-
-        // 3. Player Avatars (Fallback)
-        const avatars = { 'architect': 0x0ea5e9, 'architect_female': 0xec4899 }; // Sky Blue vs Pink
-        Object.entries(avatars).forEach(([key, color]) => {
-            if (!this.textures.exists(key)) {
-                const g = this.make.graphics({ x: 0, y: 0 });
-                g.fillStyle(color, 1);
-                // distinctive shape (square-ish for Manager)
-                g.fillRect(16, 16, 32, 48);
-                g.fillStyle(0xffffff, 1);
-                g.fillCircle(32, 24, 10); // Face
                 g.generateTexture(key, 64, 64);
             }
         });
