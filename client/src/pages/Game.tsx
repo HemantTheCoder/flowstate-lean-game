@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { GameCanvas } from '@/components/game/GameCanvas';
+import { PlanningRoom } from '@/components/game/PlanningRoom'; // Import
 import { motion, AnimatePresence } from 'framer-motion';
 import { KanbanBoard } from '@/components/game/KanbanBoard';
 import { DialogueBox } from '@/components/game/DialogueBox';
@@ -17,7 +18,6 @@ import { ChapterCompleteModal } from '@/components/game/ChapterCompleteModal';
 import { SettingsModal } from '@/components/game/SettingsModal';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
-
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
   const [showSummary, setShowSummary] = useState(false);
@@ -32,14 +32,42 @@ export default function Game() {
   const {
     startDialogue, currentDialogue, day, advanceDay, week, chapter,
     tutorialStep, setTutorialStep, flags, setFlag, importState,
-    playerName, playerGender, funds, materials, columns, lpi
+    playerName, playerGender, funds, materials, columns, lpi, phase
   } = useGameStore();
+
+  const handleChapterContinue = () => {
+    // Force UI Cleanup
+    setShowChapterComplete(false);
+    setShowKanban(false);
+    setShowSummary(false);
+    setShowDecision(false);
+
+    // Update Game State for Chapter 2
+    useGameStore.setState(s => ({
+      chapter: 2,
+      day: 6,
+      week: 2,
+      phase: 'planning', // Enter Planning Room
+      flags: {
+        ...s.flags,
+        chapter_intro_seen: false, // Trigger Ch2 Intro
+        [`day_6_started`]: false
+      }
+    }));
+  };
+
   const { saveGame, gameState, isLoading: isServerLoading } = useGame();
   const [_, navigate] = useLocation();
 
   // 1. Hydrate Store from Server on Load
   useEffect(() => {
     if (gameState && !flags['hydrated']) {
+      // Logic Check: If loaded state claims Day 5+ but flag says we are new, trust server.
+      // BUT if we want to FORCE new game behavior when requested...
+      // The issue user reported: "skips name/story -> goes to construction complete".
+      // This implies `chapter` or `day` is loaded as High Value.
+      // Or `character_created` flag is missing but other things are present.
+
       importState(gameState);
       setFlag('hydrated', true);
     }
@@ -82,11 +110,13 @@ export default function Game() {
           trust: 50,
           productivity: 40,
           quality: 80,
-          budget: state.funds
+          budget: state.funds,
+          materials: state.materials
         },
         kanbanState: { columns: state.columns } as any,
         flags: state.flags,
-        metrics: state.lpi as any,
+        metrics: { ...state.lpi, ppcHistory: state.ppcHistory },
+        weeklyPlan: state.weeklyPlan,
         completedChapters: [],
         unlockedBadges: []
       });
@@ -118,7 +148,13 @@ export default function Game() {
           triggerRetryDecision();
         } else if (!flags['decision_push_made']) {
           // Good Outcome -> Chapter Complete!
-          setTimeout(() => setShowChapterComplete(true), 1000); // Slight delay for impact
+          // Good Outcome -> Chapter Complete!
+          setTimeout(() => {
+            setShowKanban(false);
+            setShowSummary(false);
+            setShowDecision(false);
+            setShowChapterComplete(true);
+          }, 1000);
         }
       }
     }
@@ -241,6 +277,7 @@ export default function Game() {
         } else {
           useGameStore.getState().addLog("Decision: Enforced Pull. Flow protected.");
           useGameStore.getState().addLog("NEXT STEP: Maintain flow. Move tasks to 'Doing' ONLY when space is free.");
+          setFlag('decision_pull_enforced', true);
         }
         setShowDecision(false);
       }
@@ -294,76 +331,98 @@ export default function Game() {
       return isAffordable && !isRainBlocked;
     });
 
-    // 0. NARRATIVE SPECIFIC ADVICE
-    if (flags['decision_push_made']) {
-      const hasWaste = doing?.tasks.some(t => t.id.includes('waste'));
-      if (hasWaste) {
-        return "⚠️ REWORK DETECTED: Move the 'Rework' task to 'Done' immediately to stop the waste!";
+    // 0. NARRATIVE SPECIFIC ADVICE & "END DAY" TRIGGERS
+
+    // Day 1: WIP Limits & Flow
+    if (day === 1) {
+      if (doingCount === 0 && readyCount === 0) { // Simple start
+        return "✅ Objective Complete! Click 'End Day' ☀️ to finish Day 1.";
       }
+      if (doingCount === 0) {
+        return "✅ Good job! 'Doing' is clear. Click 'End Day' ☀️ now. (No need to clear the backlog yet!)";
+      }
+      return "👷 Day 1 Goal: Move tasks from 'Ready' to 'Doing' and finish them. Keep 'Doing' under limit (2).";
     }
 
-    if (day === 2 && state.materials === 0) {
-      return "🚚 SUPPLY DELAY: Material is 0! Pull 'Prep' or 'Management' tasks (0 Cost) to keep the flow moving.";
+    // Day 2: Supply Shortage
+    if (day === 2) {
+      if (doingCount > 0) {
+        return "📦 Keep working. Finish active tasks.";
+      }
+
+      const hasPrep = allPending.some(t => t.cost === 0);
+      if (hasPrep) {
+        return "🚚 SUPPLY DELAY: Materials 0! But you can still do 'Prep' tasks (0 Cost). Pull them now!";
+      }
+
+      // Only if NO DOING and NO PREP and NO MATERIALS
+      if (state.materials < 10) {
+        return "✅ Supply Delay Survived! No more work possible. Click 'End Day' ☀️.";
+      }
+
+      // Fallback
+      return "📦 Day 2 Goal: Keep working until materials run out.";
     }
 
+    // Day 3: Rain
     if (day === 3) {
+      const hasIndoor = allPending.some(t => t.type !== 'Structural' && state.materials >= t.cost);
+      if (!hasIndoor && doingCount === 0) {
+        return "✅ Rain has stopped outdoor work. Click 'End Day' ☀️ to wait for clear skies.";
+      }
       const hasStructuralReady = ready?.tasks.some(t => t.type === 'Structural');
       if (hasStructuralReady) {
-        return "🌧️ RAIN ALERT: Structural tasks (Steel/Rebar) are BLOCKED. Work on Finishing or Management tasks instead!";
+        return "🌧️ RAIN ALERT: Structural tasks are BLOCKED. Focus on Interior/Systems or End Day.";
+      }
+      return "☔ Day 3 Goal: Do what you can indoors. Don't force outdoor work.";
+    }
+
+    // Day 4: Push vs Pull
+    if (day === 4) {
+      // Prioritize the decision advice logic specific to the choice made
+      if (flags['decision_pull_enforced']) {
+        if (doingCount === 0 && readyCount === 0) {
+          return "✅ Flow Protected. Rao is annoyed, but the site is stable. Click 'End Day' ☀️.";
+        }
+        return "✅ Good Choice! Now, ONLY pull work if you have space. Don't let Rao pressure you.";
+      }
+
+      if (flags['decision_push_made']) {
+        const hasWaste = doing?.tasks.some(t => t.id.includes('waste'));
+        if (hasWaste) {
+          return "⚠️ REWORK DETECTED: You pushed! Finish the 'Rework' task IMMEDIATELY to fix the waste.";
+        }
+        if (doingCount === 0) {
+          return "✅ Waste cleared. hopefully the Inspector is lenient. Click 'End Day' ☀️.";
+        }
+      }
+
+      if (!state.flags.decision_push_made && !state.flags.decision_pull_enforced) {
+        return "🛑 DISCIPLINE! Rao wants to push. Wait for the dialogue key decision.";
       }
     }
 
-    if (day === 4 && !state.flags.decision_push_made) {
-      return "🛑 DISCIPLINE! Rao wants to push unready work. Enforce 'Pull' logic to keep the flow stable.";
+    // Day 5: Inspection
+    if (day === 5) {
+      return "🕵️ INSPECTION DAY: The outcome depends on your Day 4 choice. Watch the dialogue!";
     }
 
-    // 1. END DAY & NARRATIVE COMPLETION CHECKS
-    if (day === 1 && doingCount === 0) {
-      return "🌙 Day 1 Complete! You stabilized the flow by finishing active work. Click 'End Day'.";
-    }
-
-    if (day === 2 && state.materials < 10 && doingCount === 0) {
-      const hasPrep = allPending.some(t => t.cost === 0);
-      if (!hasPrep) {
-        return "🌙 Day 2 Complete! No more Prep tasks available. Supply truck arrives tomorrow. End Day.";
-      }
-    }
-
-    if (day === 3 && doingCount === 0) {
-      const hasIndoor = allPending.some(t => t.type !== 'Structural' && state.materials >= t.cost);
-      if (!hasIndoor) {
-        return "🌙 Day 3 Complete! Rain blocks all remaining structural work. End Day.";
-      }
-    }
-
+    // Default Fallbacks
     if (doingCount === 0 && readyCount === 0 && backlogCount === 0) {
-      return "🌙 All tasks complete! Click 'End Day' to rest and get paid.";
-    }
-
-    // 2. Resource/Constraint Lock
-    if (!canPlayAny && doingCount === 0) {
-      return "🌙 Day Complete! No actvity possible (Materials/Weather). Click 'End Day'.";
+      return "🌙 All tasks complete! Click 'End Day' to rest.";
     }
 
     // 3. Bottleneck
     if (doingCount >= doingLimit) {
-      return "⛔ BOTTLENECK: The 'Doing' column is full! Focus on finishing current work.";
+      return "⛔ BOTTLENECK: 'Doing' is full! Finish current work before pulling more.";
     }
 
     // 4. Starvation
     if (doingCount === 0 && readyCount > 0) {
-      return "⚠️ STARVATION: 'Doing' is empty! Workers are idle. Pull a card from 'Ready' to keep flow moving.";
+      return "⚠️ STARVATION: Workers are idle. Pull a task!";
     }
 
-    // 5. General Advice
-    if (readyCount === 0 && backlogCount > 0) {
-      const affordAnything = backlog?.tasks.some(t => state.materials >= t.cost);
-      if (affordAnything) {
-        return "📋 PLAN NEXT: Pull a task from Backlog to 'Ready'.";
-      }
-    }
-
-    return "✅ Flow is stable. Keep moving tasks to 'Done' to earn funds!";
+    return "✅ Flow is stable. Keep moving tasks to 'Done'.";
   };
 
   return (
@@ -473,10 +532,17 @@ export default function Game() {
         />
 
         <CharacterCreationModal />
+        <PlanningRoom />
         <ChapterIntroModal />
         <DayBriefingModal />
         <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
-        <ChapterCompleteModal isOpen={showChapterComplete} onClose={() => setShowChapterComplete(false)} />
+        {showChapterComplete && day === 5 && (
+          <ChapterCompleteModal
+            isOpen={true}
+            onClose={() => setShowChapterComplete(false)}
+            onContinue={handleChapterContinue}
+          />
+        )}
 
         {/* Modals & Screens */}
         <AnimatePresence>

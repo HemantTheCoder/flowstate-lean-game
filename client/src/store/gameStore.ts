@@ -8,16 +8,20 @@ export interface DialogueLine {
   emotion?: 'neutral' | 'happy' | 'stressed' | 'angry';
 }
 
+export type ConstraintType = 'material' | 'crew' | 'approval' | 'weather'; // red icon if present
+export type GamePhase = 'planning' | 'action' | 'review';
+
 export interface Task extends TaskType {
   status: 'backlog' | 'ready' | 'doing' | 'done';
   originalId?: string;
+  constraints?: ConstraintType[]; // If empty, task is "Sound" (Green)
 }
 
 export interface Column {
   id: string;
   title: string;
   tasks: Task[];
-  wipLimit: number; // 0 for no limit
+  wipLimit: number; // 0 for owners
 }
 
 export interface GameState {
@@ -25,7 +29,7 @@ export interface GameState {
   chapter: number;
   day: number;
   week: number;
-  phase: 'planning' | 'action' | 'review';
+  phase: GamePhase; // New: Tracks if we are in Planning Room or Site
 
   // Player Profile
   playerName: string;
@@ -43,11 +47,17 @@ export interface GameState {
   // Metrics (LPI - Lean Performance Index)
   lpi: {
     flowEfficiency: number;
-    ppc: number; // Percent Plan Complete
+    ppc: number; // Percent Plan Complete (Last Week)
     wipCompliance: number;
     wasteRemoved: number;
     teamMorale: number;
   };
+
+  // NEW: Historical PPC for trending
+  ppcHistory: { week: number, ppc: number }[];
+
+  // NEW: Last Planner Commitments
+  weeklyPlan: string[]; // IDs of tasks committed to "Ready" this week
 
   // Kanban State
   columns: Column[];
@@ -101,6 +111,11 @@ export interface GameState {
 
   // Persistence
   importState: (data: any) => void;
+
+  // Chapter 2: LPS Actions
+  removeConstraint: (taskId: string, constraint: ConstraintType) => void;
+  commitPlan: (taskIds: string[]) => void;
+  enterPlanningPhase: () => void;
 }
 
 const INITIAL_COLUMNS: Column[] = [
@@ -128,6 +143,11 @@ export const useGameStore = create<GameState>((set, get) => ({
   tutorialActive: true,
   tutorialStep: 0,
 
+
+
+  weeklyPlan: [],
+  ppcHistory: [],
+
   currentDialogue: null,
   dialogueIndex: 0,
 
@@ -140,7 +160,6 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   columns: INITIAL_COLUMNS,
-
   funds: 2500,
   materials: 300,
 
@@ -164,12 +183,40 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   advanceDay: () => set((state) => {
     const nextDay = state.day + 1;
-    const dailyCost = 250; // Daily Overhead (Salaries, Rent)
+    const dailyCost = 250; // Daily Overhead
+
+    // 1. Calculate WIP Compliance
+    // Check if any column exceeds limit
+    const violatingCols = state.columns.filter(c => c.wipLimit > 0 && c.tasks.length > c.wipLimit);
+    const compliance = violatingCols.length > 0 ? 50 : 100; // Binary penalty for now, or scaled?
+
+    // 2. Calculate Flow Efficiency
+    // Eff = Active Work / (Active Work + Queue)
+    // Active = Doing, Queue = Ready
+    const doingCount = state.columns.find(c => c.id === 'doing')?.tasks.length || 0;
+    const readyCount = state.columns.find(c => c.id === 'ready')?.tasks.length || 0;
+    const totalWIP = doingCount + readyCount;
+
+    // If total WIP is 0, efficient (or idle). If doing > 0, efficiency is high.
+    // If only Ready (Queue) exists, eff is 0.
+    let eff = state.lpi.flowEfficiency;
+    if (totalWIP > 0) {
+      eff = Math.round((doingCount / totalWIP) * 100);
+    } else if (state.columns.find(c => c.id === 'done')?.tasks.length) {
+      // If everything done, 100%
+      eff = 100;
+    }
+
     return {
       day: nextDay,
       week: Math.ceil(nextDay / 5),
-      materials: state.materials + 150, // Daily delivery
-      funds: state.funds - dailyCost
+      materials: state.materials + 150,
+      funds: state.funds - dailyCost,
+      lpi: {
+        ...state.lpi,
+        wipCompliance: compliance,
+        flowEfficiency: eff
+      }
     };
   }),
 
@@ -365,9 +412,41 @@ export const useGameStore = create<GameState>((set, get) => ({
     playerName: data.playerName ?? state.playerName,
     playerGender: data.playerGender ?? state.playerGender,
     funds: data.resources?.budget ?? state.funds,
-    materials: data.materials ?? state.materials,
+    materials: data.resources?.materials ?? data.materials ?? state.materials,
     flags: data.flags ?? state.flags,
     columns: data.kanbanState?.columns ?? state.columns,
     lpi: data.metrics ?? state.lpi,
-  }))
+    ppcHistory: (data.metrics?.ppcHistory as any) ?? state.ppcHistory,
+    weeklyPlan: data.weeklyPlan ?? state.weeklyPlan,
+  })),
+
+  // Chapter 2 Actions
+  removeConstraint: (taskId, constraint) => set((state) => {
+    // Costs for removal (Simplified for now)
+    const costs = { material: 50, crew: 20, approval: 10, weather: 0 };
+    const cost = costs[constraint] || 0;
+
+    if (state.funds < cost) return {};
+
+    return {
+      funds: state.funds - cost,
+      columns: state.columns.map(col => ({
+        ...col,
+        tasks: col.tasks.map(t =>
+          t.id === taskId
+            ? { ...t, constraints: t.constraints?.filter(c => c !== constraint) }
+            : t
+        )
+      }))
+    };
+  }),
+
+  commitPlan: (taskIds) => set((state) => ({
+    weeklyPlan: taskIds,
+    phase: 'action', // Start the week!
+    // Move committed tasks to Ready if not there (Drag and Drop handles this visually, but store ensures)
+    // For now, we assume UI put them in Ready/Lookahead column.
+  })),
+
+  enterPlanningPhase: () => set({ phase: 'planning' })
 }));

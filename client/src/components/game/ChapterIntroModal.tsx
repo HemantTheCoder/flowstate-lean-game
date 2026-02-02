@@ -26,13 +26,13 @@ export const ChapterIntroModal: React.FC = () => {
             ]
         },
         2: {
-            title: "The Monsoon Drift",
-            subtitle: "Chapter 2: Managing Variation",
-            description: "The foundation is done, but the monsoon season has arrived. Unpredictable weather and supply delays threaten to derail the schedule.",
+            title: "The Overpromised Mall",
+            subtitle: "Chapter 2: Reliable Promises",
+            description: "Riverside Market is a high-profile project with a tight deadline. Rao and Isha have already promised a 'Soft Opening' next Friday. But on the ground, nothing is ready.",
             objectives: [
-                "MISSION: Survive the storm without running out of funds.",
-                "LEARN: Why 'Zero Inventory' fails when variation strikes.",
-                "MASTER: Using 'Buffers' (Materials & Time) to absorb shocks."
+                "MISSION: Deliver the 'Soft Opening' without breaking promises.",
+                "LEARN: The Last Planner System (LPS) & Constraint Removal.",
+                "MASTER: 'Should Do' vs. 'Can Do' vs. 'Will Do'."
             ]
         }
     }[chapter] || { title: "Unknown Chapter", subtitle: "", description: "", objectives: [] };

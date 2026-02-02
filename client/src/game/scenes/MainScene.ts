@@ -245,6 +245,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     showFloatingText(message: string, color: string) {
+        if (!this.add) return;
         const { width, height } = this.scale;
         const text = this.add.text(width / 2, height / 2 - 100, message, {
             fontSize: '24px',
@@ -264,7 +265,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     spawnWorkerBark(text: string) {
-        if (this.workers.length === 0) return;
+        if (!this.add || this.workers.length === 0) return;
         const worker = Phaser.Utils.Array.GetRandom(this.workers);
 
         const bubble = this.add.text(worker.x, worker.y - 40, text, {

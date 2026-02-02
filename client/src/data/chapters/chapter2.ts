@@ -11,25 +11,26 @@ export interface DayConfig {
 export const WEEK_2_SCHEDULE: DayConfig[] = [
     {
         day: 6,
-        title: "The Monsoon Drift",
-        description: "Dark clouds gather. Variation is coming.",
+        title: "The Overpromised Mall",
+        description: "Riverside Market Mall Project. A soft opening is promised in two weeks.",
         dialogue: [
-            { character: 'Inspector', text: "Welcome back. You stabilized the flow in calm weather. Now, let's see how you handle a storm.", emotion: 'neutral' },
-            { character: 'Mira', text: "Forecast says heavy rain all week. It's going to slow down our 'Structural' tasks.", emotion: 'stressed' },
-            { character: 'Rao', text: "Rain?! We can't stop! We have deadlines! Just... work faster when it stops!", emotion: 'stressed' },
-            { character: 'Engineer', text: "We can't just 'work faster'. We need buffers. We need to plan for the variation.", emotion: 'neutral' },
-            { character: 'Inspector', text: "Exactly. Chapter 2 is about 'Variation'. Systems that are too lean break when things go wrong.", emotion: 'happy' }
+            { character: 'Rao', text: "New client, big visibility! This Riverside Market project is our ticket to the big leagues!", emotion: 'happy' },
+            { character: 'Isha', text: "I've already created the master schedule. It's aggressive, but everything fits perfectly on paper.", emotion: 'happy' },
+            { character: 'Client', text: "We have announced the soft opening for next Friday. You will be finished by then, yes?", emotion: 'neutral' },
+            { character: 'Isha', text: "Yes! Absolutely! Everything is already planned.", emotion: 'happy' },
+            { character: 'Mira', text: "(whispering) Planned... or just promised? We haven't even checked materials yet.", emotion: 'worried' },
+            { character: 'Foreman', text: "A plan without materials is just a wish.", emotion: 'neutral' },
+            { character: 'Advisor', text: "Welcome to the Planning Room. Here, we don't just list tasks. We make reliable promises.", emotion: 'neutral' }
         ]
     },
     {
         day: 7,
-        title: "Muddy Roads",
-        description: "Supply trucks are stuck.",
-        event: 'supply_delay',
+        title: "Hidden Constraints",
+        description: "The schedule looks green, but the site is full of red flags.",
         dialogue: [
-            { character: 'Mira', text: "boss, the roads are mud. The supply truck is delayed.", emotion: 'stressed' },
-            { character: 'Rao', text: "What?! But we have zero inventory! We are STARVING!", emotion: 'angry' },
-            { character: 'Engineer', text: "This is why we need a 'Buffer' of materials. Zero inventory + Variation = Starvation.", emotion: 'neutral' }
+            { character: 'Mira', text: "I checked the lookahead. We have 'Structural Supports' scheduled, but the steel hasn't been approved.", emotion: 'stressed' },
+            { character: 'Rao', text: "Details! Just get the crew start working. We can get approval later!", emotion: 'angry' },
+            { character: 'Advisor', text: "If you start without approval, you risk rework. Remove the constraint first.", emotion: 'neutral' }
         ]
     },
     // More days to be added...

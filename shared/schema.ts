@@ -18,13 +18,15 @@ export const gameStates = pgTable("game_states", {
     productivity: number;
     quality: number;
     budget: number;
+    materials: number;
   }>().default({
     morale: 50,
     stress: 20,
     trust: 50,
     productivity: 40,
     quality: 80,
-    budget: 10000
+    budget: 10000,
+    materials: 300
   }),
 
   // Kanban System
@@ -36,7 +38,17 @@ export const gameStates = pgTable("game_states", {
   unlockedBadges: text("unlocked_badges").array(),
 
   // Metrics for "LPI" (Lean Performance Index)
-  metrics: jsonb("metrics").$type<any>(),
+  metrics: jsonb("metrics").$type<{
+    flowEfficiency: number;
+    ppc: number;
+    wipCompliance: number;
+    wasteRemoved: number;
+    teamMorale: number;
+    ppcHistory?: { week: number, ppc: number }[];
+  }>(),
+
+  // Chapter 2: Last Planner State
+  weeklyPlan: text("weekly_plan").array(), // Array of Task IDs intended for the week
 
   lastPlayed: timestamp("last_played").defaultNow(),
 });

@@ -27,7 +27,7 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         ],
         briefing: {
             objective: "Visualize the Flow.",
-            action: "Open the Kanban Board and follow the Tutorial."
+            action: "Clear the 'Doing' column. You DON'T need to empty the Backlog today! Just stabilize the work."
         }
     },
     {
@@ -42,8 +42,8 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         ],
         event: 'supply_delay',
         briefing: {
-            objective: "Survivability.",
-            action: "Materials are ZERO due to the truck breakdown 🚚. Use this downtime to pull 'Prep' tasks (0 Cost) like Safety Audits to keep the crew busy!"
+            objective: "Survive Shortage.",
+            action: "Materials are ZERO 🚚. Do 'Prep' tasks (0 Cost) if possible. When you can't work, End Day."
         }
     },
     {
@@ -58,8 +58,8 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         ],
         event: 'rain',
         briefing: {
-            objective: "Adapt to Variation.",
-            action: "Heavy rain 🌧️ blocks outdoor work. Only pull 'Indoor' tasks (Systems/Interior) to the Doing column. Avoid Structural tasks!"
+            objective: "Adapt to Rain.",
+            action: "Rain 🌧️ blocks Structural work. Do Indoor tasks only. If blocked, End Day."
         }
     },
     {
@@ -77,8 +77,8 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         ],
         event: 'decision_push',
         briefing: {
-            objective: "Maintain Discipline.",
-            action: "Rao wants to 'Push' outdoor work for the client visit. Refuse him! Pushing unready work creates 'Defects' (Waste) and hurts morale."
+            objective: "Resist Pressure.",
+            action: "Rao wants to 'Push'. REFUSE him! Choose 'Pull' logic to keep the site clean for the Inspector."
         }
     },
     {
@@ -105,8 +105,8 @@ export const DAY_5_GOOD: DialogueLine[] = [
     { character: 'Inspector', text: "This is true 'Flow'. Phase 1 is officially APPROVED.", emotion: 'happy' },
     { character: 'Mira', text: "Look around! The crew is happy, the site is safe, and we actually finished the foundation ahead of schedule.", emotion: 'happy' },
     { character: 'Engineer', text: "Thank you. Flow is about finishing, not just starting.", emotion: 'happy' },
-    { character: 'Inspector', text: "I want to see if you can handle something more complex. Chapter 2 will test your ability to handle 'Variation'.", emotion: 'neutral' },
-    { character: 'Inspector', text: "See you next week, Engineer.", emotion: 'happy' }
+    { character: 'Inspector', text: "But Flow is not enough if you can't be RELIABLE.", emotion: 'neutral' },
+    { character: 'Inspector', text: "Chapter 2 is about 'Promises'. Can you deliver what you plan, even when the storm hits? See you at the Mall Project.", emotion: 'happy' }
 ];
 
 export const DAY_5_BAD: DialogueLine[] = [

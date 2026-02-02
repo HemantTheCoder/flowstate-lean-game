@@ -8,6 +8,7 @@ export interface TaskType {
     reward: number; // Funds gained
     difficulty: number; // 1-5, affects time?
     leanTip?: string; // Educational context
+    constraints?: ('material' | 'crew' | 'approval' | 'weather')[]; // Chapter 2: LPS Constraints
 }
 
 export const CONSTRUCTION_TASKS: TaskType[] = [
