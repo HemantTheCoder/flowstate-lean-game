@@ -27,12 +27,12 @@ export const ChapterIntroModal: React.FC = () => {
         },
         2: {
             title: "The Overpromised Mall",
-            subtitle: "Chapter 2: Reliable Promises",
-            description: "Riverside Market is a high-profile project with a tight deadline. Rao and Isha have already promised a 'Soft Opening' next Friday. But on the ground, nothing is ready.",
+            subtitle: "Chapter 2: Last Planner System",
+            description: "Stop planning what “should” be done. Start committing to what “can” be done. The foundation is ready, but the constraints are hidden.",
             objectives: [
                 "MISSION: Deliver the 'Soft Opening' without breaking promises.",
-                "LEARN: The Last Planner System (LPS) & Constraint Removal.",
-                "MASTER: 'Should Do' vs. 'Can Do' vs. 'Will Do'."
+                "LEARN: Plan in layers. Remove constraints. Commit only what’s ready.",
+                "MASTER: The difference between 'Should', 'Can', and 'Will'."
             ]
         }
     }[chapter] || { title: "Unknown Chapter", subtitle: "", description: "", objectives: [] };

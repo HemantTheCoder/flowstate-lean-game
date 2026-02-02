@@ -155,7 +155,22 @@ export class MainScene extends Phaser.Scene {
                 if (diff > 0) this.showFloatingText(`Morale +${diff} 😊`, '#10b981');
                 else this.showFloatingText(`Morale ${diff} 😓`, '#ef4444');
             }
+
+            // Watch for Chapter Change
+            if (state.chapter !== prevState.chapter) {
+                if (state.chapter === 2) {
+                    this.ground.setTexture('ground_mall');
+                    this.spawnBuildingEffect(); // Celebrate chapter change
+                } else {
+                    this.ground.setTexture('ground');
+                }
+            }
         });
+
+        // Initial Chapter Check
+        if (store.getState().chapter === 2) {
+            this.ground.setTexture('ground_mall');
+        }
 
         // 4. Handle Window Resize
         this.scale.on('resize', this.resize, this);

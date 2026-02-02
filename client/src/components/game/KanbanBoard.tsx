@@ -83,7 +83,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-2 md:p-8"
+            className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-2 md:p-8"
             onClick={(e) => {
                 if (e.target === e.currentTarget) onClose();
             }}
@@ -93,7 +93,9 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 {/* Header */}
                 <div className="bg-white p-4 md:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center z-10 gap-2 md:gap-4">
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black text-slate-800">Project Board</h2>
+                        <h2 className="text-xl md:text-3xl font-black text-slate-800 flex items-center gap-2">
+                            {day > 5 ? '🚧 Site Execution Board (Week Work)' : '📋 Project Kanban Board'}
+                        </h2>
                         <div className="flex gap-2 md:gap-4 mt-1 md:mt-2">
                             <div className="px-2 md:px-3 py-0.5 md:py-1 bg-blue-50 text-blue-700 rounded-lg font-mono font-bold border border-blue-100 text-[10px] md:text-sm">
                                 Funds: ${funds}
@@ -107,16 +109,23 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                         onClick={onClose}
                         className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 md:px-6 py-1.5 md:py-2 rounded-xl font-bold transition-colors w-full md:w-auto text-sm md:text-base"
                     >
-                        Close
+                        Close View
                     </button>
                 </div>
 
                 {/* Columns Grid with DragDropContext */}
                 <DragDropContext onDragEnd={onDragEnd}>
-                    <div className="flex-1 flex flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-hidden">
+                    <div className="flex-1 flex flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-hidden bg-slate-200/50">
                         {columns.map(col => {
                             let highlightClass = "border-slate-200";
                             let adviceText = null;
+
+                            // Chapter 2 Customizations
+                            let displayTitle = col.title;
+                            if (day > 5) {
+                                if (col.id === 'backlog') displayTitle = "Master Plan (Locked)";
+                                if (col.id === 'ready') displayTitle = "Weekly Plan (Committed)";
+                            }
 
                             if (col.id === 'doing' && col.tasks.length >= col.wipLimit) {
                                 highlightClass = "border-red-400 ring-4 ring-red-100";
@@ -127,19 +136,22 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                 adviceText = "Starved!";
                             }
 
+                            // Blur Backlog in Ch2 (Execution Phase)
+                            const isBlurred = day > 5 && col.id === 'backlog';
+
                             return (
-                                <Droppable key={col.id} droppableId={col.id}>
+                                <Droppable key={col.id} droppableId={col.id} isDropDisabled={isBlurred}>
                                     {(provided, snapshot) => (
                                         <div
                                             {...provided.droppableProps}
                                             ref={provided.innerRef}
                                             id={`col-${col.id}`}
-                                            className={`min-w-[280px] md:w-[320px] flex flex-col h-full bg-slate-50 rounded-2xl border-2 transition-all ${highlightClass} ${snapshot.isDraggingOver ? 'bg-blue-50/50 border-blue-300' : ''} overflow-hidden shrink-0`}
+                                            className={`min-w-[280px] md:w-[320px] flex flex-col h-full bg-slate-50 rounded-2xl border-2 transition-all ${highlightClass} ${snapshot.isDraggingOver ? 'bg-blue-50/50 border-blue-300' : ''} overflow-hidden shrink-0 ${isBlurred ? 'opacity-50 grayscale pointer-events-none' : ''}`}
                                         >
                                             {/* Column Header */}
                                             <div className={`${col.id === 'done' ? 'bg-green-100' : 'bg-white'} p-4 border-b border-slate-100`}>
                                                 <div className="flex justify-between items-center mb-1">
-                                                    <h3 className="font-bold text-slate-700">{col.title}</h3>
+                                                    <h3 className="font-bold text-slate-700">{displayTitle}</h3>
                                                     {col.wipLimit > 0 && (
                                                         <div className="flex items-center gap-2">
                                                             <span className={`text-xs font-bold px-2 py-1 rounded ${col.tasks.length >= col.wipLimit ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500'}`}>
@@ -157,44 +169,49 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
                                             {/* Draggable Task List */}
                                             <div className="flex-1 bg-slate-100 p-3 space-y-3 overflow-y-auto">
-                                                {col.tasks.map((task, index) => (
-                                                    <Draggable key={task.id} draggableId={task.id} index={index}>
-                                                        {(provided, snapshot) => (
-                                                            <div
-                                                                ref={provided.innerRef}
-                                                                {...provided.draggableProps}
-                                                                {...provided.dragHandleProps}
-                                                                className={`bg-white p-3 rounded-xl shadow-sm border-l-4 border-blue-400 cursor-grab active:cursor-grabbing hover:shadow-md transition-all group relative ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-blue-400 rotate-2' : ''}`}
-                                                            >
-                                                                <h4 className="font-bold text-slate-700 group-hover:text-blue-600 transition-colors text-sm md:text-base">{task.title}</h4>
-                                                                <p className="text-[10px] md:text-xs text-slate-400 line-clamp-2 mt-1">{task.description}</p>
+                                                {col.tasks.map((task, index) => {
+                                                    // Check for Red Constraints (Chapter 2)
+                                                    const hasRedConstraints = (task.constraints?.length || 0) > 0;
 
-                                                                <div className="mt-2 flex flex-wrap gap-1 md:gap-2 text-[10px] font-mono font-bold">
-                                                                    <span className={`px-1 rounded border ${task.type === 'Structural' ? 'bg-orange-100 text-orange-800 border-orange-200' :
-                                                                        task.type === 'Management' ? 'bg-purple-100 text-purple-800 border-purple-200' :
-                                                                            'bg-sky-100 text-sky-800 border-sky-200'
-                                                                        }`}>
-                                                                        {task.type}
-                                                                    </span>
-                                                                    <span className="text-slate-600 bg-slate-50 border border-slate-200 px-1 rounded">-{task.cost}</span>
-                                                                    <span className="text-green-600 bg-green-50 border border-green-200 px-1 rounded">+${task.reward}</span>
-                                                                </div>
-
-                                                                {task.leanTip && (
-                                                                    <div className="mt-2 text-[9px] text-slate-500 bg-slate-50 p-1.5 rounded border border-slate-100 italic">
-                                                                        💡 {task.leanTip}
+                                                    return (
+                                                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                                                            {(provided, snapshot) => (
+                                                                <div
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                    className={`bg-white p-3 rounded-xl shadow-sm border-l-4 cursor-grab active:cursor-grabbing hover:shadow-md transition-all group relative ${hasRedConstraints ? 'border-red-500 bg-red-50' : 'border-blue-400'} ${snapshot.isDragging ? 'shadow-2xl ring-2 rotate-2' : ''}`}
+                                                                >
+                                                                    <div className="flex justify-between items-start">
+                                                                        <h4 className="font-bold text-slate-700 group-hover:text-blue-600 transition-colors text-sm md:text-base flex-1">{task.title}</h4>
+                                                                        {hasRedConstraints && <span className="text-lg animate-pulse" title="Blocked by Constraints">⛔</span>}
                                                                     </div>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </Draggable>
-                                                ))}
+
+                                                                    <p className="text-[10px] md:text-xs text-slate-400 line-clamp-2 mt-1">{task.description}</p>
+
+                                                                    {/* Constraint Tags */}
+                                                                    {task.constraints?.map(c => (
+                                                                        <span key={c} className="inline-block bg-red-100 text-red-700 text-[9px] px-1 py-0.5 rounded mr-1 mt-1 font-bold border border-red-200 uppercase">
+                                                                            Blocked: {c}
+                                                                        </span>
+                                                                    ))}
+
+                                                                    <div className="mt-2 flex flex-wrap gap-1 md:gap-2 text-[10px] font-mono font-bold">
+                                                                        <span className={`px-1 rounded border ${task.type === 'Structural' ? 'bg-orange-100 text-orange-800 border-orange-200' :
+                                                                            task.type === 'Management' ? 'bg-purple-100 text-purple-800 border-purple-200' :
+                                                                                'bg-sky-100 text-sky-800 border-sky-200'
+                                                                            }`}>
+                                                                            {task.type}
+                                                                        </span>
+                                                                        <span className="text-slate-600 bg-slate-50 border border-slate-200 px-1 rounded">-{task.cost}</span>
+                                                                        <span className="text-green-600 bg-green-50 border border-green-200 px-1 rounded">+${task.reward}</span>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </Draggable>
+                                                    );
+                                                })}
                                                 {provided.placeholder}
-                                                {col.tasks.length === 0 && (
-                                                    <div className="h-full flex items-center justify-center text-slate-300 text-sm italic py-8">
-                                                        Drop items here
-                                                    </div>
-                                                )}
                                             </div>
                                         </div>
                                     )}

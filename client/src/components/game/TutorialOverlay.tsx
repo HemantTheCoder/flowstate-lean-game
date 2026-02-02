@@ -230,6 +230,69 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         </div>
                     </motion.div>
                 )}
+
+                {/* --- CHAPTER 2: PLANNING ROOM TUTORIAL --- */}
+
+                {/* Step 10: Lookahead Window (Red/Green) */}
+                {tutorialStep === 10 && (
+                    <div className="absolute top-20 right-20 z-[90] w-72 pointer-events-auto">
+                        <div className="bg-blue-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-blue-400">
+                            <h3 className="font-bold text-blue-300 text-lg mb-1">📅 Lookahead Window</h3>
+                            <p className="text-sm mb-3">
+                                Tasks here are <b>planned</b> but not yet ready. <br />
+                                <span className="text-red-400 font-bold">RED Icons</span> = Constraints (Blocked). <br />
+                                <span className="text-green-400 font-bold">GREEN</span> = Ready to Commit.
+                            </p>
+                            <button
+                                onClick={() => useGameStore.getState().setTutorialStep(11)}
+                                className="bg-blue-500 w-full py-1 rounded text-sm font-bold"
+                            >
+                                Next: Fix Constraints
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Step 11: Removing Constraints */}
+                {tutorialStep === 11 && (
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[90] w-80 pointer-events-auto">
+                        <div className="bg-red-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-red-500">
+                            <h3 className="font-bold text-red-300 text-lg mb-1">🚫 Remove Constraints!</h3>
+                            <p className="text-sm mb-3">
+                                You cannot do work with missing materials or approvals! <br />
+                                Click the <span className="text-xs bg-red-700 px-1 rounded border border-red-500">Fix</span> button on a task to pay for removal.
+                            </p>
+                            <button
+                                onClick={() => useGameStore.getState().setTutorialStep(12)}
+                                className="bg-red-500 w-full py-1 rounded text-sm font-bold"
+                            >
+                                Got it!
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Step 12: Weekly Commitment */}
+                {tutorialStep === 12 && (
+                    <div className="absolute bottom-20 right-20 z-[90] w-72 pointer-events-auto">
+                        <div className="bg-green-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-green-500">
+                            <h3 className="font-bold text-green-300 text-lg mb-1">🤝 The Weekly Promise</h3>
+                            <p className="text-sm mb-3">
+                                Only commit to tasks that are <b>Sound</b> (Green). <br />
+                                If you commit to Red tasks, they will likely fail and hurt Morale!
+                            </p>
+                            <button
+                                onClick={() => {
+                                    useGameStore.getState().setTutorialStep(99);
+                                    useGameStore.getState().setFlag('tutorial_planning_complete', true);
+                                }}
+                                className="bg-green-500 w-full py-1 rounded text-sm font-bold"
+                            >
+                                Let's Plan! 🚀
+                            </button>
+                        </div>
+                    </div>
+                )}
             </AnimatePresence>
 
         </div>

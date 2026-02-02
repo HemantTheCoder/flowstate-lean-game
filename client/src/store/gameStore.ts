@@ -5,7 +5,7 @@ import { getRandomTask, TaskType, CONSTRUCTION_TASKS } from '@/data/tasks';
 export interface DialogueLine {
   character: string;
   text: string;
-  emotion?: 'neutral' | 'happy' | 'stressed' | 'angry';
+  emotion?: 'neutral' | 'happy' | 'stressed' | 'angry' | 'worried';
 }
 
 export type ConstraintType = 'material' | 'crew' | 'approval' | 'weather'; // red icon if present
@@ -116,6 +116,9 @@ export interface GameState {
   removeConstraint: (taskId: string, constraint: ConstraintType) => void;
   commitPlan: (taskIds: string[]) => void;
   enterPlanningPhase: () => void;
+  calculatePPC: () => number;
+  // Generic Task Update (for events)
+  updateTask: (taskId: string, updates: Partial<Task>) => void;
 }
 
 const INITIAL_COLUMNS: Column[] = [
@@ -448,5 +451,42 @@ export const useGameStore = create<GameState>((set, get) => ({
     // For now, we assume UI put them in Ready/Lookahead column.
   })),
 
-  enterPlanningPhase: () => set({ phase: 'planning' })
+  enterPlanningPhase: () => set({ phase: 'planning' }),
+
+  calculatePPC: () => {
+    const state = get();
+    const plannedDetails = state.columns
+      .flatMap(c => c.tasks)
+      .filter(t => state.weeklyPlan.includes(t.id) || state.weeklyPlan.includes(t.originalId || ''));
+
+    // In a real scenario, we'd track exactly which were committed. 
+    // Simplified: Check if tasks in weeklyPlan are in 'done' column.
+
+    const doneTasks = state.columns.find(c => c.id === 'done')?.tasks || [];
+    const completedCount = doneTasks.filter(t =>
+      state.weeklyPlan.includes(t.id) || state.weeklyPlan.includes(t.originalId || '')
+    ).length;
+
+    const totalPromised = state.weeklyPlan.length;
+    if (totalPromised === 0) return 0;
+
+    const ppc = Math.round((completedCount / totalPromised) * 100);
+
+    // Save history
+    set(s => ({
+      lpi: { ...s.lpi, ppc },
+      ppcHistory: [...s.ppcHistory, { week: s.week, ppc }]
+    }));
+
+    return ppc;
+  },
+
+  updateTask: (taskId: string, updates: Partial<Task>) => {
+    set(s => ({
+      columns: s.columns.map(c => ({
+        ...c,
+        tasks: c.tasks.map(t => t.id === taskId ? { ...t, ...updates } : t)
+      }))
+    }));
+  }
 }));

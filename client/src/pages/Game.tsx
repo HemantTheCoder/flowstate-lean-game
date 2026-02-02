@@ -35,25 +35,52 @@ export default function Game() {
     playerName, playerGender, funds, materials, columns, lpi, phase
   } = useGameStore();
 
-  const handleChapterContinue = () => {
-    // Force UI Cleanup
-    setShowChapterComplete(false);
-    setShowKanban(false);
-    setShowSummary(false);
-    setShowDecision(false);
+  /* DEBUG: State Overlay */
+  const DebugOverlay = () => (
+    <div className="fixed top-0 left-0 bg-black/80 text-green-400 p-2 z-[9999] text-xs font-mono pointer-events-none">
+      <div>Day: {day} | Ch: {chapter} | Phase: {phase}</div>
+      <div>Modal: {showChapterComplete ? 'OPEN' : 'CLOSED'}</div>
+      <div>Intro Seen: {flags['chapter_intro_seen'] ? 'YES' : 'NO'}</div>
+    </div>
+  );
 
-    // Update Game State for Chapter 2
-    useGameStore.setState(s => ({
-      chapter: 2,
-      day: 6,
-      week: 2,
-      phase: 'planning', // Enter Planning Room
-      flags: {
-        ...s.flags,
-        chapter_intro_seen: false, // Trigger Ch2 Intro
-        [`day_6_started`]: false
-      }
-    }));
+  const handleChapterContinue = () => {
+    try {
+      console.log("State Update Attempt...");
+
+      // Force UI Cleanup (Sync)
+      setShowChapterComplete(false);
+      setShowKanban(false);
+      setShowSummary(false);
+      setShowDecision(false);
+
+      // Update Game State
+      useGameStore.setState(s => {
+        console.log("Setting State to Chapter 2...");
+        return {
+          chapter: 2,
+          day: 6,
+          week: 2,
+          phase: 'planning',
+          flags: {
+            ...s.flags,
+            chapter_intro_seen: false,
+            [`day_6_started`]: false
+          }
+        };
+      });
+
+      // Verification Log
+      setTimeout(() => {
+        const current = useGameStore.getState();
+        console.log("Post-Update State Check:", current.chapter, current.day);
+        if (current.day !== 6) alert("CRITICAL: State update failed. Check console.");
+      }, 100);
+
+    } catch (e: any) {
+      console.error("Transition Error:", e);
+      alert(`Transition Error: ${e.message}`);
+    }
   };
 
   const { saveGame, gameState, isLoading: isServerLoading } = useGame();
@@ -192,6 +219,19 @@ export default function Game() {
       if (dayConfig.event === 'supply_delay') {
         useGameStore.setState({ materials: 0 }); // Hard constraint!
       }
+      if (dayConfig.event === 'surprise_inspection') {
+        // Add an 'approval' constraint to a random task in Doing or Ready
+        const targetTask = useGameStore.getState().columns.find(c => c.id === 'ready' || c.id === 'doing')?.tasks[0];
+        if (targetTask) {
+          useGameStore.getState().addLog(`⚠️ EVENT: Surprise Inspection! Task '${targetTask.title}' flagged.`);
+          useGameStore.getState().updateTask(targetTask.id, { constraints: [...(targetTask.constraints || []), 'approval'] });
+        }
+      }
+      if (dayConfig.event === 'rao_push_ch2') {
+        // Trigger specific Chapter 2 push decision
+        setTimeout(() => triggerPushDecision(), 5000); // Slight delay after dialogue
+      }
+
       if (dayConfig.day === 3) {
         soundManager.playSFX('storm', audioSettings.sfxVolume);
       }
@@ -305,6 +345,14 @@ export default function Game() {
     // Check for Friday end (End of Chapter 1)
     if (day === 5) {
       navigate('/debrief');
+    }
+
+    // Check for Week 2 End (PPC Review)
+    if (day === 10) {
+      // Trigger PPC Calculation
+      const ppc = useGameStore.getState().calculatePPC();
+      // Show Chapter Complete / Weekly Review Modal
+      setShowChapterComplete(true);
     }
   };
 
@@ -519,6 +567,9 @@ export default function Game() {
         </motion.div>
 
         {/* Overlays */}
+        <CharacterCreationModal />
+        <PlanningRoom />
+
         <DialogueBox />
 
         <TutorialOverlay showKanban={showKanban} />
@@ -531,19 +582,9 @@ export default function Game() {
           onSelect={decisionProps?.onSelect || (() => { })}
         />
 
-        <CharacterCreationModal />
-        <PlanningRoom />
         <ChapterIntroModal />
         <DayBriefingModal />
         <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
-        {showChapterComplete && day === 5 && (
-          <ChapterCompleteModal
-            isOpen={true}
-            onClose={() => setShowChapterComplete(false)}
-            onContinue={handleChapterContinue}
-          />
-        )}
-
         {/* Modals & Screens */}
         <AnimatePresence>
           {showKanban && <KanbanBoard onClose={() => setShowKanban(false)} />}
@@ -556,6 +597,15 @@ export default function Game() {
         />
 
       </div >
+
+      {/* Root Level Modals (Interactive) */}
+      {showChapterComplete && day === 5 && (
+        <ChapterCompleteModal
+          isOpen={true}
+          onClose={() => setShowChapterComplete(false)}
+          onContinue={handleChapterContinue}
+        />
+      )}
     </div >
   );
 }

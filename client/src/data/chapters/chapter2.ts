@@ -12,26 +12,55 @@ export const WEEK_2_SCHEDULE: DayConfig[] = [
     {
         day: 6,
         title: "The Overpromised Mall",
-        description: "Riverside Market Mall Project. A soft opening is promised in two weeks.",
+        description: "Reviewing the Master Plan. Constraints are hidden everywhere.",
         dialogue: [
-            { character: 'Rao', text: "New client, big visibility! This Riverside Market project is our ticket to the big leagues!", emotion: 'happy' },
-            { character: 'Isha', text: "I've already created the master schedule. It's aggressive, but everything fits perfectly on paper.", emotion: 'happy' },
-            { character: 'Client', text: "We have announced the soft opening for next Friday. You will be finished by then, yes?", emotion: 'neutral' },
-            { character: 'Isha', text: "Yes! Absolutely! Everything is already planned.", emotion: 'happy' },
-            { character: 'Mira', text: "(whispering) Planned... or just promised? We haven't even checked materials yet.", emotion: 'worried' },
-            { character: 'Foreman', text: "A plan without materials is just a wish.", emotion: 'neutral' },
-            { character: 'Advisor', text: "Welcome to the Planning Room. Here, we don't just list tasks. We make reliable promises.", emotion: 'neutral' }
-        ]
+            { character: 'Client', text: "We have announced the soft opening already. Next Friday. You'll be ready, yes?", emotion: 'neutral' },
+            { character: 'Isha', text: "Yes! Everything is already planned.", emotion: 'happy' },
+            { character: 'Mira', text: "(quietly) Planned... or promised?", emotion: 'worried' },
+            { character: 'Rao', text: "This is big visibility. Let's go all in.", emotion: 'happy' },
+            { character: 'Foreman', text: "Paper plans don't pour concrete.", emotion: 'neutral' },
+            { character: 'Advisor', text: "Welcome to the Planning Room. Stop planning what 'should' be done. Start committing to what 'can' be done.", emotion: 'neutral' }
+        ],
+        // Special Phase: Planning
     },
     {
         day: 7,
-        title: "Hidden Constraints",
-        description: "The schedule looks green, but the site is full of red flags.",
+        title: "Execution Starts",
+        description: "The team starts working on the committed plan.",
         dialogue: [
-            { character: 'Mira', text: "I checked the lookahead. We have 'Structural Supports' scheduled, but the steel hasn't been approved.", emotion: 'stressed' },
-            { character: 'Rao', text: "Details! Just get the crew start working. We can get approval later!", emotion: 'angry' },
-            { character: 'Advisor', text: "If you start without approval, you risk rework. Remove the constraint first.", emotion: 'neutral' }
+            // Day 7 - Intro to pulling work
+            { character: 'Foreman', text: "The crew appreciates the clear plan. No running around looking for materials.", emotion: 'happy' }
         ]
     },
-    // More days to be added...
+    {
+        day: 8,
+        title: "The Surprise",
+        description: "Hidden constraints emerge.",
+        dialogue: [
+            { character: 'Foreman', text: "Boss, the electrical Inspector just showed up. We don't have the approval papers!", emotion: 'stressed' },
+            { character: 'Isha', text: "I thought we had that! It was green on the plan!", emotion: 'worried' },
+            { character: 'Mira', text: "We checked materials, not approvals. Constraints don't announce themselves.", emotion: 'neutral' }
+        ],
+        event: 'surprise_inspection'
+    },
+    {
+        day: 9,
+        title: "Rao's Pressure",
+        description: "Management wants to push more work.",
+        dialogue: [
+            { character: 'Rao', text: "The client is asking about the Roof Café. Promise it for tomorrow.", emotion: 'neutral' },
+            { character: 'Mira', text: "We don't have the tiles. If we promise, we fail.", emotion: 'worried' },
+            { character: 'Rao', text: "Just promise it! We'll figure it out.", emotion: 'angry' }
+        ],
+        event: 'rao_push_ch2'
+    },
+    {
+        day: 10,
+        title: "The Reckoning",
+        description: "Weekly Review. Did we keep our promises?",
+        dialogue: [
+            { character: 'Advisor', text: "It's Friday. Let's see our PPC (Percent Plan Complete).", emotion: 'neutral' }
+        ]
+        // Triggers PPC Modal
+    }
 ];

@@ -13,15 +13,15 @@ export interface TaskType {
 
 export const CONSTRUCTION_TASKS: TaskType[] = [
     // STRUCTURAL (Outdoor, High Cost/Reward, Blocked by Rain)
-    { id: 'struct_1', title: 'Pour Foundation Zone A', description: 'Complete concrete pour for main lobby.', type: 'Structural', cost: 100, reward: 3500, difficulty: 4 },
-    { id: 'struct_2', title: 'Erect Steel Beams', description: 'Crane operation for 2nd floor framing.', type: 'Structural', cost: 150, reward: 4000, difficulty: 5 },
+    { id: 'struct_1', title: 'Pour Foundation Zone A', description: 'Complete concrete pour for main lobby.', type: 'Structural', cost: 100, reward: 3500, difficulty: 4, constraints: ['approval', 'crew'] }, // Complex start
+    { id: 'struct_2', title: 'Erect Steel Beams', description: 'Crane operation for 2nd floor framing.', type: 'Structural', cost: 150, reward: 4000, difficulty: 5, constraints: ['material'] },
     { id: 'struct_3', title: 'Laying Subflooring', description: 'Install plywood sheeting for floors.', type: 'Structural', cost: 30, reward: 1200, difficulty: 2 },
-    { id: 'struct_4', title: 'Roof Truss Assembly', description: 'Assemble timber trusses on ground.', type: 'Structural', cost: 80, reward: 2500, difficulty: 3 },
+    { id: 'struct_4', title: 'Roof Truss Assembly', description: 'Assemble timber trusses on ground.', type: 'Structural', cost: 80, reward: 2500, difficulty: 3, constraints: ['weather'] },
     { id: 'struct_5', title: 'Ext. Wall Framing', description: 'Frame exterior walls with 2x6 studs.', type: 'Structural', cost: 60, reward: 2000, difficulty: 3 },
-    { id: 'struct_6', title: 'Window Installation', description: 'Install weather-sealed windows.', type: 'Structural', cost: 90, reward: 2800, difficulty: 2 },
+    { id: 'struct_6', title: 'Window Installation', description: 'Install weather-sealed windows.', type: 'Structural', cost: 90, reward: 2800, difficulty: 2, constraints: ['material'] },
 
     // SYSTEMS (Indoor, Rain Safe, Med Cost)
-    { id: 'sys_1', title: 'Rough-in Plumbing', description: 'Install sewage and water lines.', type: 'Systems', cost: 40, reward: 1800, difficulty: 3 },
+    { id: 'sys_1', title: 'Rough-in Plumbing', description: 'Install sewage and water lines.', type: 'Systems', cost: 40, reward: 1800, difficulty: 3, constraints: ['approval'] },
     { id: 'sys_2', title: 'Electrical Wiring', description: 'Run main conduits and wires.', type: 'Systems', cost: 45, reward: 1900, difficulty: 3 },
     { id: 'sys_3', title: 'HVAC Ductwork', description: 'Install AC and heating ducts.', type: 'Systems', cost: 60, reward: 2200, difficulty: 3 },
     { id: 'sys_4', title: 'Fire Sprinklers', description: 'Run overhead fire suppression pipes.', type: 'Systems', cost: 55, reward: 2100, difficulty: 3 },

@@ -21,7 +21,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="absolute inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md px-4 perspective-[1000px]">
+                <div className="absolute inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md px-4 perspective-[1000px] pointer-events-auto">
                     <motion.div
                         initial={{ scale: 0.5, rotateX: 45, opacity: 0 }}
                         animate={{ scale: 1, rotateX: 0, opacity: 1 }}

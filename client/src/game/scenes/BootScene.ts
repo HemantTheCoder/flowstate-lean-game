@@ -36,6 +36,19 @@ export class BootScene extends Phaser.Scene {
             g.generateTexture('ground', 64, 64);
         }
 
+        // 1.5 Ground (Chapter 2 - Mall)
+        if (!this.textures.exists('ground_mall')) {
+            const g = this.make.graphics({ x: 0, y: 0 });
+            g.fillStyle(0x334155, 1); // Slate-700 (Dark Concrete)
+            g.fillRect(0, 0, 64, 64);
+            // Add some "concrete" noise dots
+            g.fillStyle(0x475569, 1);
+            for (let i = 0; i < 5; i++) {
+                g.fillCircle(Math.random() * 64, Math.random() * 64, 2);
+            }
+            g.generateTexture('ground_mall', 64, 64);
+        }
+
         // 2. Workers (Colored Circles)
         const colors = { 'worker_blue': 0x3b82f6, 'worker_orange': 0xf97316, 'worker_green': 0x22c55e };
         Object.entries(colors).forEach(([key, color]) => {
