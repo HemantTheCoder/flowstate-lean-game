@@ -7,11 +7,13 @@ import { DialogueBox } from '@/components/game/DialogueBox';
 import { TutorialOverlay } from '@/components/game/TutorialOverlay';
 import { DailySummary } from '@/components/game/DailySummary'; // Import
 import { useGameStore } from '@/store/gameStore';
-import { WEEK_1_SCHEDULE } from '@/data/chapters/chapter1';
+import { WEEK_1_SCHEDULE, DAY_5_GOOD, DAY_5_BAD } from '@/data/chapters/chapter1';
+import { WEEK_2_SCHEDULE } from '@/data/chapters/chapter2';
 import { DecisionModal } from '@/components/game/DecisionModal';
 import { CharacterCreationModal } from '@/components/game/CharacterCreationModal';
 import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
 import { DayBriefingModal } from '@/components/game/DayBriefingModal';
+import { ChapterCompleteModal } from '@/components/game/ChapterCompleteModal';
 import { SettingsModal } from '@/components/game/SettingsModal';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
@@ -21,13 +23,14 @@ export default function Game() {
   const [showSummary, setShowSummary] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [completedToday, setCompletedToday] = useState(0);
+  const [showChapterComplete, setShowChapterComplete] = useState(false);
 
   // Decision State
   const [showDecision, setShowDecision] = useState(false);
   const [decisionProps, setDecisionProps] = useState<any>(null);
 
   const {
-    startDialogue, currentDialogue, day, advanceDay, week,
+    startDialogue, currentDialogue, day, advanceDay, week, chapter,
     tutorialStep, setTutorialStep, flags, setFlag, importState,
     playerName, playerGender, funds, materials, columns, lpi
   } = useGameStore();
@@ -94,41 +97,130 @@ export default function Game() {
     }
   };
 
+  // Track previous dialogue state to detect completion
+  const prevDialogueRef = React.useRef(currentDialogue);
+
+  useEffect(() => {
+    // Check if dialogue just finished (was active, now null)
+    if (prevDialogueRef.current && !currentDialogue) {
+      // Dialogue Ended Logic
+      if (day === 4 && !flags['decision_push_seen']) {
+        // Day 4: Trigger Push Decision immediately after dialogue
+        setFlag('decision_push_seen', true); // Prevent re-trigger
+        triggerPushDecision();
+      }
+
+      if (day === 5) {
+        if (flags['decision_push_made'] && !flags['decision_retry_seen']) {
+          // Bad Outcome -> Retry
+          setFlag('decision_retry_seen', true);
+          triggerRetryDecision();
+        } else if (!flags['decision_push_made']) {
+          // Good Outcome -> Chapter Complete!
+          setTimeout(() => setShowChapterComplete(true), 1000); // Slight delay for impact
+        }
+      }
+    }
+    prevDialogueRef.current = currentDialogue;
+  }, [currentDialogue, day, flags, setFlag]);
+
   // Daily Event & Story Loader
   useEffect(() => {
+    // Choose Schedule based on Chapter
+    const currentSchedule = chapter === 1 ? WEEK_1_SCHEDULE : WEEK_2_SCHEDULE;
     // Check if we have config for this day
-    const dayConfig = WEEK_1_SCHEDULE.find(d => d.day === day);
+    const dayConfig = currentSchedule.find(d => d.day === day);
     const dayKey = `day_${day}_started`;
 
     if (dayConfig && !flags[dayKey] && flags['character_created'] && flags['chapter_intro_seen']) {
       // 1. Play Dialogue
-      setTimeout(() => {
-        startDialogue(dayConfig.dialogue);
-        setFlag(dayKey, true);
+      let dialogue = dayConfig.dialogue;
 
-        // 2. Trigger Event Effects
-        if (dayConfig.event === 'supply_delay') {
-          useGameStore.setState({ materials: 0 }); // Hard constraint!
+      // Day 5 Branching Logic
+      if (day === 5) {
+        const pushed = flags['decision_push_made'];
+        const branch = pushed ? DAY_5_BAD : DAY_5_GOOD;
+        dialogue = [...dialogue, ...branch];
+
+        // If Good Outcome, trigger Celebration Flag for Visuals AND Audio
+        if (!pushed) {
+          setTimeout(() => setFlag('celebration_triggered', true), 500);
         }
-        if (dayConfig.day === 3) {
-          soundManager.playSFX('storm', audioSettings.sfxVolume);
-        }
-        if (dayConfig.event === 'decision_push') {
-          // Trigger decision AFTER dialogue? Or parallel. 
-          // Let's trigger it after a short delay or checking dialogue end.
-          // For simplicity, we'll trigger it via a separate effect or timeout
-          setTimeout(() => triggerPushDecision(), 5000);
-        }
-      }, 1000);
+      }
+
+      startDialogue(dialogue);
+      setFlag(dayKey, true);
+
+      // 2. Trigger Event Effects
+      if (dayConfig.event === 'supply_delay') {
+        useGameStore.setState({ materials: 0 }); // Hard constraint!
+      }
+      if (dayConfig.day === 3) {
+        soundManager.playSFX('storm', audioSettings.sfxVolume);
+      }
+      // NOTE: Decisions are now triggered by the dialogue completion effect above!
     }
-  }, [day, flags, startDialogue, setFlag]);
+  }, [day, chapter, flags, startDialogue, setFlag]);
 
-  // Tutorial Logic: Step 1 -> 2 (Open Kanban)
+  // Bankruptcy Check
   useEffect(() => {
+    if (funds < 0) {
+      alert("💸 BANKRUPTCY 💸\n\nYou ran out of funds! The project has been shut down.\n\nTip: Keep the flow moving to generate revenue faster than the Daily Overhead expenses.");
+      window.location.reload();
+    }
+  }, [funds]);
+
+  // Tutorial Logic
+  useEffect(() => {
+    // Step 1 -> 2 (Open Kanban)
     if (showKanban && tutorialStep === 1) {
       setTutorialStep(2);
     }
+    // Step 5: Close Kanban to show Advisor Spotlight
+    if (tutorialStep === 5 && showKanban) {
+      setShowKanban(false);
+    }
   }, [showKanban, tutorialStep, setTutorialStep]);
+
+  const triggerRetryDecision = () => {
+    setDecisionProps({
+      title: "Inspection Failed ❌",
+      prompt: "The Inspector flagged the project for 'Excessive Waste' due to your Push decision. Relying on false demand has put the project at risk.",
+      options: [
+        { id: 'retry', text: "🔄 Replay Day 4 (Fix Mistake)", type: 'safe', description: "Go back in time. Choose 'Pull' this time." },
+        { id: 'accept', text: "Accept Consequences", type: 'risky', description: "Funding stops. Project fails. (GAME OVER)" }
+      ],
+      onSelect: async (id: string) => {
+        if (id === 'retry') {
+          // Reset to Day 4 Start
+          useGameStore.setState(s => ({
+            day: 4,
+            // Reset flags related to Day 4/5
+            flags: { ...s.flags, decision_push_made: false, [`day_4_started`]: false, [`day_5_started`]: false },
+            // Clear 'Doing' tasks to remove the "Waste" created by Push
+            columns: s.columns.map(c =>
+              c.id === 'doing' ? { ...c, tasks: [] } : c
+            )
+          }));
+          // Force a UI refresh by invalidating current day view logic? 
+          // The store update should trigger re-render.
+          alert("Rewinding to Day 4... Make the Lean choice this time!");
+          window.location.reload(); // Cleanest way to restart day logic
+        } else {
+          // GAME OVER
+          alert("⛔ GAME OVER ⛔\n\nThe funding was pulled due to poor management and excessive waste. The project has been cancelled.\n\nReturning to Title Screen...");
+          // Reset Game State completely
+          await useGameStore.getState().setChapter(1); // Reset store basics if needed, or just let server reset
+          // Use the mutation if available or just hard reload to clear session if local?
+          // Simple approach: Reload to root, user can restart.
+          // Ideally we call the `resetGame` hook if we had it exposed here, but a reload works for now or forcing chapter 1.
+          localStorage.clear(); // Clear local client state if any
+          window.location.reload();
+        }
+      }
+    });
+    setShowDecision(true);
+  };
 
   const triggerPushDecision = () => {
     setDecisionProps({
@@ -191,6 +283,14 @@ export default function Game() {
     const backlogCount = backlog?.tasks.length || 0;
     const doingLimit = doing?.wipLimit || 3;
 
+    // Define helper variables early for use in checks
+    const allPending = [...(backlog?.tasks || []), ...(ready?.tasks || [])];
+    const canPlayAny = allPending.some(t => {
+      const isAffordable = state.materials >= t.cost;
+      const isRainBlocked = day === 3 && t.type === 'Structural';
+      return isAffordable && !isRainBlocked;
+    });
+
     // 0. NARRATIVE SPECIFIC ADVICE (User requested better guidance)
     if (day === 2 && state.materials === 0) {
       return "🚚 SUPPLY DELAY: Material is 0! Pull 'Prep' or 'Management' tasks (0 Cost) to keep the flow moving.";
@@ -207,41 +307,54 @@ export default function Game() {
       return "🛑 DISCIPLINE! Rao wants to push unready work. Enforce 'Pull' logic to keep the flow stable.";
     }
 
-    // 1. End Day Condition
+    // 1. END DAY & NARRATIVE COMPLETION CHECKS
+    // Day 1: Narrative says "Stop starting new things". If 'Doing' is empty, we are done, even if Backlog has items.
+    if (day === 1 && doingCount === 0) {
+      return "🌙 Day 1 Complete! You stabilized the flow by finishing active work. Click 'End Day'.";
+    }
+
+    // Day 2 (Supply Delay): If we have no materials and no 0-cost (Prep) tasks left, we are done.
+    if (day === 2 && state.materials < 10 && doingCount === 0) { // <10 buffer
+      const hasPrep = allPending.some(t => t.cost === 0);
+      if (!hasPrep) {
+        return "🌙 Day 2 Complete! No more Prep tasks available. Supply truck arrives tomorrow. End Day.";
+      }
+    }
+
+    // Day 3 (Rain): If we have no Indoor tasks left and Outdoor is blocked.
+    if (day === 3 && doingCount === 0) {
+      const hasIndoor = allPending.some(t => t.type !== 'Structural' && state.materials >= t.cost);
+      if (!hasIndoor) {
+        return "🌙 Day 3 Complete! Rain blocks all remaining structural work. End Day.";
+      }
+    }
+
+    // Generic "All Done" (Total Empty)
     if (doingCount === 0 && readyCount === 0 && backlogCount === 0) {
-      return "All tasks complete! Click 'End Day' to rest. 🌙";
+      return "🌙 All tasks complete! Click 'End Day' to rest and get paid.";
     }
 
-    // 2. Starvation
-    if (doingCount === 0 && readyCount > 0) {
-      return "⚠️ IDLE CREWS! Move a task from 'Ready' to 'Doing'.";
+    // 2. Resource/Constraint Lock (Generic)
+    if (!canPlayAny && doingCount === 0) {
+      return "🌙 Day Complete! No actvity possible (Materials/Weather). Click 'End Day'.";
     }
 
-    // 3. Bottleneck
+    // 3. Bottleneck (High Priority Alert)
     if (doingCount >= doingLimit) {
-      return "⛔ BOTTLENECK detected! Finish tasks in 'Doing' to clear space.";
+      return "⛔ BOTTLENECK: The 'Doing' column is full! You cannot start new cards. Focus on finishing current work.";
     }
 
-    // 4. Prep Work
+    // 4. Starvation (Alert)
+    if (doingCount === 0 && readyCount > 0) {
+      return "⚠️ STARVATION: 'Doing' is empty! Workers are idle. Pull a card from 'Ready' to keep flow moving.";
+    }
+
+    // 5. General Advice
     if (readyCount === 0 && backlogCount > 0) {
-      // Check if we can actually PULL anything
       const affordAnything = backlog?.tasks.some(t => state.materials >= t.cost);
       if (affordAnything) {
         return "📋 PLAN NEXT: Pull a task from Backlog to 'Ready'.";
       }
-    }
-
-    // 5. RESOURCE/STORY LOCK (The user requests this prompt)
-    // If we have no affordable tasks and nothing in progress, force End Day.
-    const allPending = [...(backlog?.tasks || []), ...(ready?.tasks || [])];
-    const canPlayAny = allPending.some(t => {
-      const isAffordable = state.materials >= t.cost;
-      const isRainBlocked = day === 3 && t.type === 'Structural';
-      return isAffordable && !isRainBlocked;
-    });
-
-    if (!canPlayAny && doingCount === 0) {
-      return "⛔ NO MOVES LEFT! (Materials/Weather). End the Day to continue. 🌙";
     }
 
     return "✅ Flow is stable. Keep moving tasks to 'Done' to earn funds!";
@@ -262,7 +375,7 @@ export default function Game() {
           className="flex flex-col md:flex-row justify-between items-start pointer-events-auto gap-4 w-full md:w-auto"
         >
           <div className="flex gap-4 w-full md:w-auto">
-            <div className="bg-white/90 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border-2 border-slate-100 w-full md:min-w-[300px] md:w-auto flex-1">
+            <div id="smart-advisor-box" className="bg-white/90 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border-2 border-slate-100 w-full md:min-w-[300px] md:w-auto flex-1">
               <h3 className="font-bold text-slate-700 text-sm md:text-base">Week {week} | Day {day}</h3>
               <div className="text-xs md:text-sm text-slate-500 font-medium">Current Focus:</div>
               <div className="text-xs md:text-sm text-blue-600 animate-pulse font-bold mt-1 leading-tight">
@@ -272,13 +385,13 @@ export default function Game() {
 
             <button
               onClick={handleEndDay}
-              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center border-b-4 border-blue-700 text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') ? 'animate-bounce ring-4 ring-yellow-400' : ''}`}
+              className={`bg - blue - 500 hover: bg - blue - 600 text - white font - bold px - 3 py - 2 md: px - 4 rounded - xl shadow - md transition - colors h - fit self - center border - b - 4 border - blue - 700 text - sm md: text - base whitespace - nowrap ${getSmartObjective().includes('End Day') ? 'animate-bounce ring-4 ring-yellow-400' : ''} `}
             >
               End Day ☀️
             </button>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border-2 border-slate-100 flex gap-4 md:gap-6 w-full md:w-auto justify-around">
+          <div id="stats-box" className="bg-white/90 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border-2 border-slate-100 flex gap-4 md:gap-6 w-full md:w-auto justify-around">
             <div className="text-center">
               <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Funds</div>
               <div className="font-mono font-bold text-blue-600 text-sm md:text-base">${useGameStore(s => s.funds)}</div>
@@ -296,6 +409,7 @@ export default function Game() {
               {saveGame.isPending ? '⏳' : '💾'}
             </button>
             <button
+              id="btn-settings"
               onClick={() => {
                 soundManager.playSFX('click', audioSettings.sfxVolume);
                 setShowSettings(true);
@@ -356,6 +470,7 @@ export default function Game() {
         <ChapterIntroModal />
         <DayBriefingModal />
         <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
+        <ChapterCompleteModal isOpen={showChapterComplete} onClose={() => setShowChapterComplete(false)} />
 
         {/* Modals & Screens */}
         <AnimatePresence>

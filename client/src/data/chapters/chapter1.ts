@@ -68,8 +68,12 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         description: "Rao wants to rush tasks to look good for the client.",
         lesson: "Concept: Push vs Pull.",
         dialogue: [
-            { character: 'Rao', text: "Client visits tomorrow! We need to look busy! Start the landscaping!", emotion: 'angry' },
-            { character: 'Mira', text: "We aren't ready! The path isn't paved!", emotion: 'stressed' }
+            { character: 'Rao', text: "The Client's Chief Inspector is coming tomorrow! I walked the site—it looks empty!", emotion: 'angry' },
+            { character: 'Mira', text: "We are prepping drainage, Rao. Use your eyes. Digging now creates a mud pit.", emotion: 'stressed' },
+            { character: 'Rao', text: "I don't care about mud! I care about optics! If the Inspector sees idle workers, we are fired!", emotion: 'angry' },
+            { character: 'Rao', text: "PUSH everyone to the South Lawn! Make it look busy! Now!", emotion: 'angry' },
+            { character: 'Engineer', text: "That's false demand. Pushing unready work creates 'Waste'—rework later.", emotion: 'neutral' },
+            { character: 'Rao', text: "Waste? I see completed tasks! Make a choice, Engineer. My way, or the highway.", emotion: 'angry' }
         ],
         event: 'decision_push',
         briefing: {
@@ -80,16 +84,35 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
     {
         day: 5,
         title: "The Inspection",
-        description: "The Weekly Review. Did we keep our promises?",
+        description: "The Client Inspector arrives to judge our progress.",
         lesson: "Concept: Reliability (PPC).",
         dialogue: [
-            { character: 'Isha', text: "The inspector is here. Everyone look sharp.", emotion: 'stressed' },
-            { character: 'Old Foreman', text: "Work speaks for itself. If it's done right, no need to hide.", emotion: 'happy' }
+            { character: 'Isha', text: "She's here. The Inspector. Everyone look sharp.", emotion: 'stressed' },
+            { character: 'Rao', text: "Just smile and show her the activity.", emotion: 'neutral' }
         ],
         event: 'inspection',
         briefing: {
             objective: "Review Performance.",
-            action: "Clear the board and check your Morale score."
+            action: "The Inspector will judge your flow. Did you Push (Waste) or Pull (Value)?"
         }
     }
+];
+
+export const DAY_5_GOOD: DialogueLine[] = [
+    { character: 'Inspector', text: "I see a clean site. No piles of material blocking paths. Workers are focused.", emotion: 'happy' },
+    { character: 'Rao', text: "Yes! exactly as planned! We run a tight ship!", emotion: 'happy' },
+    { character: 'Inspector', text: "Your Lead Engineer deserves credit, Rao. They resisted the urge to clutter the site for show.", emotion: 'happy' },
+    { character: 'Inspector', text: "This is true 'Flow'. Phase 1 is officially APPROVED.", emotion: 'happy' },
+    { character: 'Mira', text: "Look around! The crew is happy, the site is safe, and we actually finished the foundation ahead of schedule.", emotion: 'happy' },
+    { character: 'Engineer', text: "Thank you. Flow is about finishing, not just starting.", emotion: 'happy' },
+    { character: 'Inspector', text: "I want to see if you can handle something more complex. Chapter 2 will test your ability to handle 'Variation'.", emotion: 'neutral' },
+    { character: 'Inspector', text: "See you next week, Engineer.", emotion: 'happy' }
+];
+
+export const DAY_5_BAD: DialogueLine[] = [
+    { character: 'Inspector', text: "What is this mess? Why is the landscape dug up when the drains aren't in?", emotion: 'angry' },
+    { character: 'Rao', text: "We... uh... we wanted to show progress!", emotion: 'stressed' },
+    { character: 'Inspector', text: "This isn't progress. This is chaos. Now you have to redo the grading.", emotion: 'angry' },
+    { character: 'Inspector', text: "I am flagging this project as 'At Risk'. Clean this up, or funding stops.", emotion: 'angry' },
+    { character: 'Rao', text: "You embarrassed me, Engineer! I told you to make it look GOOD, not messy!", emotion: 'angry' }
 ];

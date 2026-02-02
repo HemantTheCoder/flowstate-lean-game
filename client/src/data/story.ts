@@ -4,7 +4,7 @@ export const CHAPTER_1_INTRO: DialogueLine[] = [
     { character: 'Mira', text: "We’ve been busy two weeks straight, but… look. The site is a mess.", emotion: 'stressed' },
     { character: 'Rao', text: "Mess? We are building! Client wants it open for the summer festival—two weeks!", emotion: 'angry' },
     { character: 'Isha', text: "I scheduled everything in the plan, Rao. We’ll be fine if we just follow the dates.", emotion: 'happy' },
-    { character: 'Old Foreman', text: "Plans on paper are thin like rice paper. On site... it’s mud.", emotion: 'neutral' },
+    { character: 'Mira', text: "Plans on paper are thin like rice paper. On site... it’s mud.", emotion: 'neutral' },
     { character: 'Architect', text: "Foreman is right. A schedule isn't reality. We need to visualize the actual constraints.", emotion: 'neutral' },
     { character: 'Architect', text: "Let's open the Kanban Board. It will show us the truth.", emotion: 'happy' }
 ];

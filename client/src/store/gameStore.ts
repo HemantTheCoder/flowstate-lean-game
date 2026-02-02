@@ -10,6 +10,7 @@ export interface DialogueLine {
 
 export interface Task extends TaskType {
   status: 'backlog' | 'ready' | 'doing' | 'done';
+  originalId?: string;
 }
 
 export interface Column {
@@ -106,7 +107,7 @@ const INITIAL_COLUMNS: Column[] = [
   {
     id: 'backlog',
     title: 'Backlog',
-    tasks: CONSTRUCTION_TASKS.map(t => ({ ...t, id: uuidv4(), status: 'backlog' })),
+    tasks: CONSTRUCTION_TASKS.map(t => ({ ...t, id: uuidv4(), status: 'backlog', originalId: t.id })),
     wipLimit: 0
   },
   { id: 'ready', title: 'Ready', tasks: [], wipLimit: 3 },
@@ -161,11 +162,16 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   setChapter: (chapter) => set({ chapter }),
 
-  advanceDay: () => set((state) => ({
-    day: state.day + 1,
-    week: Math.floor((state.day + 1) / 5) + 1,
-    materials: state.materials + 150 // Daily delivery of materials
-  })),
+  advanceDay: () => set((state) => {
+    const nextDay = state.day + 1;
+    const dailyCost = 150; // Daily Overhead (Salaries, Rent)
+    return {
+      day: nextDay,
+      week: Math.ceil(nextDay / 5),
+      materials: state.materials + 150, // Daily delivery
+      funds: state.funds - dailyCost
+    };
+  }),
 
   updateLPI: (metric, value) => set((state) => ({
     lpi: { ...state.lpi, [metric]: value }
@@ -270,11 +276,27 @@ export const useGameStore = create<GameState>((set, get) => ({
   })),
 
   addTask: () => set((state) => {
-    const template = getRandomTask();
+    // Attempt to find a unique task that isn't already on the board
+    let template = getRandomTask();
+    let attempts = 0;
+    const existingIds = new Set(state.columns.flatMap(c => c.tasks.map(t => t.originalId)));
+
+    while (existingIds.has(template.id) && attempts < 10) {
+      template = getRandomTask();
+      attempts++;
+    }
+
+    // If we couldn't find a unique one, we might just not add one, or duplicate if strictly needed.
+    // For now, let's respect "Unique Only" strictly.
+    if (existingIds.has(template.id)) {
+      return {}; // Do nothing if all tasks taken
+    }
+
     const newTask: Task = {
       ...template,
       id: uuidv4(),
-      status: 'backlog'
+      status: 'backlog',
+      originalId: template.id
     };
 
     return {
@@ -313,14 +335,19 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // Gameplay Loop - Day 2+ Refill
   addDailyTasks: (count: number, currentDay?: number) => set((state) => {
-    // User Request: "All tasks in backlog... let user select".
-    // We ignore 'count' and spawn the full catalog so the user has the full menu.
+    // User Request: "Unique Only".
+    // Filter out tasks that are already present in ANY column.
 
-    const newTasks: Task[] = CONSTRUCTION_TASKS.map(template => ({
-      ...template,
-      id: uuidv4(),
-      status: 'backlog'
-    }));
+    const existingIds = new Set(state.columns.flatMap(c => c.tasks.map(t => t.originalId)));
+
+    const newTasks: Task[] = CONSTRUCTION_TASKS
+      .filter(t => !existingIds.has(t.id))
+      .map(template => ({
+        ...template,
+        id: uuidv4(),
+        status: 'backlog',
+        originalId: template.id
+      }));
 
     return {
       columns: state.columns.map(col =>

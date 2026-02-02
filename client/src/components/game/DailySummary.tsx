@@ -39,6 +39,18 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                         </div>
                     </div>
 
+                    <div className="bg-red-50 p-4 rounded-xl border border-red-100">
+                        <div className="flex justify-between items-center mb-1">
+                            <span className="text-red-800 font-bold">Daily Overhead</span>
+                            <span className="text-red-600 font-mono font-bold">-$150</span>
+                        </div>
+                        <p className="text-xs text-red-600">Salaries, Equipment, Rent.</p>
+                    </div>
+
+                    <div className={`text-center font-bold ${funds < 0 ? 'text-red-600' : 'text-slate-600'}`}>
+                        Current Funds: <span className="font-mono">${funds}</span>
+                    </div>
+
                     <div className="bg-slate-50 p-4 rounded-xl text-sm text-slate-600 italic border-l-4 border-blue-400">
                         "Lean Construction isn't just about speed. It's about consistency. A steady flow beats a rushed chaos."
                     </div>

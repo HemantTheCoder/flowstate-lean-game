@@ -43,7 +43,20 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             return;
         }
 
-        // 3. EXECUTE MOVE
+        // 3. FLOW VALIDATION (Prevent skipping columns)
+        // Allowed moves: Backlog -> Ready -> Doing -> Done (and backward one step for undo)
+        const flowOrder = ['backlog', 'ready', 'doing', 'done'];
+        const sourceIndex = flowOrder.indexOf(sourceColId);
+        const destIndex = flowOrder.indexOf(destColId);
+
+        // Allow moving forward by exactly 1 step OR backward by exactly 1 step
+        if (Math.abs(destIndex - sourceIndex) !== 1) {
+            soundManager.playSFX('alert', audioSettings.sfxVolume);
+            alert("⛔ INVALID MOVE!\n\nYou must follow the flow:\nBacklog ➡️ Ready ➡️ Doing ➡️ Done\n\nYou cannot skip steps!");
+            return;
+        }
+
+        // 4. EXECUTE MOVE
         const success = moveTask(draggableId, sourceColId, destColId);
 
         if (success) {

@@ -17,12 +17,22 @@ export const ChapterIntroModal: React.FC = () => {
     const content = {
         1: {
             title: "The Jam at Juniper Pier",
-            subtitle: "Chapter 1: Flow & Friction",
-            description: "You've been hired to fix a stalled pier construction project. The previous manager, Rao, believes in 'pushing' work to keep people busy. The result? Chaos.",
+            subtitle: "Chapter 1: Flow vs. Chaos",
+            description: "You are the new Lean Engineer. The project is behind schedule, over budget, and chaotic. Manager Rao wants to 'Push' harder, but that only creates waste.",
             objectives: [
-                "Visualization: See the work.",
-                "WIP Limits: Stop starting, start finishing.",
-                "Flow: Move from Chaos to Order."
+                "MISSION: Stabilize the project before the Client Inspector arrives on Day 5.",
+                "LEARN: Manage WIP Limits to stop 'Starvation' and 'Bottlenecks'.",
+                "MASTER: The difference between 'Pushing' work and 'Pulling' value."
+            ]
+        },
+        2: {
+            title: "The Monsoon Drift",
+            subtitle: "Chapter 2: Managing Variation",
+            description: "The foundation is done, but the monsoon season has arrived. Unpredictable weather and supply delays threaten to derail the schedule.",
+            objectives: [
+                "MISSION: Survive the storm without running out of funds.",
+                "LEARN: Why 'Zero Inventory' fails when variation strikes.",
+                "MASTER: Using 'Buffers' (Materials & Time) to absorb shocks."
             ]
         }
     }[chapter] || { title: "Unknown Chapter", subtitle: "", description: "", objectives: [] };

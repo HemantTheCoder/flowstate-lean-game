@@ -100,11 +100,41 @@ export class MainScene extends Phaser.Scene {
             this.workers.push(worker);
         }
 
+
+
         // React to Store Changes (Zustand subscription)
         const store = useGameStore;
 
-        // Subscribe to task changes to spawn buildings & show insights
+        // 3.5. Add Player Avatar (The Engineer)
+        const playerGender = store.getState().playerGender;
+        const playerTexture = playerGender === 'female' ? 'architect_female' : 'architect';
+
+        // Check if texture exists, else fallback
+        const textureKey = this.textures.exists(playerTexture) ? playerTexture : 'worker_blue';
+
+        const player = this.add.sprite(width / 2, height - 100, textureKey);
+        player.setScale(1.5);
+        player.setDepth(2000); // On top
+
+        // Label
+        const label = this.add.text(player.x, player.y - 50, "YOU", {
+            fontSize: '14px',
+            fontStyle: 'bold',
+            color: '#ffffff',
+            backgroundColor: '#000000'
+        }).setOrigin(0.5).setDepth(2001);
+
+        // Store subscription for Gender Sync
         this.unsubscribe = store.subscribe((state, prevState) => {
+            // Gender Change
+            if (state.playerGender !== prevState.playerGender) {
+                const newKey = state.playerGender === 'female' ? 'architect_female' : 'architect';
+                if (this.textures.exists(newKey)) {
+                    player.setTexture(newKey);
+                }
+            }
+
+            // Rest of subscription logic...
             const prevDone = prevState.columns.find(c => c.id === 'done')?.tasks.length || 0;
             const currDone = state.columns.find(c => c.id === 'done')?.tasks.length || 0;
 
@@ -128,6 +158,25 @@ export class MainScene extends Phaser.Scene {
                     "Material pull authorized."
                 ];
                 this.spawnWorkerBark(Phaser.Utils.Array.GetRandom(barks));
+            }
+
+            // Celebration Trigger
+            if (state.flags['celebration_triggered'] && !prevState.flags['celebration_triggered']) {
+                this.spawnCelebration();
+            }
+
+            // Watch for Funds/Morale Change logic continues...
+            if (state.funds !== prevState.funds) {
+                const diff = state.funds - prevState.funds;
+                if (diff > 0) this.showFloatingText(`Funds +$${diff} 💰`, '#10b981');
+                else this.showFloatingText(`Funds -$${Math.abs(diff)} 💸`, '#ef4444');
+            }
+
+            // Watch for Morale Change
+            if (state.lpi.teamMorale !== prevState.lpi.teamMorale) {
+                const diff = state.lpi.teamMorale - prevState.lpi.teamMorale;
+                if (diff > 0) this.showFloatingText(`Morale +${diff} 😊`, '#10b981');
+                else this.showFloatingText(`Morale ${diff} 😓`, '#ef4444');
             }
         });
 
@@ -265,6 +314,46 @@ export class MainScene extends Phaser.Scene {
             duration: 2000,
             onComplete: () => bubble.destroy()
         });
+    }
+
+    spawnCelebration() {
+        const { width, height } = this.scale;
+
+        // 1. Confetti Explosion
+        const colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff];
+        const emitter = this.add.particles(0, 0, 'rain_drop', {
+            x: width / 2,
+            y: height / 2,
+            speed: { min: 200, max: 600 },
+            angle: { min: 0, max: 360 },
+            scale: { start: 0.6, end: 0 },
+            lifespan: 2000,
+            gravityY: 200,
+            quantity: 50,
+            emitting: false
+        });
+
+        // Tint particles randomly? Phaser particles tinting is per emitter usually, or per particle in newer versions.
+        // For simplicity, just burst.
+        emitter.explode(100, width / 2, height / 2);
+
+        // 2. Workers Cheer (Jump Tween)
+        this.workers.forEach(worker => {
+            this.tweens.add({
+                targets: worker,
+                y: '-=50',
+                duration: 300,
+                yoyo: true,
+                repeat: 3,
+                ease: 'Bounce.out'
+            });
+            this.spawnWorkerBark("YAY! We did it! 🎉");
+        });
+
+        // 3. Spawn Buildings everywhere to show "Complete"
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => this.spawnBuildingEffect(), i * 300);
+        }
     }
 
     spawnGremlin() {

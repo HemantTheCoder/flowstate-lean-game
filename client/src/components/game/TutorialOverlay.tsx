@@ -23,6 +23,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
             if (tutorialStep === 2) targetId = 'col-backlog';
             if (tutorialStep === 3) targetId = 'col-ready';
             if (tutorialStep === 4) targetId = 'col-doing';
+            if (tutorialStep === 5) targetId = 'smart-advisor-box';
+            if (tutorialStep === 6) targetId = 'stats-box';
+            if (tutorialStep === 7) targetId = 'btn-settings';
 
             if (targetId) {
                 const el = document.getElementById(targetId);
@@ -139,8 +142,78 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                     </>
                 )}
 
-                {/* Step 5: Complete */}
-                {tutorialStep === 5 && (
+                {/* Step 5: Smart Advisor Spotlight */}
+                {tutorialStep === 5 && spotlightPos && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                        style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x }}
+                        className="absolute z-[90] w-72 pointer-events-auto"
+                    >
+                        <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-blue-500 relative">
+                            <div className="absolute -top-3 left-6 w-6 h-6 bg-white border-t-4 border-l-4 border-blue-500 transform rotate-45"></div>
+                            <h3 className="font-black text-blue-600 text-lg mb-1">👀 Smart Advisor</h3>
+                            <p className="text-sm font-medium mb-3 leading-snug">
+                                Always check here! I will warn you about <b>Bottlenecks</b> (Too much WIP) and <b>Starvation</b> (Idle workers).
+                            </p>
+                            <button
+                                onClick={() => useGameStore.getState().setTutorialStep(6)}
+                                className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-blue-700 transition-colors"
+                            >
+                                Next: Stats 💰
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Step 6: Funds & Morale */}
+                {tutorialStep === 6 && spotlightPos && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                        style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x }}
+                        className="absolute z-[90] w-72 pointer-events-auto"
+                    >
+                        <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-green-500 relative">
+                            <div className="absolute -top-3 left-6 w-6 h-6 bg-white border-t-4 border-l-4 border-green-500 transform rotate-45"></div>
+                            <h3 className="font-black text-green-600 text-lg mb-1">📈 Project Health</h3>
+                            <ul className="text-sm font-medium mb-3 space-y-2">
+                                <li>💰 <b>Funds</b>: You earn money when tasks reach <b>Done</b>. Don't run out!</li>
+                                <li>😊 <b>Morale</b>: Drops if you make bad choices (Pushing work). </li>
+                            </ul>
+                            <button
+                                onClick={() => useGameStore.getState().setTutorialStep(7)}
+                                className="bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-green-700 transition-colors"
+                            >
+                                Next: Saving 💾
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Step 7: Settings & Save */}
+                {tutorialStep === 7 && spotlightPos && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                        style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x - 150 }}
+                        className="absolute z-[90] w-72 pointer-events-auto"
+                    >
+                        <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-purple-500 relative">
+                            <div className="absolute -top-3 right-6 w-6 h-6 bg-white border-t-4 border-l-4 border-purple-500 transform rotate-45"></div>
+                            <h3 className="font-black text-purple-600 text-lg mb-1">💾 Save Your Game</h3>
+                            <p className="text-sm font-medium mb-3 leading-snug">
+                                Click the Gear icon to access <b>Settings</b>. <br /> From there, you can <b>Export</b> your save file to keep it safe!
+                            </p>
+                            <button
+                                onClick={() => useGameStore.getState().setTutorialStep(8)}
+                                className="bg-purple-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-purple-700 transition-colors"
+                            >
+                                Finish Tutorial 🚀
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Step 8: Complete */}
+                {tutorialStep === 8 && (
                     <motion.div
                         initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-auto z-[90]"
@@ -158,6 +231,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
         </div>
     );
 };

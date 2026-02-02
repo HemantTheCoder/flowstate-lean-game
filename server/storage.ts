@@ -1,6 +1,6 @@
-import { db } from "./db";
+// import { db } from "./db"; // DB Disabled for Local Mode
 import { gameStates, type GameState, type InsertGameState } from "@shared/schema";
-import { eq } from "drizzle-orm";
+// import { eq } from "drizzle-orm"; // DB Disabled
 
 export interface IStorage {
   getGameState(sessionId: string): Promise<GameState | undefined>;
@@ -9,43 +9,45 @@ export interface IStorage {
   deleteGameState(sessionId: string): Promise<void>;
 }
 
-export class DatabaseStorage implements IStorage {
+export class MemStorage implements IStorage {
+  private states: Map<string, GameState>;
+  private currentId: number;
+
+  constructor() {
+    this.states = new Map();
+    this.currentId = 1;
+  }
+
   async getGameState(sessionId: string): Promise<GameState | undefined> {
-    const [state] = await db.select().from(gameStates).where(eq(gameStates.sessionId, sessionId));
-    return state;
+    return this.states.get(sessionId);
   }
 
   async createOrUpdateGameState(gameState: InsertGameState): Promise<GameState> {
-    // Check if exists first to handle "save" logic cleanly
-    const existing = await this.getGameState(gameState.sessionId);
-    
+    const existing = this.states.get(gameState.sessionId);
     if (existing) {
-      const [updated] = await db.update(gameStates)
-        .set({ ...gameState, lastPlayed: new Date() })
-        .where(eq(gameStates.sessionId, gameState.sessionId))
-        .returning();
+      const updated = { ...existing, ...gameState, lastPlayed: new Date() };
+      this.states.set(gameState.sessionId, updated);
       return updated;
     } else {
-      const [created] = await db.insert(gameStates)
-        .values(gameState)
-        .returning();
+      const id = this.currentId++;
+      const created: GameState = { ...gameState, id, lastPlayed: new Date() } as any;
+      this.states.set(gameState.sessionId, created);
       return created;
     }
   }
 
   async updateGameState(sessionId: string, updates: Partial<InsertGameState>): Promise<GameState> {
-    const [updated] = await db.update(gameStates)
-      .set({ ...updates, lastPlayed: new Date() })
-      .where(eq(gameStates.sessionId, sessionId))
-      .returning();
-    
-    if (!updated) throw new Error("Game state not found");
+    const existing = this.states.get(sessionId);
+    if (!existing) throw new Error("Game state not found");
+
+    const updated = { ...existing, ...updates, lastPlayed: new Date() };
+    this.states.set(sessionId, updated);
     return updated;
   }
 
   async deleteGameState(sessionId: string): Promise<void> {
-    await db.delete(gameStates).where(eq(gameStates.sessionId, sessionId));
+    this.states.delete(sessionId);
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new MemStorage();

@@ -58,7 +58,7 @@ export const DialogueBox: React.FC = () => {
                             initial={{ opacity: 0, x: -20, scale: 0.95 }}
                             animate={{ opacity: 1, x: 0, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className={`absolute bottom-24 ${isPlayer ? 'right-10' : 'left-0 md:-left-10'} z-0`}
+                            className={`absolute bottom-24 ${isPlayer ? 'right-10' : 'left-0 md:-left-10'} z-0 bg-transparent`}
                         >
                             <img
                                 src={`/assets/${portrait}`}
