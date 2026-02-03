@@ -1,5 +1,5 @@
 // import { db } from "./db"; // DB Disabled for Local Mode
-import { gameStates, type GameState, type InsertGameState } from "@shared/schema";
+import { gameStates, type GameState, type InsertGameState, GAME_CONSTANTS } from "@shared/schema";
 // import { eq } from "drizzle-orm"; // DB Disabled
 
 export interface IStorage {
@@ -30,7 +30,21 @@ export class MemStorage implements IStorage {
       return updated;
     } else {
       const id = this.currentId++;
-      const created: GameState = { ...gameState, id, lastPlayed: new Date() } as any;
+      const created: GameState = {
+        ...gameState,
+        id,
+        lastPlayed: new Date(),
+        playerName: gameState.playerName ?? "Architect",
+        chapter: gameState.chapter ?? 1,
+        week: gameState.week ?? 1,
+        resources: (gameState.resources as any) ?? GAME_CONSTANTS.INITIAL_RESOURCES,
+        kanbanState: gameState.kanbanState ?? null,
+        flags: gameState.flags ?? null,
+        metrics: gameState.metrics ?? null,
+        completedChapters: gameState.completedChapters ?? null,
+        unlockedBadges: gameState.unlockedBadges ?? null,
+        weeklyPlan: gameState.weeklyPlan ?? null,
+      };
       this.states.set(gameState.sessionId, created);
       return created;
     }

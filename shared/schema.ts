@@ -54,7 +54,29 @@ export const gameStates = pgTable("game_states", {
 });
 
 // === SCHEMAS ===
-export const insertGameStateSchema = createInsertSchema(gameStates).omit({
+export const insertGameStateSchema = createInsertSchema(gameStates, {
+  metrics: z.object({
+    flowEfficiency: z.number(),
+    ppc: z.number(),
+    wipCompliance: z.number(),
+    wasteRemoved: z.number(),
+    teamMorale: z.number(),
+    ppcHistory: z.array(z.object({
+      week: z.number(),
+      ppc: z.number()
+    })).optional()
+  }).nullable(),
+  resources: z.object({
+    morale: z.number(),
+    stress: z.number(),
+    trust: z.number(),
+    productivity: z.number(),
+    quality: z.number(),
+    budget: z.number(),
+    materials: z.number()
+  }),
+  flags: z.record(z.boolean())
+}).omit({
   id: true,
   lastPlayed: true
 });
