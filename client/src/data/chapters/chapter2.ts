@@ -11,62 +11,135 @@ export interface DayConfig {
 export const WEEK_2_SCHEDULE: DayConfig[] = [
     {
         day: 6,
-        title: "The Overpromised Mall",
-        description: "Reviewing the Master Plan. Constraints are hidden everywhere.",
+        title: "The Master Schedule",
+        description: "Isha introduces the Master Schedule and the concept of Pull planning.",
         dialogue: [
-            { character: 'Client', text: "We have announced the soft opening already. Next Friday. You'll be ready, yes?", emotion: 'neutral' },
-            { character: 'Isha', text: "Yes! Everything is already planned.", emotion: 'happy' },
-            { character: 'Mira', text: "(quietly) Planned... or promised?", emotion: 'worried' },
-            { character: 'Rao', text: "This is big visibility. Let's go all in.", emotion: 'happy' },
-            { character: 'Advisor', text: "Welcome to the Planning Room. We need the Last Planner System.", emotion: 'neutral' },
-            { character: 'Advisor', text: "The Master Schedule shows what we SHOULD do. The Lookahead checks if we CAN do it (Constraints).", emotion: 'neutral' },
-            { character: 'Advisor', text: "Only move tasks to 'Weekly Plan' if they are fully sound. That is what we WILL do.", emotion: 'happy' }
+            {
+                character: "Isha",
+                text: "Welcome to the Mall Project, Architect. This is a much bigger site than the Villa.",
+                emotion: "neutral"
+            },
+            {
+                character: "Isha",
+                text: "We have a strictly defined 'Master Schedule' (The SHOULD). Check the Backlog.",
+                emotion: "neutral"
+            },
+            {
+                character: "Advisor",
+                text: "Your goal today is simple: Review the Master Plan and 'Pull' tasks into the Lookahead window.",
+                emotion: "happy"
+            },
+            {
+                character: "Advisor",
+                text: "Don't commit yet! Just identify what we SHOULD do.",
+                emotion: "neutral"
+            }
         ],
-        // Special Phase: Planning
+        event: "tutorial_start"
     },
     {
         day: 7,
-        title: "Execution Starts",
-        description: "The team starts working on the committed plan.",
+        title: "Constraint Discovery",
+        description: "The team identifies blockers preventing tasks from being ready.",
         dialogue: [
-            // Day 7 - Intro to pulling work
-            { character: 'Foreman', text: "The crew appreciates the clear plan. We know exactly what to do today.", emotion: 'happy' },
-            { character: 'Isha', text: "It feels slower than usual... but smoother.", emotion: 'neutral' },
-            { character: 'Advisor', text: "That is Flow. Fast is not rushing. Fast is never stopping.", emotion: 'happy' }
+            {
+                character: "Foreman",
+                text: "Ey boss. We got a problem. I looked at that 'Lookahead' plan you made.",
+                emotion: "worried"
+            },
+            {
+                character: "Foreman",
+                text: "Half these tasks ain't ready! We got missing drawings and no steel.",
+                emotion: "angry"
+            },
+            {
+                character: "Advisor",
+                text: "He's right. In LPS, we call these 'Constraints'. Look for reasonable RED icons on the tasks.",
+                emotion: "neutral"
+            },
+            {
+                character: "Advisor",
+                text: "You cannot build what isn't ready. Today, just identify the blockers.",
+                emotion: "neutral"
+            }
         ]
     },
     {
         day: 8,
-        title: "The Surprise",
-        description: "Hidden constraints emerge.",
+        title: "Making It Ready",
+        description: "Resolving constraints to make tasks sound.",
         dialogue: [
-            { character: 'Foreman', text: "Boss, the electrical Inspector just showed up. We don't have the approval papers!", emotion: 'stressed' },
-            { character: 'Isha', text: "I thought we had that! It was green on the plan!", emotion: 'worried' },
-            { character: 'Advisor', text: "We failed our Constraint Analysis. We hoped, we didn't check.", emotion: 'neutral' },
-            { character: 'Advisor', text: "A task with a red constraint is NOT Ready. Never promise what you can't start.", emotion: 'angry' }
-        ],
-        event: 'surprise_inspection'
+            {
+                character: "Client",
+                text: "I want to see progress! Why isn't the steel going up?",
+                emotion: "angry"
+            },
+            {
+                character: "Isha",
+                text: "We are 'Making Ready', sir. Ensuring flow prevents delays later.",
+                emotion: "neutral"
+            },
+            {
+                character: "Advisor",
+                text: "Time to fix those Constraints! Click 'Fix' on the Red tasks in Lookahead.",
+                emotion: "happy"
+            },
+            {
+                character: "Advisor",
+                text: "This turns them GREEN (Sound). Only then are they safe to commit.",
+                emotion: "happy"
+            }
+        ]
     },
     {
         day: 9,
-        title: "Rao's Pressure",
-        description: "Management wants to push more work.",
+        title: "The Weekly Promise",
+        description: "Committing to a reliable weekly work plan.",
         dialogue: [
-            { character: 'Rao', text: "The client is asking about the Roof Café. Promise it for tomorrow.", emotion: 'neutral' },
-            { character: 'Mira', text: "We don't have the tiles. If we promise, we fail.", emotion: 'worried' },
-            { character: 'Rao', text: "Just promise it! We'll figure it out.", emotion: 'angry' },
-            { character: 'Advisor', text: "Protect the plan, Engineer. Reliability is trust. Don't break it.", emotion: 'neutral' }
+            {
+                character: "Rao",
+                text: "Enough planning. I want a commitment. What will be done by Friday?",
+                emotion: "neutral"
+            },
+            {
+                character: "Advisor",
+                text: "This is the moment of truth. Move GREEN tasks to the 'Weekly Plan'.",
+                emotion: "neutral"
+            },
+            {
+                character: "Advisor",
+                text: "WARNING: If you commit a Red task now, it WILL fail, and Rao will be furious.",
+                emotion: "worried"
+            },
+            {
+                character: "Isha",
+                text: "Commit only what we CAN do. That is our Promise (The WILL).",
+                emotion: "neutral"
+            }
         ],
-        event: 'rao_push_ch2'
+        event: "rao_push_ch2"
     },
     {
         day: 10,
-        title: "The Reckoning",
-        description: "Weekly Review. Did we keep our promises?",
+        title: "PPC Review",
+        description: "Reviewing Percent Plan Complete (PPC).",
         dialogue: [
-            { character: 'Advisor', text: "It's Friday. Let's calculate our PPC (Percent Plan Complete).", emotion: 'neutral' },
-            { character: 'Advisor', text: "This metric tells us how reliable we are. High PPC = High Trust.", emotion: 'happy' }
-        ]
-        // Triggers PPC Modal
+            {
+                character: "Isha",
+                text: "The week is over. Let's look at our Percent Plan Complete (PPC).",
+                emotion: "neutral"
+            },
+            {
+                character: "Advisor",
+                text: "If we hit 100%, we are Learning! If we failed, we must analyze why.",
+                emotion: "happy"
+            },
+            {
+                character: "Client",
+                text: "Professional flow. I like it. Proceed to the next phase.",
+                emotion: "happy"
+            }
+        ],
+        event: "chapter_complete"
     }
 ];

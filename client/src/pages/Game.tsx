@@ -389,6 +389,26 @@ export default function Game() {
       return isAffordable && !isRainBlocked;
     });
 
+    // CHAPTER 2 SPECIFIC GUIDANCE (LPS Teaching)
+    if (chapter === 2) {
+      if (day === 6) {
+        if (readyCount < 3) return "📅 Monday Goal: Check the Backlog. Pull at least 3 tasks to 'Looking Ahead'.";
+        return "✅ Good. We have a Lookahead plan. End the day to let the Foreman check it.";
+      }
+      if (day === 7) {
+        return "🔍 Tuesday Goal: Click tasks in Lookahead. Find the RED constraints.";
+      }
+      if (day === 8) {
+        const hasGreen = ready?.tasks.some(t => (t.constraints?.length || 0) === 0);
+        if (!hasGreen) return "🛠️ Wednesday Goal: Use Funds/Action to FIX constraints. Make tasks Green.";
+        return "✅ Constraints removed! We are ready to commit tomorrow.";
+      }
+      if (day === 9) {
+        return "🤝 Thursday Goal: COMMIT! Click 'Run Week'. Do NOT commit Red tasks!";
+      }
+      if (day === 10) return "📊 Friday Goal: Check PPC. Did we deliver our promise?";
+    }
+
     // 0. NARRATIVE SPECIFIC ADVICE & "END DAY" TRIGGERS
 
     // Day 1: WIP Limits & Flow

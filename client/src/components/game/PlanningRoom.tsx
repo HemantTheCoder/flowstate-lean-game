@@ -52,13 +52,19 @@ export const PlanningRoom: React.FC = () => {
     // Commit Logic
     const handleCommitPlan = () => {
         const committedTasks = lookaheadTasks.filter(t => !t.constraints?.length);
+        const skippedCount = lookaheadTasks.length - committedTasks.length;
 
         if (committedTasks.length === 0) {
-            alert("Your plan is empty! Prepare at least one task.");
+            alert("Your plan is empty! Prepare at least one sound task.");
             return;
         }
 
-        if (confirm(`Commit ${committedTasks.length} tasks to the Weekly Plan? This cannot be changed!`)) {
+        let message = `Commit ${committedTasks.length} tasks to the Weekly Plan?`;
+        if (skippedCount > 0) {
+            message += `\n\n⚠️ ${skippedCount} tasks with RED constraints will be left behind in Lookahead.`;
+        }
+
+        if (confirm(message)) {
             commitPlan(committedTasks.map(t => t.id));
         }
     };
@@ -181,8 +187,14 @@ export const PlanningRoom: React.FC = () => {
                         </div>
                         <div className="flex-1 overflow-y-auto p-3 space-y-2">
                             {masterPlanTasks.map(task => (
-                                <div key={task.id} className="p-3 bg-slate-100 rounded-lg border border-slate-200 opacity-70 hover:opacity-100 transition-opacity">
-                                    <div className="font-bold text-sm text-slate-600">{task.title}</div>
+                                <div key={task.id}
+                                    className="p-3 bg-white border-l-4 border-slate-300 rounded-lg shadow-sm hover:shadow-md hover:scale-[1.02] transition-all cursor-pointer group"
+                                    onClick={() => moveToReady(task.id)}
+                                >
+                                    <div className="font-bold text-sm text-slate-700 flex justify-between">
+                                        {task.title}
+                                        <span className="text-[10px] bg-slate-100 text-slate-500 px-1 rounded group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">PULL ➡️</span>
+                                    </div>
                                     <div className="text-[10px] text-slate-400 mt-1">{task.type} | Cost: {task.cost}</div>
                                 </div>
                             ))}
