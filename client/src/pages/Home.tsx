@@ -2,7 +2,11 @@ import React from 'react';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
 
+import { ComingSoonModal } from '../components/game/ComingSoonModal';
+
 export default function Home() {
+  const [pendingFeature, setPendingFeature] = React.useState<'multiplayer' | 'cases' | null>(null);
+
   return (
     <div className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-blue-200 to-purple-100 flex flex-col items-center justify-center p-4">
       {/* Animated Background Placeholder - Could be SVG or Canvas later */}
@@ -31,11 +35,19 @@ export default function Home() {
           </Link>
 
           <button
-            className="w-full py-4 text-xl font-bold text-slate-500 bg-white/50 rounded-2xl border-2 border-slate-200 cursor-not-allowed"
-            disabled
+            onClick={() => setPendingFeature('multiplayer')}
+            className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200"
           >
             MULTIPLAYER — Coming Soon
           </button>
+
+          <button
+            onClick={() => setPendingFeature('cases')}
+            className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200"
+          >
+            CASE LEVELS — Coming Soon
+          </button>
+
 
           <Link href="/settings">
             <button className="w-full py-3 text-lg font-medium text-slate-700 bg-white rounded-2xl shadow-sm hover:bg-slate-50 transition-colors">
@@ -56,6 +68,14 @@ export default function Home() {
           Made by <a href="https://www.linkedin.com/in/hemantkumar2430/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 hover:underline">Hemant Kumar</a>
         </p>
       </motion.footer>
+
+      {/* Feature Preview Modal */}
+      <ComingSoonModal
+        isOpen={!!pendingFeature}
+        onClose={() => setPendingFeature(null)}
+        mode={pendingFeature || 'multiplayer'}
+      />
+
     </div>
   );
 }
