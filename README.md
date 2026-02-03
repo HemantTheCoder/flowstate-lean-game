@@ -40,24 +40,5 @@ I have implemented the core foundation and the first chapter of Flowstate.
 -   Implement Chapter 2 (Last Planner System).
 -   Add more tasks and character interactions.
 ### Deployment
-The game is deployed to GitHub Pages via an automated GitHub Actions workflow.
-
-**Live URL**: [https://HemantTheCoder.github.io/flowstate-lean-game/](https://HemantTheCoder.github.io/flowstate-lean-game/)
-
-The deployment workflow (`.github/workflows/deploy.yml`) runs automatically on every push to the `main` branch.
-
-#### Alternative Deployment Options
-If you want to deploy elsewhere:
-
-1.  **Vercel (Frontend Only)**:
-    -   Best for the static game experience.
-    -   Connect your GitHub repo.
-    -   Set **Root Directory** to `client`.
-    -   Vercel will auto-detect Vite and deploy.
-
-2.  **Render / Railway (Full Stack)**:
-    -   Best if you want to enable the Multiplayer/Server features later.
-    -   Connect your GitHub repo.
-    -   Use the **Root** directory.
-    -   Build Command: `npm run build`
-    -   Start Command: `npm start`
+The game is deployed to Vercel
+https://flowstate-lean-game.vercel.app/
