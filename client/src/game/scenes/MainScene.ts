@@ -157,12 +157,16 @@ export class MainScene extends Phaser.Scene {
             }
 
             // Watch for Chapter Change
+            // Watch for Chapter Change
             if (state.chapter !== prevState.chapter) {
+                // Safety check: specific to Phaser scene lifecycle
+                if (!this.sys || !this.scene || !this.ground) return;
+
                 if (state.chapter === 2) {
-                    if (this.ground) this.ground.setTexture('ground_mall');
+                    this.ground.setTexture('ground_mall');
                     this.spawnBuildingEffect(); // Celebrate chapter change
                 } else {
-                    if (this.ground) this.ground.setTexture('ground');
+                    this.ground.setTexture('ground');
                 }
             }
         });
@@ -179,6 +183,13 @@ export class MainScene extends Phaser.Scene {
 
         // Cleanup on shutdown
         this.events.on('shutdown', () => {
+            if (this.unsubscribe) {
+                this.unsubscribe();
+                this.unsubscribe = undefined;
+            }
+        });
+
+        this.events.on('destroy', () => {
             if (this.unsubscribe) {
                 this.unsubscribe();
                 this.unsubscribe = undefined;

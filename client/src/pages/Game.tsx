@@ -12,18 +12,21 @@ import { WEEK_1_SCHEDULE, DAY_5_GOOD, DAY_5_BAD } from '@/data/chapters/chapter1
 import { WEEK_2_SCHEDULE } from '@/data/chapters/chapter2';
 import { DecisionModal } from '@/components/game/DecisionModal';
 // import { CharacterCreationModal } from '@/components/game/CharacterCreationModal'; // Removed, moved to ChapterSelect
+import { TransitionScreen } from '@/components/game/TransitionScreen';
 import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
 import { DayBriefingModal } from '@/components/game/DayBriefingModal';
 import { ChapterCompleteModal } from '@/components/game/ChapterCompleteModal';
 import { SettingsModal } from '@/components/game/SettingsModal';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
+
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [completedToday, setCompletedToday] = useState(0);
   const [showChapterComplete, setShowChapterComplete] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
 
   // Decision State
   const [showDecision, setShowDecision] = useState(false);
@@ -49,6 +52,15 @@ export default function Game() {
   const lpi = useGameStore(s => s.lpi);
   const phase = useGameStore(s => s.phase);
   const unlockedChapters = useGameStore(s => s.unlockedChapters); // Added since used in save
+
+  // Phase Change Detection for Transition Screen
+  const prevPhaseRef = React.useRef(phase);
+  useEffect(() => {
+    if (prevPhaseRef.current === 'planning' && phase === 'action') {
+      setShowTransition(true);
+    }
+    prevPhaseRef.current = phase;
+  }, [phase]);
 
   /* DEBUG: State Overlay */
   const DebugOverlay = () => (
@@ -596,6 +608,14 @@ export default function Game() {
 
       </div >
 
+      <TransitionScreen
+        isOpen={showTransition}
+        onComplete={() => setShowTransition(false)}
+        title="Plan Committed"
+        subtitle="Phase Complete"
+        description="The weekly plan is set. The crew is ready to execute. Let's build!"
+        type="execution"
+      />
       {/* Root Level Modals (Interactive) */}
       {showChapterComplete && day === 5 && (
         <ChapterCompleteModal
