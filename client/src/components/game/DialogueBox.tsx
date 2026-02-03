@@ -20,8 +20,12 @@ export const DialogueBox: React.FC = () => {
         'Architect': 'bg-blue-500',
         'Mira': 'bg-pink-500',
         'Rao': 'bg-orange-600',
-        'Isha': 'bg-purple-500',
-        'Old Foreman': 'bg-slate-600'
+        'Isha': 'bg-teal-500',
+        'Old Foreman': 'bg-slate-600',
+        'Foreman': 'bg-slate-600',
+        'Advisor': 'bg-indigo-500',
+        'Client': 'bg-rose-600',
+        'Inspector': 'bg-rose-600'
     };
 
     const bgColor = colorMap[line.character] || 'bg-slate-700';
@@ -32,8 +36,12 @@ export const DialogueBox: React.FC = () => {
         'Rao': 'rao.png',
         'Engineer': playerGender === 'female' ? 'architect_female.png' : 'architect.png',
         'Architect': playerGender === 'female' ? 'architect_female.png' : 'architect.png',
-        'Isha': 'mira.png', // Placeholder (Junior Planner)
-        'Old Foreman': 'rao.png' // Placeholder fallback
+        'Isha': 'isha.png',
+        'Foreman': 'foreman.png',
+        'Old Foreman': 'foreman.png',
+        'Advisor': 'advisor.png',
+        'Client': 'client.png',
+        'Inspector': 'client.png'
     };
 
     const portrait = imageMap[line.character];

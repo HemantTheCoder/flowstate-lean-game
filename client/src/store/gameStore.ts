@@ -30,6 +30,8 @@ export interface GameState {
   day: number;
   week: number;
   phase: GamePhase; // New: Tracks if we are in Planning Room or Site
+  unlockedChapters: number[];
+  completeChapter: (chapter: number) => void;
 
   // Player Profile
   playerName: string;
@@ -79,7 +81,8 @@ export interface GameState {
   // Actions
   setAudioVolume: (type: 'bgm' | 'sfx', volume: number) => void;
   toggleMute: () => void;
-  setChapter: (chapter: number) => void;
+  startChapter: (chapter: number) => void;
+  // setChapter: (chapter: number) => void; // Deprecated, use startChapter
   advanceDay: () => void;
   updateLPI: (metric: keyof GameState['lpi'], value: number) => void;
 
@@ -138,6 +141,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   day: 1,
   week: 1,
   phase: 'action',
+  unlockedChapters: [1],
 
   playerName: 'Engineer',
   playerGender: 'male',
@@ -182,7 +186,46 @@ export const useGameStore = create<GameState>((set, get) => ({
     audioSettings: { ...state.audioSettings, isMuted: !state.audioSettings.isMuted }
   })),
 
-  setChapter: (chapter) => set({ chapter }),
+  startChapter: (chapter) => set((state) => {
+    const commonUpdates = {
+      chapter,
+      currentDialogue: null,
+      dialogueIndex: 0,
+    };
+
+    if (chapter === 1) {
+      return {
+        ...commonUpdates,
+        day: 1,
+        week: 1,
+        phase: 'action',
+        columns: INITIAL_COLUMNS,
+        funds: 2500,
+        materials: 300,
+        flags: { ...state.flags, chapter_intro_seen: false }
+      };
+    }
+
+    if (chapter === 2) {
+      return {
+        ...commonUpdates,
+        day: 6,
+        week: 2,
+        phase: 'planning',
+        flags: { ...state.flags, chapter_intro_seen: false, day_6_started: false }
+        // Note: keeping existing funds/materials could be an option here if we want continuity
+      };
+    }
+
+    return { ...commonUpdates };
+  }),
+
+  completeChapter: (chapter) => set((state) => {
+    if (!state.unlockedChapters.includes(chapter + 1)) {
+      return { unlockedChapters: [...state.unlockedChapters, chapter + 1] };
+    }
+    return {};
+  }),
 
   advanceDay: () => set((state) => {
     const nextDay = state.day + 1;
@@ -410,6 +453,9 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   importState: (data: any) => set((state) => ({
     chapter: data.chapter ?? state.chapter,
+    unlockedChapters: data.completedChapters
+      ? [1, ...data.completedChapters.map((c: number) => c + 1)]
+      : [1],
     day: data.day ?? state.day,
     week: data.week ?? state.week,
     playerName: data.playerName ?? state.playerName,
@@ -425,14 +471,16 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // Chapter 2 Actions
   removeConstraint: (taskId, constraint) => set((state) => {
-    // Costs for removal (Simplified for now)
-    const costs = { material: 50, crew: 20, approval: 10, weather: 0 };
+    const costs = { material: 200, crew: 0, approval: 50, weather: 0 };
     const cost = costs[constraint] || 0;
 
     if (state.funds < cost) return {};
 
+    const newMorale = constraint === 'crew' ? Math.max(0, state.lpi.teamMorale - 5) : state.lpi.teamMorale;
+
     return {
       funds: state.funds - cost,
+      lpi: { ...state.lpi, teamMorale: newMorale },
       columns: state.columns.map(col => ({
         ...col,
         tasks: col.tasks.map(t =>

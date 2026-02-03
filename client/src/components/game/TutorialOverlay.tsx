@@ -31,15 +31,22 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 const el = document.getElementById(targetId);
                 if (el) {
                     const rect = el.getBoundingClientRect();
-                    setSpotlightPos({
+                    const newPos = {
                         x: rect.left - 10,
                         y: rect.top - 10,
                         w: rect.width + 20,
                         h: rect.height + 20
+                    };
+
+                    setSpotlightPos(prev => {
+                        if (prev && Math.abs(prev.x - newPos.x) < 1 && Math.abs(prev.y - newPos.y) < 1 && Math.abs(prev.w - newPos.w) < 1 && Math.abs(prev.h - newPos.h) < 1) {
+                            return prev;
+                        }
+                        return newPos;
                     });
                 }
             } else {
-                setSpotlightPos(null);
+                setSpotlightPos(prev => prev ? null : prev);
             }
 
             // Loop

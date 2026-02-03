@@ -11,7 +11,7 @@ import { useGameStore } from '@/store/gameStore';
 import { WEEK_1_SCHEDULE, DAY_5_GOOD, DAY_5_BAD } from '@/data/chapters/chapter1';
 import { WEEK_2_SCHEDULE } from '@/data/chapters/chapter2';
 import { DecisionModal } from '@/components/game/DecisionModal';
-import { CharacterCreationModal } from '@/components/game/CharacterCreationModal';
+// import { CharacterCreationModal } from '@/components/game/CharacterCreationModal'; // Removed, moved to ChapterSelect
 import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
 import { DayBriefingModal } from '@/components/game/DayBriefingModal';
 import { ChapterCompleteModal } from '@/components/game/ChapterCompleteModal';
@@ -29,11 +29,26 @@ export default function Game() {
   const [showDecision, setShowDecision] = useState(false);
   const [decisionProps, setDecisionProps] = useState<any>(null);
 
-  const {
-    startDialogue, currentDialogue, day, advanceDay, week, chapter,
-    tutorialStep, setTutorialStep, flags, setFlag, importState,
-    playerName, playerGender, funds, materials, columns, lpi, phase
-  } = useGameStore();
+  // State Selectors (Split to prevent unnecessary re-renders)
+  const startDialogue = useGameStore(s => s.startDialogue);
+  const currentDialogue = useGameStore(s => s.currentDialogue);
+  const day = useGameStore(s => s.day);
+  const advanceDay = useGameStore(s => s.advanceDay);
+  const week = useGameStore(s => s.week);
+  const chapter = useGameStore(s => s.chapter);
+  const tutorialStep = useGameStore(s => s.tutorialStep);
+  const setTutorialStep = useGameStore(s => s.setTutorialStep);
+  const flags = useGameStore(s => s.flags);
+  const setFlag = useGameStore(s => s.setFlag);
+  const importState = useGameStore(s => s.importState);
+  const playerName = useGameStore(s => s.playerName);
+  const playerGender = useGameStore(s => s.playerGender);
+  const funds = useGameStore(s => s.funds);
+  const materials = useGameStore(s => s.materials);
+  const columns = useGameStore(s => s.columns);
+  const lpi = useGameStore(s => s.lpi);
+  const phase = useGameStore(s => s.phase);
+  const unlockedChapters = useGameStore(s => s.unlockedChapters); // Added since used in save
 
   /* DEBUG: State Overlay */
   const DebugOverlay = () => (
@@ -44,38 +59,19 @@ export default function Game() {
     </div>
   );
 
-  const handleChapterContinue = () => {
+  const handleChapterContinue = async () => {
     try {
-      console.log("State Update Attempt...");
+      console.log("Completing Chapter 1...");
 
-      // Force UI Cleanup (Sync)
-      setShowChapterComplete(false);
-      setShowKanban(false);
-      setShowSummary(false);
-      setShowDecision(false);
+      // 1. Mark Chapter as Complete (Unlock Next)
+      useGameStore.getState().completeChapter(1);
 
-      // Update Game State
-      useGameStore.setState(s => {
-        console.log("Setting State to Chapter 2...");
-        return {
-          chapter: 2,
-          day: 6,
-          week: 2,
-          phase: 'planning',
-          flags: {
-            ...s.flags,
-            chapter_intro_seen: false,
-            [`day_6_started`]: false
-          }
-        };
-      });
+      // 2. Save Progress (Persist Unlock)
+      // We wait for safe save
+      await handleSave(true);
 
-      // Verification Log
-      setTimeout(() => {
-        const current = useGameStore.getState();
-        console.log("Post-Update State Check:", current.chapter, current.day);
-        if (current.day !== 6) alert("CRITICAL: State update failed. Check console.");
-      }, 100);
+      // 3. Navigate to Chapter Selection
+      navigate('/chapters');
 
     } catch (e: any) {
       console.error("Transition Error:", e);
@@ -87,8 +83,9 @@ export default function Game() {
   const [_, navigate] = useLocation();
 
   // 1. Hydrate Store from Server on Load
+  const hydratedRef = React.useRef(false);
   useEffect(() => {
-    if (gameState && !flags['hydrated']) {
+    if (gameState && !hydratedRef.current) {
       // Logic Check: If loaded state claims Day 5+ but flag says we are new, trust server.
       // BUT if we want to FORCE new game behavior when requested...
       // The issue user reported: "skips name/story -> goes to construction complete".
@@ -97,8 +94,9 @@ export default function Game() {
 
       importState(gameState);
       setFlag('hydrated', true);
+      hydratedRef.current = true;
     }
-  }, [gameState, flags, importState, setFlag]);
+  }, [gameState, importState, setFlag]);
 
   // Audio Control Loop
   const audioSettings = useGameStore(s => s.audioSettings);
@@ -144,7 +142,7 @@ export default function Game() {
         flags: state.flags,
         metrics: { ...state.lpi, ppcHistory: state.ppcHistory },
         weeklyPlan: state.weeklyPlan,
-        completedChapters: [],
+        completedChapters: state.unlockedChapters.filter(c => c !== 1).map(c => c - 1),
         unlockedBadges: []
       });
       if (!silent) {
@@ -287,7 +285,7 @@ export default function Game() {
           // GAME OVER
           alert("⛔ GAME OVER ⛔\n\nThe funding was pulled due to poor management and excessive waste. The project has been cancelled.\n\nReturning to Title Screen...");
           // Reset Game State completely
-          await useGameStore.getState().setChapter(1); // Reset store basics if needed, or just let server reset
+          useGameStore.getState().startChapter(1); // Reset store basics if needed, or just let server reset
           // Use the mutation if available or just hard reload to clear session if local?
           // Simple approach: Reload to root, user can restart.
           // Ideally we call the `resetGame` hook if we had it exposed here, but a reload works for now or forcing chapter 1.
@@ -507,7 +505,7 @@ export default function Game() {
           <div id="stats-box" className="bg-white/90 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border-2 border-slate-100 flex gap-4 md:gap-6 w-full md:w-auto justify-around">
             <div className="text-center">
               <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Funds</div>
-              <div className="font-mono font-bold text-blue-600 text-sm md:text-base">${useGameStore(s => s.funds)}</div>
+              <div className="font-mono font-bold text-blue-600 text-sm md:text-base">${funds}</div>
             </div>
             <div className="text-center">
               <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Morale</div>
@@ -567,7 +565,7 @@ export default function Game() {
         </motion.div>
 
         {/* Overlays */}
-        <CharacterCreationModal />
+        {/* <CharacterCreationModal /> Moved to ChapterSelect */}
         <PlanningRoom />
 
         <DialogueBox />

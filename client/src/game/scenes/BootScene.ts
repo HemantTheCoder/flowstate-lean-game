@@ -13,6 +13,11 @@ export class BootScene extends Phaser.Scene {
         this.load.image('mira', '/assets/mira.png');
         this.load.image('rao', '/assets/rao.png');
         this.load.image('architect', '/assets/architect.png');
+        this.load.image('architect_female', '/assets/architect_female.png');
+        this.load.image('isha', '/assets/isha.png');
+        this.load.image('foreman', '/assets/foreman.png');
+        this.load.image('advisor', '/assets/advisor.png');
+        this.load.image('client', '/assets/client.png');
 
         // Environment
         this.load.image('ground', '/assets/ground.png');

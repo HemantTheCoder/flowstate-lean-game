@@ -159,10 +159,10 @@ export class MainScene extends Phaser.Scene {
             // Watch for Chapter Change
             if (state.chapter !== prevState.chapter) {
                 if (state.chapter === 2) {
-                    this.ground.setTexture('ground_mall');
+                    if (this.ground) this.ground.setTexture('ground_mall');
                     this.spawnBuildingEffect(); // Celebrate chapter change
                 } else {
-                    this.ground.setTexture('ground');
+                    if (this.ground) this.ground.setTexture('ground');
                 }
             }
         });

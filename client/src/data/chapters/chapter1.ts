@@ -18,12 +18,12 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         day: 1,
         title: "The Jam at Juniper Pier",
         description: "The site is chaotic. Workers are starting everywhere but finishing nothing.",
-        lesson: "Concept: Work In Progress (WIP).",
+        lesson: "Concept: Kanban & Work In Progress (WIP).",
         dialogue: [
             { character: 'Mira', text: "Welcome to Juniper Pier, Engineer. It's a mess. We have 2 weeks to open.", emotion: 'stressed' },
             { character: 'Rao', text: "We are working hard! 100% utilization! Look at all the open trenches!", emotion: 'angry' },
             { character: 'Engineer', text: "Open trenches don't pay bills, Rao. Completed piers do.", emotion: 'neutral' },
-            { character: 'Engineer', text: "Today, we simply observe and stop starting new things. Let's set WIP limits.", emotion: 'happy' }
+            { character: 'Engineer', text: "Today, we simply observe and stop starting new things. Let's use a Kanban board to set WIP limits.", emotion: 'happy' }
         ],
         briefing: {
             objective: "Visualize the Flow.",

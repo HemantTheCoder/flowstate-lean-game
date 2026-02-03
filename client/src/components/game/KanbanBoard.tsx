@@ -5,7 +5,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import soundManager from '@/lib/soundManager';
 
 export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-    const { columns, moveTask, setWipLimit, funds, materials, tutorialStep, setTutorialStep, day, audioSettings } = useGameStore();
+    const { columns, moveTask, setWipLimit, funds, materials, tutorialStep, setTutorialStep, day, audioSettings, chapter } = useGameStore();
 
     const onDragEnd = (result: DropResult) => {
         const { source, destination, draggableId } = result;
@@ -171,7 +171,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                             <div className="flex-1 bg-slate-100 p-3 space-y-3 overflow-y-auto">
                                                 {col.tasks.map((task, index) => {
                                                     // Check for Red Constraints (Chapter 2)
-                                                    const hasRedConstraints = (task.constraints?.length || 0) > 0;
+                                                    const hasRedConstraints = chapter > 1 && (task.constraints?.length || 0) > 0;
 
                                                     return (
                                                         <Draggable key={task.id} draggableId={task.id} index={index}>
@@ -190,7 +190,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                     <p className="text-[10px] md:text-xs text-slate-400 line-clamp-2 mt-1">{task.description}</p>
 
                                                                     {/* Constraint Tags */}
-                                                                    {task.constraints?.map(c => (
+                                                                    {chapter > 1 && task.constraints?.map(c => (
                                                                         <span key={c} className="inline-block bg-red-100 text-red-700 text-[9px] px-1 py-0.5 rounded mr-1 mt-1 font-bold border border-red-200 uppercase">
                                                                             Blocked: {c}
                                                                         </span>

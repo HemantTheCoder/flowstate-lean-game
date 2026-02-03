@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useGameStore, Task } from '@/store/gameStore';
+import { useGameStore, Task, ConstraintType } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const PlanningRoom: React.FC = () => {
@@ -68,8 +68,9 @@ export const PlanningRoom: React.FC = () => {
         setSelectedTaskId(taskId);
     };
 
-    const handleConstraintRemoval = (constraintType: string) => {
+    const handleConstraintRemoval = (type: string) => {
         if (!selectedTask) return;
+        const constraintType = type as ConstraintType;
 
         // Example logic for removing constraints (this would interact with gameStore)
         // For now, just simulate removal
@@ -109,7 +110,7 @@ export const PlanningRoom: React.FC = () => {
         setSelectedTaskId(selectedTask.id);
     };
 
-    if (phase !== 'planning') return null;
+    if (phase !== 'planning' || useGameStore.getState().chapter === 1) return null;
 
     return (
         <div
@@ -143,7 +144,8 @@ export const PlanningRoom: React.FC = () => {
                 <div className="col-span-3 bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-slate-200 flex flex-col overflow-hidden">
                     <div className="p-4 border-b border-slate-100 bg-slate-50">
                         <h3 className="font-bold text-slate-700">📂 Master Schedule</h3>
-                        <p className="text-xs text-slate-400">All Project Tasks</p>
+                        <p className="text-xs text-slate-500 font-medium mt-1 text-center bg-slate-200 py-1 rounded">"What we <span className="font-bold">SHOULD</span> do"</p>
+                        <p className="text-[10px] text-slate-400 mt-2">All Project Tasks</p>
                     </div>
                     <div className="flex-1 overflow-y-auto p-3 space-y-2">
                         {masterPlanTasks.map(task => (
@@ -161,13 +163,13 @@ export const PlanningRoom: React.FC = () => {
                         <div className="p-4 border-b border-slate-100 bg-blue-50/50 flex justify-between items-center">
                             <div>
                                 <h3 className="font-bold text-blue-900">🔭 Lookahead Window</h3>
-                                <p className="text-xs text-blue-600">Select tasks to Inspect & Prep</p>
+                                <p className="text-xs text-blue-600 font-medium mt-1 bg-blue-100 py-1 px-2 rounded inline-block">"What we <span className="font-bold">CAN</span> do" (Check Constraints)</p>
                             </div>
                             <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">{lookaheadTasks.length} Candidates</span>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 gap-3 content-start">
-                            {lookaheadTasks.map(task => {
+                            {lookaheadTasks.map(task => { // ... map content ...
                                 const hasConstraints = (task.constraints?.length || 0) > 0;
                                 const isSelected = selectedTaskId === task.id;
                                 return (
@@ -206,7 +208,10 @@ export const PlanningRoom: React.FC = () => {
                     {/* WEEKLY COMMITMENT BAR */}
                     <div className="h-32 bg-slate-800/90 backdrop-blur rounded-2xl border-2 border-slate-700 p-4 flex flex-col">
                         <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-white font-bold text-sm uppercase tracking-wide">Weekly Work Plan (Committment)</h3>
+                            <div>
+                                <h3 className="text-white font-bold text-sm uppercase tracking-wide">Weekly Work Plan (Promises)</h3>
+                                <p className="text-[10px] text-slate-400">"What we <span className="font-bold text-green-400">WILL</span> do"</p>
+                            </div>
                             <button
                                 onClick={handleCommitPlan}
                                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold shadow-lg shadow-green-900/20 transition-all active:scale-95"

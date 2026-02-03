@@ -24,7 +24,7 @@ export default function Home() {
         </p>
 
         <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
-          <Link href="/game">
+          <Link href="/chapters">
             <button className="w-full py-4 text-xl font-bold text-white bg-blue-500 rounded-2xl shadow-lg hover:bg-blue-600 hover:shadow-xl hover:scale-105 transition-all transform active:scale-95">
               START GAME
             </button>

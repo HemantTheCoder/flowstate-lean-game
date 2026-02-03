@@ -11,7 +11,8 @@ interface Props {
 export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks }) => {
     if (!isOpen) return null;
 
-    const { day, funds } = useGameStore();
+    const day = useGameStore(s => s.day);
+    const funds = useGameStore(s => s.funds);
     const efficiency = Math.min(100, Math.floor(completedTasks * 25)); // Mock satisfaction logic
 
     return (
