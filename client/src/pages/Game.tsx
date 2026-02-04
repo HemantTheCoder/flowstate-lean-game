@@ -64,13 +64,16 @@ export default function Game() {
     prevPhaseRef.current = phase;
   }, [phase]);
 
-  /* DEBUG: State Overlay */
-  const DebugOverlay = () => (
-    <div className="fixed top-0 left-0 bg-black/80 text-green-400 p-2 z-[9999] text-xs font-mono pointer-events-none">
-      <div>Day: {day} | Ch: {chapter} | Phase: {phase}</div>
-      <div>Cast: {flags['character_cast_seen'] ? 'Y' : 'N'} | Intro: {flags['chapter_intro_seen'] ? 'Y' : 'N'}</div>
-    </div>
-  );
+
+  const { saveGame, gameState, isLoading: isServerLoading } = useGame();
+  const [_, navigate] = useLocation();
+
+  // Redirect to chapters if character not created
+  useEffect(() => {
+    if (!flags['character_created']) {
+      navigate('/chapters');
+    }
+  }, [flags, navigate]);
 
   const handleChapterContinue = async () => {
     try {
@@ -93,9 +96,6 @@ export default function Game() {
       console.error("Transition Error:", e);
     }
   };
-
-  const { saveGame, gameState, isLoading: isServerLoading } = useGame();
-  const [_, navigate] = useLocation();
 
   // 1. Hydrate Store from Server on Load
   const hydratedRef = React.useRef(false);
@@ -657,13 +657,6 @@ export default function Game() {
           onSelect={decisionProps?.onSelect || (() => { })}
         />
 
-        {flags['character_created'] && !flags['character_cast_seen'] && (
-          <CharacterCastModal 
-            chapter={chapter} 
-            onContinue={() => setFlag('character_cast_seen', true)} 
-          />
-        )}
-        {flags['character_cast_seen'] && !flags['chapter_intro_seen'] && <ChapterIntroModal />}
         <DayBriefingModal />
         <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
         {/* Modals & Screens */}
@@ -688,6 +681,13 @@ export default function Game() {
         type="execution"
       />
       {/* Root Level Modals (Interactive) */}
+      {flags['character_created'] && !flags['character_cast_seen'] && (
+        <CharacterCastModal 
+          chapter={chapter} 
+          onContinue={() => setFlag('character_cast_seen', true)} 
+        />
+      )}
+      {flags['character_cast_seen'] && !flags['chapter_intro_seen'] && <ChapterIntroModal />}
       {showChapterComplete && chapter === 1 && day === 5 && (
         <ChapterCompleteModal
           isOpen={true}
