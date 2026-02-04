@@ -17,33 +17,33 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
     {
         day: 1,
         title: "The Jam at Juniper Pier",
-        description: "The site is chaotic. Workers are starting everywhere but finishing nothing.",
-        lesson: "Concept: Kanban & Work In Progress (WIP).",
+        description: "The site is congested. Workers are starting multiple activities but finishing nothing, leading to high work-in-progress and low throughput.",
+        lesson: "Concept: Kanban & Work In Progress (WIP) Limits.",
         dialogue: [
-            { character: 'Mira', text: "Welcome to Juniper Pier, Engineer. It's a mess. We have 2 weeks to open.", emotion: 'stressed' },
-            { character: 'Rao', text: "We are working hard! 100% utilization! Look at all the open trenches!", emotion: 'angry' },
-            { character: 'Engineer', text: "Open trenches don't pay bills, Rao. Completed piers do.", emotion: 'neutral' },
-            { character: 'Engineer', text: "Today, we simply observe and stop starting new things. Let's use a Kanban board to set WIP limits.", emotion: 'happy' }
+            { character: 'Mira', text: "Welcome to Juniper Pier, Engineer. The project is behind schedule. We have two weeks until the grand opening.", emotion: 'stressed' },
+            { character: 'Rao', text: "My teams are working at 100% capacity! Look at the number of active work fronts!", emotion: 'angry' },
+            { character: 'Engineer', text: "Excessive active fronts lead to congestion, Rao. We need to focus on handover and throughput, not just activity.", emotion: 'neutral' },
+            { character: 'Engineer', text: "We will implement a Kanban system to limit our Work In Progress (WIP). This will stabilize the site and improve our cycle time.", emotion: 'happy' }
         ],
         briefing: {
-            objective: "Visualize the Flow.",
-            action: "Clear the 'Doing' column. You DON'T need to empty the Backlog today! Just stabilize the work."
+            objective: "Establish Stable Flow.",
+            action: "Control the 'Doing' column. Maintain WIP limits to prevent site congestion. Focus on finishing current tasks before pulling from the backlog."
         }
     },
     {
         day: 2,
-        title: "The Material Shortage",
-        description: "A truck broke down. Concrete delivery is delayed.",
-        lesson: "Concept: Constraints & Inventory.",
+        title: "Supply Chain Variability",
+        description: "A logistics failure has delayed the concrete delivery, exposing the vulnerability of our current inventory levels.",
+        lesson: "Concept: Material Constraints & Buffer Management.",
         dialogue: [
-            { character: 'Mira', text: "Bad news. The concrete mixer is stuck on the highway.", emotion: 'stressed' },
-            { character: 'Rao', text: "What?! The men are standing idle! This is costing me money!", emotion: 'angry' },
-            { character: 'Engineer', text: "This is 'Starvation'. If we had a Pull system, we would see this coming.", emotion: 'neutral' }
+            { character: 'Mira', text: "The concrete mixer is delayed due to a highway obstruction. Our primary work front is stalled.", emotion: 'stressed' },
+            { character: 'Rao', text: "This idle time is a disaster! My production rates are plummeting!", emotion: 'angry' },
+            { character: 'Engineer', text: "This is 'Resource Starvation'. A Pull system helps us manage these constraints by pivoting to non-constrained tasks.", emotion: 'neutral' }
         ],
         event: 'supply_delay',
         briefing: {
-            objective: "Survive Shortage.",
-            action: "Materials are ZERO 🚚. Do 'Prep' tasks (0 Cost) if possible. When you can't work, End Day."
+            objective: "Mitigate Starvation.",
+            action: "Material inventory is zero 🚚. Execute 'Management' or 'Prep' tasks (0 Cost) to maintain value-added activity while we wait for the delivery."
         }
     },
     {

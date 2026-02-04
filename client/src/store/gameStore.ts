@@ -258,7 +258,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     const doneCount = state.columns.find(c => c.id === 'done')?.tasks.length || 0;
-    const newDailyMetric = { day: state.day, efficiency: eff, tasksDone: doneCount };
+    // Log efficiency for chart, ensuring it's never NaN
+    const chartEff = isNaN(eff) ? 0 : eff;
+    const newDailyMetric = { day: state.day, efficiency: chartEff, tasksDone: doneCount };
 
     return {
       day: nextDay,

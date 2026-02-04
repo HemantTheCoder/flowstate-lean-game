@@ -29,7 +29,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         // Block Structural in Rain (Moving to Doing)
         if (day === 3 && task.type === 'Structural' && destColId === 'doing' && sourceColId !== 'doing') {
             soundManager.playSFX('alert', audioSettings.sfxVolume);
-            alert("🌧️ WEATHER VARIATION DETECTED!\n\nIt is raining heavily! Structural work (Outdoor) like this is unsafe and will result in quality defects if forced.\n\n✅ LEAN ACTION: Pivot to 'Indoor' or 'System' tasks in the Ready column until the weather clears.");
+            alert("🌧️ ENVIRONMENTAL VARIATION DETECTED!\n\nPrecipitation exceeds safety thresholds for structural work. Continuing would compromise quality and safety standards.\n\n✅ LEAN RESPONSE: Pivot to interior fit-out or MEP systems in the Ready column to maintain throughput.");
             return;
         }
 
@@ -37,9 +37,9 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         if (destColId === 'doing' && sourceColId !== 'doing' && materials < task.cost) {
             soundManager.playSFX('alert', audioSettings.sfxVolume);
             const isDay2 = day === 2;
-            const reason = isDay2 ? "The Concrete Truck 🚚 is delayed!" : "Insufficient resources.";
+            const reason = isDay2 ? "Logistics failure: Concrete delivery delayed 🚚" : "Resource constraint detected.";
 
-            alert(`⛔ CONSTRAINT ALERT: MATERIAL SHORTAGE!\n\n${reason}\nNeed ${task.cost}, Have ${materials}.\n\n✅ LEAN ACTION: You cannot start this task. Use this 'Waste' time to pull 'Prep' or 'Management' tasks (0 Cost) into Ready!`);
+            alert(`⛔ RESOURCE CONSTRAINT!\n\n${reason}\nAvailable Materials: ${materials} units. Required: ${task.cost} units.\n\n✅ LEAN RESPONSE: Identify non-material dependent tasks (Management/Prep) to minimize idle time waste.`);
             return;
         }
 
