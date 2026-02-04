@@ -36,9 +36,12 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         description: "A logistics failure has delayed the concrete delivery, exposing the vulnerability of our current inventory levels.",
         lesson: "Concept: Material Constraints & Buffer Management.",
         dialogue: [
-            { character: 'Mira', text: "The concrete mixer is delayed due to a highway obstruction. Our primary work front is stalled.", emotion: 'stressed' },
-            { character: 'Rao', text: "This idle time is a disaster! My production rates are plummeting!", emotion: 'angry' },
-            { character: 'Engineer', text: "This is 'Resource Starvation'. A Pull system helps us manage these constraints by pivoting to non-constrained tasks.", emotion: 'neutral' }
+            { character: 'Mira', text: "Bad news. The concrete mixer is stuck on the highway—overturned truck blocking three lanes.", emotion: 'stressed' },
+            { character: 'Rao', text: "What?! The men are standing around! This idle time is a disaster!", emotion: 'angry' },
+            { character: 'Engineer', text: "Calm down, Rao. This is 'Resource Starvation'—a classic supply chain failure.", emotion: 'neutral' },
+            { character: 'Engineer', text: "In a Push system, we'd panic. But in a Pull system, we pivot to tasks that don't need the delayed material.", emotion: 'neutral' },
+            { character: 'Mira', text: "We have site surveys and safety inspections pending. Zero material cost.", emotion: 'neutral' },
+            { character: 'Engineer', text: "Exactly. Pull those into the queue. We maintain value-added activity while we wait.", emotion: 'happy' }
         ],
         event: 'supply_delay',
         briefing: {
@@ -49,17 +52,20 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
     {
         day: 3,
         title: "The Monsoon Drift",
-        description: "Heavy rains make outdoor painting impossible.",
+        description: "Unexpected heavy rain disrupts all outdoor structural work, testing your ability to adapt.",
         lesson: "Concept: Variation & Robustness.",
         dialogue: [
-            { character: 'Old Foreman', text: "Sky's turning grey. Smells like rain.", emotion: 'neutral' },
-            { character: 'Isha', text: "But the schedule says 'Paint Decking' today! We can't delay!", emotion: 'stressed' },
-            { character: 'Engineer', text: "The rain doesn't care about your schedule, Isha.", emotion: 'neutral' }
+            { character: 'Old Foreman', text: "Sky's turning grey. Smells like rain coming down hard.", emotion: 'neutral' },
+            { character: 'Isha', text: "But the schedule says 'Erect Steel Beams' today! The crane is already on-site!", emotion: 'stressed' },
+            { character: 'Engineer', text: "The rain doesn't care about your schedule, Isha. And neither does gravity when steel is wet.", emotion: 'neutral' },
+            { character: 'Mira', text: "Crane operations in rain are a safety violation. We have no choice but to stand down on structural.", emotion: 'stressed' },
+            { character: 'Engineer', text: "This is 'Variation'—the unpredictable events that disrupt flow. A robust system has backup work ready.", emotion: 'neutral' },
+            { character: 'Engineer', text: "Pull interior fit-out or systems work into the queue. We keep the crew productive, even when the sky disagrees.", emotion: 'happy' }
         ],
         event: 'rain',
         briefing: {
-            objective: "Adapt to Rain.",
-            action: "Rain 🌧️ blocks Structural work. Do Indoor tasks only. If blocked, End Day."
+            objective: "Adapt to Variation.",
+            action: "Rain 🌧️ blocks all Structural (outdoor) work today. Pivot to Interior or Systems tasks to maintain throughput."
         }
     },
     {

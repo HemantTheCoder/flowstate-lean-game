@@ -13,7 +13,8 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
 
     const day = useGameStore(s => s.day);
     const funds = useGameStore(s => s.funds);
-    const efficiency = Math.min(100, Math.floor(completedTasks * 25)); // Mock satisfaction logic
+    const lpi = useGameStore(s => s.lpi);
+    const efficiency = lpi.flowEfficiency; // Use actual calculated efficiency
 
     return (
         <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 pointer-events-auto">
@@ -53,7 +54,12 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                     </div>
 
                     <div className="bg-slate-50 p-4 rounded-xl text-sm text-slate-600 italic border-l-4 border-blue-400">
-                        "Lean Construction isn't just about speed. It's about consistency. A steady flow beats a rushed chaos."
+                        {day === 1 && "\"Limiting Work In Progress prevents bottlenecks and keeps the team focused on finishing, not just starting.\""}
+                        {day === 2 && "\"When materials are constrained, a Pull system pivots to available work—never let workers stand idle.\""}
+                        {day === 3 && "\"Variation is inevitable. A robust system has backup tasks ready to maintain flow.\""}
+                        {day === 4 && "\"Pushing unready work creates waste. Pulling ready work creates value.\""}
+                        {day === 5 && "\"Reliability comes from finishing what you start, not from looking busy.\""}
+                        {day > 5 && "\"Lean Construction isn't just about speed. It's about consistency. A steady flow beats a rushed chaos.\""}
                     </div>
 
                     <button
