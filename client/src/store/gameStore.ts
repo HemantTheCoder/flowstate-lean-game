@@ -55,6 +55,9 @@ export interface GameState {
     teamMorale: number;
   };
 
+  // NEW: Historical daily metrics for end-of-chapter charts
+  dailyMetrics: { day: number, efficiency: number, tasksDone: number }[];
+
   // NEW: Historical PPC for trending
   ppcHistory: { week: number, ppc: number }[];
 
@@ -154,6 +157,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   weeklyPlan: [],
   ppcHistory: [],
+  dailyMetrics: [],
 
   currentDialogue: null,
   dialogueIndex: 0,
@@ -253,11 +257,15 @@ export const useGameStore = create<GameState>((set, get) => ({
       eff = 100;
     }
 
+    const doneCount = state.columns.find(c => c.id === 'done')?.tasks.length || 0;
+    const newDailyMetric = { day: state.day, efficiency: eff, tasksDone: doneCount };
+
     return {
       day: nextDay,
       week: Math.ceil(nextDay / 5),
       materials: state.materials + 150,
       funds: state.funds - dailyCost,
+      dailyMetrics: [...state.dailyMetrics, newDailyMetric],
       lpi: {
         ...state.lpi,
         wipCompliance: compliance,

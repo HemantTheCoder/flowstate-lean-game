@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => void; onContinue: () => void }> = ({ isOpen, onClose, onContinue }) => {
-    const { funds, lpi } = useGameStore();
+    const { funds, lpi, dailyMetrics } = useGameStore();
 
     // Play sound on open
     useEffect(() => {
@@ -38,33 +39,70 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                             <p className="text-green-100 font-bold tracking-widest uppercase mt-2">Chapter 1 Complete</p>
                         </div>
 
-                        <div className="p-8 md:p-12 text-center">
-                            <p className="text-xl text-slate-600 mb-8 font-medium">
+                        <div className="p-6 md:p-8 text-center max-h-[80vh] overflow-y-auto">
+                            <p className="text-lg text-slate-600 mb-6 font-medium">
                                 The site flow is stable. The Inspector is impressed. Your crew is happy.
                             </p>
 
+                            {/* Metrics Graph */}
+                            <div className="mb-8 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                                <h3 className="text-slate-800 font-bold text-sm uppercase mb-4 flex items-center justify-center gap-2">
+                                    📈 Weekly Flow Performance
+                                </h3>
+                                <div className="h-48 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={dailyMetrics}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                            <XAxis 
+                                                dataKey="day" 
+                                                label={{ value: 'Day', position: 'insideBottom', offset: -5 }} 
+                                                tick={{ fontSize: 12 }}
+                                            />
+                                            <YAxis 
+                                                label={{ value: '%', angle: -90, position: 'insideLeft' }} 
+                                                tick={{ fontSize: 12 }}
+                                                domain={[0, 100]}
+                                            />
+                                            <Tooltip 
+                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                            />
+                                            <Line 
+                                                type="monotone" 
+                                                dataKey="efficiency" 
+                                                name="Efficiency %"
+                                                stroke="#10b981" 
+                                                strokeWidth={3} 
+                                                dot={{ r: 6, fill: '#10b981' }}
+                                                activeDot={{ r: 8 }}
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </div>
+                                <p className="text-xs text-slate-400 mt-2 italic">Goal: Stabilize flow above 80% to minimize waste.</p>
+                            </div>
+
                             {/* Report Card */}
-                            <div className="grid grid-cols-2 gap-4 mb-8">
+                            <div className="grid grid-cols-2 gap-4 mb-6">
                                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                    <div className="text-slate-400 text-xs font-bold uppercase">Funds Earned</div>
-                                    <div className="text-3xl font-mono font-bold text-slate-800">${funds}</div>
+                                    <div className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Funds Earned</div>
+                                    <div className="text-2xl font-mono font-bold text-slate-800">${funds}</div>
                                 </div>
                                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                    <div className="text-slate-400 text-xs font-bold uppercase">Team Morale</div>
-                                    <div className="text-3xl font-mono font-bold text-green-500">{lpi.teamMorale}%</div>
+                                    <div className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Team Morale</div>
+                                    <div className="text-2xl font-mono font-bold text-green-500">{lpi.teamMorale}%</div>
                                 </div>
                             </div>
 
-                            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-left rounded-r-lg mb-8">
+                            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-left rounded-r-lg mb-6">
                                 <h4 className="font-bold text-yellow-800 text-sm uppercase mb-1">Coming Up in Chapter 2...</h4>
-                                <p className="text-yellow-700 text-sm">
+                                <p className="text-yellow-700 text-sm italic">
                                     "The Monsoon Drift". Can your system handle random variation? Learn about <strong>Buffers</strong> and <strong>Robustness</strong>.
                                 </p>
                             </div>
 
                             <button
                                 onClick={handleContinue}
-                                className="w-full bg-green-500 hover:bg-green-600 text-white text-2xl font-black py-4 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
+                                className="w-full bg-green-500 hover:bg-green-600 text-white text-xl font-black py-4 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
                             >
                                 Start Chapter 2 ▶
                             </button>
