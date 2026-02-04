@@ -246,6 +246,15 @@ export const useGameStore = create<GameState>((set, get) => ({
     const doingCount = state.columns.find(c => c.id === 'doing')?.tasks.length || 0;
     const readyCount = state.columns.find(c => c.id === 'ready')?.tasks.length || 0;
     const totalWIP = doingCount + readyCount;
+    const doingLimit = state.columns.find(c => c.id === 'doing')?.wipLimit || 2;
+
+    // Morale logic: Penalty for WIP violation, bonus for healthy flow
+    let moraleDelta = 0;
+    if (doingCount > doingLimit) {
+      moraleDelta = -5; // Stress from overwork
+    } else if (doingCount > 0 && doingCount <= doingLimit) {
+      moraleDelta = 2; // Pride in stable flow
+    }
 
     // If total WIP is 0, efficient (or idle). If doing > 0, efficiency is high.
     // If only Ready (Queue) exists, eff is 0.
@@ -271,7 +280,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       lpi: {
         ...state.lpi,
         wipCompliance: compliance,
-        flowEfficiency: eff
+        flowEfficiency: eff,
+        teamMorale: Math.max(0, Math.min(100, state.lpi.teamMorale + moraleDelta))
       }
     };
   }),

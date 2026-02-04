@@ -184,7 +184,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                             <h3 className="font-black text-green-600 text-lg mb-1">📈 Project Health</h3>
                             <ul className="text-sm font-medium mb-3 space-y-2">
                                 <li>💰 <b>Funds</b>: You earn money when tasks reach <b>Done</b>. Don't run out!</li>
-                                <li>😊 <b>Morale</b>: Drops if you make bad choices (Pushing work). </li>
+                                <li>😊 <b>Morale</b>: Tracks site stability. It drops if you violate <b>WIP Limits</b> or push workers too hard, and rises when flow is steady.</li>
                             </ul>
                             <button
                                 onClick={() => useGameStore.getState().setTutorialStep(7)}

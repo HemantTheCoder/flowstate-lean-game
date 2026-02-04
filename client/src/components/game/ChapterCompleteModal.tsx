@@ -45,40 +45,57 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                             </p>
 
                             {/* Metrics Graph */}
-                            <div className="mb-8 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                            <div className="mb-8 p-4 bg-slate-50 rounded-2xl border border-slate-200 shadow-inner">
                                 <h3 className="text-slate-800 font-bold text-sm uppercase mb-4 flex items-center justify-center gap-2">
                                     📈 Weekly Flow Performance
                                 </h3>
                                 <div className="h-48 w-full">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={dailyMetrics}>
+                                        <LineChart data={dailyMetrics.length > 0 ? dailyMetrics : [{ day: 1, efficiency: 50, tasksDone: 0 }]}>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                             <XAxis 
                                                 dataKey="day" 
-                                                label={{ value: 'Day', position: 'insideBottom', offset: -5 }} 
-                                                tick={{ fontSize: 12 }}
+                                                label={{ value: 'Work Day', position: 'insideBottom', offset: -5, fontSize: 10 }} 
+                                                tick={{ fontSize: 10 }}
                                             />
                                             <YAxis 
-                                                label={{ value: '%', angle: -90, position: 'insideLeft' }} 
-                                                tick={{ fontSize: 12 }}
+                                                label={{ value: 'Efficiency %', angle: -90, position: 'insideLeft', fontSize: 10 }} 
+                                                tick={{ fontSize: 10 }}
                                                 domain={[0, 100]}
                                             />
                                             <Tooltip 
-                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
                                             />
                                             <Line 
                                                 type="monotone" 
                                                 dataKey="efficiency" 
                                                 name="Efficiency %"
-                                                stroke="#10b981" 
+                                                stroke="#3b82f6" 
                                                 strokeWidth={3} 
-                                                dot={{ r: 6, fill: '#10b981' }}
-                                                activeDot={{ r: 8 }}
+                                                dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }}
+                                                activeDot={{ r: 6 }}
+                                                animationDuration={1500}
+                                            />
+                                            <Line 
+                                                type="monotone" 
+                                                dataKey="tasksDone" 
+                                                name="Throughput"
+                                                stroke="#10b981" 
+                                                strokeWidth={2} 
+                                                strokeDasharray="5 5"
+                                                dot={{ r: 3, fill: '#10b981' }}
                                             />
                                         </LineChart>
                                     </ResponsiveContainer>
                                 </div>
-                                <p className="text-xs text-slate-400 mt-2 italic">Goal: Stabilize flow above 80% to minimize waste.</p>
+                                <div className="flex justify-center gap-4 mt-3">
+                                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-blue-600">
+                                        <div className="w-3 h-0.5 bg-blue-600"></div> Efficiency
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600">
+                                        <div className="w-3 h-0.5 bg-emerald-600 border-t border-dashed"></div> Throughput
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Report Card */}
