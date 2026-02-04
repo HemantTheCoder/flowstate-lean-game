@@ -477,7 +477,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   injectWaste: () => set((state) => {
     const wasteTask: Task = {
       id: `waste-${Date.now()}`,
-      title: "⚠️ Rework",
+      title: "REWORK",
       description: "Defects caused by rushing.",
       cost: 0,
       reward: 0,

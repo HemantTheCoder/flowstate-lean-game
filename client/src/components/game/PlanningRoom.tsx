@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useGameStore, Task, ConstraintType } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, CheckCircle, Package, Users, FileCheck, Cloud, ArrowRight, Briefcase, Target, Lock } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Package, Users, FileCheck, Cloud, ArrowRight, Briefcase, Target, Lock, Calendar, ClipboardCheck, Wrench, HandshakeIcon, Play, BarChart3, Sun } from 'lucide-react';
 
 const constraintConfig: Record<ConstraintType, { icon: React.ReactNode, label: string, color: string, action: string, cost: string }> = {
     material: { icon: <Package className="w-4 h-4" />, label: 'Material', color: 'red', action: 'Call Supplier', cost: '$200' },
@@ -10,11 +10,65 @@ const constraintConfig: Record<ConstraintType, { icon: React.ReactNode, label: s
     weather: { icon: <Cloud className="w-4 h-4" />, label: 'Weather', color: 'blue', action: 'Wait for Clear', cost: 'Time' }
 };
 
+const colorClassMap: Record<string, { bg: string, border: string }> = {
+    blue: { bg: 'bg-blue-500/30', border: 'border-blue-400/50' },
+    orange: { bg: 'bg-orange-500/30', border: 'border-orange-400/50' },
+    purple: { bg: 'bg-purple-500/30', border: 'border-purple-400/50' },
+    green: { bg: 'bg-green-500/30', border: 'border-green-400/50' },
+    slate: { bg: 'bg-slate-500/30', border: 'border-slate-400/50' }
+};
+
+// Day-specific objectives for Chapter 2
+const DAY_OBJECTIVES: Record<number, { icon: React.ReactNode, title: string, objective: string, action: string, color: string }> = {
+    6: { 
+        icon: <Calendar className="w-5 h-5" />, 
+        title: "The Planning Room", 
+        objective: "Learn the Last Planner System layout",
+        action: "Pull 3-4 tasks from Master Schedule to Lookahead Window",
+        color: "blue"
+    },
+    7: { 
+        icon: <AlertTriangle className="w-5 h-5" />, 
+        title: "Constraint Discovery", 
+        objective: "Identify blockers on your tasks",
+        action: "Click RED tasks in Lookahead to see their constraints",
+        color: "orange"
+    },
+    8: { 
+        icon: <Wrench className="w-5 h-5" />, 
+        title: "Making Work Ready", 
+        objective: "Remove constraints to make tasks Sound",
+        action: "Click 'Fix' on constraints. Each has a cost - choose wisely",
+        color: "purple"
+    },
+    9: { 
+        icon: <HandshakeIcon className="w-5 h-5" />, 
+        title: "The Weekly Promise", 
+        objective: "Commit only what you CAN deliver",
+        action: "Click 'Start Week' to commit GREEN tasks to your Weekly Plan",
+        color: "green"
+    },
+    10: { 
+        icon: <Play className="w-5 h-5" />, 
+        title: "Execution Day", 
+        objective: "Deliver on your promises",
+        action: "Complete the tasks you committed to in the Weekly Plan",
+        color: "blue"
+    },
+    11: { 
+        icon: <BarChart3 className="w-5 h-5" />, 
+        title: "PPC Review", 
+        objective: "Measure your reliability",
+        action: "Review your Percent Plan Complete - did you keep your promises?",
+        color: "slate"
+    }
+};
+
 export const PlanningRoom: React.FC = () => {
     const {
         columns, weeklyPlan, phase, removeConstraint, commitPlan, moveTask,
         week, tutorialActive, tutorialStep, setTutorialStep, flags, setFlag,
-        funds, lpi, chapter
+        funds, lpi, chapter, day, currentDialogue, advanceDay
     } = useGameStore();
 
     const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -28,12 +82,18 @@ export const PlanningRoom: React.FC = () => {
 
     const selectedTask = [...backlog, ...ready].find(t => t.id === selectedTaskId);
     const readyTasksCount = lookaheadTasks.filter(t => (t.constraints?.length || 0) === 0).length;
+    
+    // Get current day objective
+    const dayObjective = DAY_OBJECTIVES[day] || DAY_OBJECTIVES[6];
 
+    // Only show tutorial AFTER story dialogue ends on Day 6
     useEffect(() => {
-        if (phase === 'planning' && chapter === 2 && !flags['planning_tutorial_seen']) {
-            setShowTutorial(true);
+        if (phase === 'planning' && chapter === 2 && !flags['planning_tutorial_seen'] && !currentDialogue && day === 6 && flags[`day_6_started`]) {
+            // Small delay to ensure smooth transition from dialogue
+            const timer = setTimeout(() => setShowTutorial(true), 500);
+            return () => clearTimeout(timer);
         }
-    }, [phase, chapter, flags]);
+    }, [phase, chapter, flags, currentDialogue, day]);
 
     const tutorialSteps = [
         { title: "Master Schedule", content: "This is your Master Schedule - tasks that SHOULD happen this week. Click a task to pull it into the Lookahead.", highlight: "master" },
@@ -91,66 +151,107 @@ export const PlanningRoom: React.FC = () => {
         <div
             className="absolute inset-0 z-[50] flex flex-col font-sans text-slate-800 pointer-events-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
         >
-            {/* Header */}
-            <div className="relative z-10 h-16 bg-white/95 border-b border-slate-200 flex items-center justify-between px-6 shadow-lg">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <Briefcase className="w-5 h-5 text-white" />
+            {/* Header with Day Objective */}
+            <div className="relative z-10 bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-900 border-b border-indigo-700 shadow-lg">
+                {/* Top row: Title + Stats */}
+                <div className="h-14 flex items-center justify-between px-6 border-b border-white/10">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                            <Briefcase className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-lg font-black text-white">The Planning Room</h1>
+                            <p className="text-xs text-indigo-200">Week {week} - Last Planner System</p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 className="text-xl font-black text-slate-800">The Planning Room</h1>
-                        <p className="text-xs text-slate-500">Week {week} - Last Planner System</p>
+                    <div className="flex gap-4 text-sm items-center">
+                        <div className="flex flex-col items-center px-4 py-1 bg-white/10 backdrop-blur rounded-lg">
+                            <span className="text-[10px] uppercase text-indigo-200 font-bold">Budget</span>
+                            <span className="text-white font-mono font-bold">${funds}</span>
+                        </div>
+                        <div className="flex flex-col items-center px-4 py-1 bg-white/10 backdrop-blur rounded-lg">
+                            <span className="text-[10px] uppercase text-indigo-200 font-bold">Morale</span>
+                            <span className="text-green-300 font-mono font-bold">{lpi.teamMorale}%</span>
+                        </div>
+                        <button
+                            onClick={() => advanceDay()}
+                            className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white font-bold rounded-lg shadow-lg transition-colors"
+                            data-testid="button-end-planning-day"
+                        >
+                            <Sun className="w-4 h-4" />
+                            End Day
+                        </button>
                     </div>
                 </div>
-                <div className="flex gap-6 text-sm">
-                    <div className="flex flex-col items-center px-4 py-1 bg-slate-50 rounded-lg">
-                        <span className="text-[10px] uppercase text-slate-400 font-bold">Budget</span>
-                        <span className="text-blue-600 font-mono font-bold">${funds}</span>
+                
+                {/* Day Objective Banner */}
+                <div className="h-12 flex items-center px-6 gap-4 bg-black/20">
+                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full border ${colorClassMap[dayObjective.color]?.bg || 'bg-blue-500/30'} ${colorClassMap[dayObjective.color]?.border || 'border-blue-400/50'}`}>
+                        <span className="text-white">{dayObjective.icon}</span>
+                        <span className="text-white font-bold text-sm">Day {day}</span>
                     </div>
-                    <div className="flex flex-col items-center px-4 py-1 bg-slate-50 rounded-lg">
-                        <span className="text-[10px] uppercase text-slate-400 font-bold">Morale</span>
-                        <span className="text-green-600 font-mono font-bold">{lpi.teamMorale}%</span>
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                            <span className="text-white font-bold">{dayObjective.title}:</span>
+                            <span className="text-indigo-200 text-sm">{dayObjective.objective}</span>
+                        </div>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur px-4 py-1.5 rounded-lg">
+                        <span className="text-xs text-indigo-100 font-medium">Action: </span>
+                        <span className="text-xs text-yellow-300 font-bold">{dayObjective.action}</span>
                     </div>
                 </div>
             </div>
 
             {/* Main Content */}
             <div className="relative z-10 flex-1 flex overflow-hidden">
-                {/* LPS Workflow Sidebar */}
-                <div className="w-56 bg-slate-800/90 backdrop-blur text-slate-200 border-r border-slate-700 flex flex-col p-4">
-                    <h3 className="text-blue-400 font-black uppercase tracking-wider text-xs mb-4 flex items-center gap-2">
+                {/* LPS Workflow Sidebar - Purple Theme */}
+                <div className="w-56 bg-gradient-to-b from-indigo-900/95 to-purple-900/95 backdrop-blur text-slate-200 border-r border-indigo-600/50 flex flex-col p-4">
+                    <h3 className="text-indigo-300 font-black uppercase tracking-wider text-xs mb-4 flex items-center gap-2">
                         <Target className="w-4 h-4" />
                         LPS Workflow
                     </h3>
 
-                    <div className="space-y-4 flex-1">
-                        <div className={`p-3 rounded-xl border transition-all ${lookaheadTasks.length === 0 ? 'bg-blue-900/60 border-blue-500 shadow-lg shadow-blue-500/20' : 'border-slate-700 opacity-60'}`}>
-                            <div className="text-lg font-bold mb-1 flex items-center gap-2">
-                                <span className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-sm">1</span>
-                                SHOULD
+                    <div className="space-y-3 flex-1">
+                        <div className={`p-3 rounded-xl border transition-all ${lookaheadTasks.length === 0 ? 'bg-blue-600/40 border-blue-400 shadow-lg shadow-blue-500/30 ring-2 ring-blue-400/50' : 'border-indigo-600/40 bg-indigo-800/30'}`}>
+                            <div className="text-base font-bold mb-1 flex items-center gap-2">
+                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-black ${lookaheadTasks.length === 0 ? 'bg-blue-500 text-white' : 'bg-indigo-700 text-indigo-300'}`}>1</span>
+                                <span className={lookaheadTasks.length === 0 ? 'text-white' : 'text-indigo-300'}>SHOULD</span>
                             </div>
-                            <p className="text-xs leading-snug text-slate-400">Review Master Schedule. Pull tasks to Lookahead.</p>
+                            <p className="text-[11px] leading-snug text-indigo-200/70 ml-8">Pull tasks to Lookahead</p>
                         </div>
 
-                        <div className={`p-3 rounded-xl border transition-all ${lookaheadTasks.length > 0 && readyTasksCount < lookaheadTasks.length ? 'bg-orange-900/60 border-orange-500 shadow-lg shadow-orange-500/20' : 'border-slate-700 opacity-60'}`}>
-                            <div className="text-lg font-bold mb-1 flex items-center gap-2">
-                                <span className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-sm">2</span>
-                                CAN
+                        <div className={`p-3 rounded-xl border transition-all ${lookaheadTasks.length > 0 && readyTasksCount < lookaheadTasks.length ? 'bg-orange-600/40 border-orange-400 shadow-lg shadow-orange-500/30 ring-2 ring-orange-400/50' : 'border-indigo-600/40 bg-indigo-800/30'}`}>
+                            <div className="text-base font-bold mb-1 flex items-center gap-2">
+                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-black ${lookaheadTasks.length > 0 && readyTasksCount < lookaheadTasks.length ? 'bg-orange-500 text-white' : 'bg-indigo-700 text-indigo-300'}`}>2</span>
+                                <span className={lookaheadTasks.length > 0 && readyTasksCount < lookaheadTasks.length ? 'text-white' : 'text-indigo-300'}>CAN</span>
                             </div>
-                            <p className="text-xs leading-snug text-slate-400">Check constraints. Fix blockers to make tasks Sound.</p>
+                            <p className="text-[11px] leading-snug text-indigo-200/70 ml-8">Fix constraints</p>
                         </div>
 
-                        <div className={`p-3 rounded-xl border transition-all ${readyTasksCount > 0 ? 'bg-green-900/60 border-green-500 shadow-lg shadow-green-500/20' : 'border-slate-700 opacity-60'}`}>
-                            <div className="text-lg font-bold mb-1 flex items-center gap-2">
-                                <span className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-sm">3</span>
-                                WILL
+                        <div className={`p-3 rounded-xl border transition-all ${readyTasksCount > 0 ? 'bg-green-600/40 border-green-400 shadow-lg shadow-green-500/30 ring-2 ring-green-400/50' : 'border-indigo-600/40 bg-indigo-800/30'}`}>
+                            <div className="text-base font-bold mb-1 flex items-center gap-2">
+                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-black ${readyTasksCount > 0 ? 'bg-green-500 text-white' : 'bg-indigo-700 text-indigo-300'}`}>3</span>
+                                <span className={readyTasksCount > 0 ? 'text-white' : 'text-indigo-300'}>WILL</span>
                             </div>
-                            <p className="text-xs leading-snug text-slate-400">Commit GREEN tasks only. This is your promise!</p>
+                            <p className="text-[11px] leading-snug text-indigo-200/70 ml-8">Commit to your promise</p>
                         </div>
                     </div>
 
-                    <div className="pt-4 border-t border-slate-700">
-                        <p className="text-[10px] text-slate-500 italic leading-relaxed">"The Last Planner protects the crew from bad plans."</p>
+                    {/* Progress Summary */}
+                    <div className="pt-4 border-t border-indigo-600/50 space-y-2">
+                        <div className="flex justify-between text-xs">
+                            <span className="text-indigo-300">In Lookahead:</span>
+                            <span className="text-white font-mono font-bold">{lookaheadTasks.length}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                            <span className="text-red-300">Blocked:</span>
+                            <span className="text-red-400 font-mono font-bold">{lookaheadTasks.length - readyTasksCount}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                            <span className="text-green-300">Ready:</span>
+                            <span className="text-green-400 font-mono font-bold">{readyTasksCount}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -271,27 +372,27 @@ export const PlanningRoom: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Weekly Commitment Bar */}
-                        <div className={`h-36 bg-slate-800/95 backdrop-blur rounded-2xl border-2 ${showTutorial && (tutorialSteps[tutorialIndex].highlight === 'weekly' || tutorialSteps[tutorialIndex].highlight === 'commit') ? 'border-green-500 ring-4 ring-green-500/30' : 'border-slate-700'} p-4 flex flex-col transition-all`}>
+                        {/* Weekly Commitment Bar - Purple Theme */}
+                        <div className={`h-36 bg-gradient-to-r from-indigo-900/95 to-purple-900/95 backdrop-blur rounded-2xl border-2 ${showTutorial && (tutorialSteps[tutorialIndex].highlight === 'weekly' || tutorialSteps[tutorialIndex].highlight === 'commit') ? 'border-green-500 ring-4 ring-green-500/30' : 'border-indigo-600/50'} p-4 flex flex-col transition-all`}>
                             <div className="flex justify-between items-center mb-3">
                                 <div>
                                     <h3 className="text-white font-bold text-sm uppercase tracking-wide flex items-center gap-2">
-                                        <Lock className="w-4 h-4" />
-                                        Weekly Work Plan (Your Promises)
+                                        <Lock className="w-4 h-4 text-indigo-300" />
+                                        Weekly Work Plan
                                     </h3>
-                                    <p className="text-[10px] text-slate-400">What we WILL do - Only GREEN tasks qualify</p>
+                                    <p className="text-[10px] text-indigo-300">Your PROMISES - Only GREEN tasks qualify</p>
                                 </div>
                                 <button
                                     onClick={handleCommitPlan}
-                                    disabled={readyTasksCount === 0}
+                                    disabled={readyTasksCount === 0 || day > 9}
                                     className={`px-5 py-2 rounded-lg text-sm font-bold shadow-lg transition-all active:scale-95 ${
-                                        readyTasksCount > 0 
-                                            ? 'bg-green-500 hover:bg-green-600 text-white shadow-green-900/30' 
-                                            : 'bg-slate-600 text-slate-400 cursor-not-allowed'
+                                        readyTasksCount > 0 && day <= 9
+                                            ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white shadow-green-900/30 ring-2 ring-green-400/50' 
+                                            : 'bg-indigo-800/50 text-indigo-400 cursor-not-allowed'
                                     }`}
                                     data-testid="button-start-week"
                                 >
-                                    Start Week ({readyTasksCount} tasks)
+                                    {day > 9 ? 'Plan Committed' : `Start Week (${readyTasksCount} tasks)`}
                                 </button>
                             </div>
                             <div className="flex-1 flex gap-2">
@@ -300,14 +401,14 @@ export const PlanningRoom: React.FC = () => {
                                         initial={{ scale: 0 }} 
                                         animate={{ scale: 1 }}
                                         key={t.id}
-                                        className="flex-1 bg-green-500/20 border-2 border-green-500 rounded-lg flex items-center justify-center p-2 text-center"
+                                        className="flex-1 bg-green-500/30 border-2 border-green-400 rounded-lg flex items-center justify-center p-2 text-center shadow-lg shadow-green-500/20"
                                     >
                                         <span className="text-[10px] font-bold text-green-100 leading-tight">{t.title}</span>
                                     </motion.div>
                                 ))}
                                 {Array.from({ length: Math.max(0, 5 - readyTasksCount) }).map((_, i) => (
-                                    <div key={`empty-${i}`} className="flex-1 border-2 border-dashed border-slate-600 rounded-lg flex items-center justify-center">
-                                        <span className="text-slate-600 text-xs">Empty</span>
+                                    <div key={`empty-${i}`} className="flex-1 border-2 border-dashed border-indigo-600/50 rounded-lg flex items-center justify-center bg-indigo-800/20">
+                                        <span className="text-indigo-500 text-xs">Empty</span>
                                     </div>
                                 ))}
                             </div>

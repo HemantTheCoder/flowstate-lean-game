@@ -23,6 +23,10 @@ This is a fullstack TypeScript application featuring:
 - Days 6-11 with constraint management and PPC review
 - Characters: Client, Old Foreman, Isha, Advisor (Dr. Lean)
 - Features: Planning Room UI, Constraint Removal, PPC Calculation, Badges
+- **Distinct Visual Design**: Purple/indigo theme differentiates from Chapter 1's blue theme
+- **Day Objective Banner**: Shows daily goals clearly at top of Planning Room
+- **Tutorial Timing**: Tutorial only shows after story dialogue ends on Day 6
+- **LPS Workflow Sidebar**: Visual progress tracker for SHOULD/CAN/WILL phases
 
 ## Project Structure
 

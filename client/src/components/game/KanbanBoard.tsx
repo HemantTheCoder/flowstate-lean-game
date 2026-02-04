@@ -88,26 +88,29 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 if (e.target === e.currentTarget) onClose();
             }}
         >
-            <div className="bg-slate-100 w-full h-full max-w-6xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto">
+            <div className={`w-full h-full max-w-6xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto ${chapter > 1 ? 'bg-gradient-to-br from-slate-800 to-slate-900' : 'bg-slate-100'}`}>
 
-                {/* Header */}
-                <div className="bg-white p-4 md:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center z-10 gap-2 md:gap-4">
+                {/* Header - Different for Chapter 2 */}
+                <div className={`p-4 md:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center z-10 gap-2 md:gap-4 ${chapter > 1 ? 'bg-gradient-to-r from-indigo-900 to-purple-900 border-b border-indigo-600/50' : 'bg-white'}`}>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black text-slate-800 flex items-center gap-2">
-                            {day > 5 ? 'Site Execution Board (Week Work)' : 'Project Kanban Board'}
+                        <h2 className={`text-xl md:text-3xl font-black flex items-center gap-2 ${chapter > 1 ? 'text-white' : 'text-slate-800'}`}>
+                            {chapter > 1 ? 'Week 2 Execution Board' : 'Project Kanban Board'}
                         </h2>
+                        <p className={`text-xs mt-1 ${chapter > 1 ? 'text-indigo-200' : 'text-slate-500'}`}>
+                            {chapter > 1 ? 'Execute your committed Weekly Work Plan' : 'Manage your work-in-progress'}
+                        </p>
                         <div className="flex gap-2 md:gap-4 mt-1 md:mt-2">
-                            <div className="px-2 md:px-3 py-0.5 md:py-1 bg-blue-50 text-blue-700 rounded-lg font-mono font-bold border border-blue-100 text-[10px] md:text-sm">
+                            <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-lg font-mono font-bold border text-[10px] md:text-sm ${chapter > 1 ? 'bg-white/10 text-white border-white/20' : 'bg-blue-50 text-blue-700 border-blue-100'}`}>
                                 Funds: ${funds}
                             </div>
-                            <div className="px-2 md:px-3 py-0.5 md:py-1 bg-amber-50 text-amber-700 rounded-lg font-mono font-bold border border-amber-100 text-[10px] md:text-sm">
+                            <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-lg font-mono font-bold border text-[10px] md:text-sm ${chapter > 1 ? 'bg-white/10 text-white border-white/20' : 'bg-amber-50 text-amber-700 border-amber-100'}`}>
                                 Materials: {materials}
                             </div>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 md:px-6 py-1.5 md:py-2 rounded-xl font-bold transition-colors w-full md:w-auto text-sm md:text-base"
+                        className={`px-4 md:px-6 py-1.5 md:py-2 rounded-xl font-bold transition-colors w-full md:w-auto text-sm md:text-base ${chapter > 1 ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20' : 'bg-slate-200 hover:bg-slate-300 text-slate-700'}`}
                     >
                         Close View
                     </button>
@@ -115,7 +118,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
                 {/* Columns Grid with DragDropContext */}
                 <DragDropContext onDragEnd={onDragEnd}>
-                    <div className="flex-1 flex flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-hidden bg-slate-200/50">
+                    <div className={`flex-1 flex flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-hidden ${chapter > 1 ? 'bg-slate-800/50' : 'bg-slate-200/50'}`}>
                         {columns.map(col => {
                             let highlightClass = "border-slate-200";
                             let adviceText = null;

@@ -161,7 +161,7 @@ export default function Game() {
         unlockedBadges: []
       });
       if (!silent) {
-        alert("Game Saved Successfully! 💾");
+        alert("Game Saved Successfully!");
       }
     } catch (err) {
       console.error("Save failed:", err);
@@ -413,7 +413,7 @@ export default function Game() {
 
   // Smart Advisor Logic
   const getSmartObjective = () => {
-    if (tutorialStep < 99) return "Follow the Tutorial arrows to learn the basics! ⬇️";
+    if (tutorialStep < 99 && chapter === 1) return "Follow the Tutorial arrows to learn the basics!";
 
     const state = useGameStore.getState();
     const cols = state.columns;
@@ -436,22 +436,48 @@ export default function Game() {
 
     // CHAPTER 2 SPECIFIC GUIDANCE (LPS Teaching)
     if (chapter === 2) {
+      const isPlanning = state.phase === 'planning';
+      
       if (day === 6) {
-        if (readyCount < 3) return "Monday Goal: Check the Backlog. Pull at least 3 tasks to 'Looking Ahead'.";
-        return "Good. We have a Lookahead plan. End the day to let the Foreman check it.";
+        if (isPlanning) {
+          const lookaheadCount = ready?.tasks.length || 0;
+          if (lookaheadCount < 3) return "Day 6: Pull 3-4 tasks from Master Schedule to Lookahead Window.";
+          const hasRed = ready?.tasks.some(t => (t.constraints?.length || 0) > 0);
+          if (hasRed) return "Good! Tasks in Lookahead. Notice the RED constraints? Those block execution.";
+          return "Tasks are green! You're ready to learn about constraints tomorrow.";
+        }
+        return "Planning Room is open. Review your Master Schedule and Lookahead.";
       }
       if (day === 7) {
-        return "Tuesday Goal: Click tasks in Lookahead. Find the RED constraints.";
+        if (isPlanning) {
+          return "Day 7: Click each RED task in Lookahead. Identify what's blocking them.";
+        }
+        return "Constraint Discovery: Find all the blockers before trying to fix them.";
       }
       if (day === 8) {
-        const hasGreen = ready?.tasks.some(t => (t.constraints?.length || 0) === 0);
-        if (!hasGreen) return "Wednesday Goal: Use Funds/Action to FIX constraints. Make tasks Green.";
-        return "Constraints removed! We are ready to commit tomorrow.";
+        if (isPlanning) {
+          const greenCount = ready?.tasks.filter(t => (t.constraints?.length || 0) === 0).length || 0;
+          if (greenCount < 2) return "Day 8: Click 'Fix' on constraints to make tasks GREEN (Sound).";
+          return "Tasks are becoming Sound! Keep fixing constraints or End Day.";
+        }
+        return "Make Ready: Remove blockers so tasks can flow.";
       }
       if (day === 9) {
-        return "Thursday Goal: COMMIT! Click 'Run Week'. Do NOT commit Red tasks!";
+        if (isPlanning) {
+          const greenCount = ready?.tasks.filter(t => (t.constraints?.length || 0) === 0).length || 0;
+          if (greenCount === 0) return "Day 9: You need GREEN tasks to commit! Fix more constraints.";
+          return "Day 9: Click 'Start Week' to COMMIT your GREEN tasks. Only promise what you CAN do!";
+        }
+        return "Commitment Day: Lock in your Weekly Work Plan.";
       }
-      if (day === 10) return "Friday Goal: Check PPC. Did we deliver our promise?";
+      if (day === 10) {
+        if (isPlanning) return "Planning complete. The week's execution begins!";
+        if (doingCount > 0) return "Day 10: Execute! Complete the tasks you committed to.";
+        const weeklyPlanCount = state.weeklyPlan.length;
+        const doneFromPlan = doing?.tasks.filter(t => state.weeklyPlan.includes(t.id)).length || 0;
+        return `Day 10: Execution Day - ${doneFromPlan}/${weeklyPlanCount} committed tasks in progress.`;
+      }
+      if (day === 11) return "Day 11: PPC Review - Did you keep your promises?";
     }
 
     // 0. NARRATIVE SPECIFIC ADVICE & "END DAY" TRIGGERS
@@ -521,18 +547,18 @@ export default function Game() {
       }
 
       if (!state.flags.decision_push_made && !state.flags.decision_pull_enforced) {
-        return "🛑 DISCIPLINE! Rao wants to push. Wait for the dialogue key decision.";
+        return "DISCIPLINE: Rao wants to push. Wait for the key decision.";
       }
     }
 
     // Day 5: Inspection
     if (day === 5) {
-      return "🕵️ INSPECTION DAY: The outcome depends on your Day 4 choice. Watch the dialogue!";
+      return "INSPECTION DAY: The outcome depends on your Day 4 choice. Watch the dialogue!";
     }
 
     // Default Fallbacks
     if (doingCount === 0 && readyCount === 0 && backlogCount === 0) {
-      return "🌙 All tasks complete! Click 'End Day' to rest.";
+      return "All tasks complete! Click 'End Day' to rest.";
     }
 
     // 3. Bottleneck
@@ -573,6 +599,7 @@ export default function Game() {
 
             <button
               onClick={handleEndDay}
+              data-testid="button-end-day"
               className={`bg-blue-500 hover:bg-blue-600 text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center border-b-4 border-blue-700 text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') ? 'animate-bounce ring-4 ring-yellow-400' : ''}`}
             >
               End Day
