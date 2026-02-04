@@ -13,11 +13,11 @@ export default function Debrief() {
   };
 
   const chartData = dailyMetrics.length > 0 ? dailyMetrics : [
-    { day: 1, efficiency: 40, tasksDone: 2 },
-    { day: 2, efficiency: 60, tasksDone: 3 },
-    { day: 3, efficiency: 50, tasksDone: 2 },
-    { day: 4, efficiency: 75, tasksDone: 5 },
-    { day: 5, efficiency: 90, tasksDone: 6 },
+    { day: 1, efficiency: 40, tasksCompletedToday: 1, potentialCapacity: 2 },
+    { day: 2, efficiency: 50, tasksCompletedToday: 1, potentialCapacity: 2 },
+    { day: 3, efficiency: 100, tasksCompletedToday: 2, potentialCapacity: 2 },
+    { day: 4, efficiency: 75, tasksCompletedToday: 1, potentialCapacity: 2 },
+    { day: 5, efficiency: 100, tasksCompletedToday: 2, potentialCapacity: 2 },
   ];
 
   return (
@@ -89,13 +89,18 @@ export default function Debrief() {
           <div className="flex flex-col gap-4">
              <div className="bg-slate-800/30 p-5 rounded-2xl border border-slate-800/50 flex-1">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Site Throughput</span>
-                  <span className="text-emerald-400 font-mono text-xs font-bold">{chartData.reduce((acc, d) => acc + d.tasksDone, 0)} Units</span>
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Daily Throughput</span>
+                  <span className="text-emerald-400 font-mono text-xs font-bold">{chartData.reduce((acc, d) => acc + (d.tasksCompletedToday || 0), 0)} Total</span>
                 </div>
                 <div className="h-32 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData}>
-                      <Bar dataKey="tasksDone" fill="#10b981" radius={[4, 4, 0, 0]} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px', fontSize: '10px' }}
+                        formatter={(value: number, name: string) => [value, name === 'tasksCompletedToday' ? 'Completed' : 'Capacity']}
+                      />
+                      <Bar dataKey="potentialCapacity" fill="#334155" radius={[4, 4, 0, 0]} name="Capacity" />
+                      <Bar dataKey="tasksCompletedToday" fill="#10b981" radius={[4, 4, 0, 0]} name="Completed" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>

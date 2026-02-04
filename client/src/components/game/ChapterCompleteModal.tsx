@@ -51,7 +51,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 </h3>
                                 <div className="h-48 w-full">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={dailyMetrics.length > 0 ? dailyMetrics : [{ day: 1, efficiency: 50, tasksDone: 0 }]}>
+                                        <LineChart data={dailyMetrics.length > 0 ? dailyMetrics : [{ day: 1, efficiency: 50, tasksCompletedToday: 0, potentialCapacity: 2 }]}>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                             <XAxis 
                                                 dataKey="day" 
@@ -78,8 +78,8 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                             />
                                             <Line 
                                                 type="monotone" 
-                                                dataKey="tasksDone" 
-                                                name="Throughput"
+                                                dataKey="tasksCompletedToday" 
+                                                name="Tasks Completed"
                                                 stroke="#10b981" 
                                                 strokeWidth={2} 
                                                 strokeDasharray="5 5"

@@ -56,7 +56,10 @@ export interface GameState {
   };
 
   // NEW: Historical daily metrics for end-of-chapter charts
-  dailyMetrics: { day: number, efficiency: number, tasksDone: number }[];
+  dailyMetrics: { day: number, efficiency: number, tasksCompletedToday: number, potentialCapacity: number }[];
+  
+  // Track previous done count for delta calculation
+  previousDoneCount: number;
 
   // NEW: Historical PPC for trending
   ppcHistory: { week: number, ppc: number }[];
@@ -158,6 +161,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   weeklyPlan: [],
   ppcHistory: [],
   dailyMetrics: [],
+  previousDoneCount: 0,
 
   currentDialogue: null,
   dialogueIndex: 0,
@@ -236,40 +240,60 @@ export const useGameStore = create<GameState>((set, get) => ({
     const dailyCost = 250; // Daily Overhead
 
     // 1. Calculate WIP Compliance
-    // Check if any column exceeds limit
     const violatingCols = state.columns.filter(c => c.wipLimit > 0 && c.tasks.length > c.wipLimit);
-    const compliance = violatingCols.length > 0 ? 50 : 100; // Binary penalty for now, or scaled?
+    const compliance = violatingCols.length > 0 ? 50 : 100;
 
-    // 2. Calculate Flow Efficiency
-    // Eff = Active Work / (Active Work + Queue)
-    // Active = Doing, Queue = Ready
-    const doingCount = state.columns.find(c => c.id === 'doing')?.tasks.length || 0;
-    const readyCount = state.columns.find(c => c.id === 'ready')?.tasks.length || 0;
-    const totalWIP = doingCount + readyCount;
+    // 2. Calculate actual tasks completed TODAY (delta from previous day)
+    const currentDoneCount = state.columns.find(c => c.id === 'done')?.tasks.length || 0;
+    const tasksCompletedToday = currentDoneCount - state.previousDoneCount;
+
+    // 3. Calculate POTENTIAL capacity for today
+    // Based on: WIP limit in Doing column + constraints
     const doingLimit = state.columns.find(c => c.id === 'doing')?.wipLimit || 2;
+    const readyTasks = state.columns.find(c => c.id === 'ready')?.tasks || [];
+    const backlogTasks = state.columns.find(c => c.id === 'backlog')?.tasks || [];
+    
+    // Narrative constraints reduce capacity
+    let potentialCapacity = doingLimit;
+    
+    // Day 2: Material shortage - only 0-cost tasks possible
+    if (state.day === 2) {
+      const zeroCostReady = readyTasks.filter(t => t.cost === 0).length;
+      const zeroCostBacklog = backlogTasks.filter(t => t.cost === 0).length;
+      potentialCapacity = Math.min(doingLimit, zeroCostReady + zeroCostBacklog);
+    }
+    
+    // Day 3: Weather blocks Structural - only non-structural possible
+    if (state.day === 3) {
+      const nonStructuralReady = readyTasks.filter(t => t.type !== 'Structural').length;
+      const nonStructuralBacklog = backlogTasks.filter(t => t.type !== 'Structural').length;
+      potentialCapacity = Math.min(doingLimit, nonStructuralReady + nonStructuralBacklog);
+    }
+    
+    // Ensure at least 1 potential (to avoid division by zero)
+    potentialCapacity = Math.max(1, potentialCapacity);
 
-    // Morale logic: Penalty for WIP violation, bonus for healthy flow
+    // 4. Calculate efficiency: (Actual / Potential) * 100
+    let eff = Math.round((tasksCompletedToday / potentialCapacity) * 100);
+    eff = Math.min(100, Math.max(0, eff)); // Clamp 0-100
+
+    // 5. Morale logic
+    const doingCount = state.columns.find(c => c.id === 'doing')?.tasks.length || 0;
     let moraleDelta = 0;
     if (doingCount > doingLimit) {
       moraleDelta = -5; // Stress from overwork
-    } else if (doingCount > 0 && doingCount <= doingLimit) {
-      moraleDelta = 2; // Pride in stable flow
+    } else if (tasksCompletedToday > 0) {
+      moraleDelta = 3; // Pride in completing work
+    } else if (doingCount > 0) {
+      moraleDelta = 1; // Maintaining flow
     }
 
-    // If total WIP is 0, efficient (or idle). If doing > 0, efficiency is high.
-    // If only Ready (Queue) exists, eff is 0.
-    let eff = state.lpi.flowEfficiency;
-    if (totalWIP > 0) {
-      eff = Math.round((doingCount / totalWIP) * 100);
-    } else if (state.columns.find(c => c.id === 'done')?.tasks.length) {
-      // If everything done, 100%
-      eff = 100;
-    }
-
-    const doneCount = state.columns.find(c => c.id === 'done')?.tasks.length || 0;
-    // Log efficiency for chart, ensuring it's never NaN
-    const chartEff = isNaN(eff) ? 0 : eff;
-    const newDailyMetric = { day: state.day, efficiency: chartEff, tasksDone: doneCount };
+    const newDailyMetric = { 
+      day: state.day, 
+      efficiency: eff, 
+      tasksCompletedToday, 
+      potentialCapacity 
+    };
 
     return {
       day: nextDay,
@@ -277,6 +301,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       materials: state.materials + 150,
       funds: state.funds - dailyCost,
       dailyMetrics: [...state.dailyMetrics, newDailyMetric],
+      previousDoneCount: currentDoneCount,
       lpi: {
         ...state.lpi,
         wipCompliance: compliance,
