@@ -16,6 +16,7 @@ import { TransitionScreen } from '@/components/game/TransitionScreen';
 import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
 import { DayBriefingModal } from '@/components/game/DayBriefingModal';
 import { ChapterCompleteModal } from '@/components/game/ChapterCompleteModal';
+import { Chapter2CompleteModal } from '@/components/game/Chapter2CompleteModal';
 import { SettingsModal } from '@/components/game/SettingsModal';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
@@ -74,20 +75,22 @@ export default function Game() {
   const handleChapterContinue = async () => {
     try {
       console.log("Completing Chapter 1...");
-
-      // 1. Mark Chapter as Complete (Unlock Next)
       useGameStore.getState().completeChapter(1);
-
-      // 2. Save Progress (Persist Unlock)
-      // We wait for safe save
       await handleSave(true);
-
-      // 3. Navigate to Chapter Selection
       navigate('/chapters');
-
     } catch (e: any) {
       console.error("Transition Error:", e);
-      alert(`Transition Error: ${e.message}`);
+    }
+  };
+
+  const handleChapter2Continue = async () => {
+    try {
+      console.log("Completing Chapter 2...");
+      useGameStore.getState().completeChapter(2);
+      await handleSave(true);
+      navigate('/chapters');
+    } catch (e: any) {
+      console.error("Transition Error:", e);
     }
   };
 
@@ -229,17 +232,16 @@ export default function Game() {
       if (dayConfig.event === 'supply_delay') {
         useGameStore.setState({ materials: 0 }); // Hard constraint!
       }
-      if (dayConfig.event === 'surprise_inspection') {
-        // Add an 'approval' constraint to a random task in Doing or Ready
-        const targetTask = useGameStore.getState().columns.find(c => c.id === 'ready' || c.id === 'doing')?.tasks[0];
-        if (targetTask) {
-          useGameStore.getState().addLog(`⚠️ EVENT: Surprise Inspection! Task '${targetTask.title}' flagged.`);
-          useGameStore.getState().updateTask(targetTask.id, { constraints: [...(targetTask.constraints || []), 'approval'] });
-        }
+
+      // Chapter 2 Events
+      if (dayConfig.event === 'client_pressure' && chapter === 2) {
+        setTimeout(() => triggerClientPressureDecision(), 1000);
       }
-      if (dayConfig.event === 'rao_push_ch2') {
-        // Trigger specific Chapter 2 push decision
-        setTimeout(() => triggerPushDecision(), 5000); // Slight delay after dialogue
+      if (dayConfig.event === 'inspection' && chapter === 2) {
+        useGameStore.getState().calculatePPC();
+        setTimeout(() => {
+          setShowChapterComplete(true);
+        }, 2000);
       }
 
       if (dayConfig.day === 3) {
@@ -323,11 +325,54 @@ export default function Game() {
           useGameStore.getState().addLog("NEXT STEP: A 'Rework' task was added. Finish it IMMEDIATELY to clear the waste!");
           setFlag('decision_push_made', true);
           useGameStore.getState().injectWaste();
-          // Add penalty logic here later
         } else {
           useGameStore.getState().addLog("Decision: Enforced Pull. Flow protected.");
           useGameStore.getState().addLog("NEXT STEP: Maintain flow. Move tasks to 'Doing' ONLY when space is free.");
           setFlag('decision_pull_enforced', true);
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
+
+  const triggerClientPressureDecision = () => {
+    setDecisionProps({
+      title: "Client Request",
+      prompt: "The Client is asking you to add extra work (Cafe Roofing) to this week's plan. It was scheduled for next week but the investors want to see it.",
+      options: [
+        { id: 'accept', text: "Accept Extra Work", type: 'risky', description: "Adds unplanned work. Increases PPC denominator. High risk of failure." },
+        { id: 'decline', text: "Decline Politely", type: 'safe', description: "Protects your plan. Client may be disappointed but will respect honesty." }
+      ],
+      onSelect: (id: string) => {
+        if (id === 'accept') {
+          useGameStore.getState().addLog("Decision: Accepted extra work. Overcommitment risk!");
+          setFlag('overcommitment_accepted', true);
+          const state = useGameStore.getState();
+          const extraTaskId = `extra-${Date.now()}`;
+          useGameStore.setState({
+            weeklyPlan: [...state.weeklyPlan, extraTaskId],
+            columns: state.columns.map(col =>
+              col.id === 'ready' ? {
+                ...col,
+                tasks: [...col.tasks, {
+                  id: extraTaskId,
+                  title: 'Cafe Roofing (Rush)',
+                  description: 'Unplanned work added at client request.',
+                  type: 'Structural' as const,
+                  cost: 100,
+                  reward: 2000,
+                  status: 'ready' as const,
+                  difficulty: 4,
+                  constraints: ['material', 'crew'] as any[]
+                }]
+              } : col
+            )
+          });
+          useGameStore.getState().updateMorale(-5);
+        } else {
+          useGameStore.getState().addLog("Decision: Declined extra work. Plan protected.");
+          setFlag('overcommitment_declined', true);
         }
         setShowDecision(false);
       }
@@ -637,11 +682,18 @@ export default function Game() {
         type="execution"
       />
       {/* Root Level Modals (Interactive) */}
-      {showChapterComplete && day === 5 && (
+      {showChapterComplete && chapter === 1 && day === 5 && (
         <ChapterCompleteModal
           isOpen={true}
           onClose={() => setShowChapterComplete(false)}
           onContinue={handleChapterContinue}
+        />
+      )}
+      {showChapterComplete && chapter === 2 && day === 11 && (
+        <Chapter2CompleteModal
+          isOpen={true}
+          onClose={() => setShowChapterComplete(false)}
+          onContinue={handleChapter2Continue}
         />
       )}
     </div >

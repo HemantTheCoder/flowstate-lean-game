@@ -67,8 +67,9 @@ export const CharacterCreationModal: React.FC = () => {
                         onClick={handleConfirm}
                         disabled={!name.trim()}
                         className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl text-xl shadow-lg transition-all transform hover:scale-[1.02]"
+                        data-testid="button-start-career"
                     >
-                        Start Career 🚀
+                        Start Career
                     </button>
                 </div>
             </motion.div>

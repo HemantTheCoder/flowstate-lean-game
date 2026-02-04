@@ -75,8 +75,9 @@ export const ChapterIntroModal: React.FC = () => {
                     <button
                         onClick={handleStart}
                         className="w-full bg-black text-white text-xl font-bold py-4 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                        data-testid="button-start-chapter"
                     >
-                        Start Chapter 🚀
+                        Start Chapter
                     </button>
                 </div>
             </motion.div>
