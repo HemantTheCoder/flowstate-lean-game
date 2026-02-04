@@ -42,16 +42,16 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl max-w-4xl w-full overflow-hidden shadow-2xl border border-slate-700"
+          className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-slate-700 flex flex-col"
         >
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-center">
-            <p className="text-blue-200 text-sm uppercase tracking-widest mb-1">Chapter {chapter}</p>
-            <h2 className="text-3xl font-bold text-white">{chapterTitles[chapter] || `Chapter ${chapter}`}</h2>
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 md:p-6 text-center shrink-0">
+            <p className="text-blue-200 text-xs md:text-sm uppercase tracking-widest mb-1">Chapter {chapter}</p>
+            <h2 className="text-xl md:text-3xl font-bold text-white">{chapterTitles[chapter] || `Chapter ${chapter}`}</h2>
           </div>
 
-          <div className="p-6 md:p-8">
-            <div className="mb-6">
-              <h3 className="text-slate-400 text-sm uppercase tracking-wider mb-4 text-center">Your Character</h3>
+          <div className="p-4 md:p-6 overflow-y-auto flex-1">
+            <div className="mb-4 md:mb-6">
+              <h3 className="text-slate-400 text-xs md:text-sm uppercase tracking-wider mb-3 text-center">Your Character</h3>
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -62,20 +62,20 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
                   <img
                     src={`/assets/${playerImage}`}
                     alt="Your Character"
-                    className="h-32 md:h-40 object-contain drop-shadow-xl"
+                    className="h-20 md:h-32 object-contain drop-shadow-xl"
                   />
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-yellow-500 text-slate-900 text-xs font-bold px-3 py-1 rounded-full">
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-yellow-500 text-slate-900 text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full">
                     YOU
                   </div>
                 </div>
-                <p className="text-xl font-bold text-white mt-4">{playerName || 'Engineer'}</p>
-                <p className="text-blue-400 text-sm">Flow Architect</p>
+                <p className="text-lg md:text-xl font-bold text-white mt-3">{playerName || 'Engineer'}</p>
+                <p className="text-blue-400 text-xs md:text-sm">Flow Architect</p>
               </motion.div>
             </div>
 
-            <div className="border-t border-slate-700 pt-6">
-              <h3 className="text-slate-400 text-sm uppercase tracking-wider mb-4 text-center">Key Characters</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="border-t border-slate-700 pt-4 md:pt-6">
+              <h3 className="text-slate-400 text-xs md:text-sm uppercase tracking-wider mb-3 text-center">Key Characters</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
                 {chapterCharacters.map((charId, index) => {
                   const character = CHARACTERS[charId];
                   if (!character) return null;
@@ -87,15 +87,15 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.3 + index * 0.1 }}
-                      className="flex flex-col items-center text-center p-3 rounded-lg bg-slate-800/50"
+                      className="flex flex-col items-center text-center p-2 md:p-3 rounded-lg bg-slate-800/50"
                     >
                       <img
                         src={`/assets/${imagePath}`}
                         alt={character.name}
-                        className="h-24 md:h-28 object-contain drop-shadow-lg"
+                        className="h-16 md:h-24 object-contain drop-shadow-lg"
                       />
-                      <p className="text-white font-medium mt-2 text-sm">{character.name}</p>
-                      <p className="text-blue-400 text-xs">{character.role}</p>
+                      <p className="text-white font-medium mt-1 md:mt-2 text-xs md:text-sm">{character.name}</p>
+                      <p className="text-blue-400 text-[10px] md:text-xs">{character.role}</p>
                     </motion.div>
                   );
                 })}
@@ -103,12 +103,12 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
             </div>
           </div>
 
-          <div className="p-6 bg-slate-900/50 border-t border-slate-700">
+          <div className="p-4 md:p-6 bg-slate-900/50 border-t border-slate-700 shrink-0">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={onContinue}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-xl text-lg shadow-lg transition-all"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 md:py-4 rounded-xl text-base md:text-lg shadow-lg transition-all"
               data-testid="button-start-chapter"
             >
               Begin Chapter {chapter}

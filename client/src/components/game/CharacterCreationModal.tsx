@@ -18,18 +18,18 @@ export const CharacterCreationModal: React.FC = () => {
     };
 
     return (
-        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-900/95 px-4 pointer-events-auto">
+        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-900/95 p-4 pointer-events-auto">
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+                className="bg-white w-full max-w-lg max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col"
             >
-                <div className="bg-blue-600 p-8 text-white text-center">
-                    <h1 className="text-3xl font-black uppercase tracking-widest">New Hire</h1>
-                    <p className="opacity-80 mt-2">Create your Engineer Profile</p>
+                <div className="bg-blue-600 p-4 md:p-8 text-white text-center shrink-0">
+                    <h1 className="text-xl md:text-3xl font-black uppercase tracking-widest">New Hire</h1>
+                    <p className="opacity-80 mt-1 md:mt-2 text-sm md:text-base">Create your Engineer Profile</p>
                 </div>
 
-                <div className="p-8 space-y-8">
+                <div className="p-4 md:p-8 space-y-6 md:space-y-8 overflow-y-auto flex-1">
                     {/* Name Input */}
                     <div>
                         <label className="block text-sm font-bold text-slate-500 uppercase mb-2">Engineer Name</label>
@@ -77,7 +77,7 @@ export const CharacterCreationModal: React.FC = () => {
                     <button
                         onClick={handleConfirm}
                         disabled={!name.trim()}
-                        className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl text-xl shadow-lg transition-all transform hover:scale-[1.02]"
+                        className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 md:py-4 rounded-xl text-lg md:text-xl shadow-lg transition-all transform hover:scale-[1.02]"
                         data-testid="button-start-career"
                     >
                         Start Career
