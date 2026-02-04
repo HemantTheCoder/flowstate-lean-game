@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
+import { User, UserCircle } from 'lucide-react';
 
 export const CharacterCreationModal: React.FC = () => {
     const { setPlayerProfile, setFlag, flags } = useGameStore();
@@ -49,15 +50,25 @@ export const CharacterCreationModal: React.FC = () => {
                             <button
                                 onClick={() => setGender('male')}
                                 className={`flex-1 p-4 rounded-xl border-4 transition-all ${gender === 'male' ? 'border-blue-500 bg-blue-50' : 'border-slate-100 hover:border-slate-200'}`}
+                                data-testid="button-select-male"
                             >
-                                <div className="text-4xl mb-2">👨‍💼</div>
+                                <div className="flex justify-center mb-2">
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${gender === 'male' ? 'bg-blue-500' : 'bg-slate-300'}`}>
+                                        <User className="w-6 h-6 text-white" />
+                                    </div>
+                                </div>
                                 <div className={`font-bold ${gender === 'male' ? 'text-blue-600' : 'text-slate-400'}`}>Male</div>
                             </button>
                             <button
                                 onClick={() => setGender('female')}
                                 className={`flex-1 p-4 rounded-xl border-4 transition-all ${gender === 'female' ? 'border-pink-500 bg-pink-50' : 'border-slate-100 hover:border-slate-200'}`}
+                                data-testid="button-select-female"
                             >
-                                <div className="text-4xl mb-2">👩‍💼</div>
+                                <div className="flex justify-center mb-2">
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${gender === 'female' ? 'bg-pink-500' : 'bg-slate-300'}`}>
+                                        <UserCircle className="w-6 h-6 text-white" />
+                                    </div>
+                                </div>
                                 <div className={`font-bold ${gender === 'female' ? 'text-pink-600' : 'text-slate-400'}`}>Female</div>
                             </button>
                         </div>

@@ -14,6 +14,7 @@ import { DecisionModal } from '@/components/game/DecisionModal';
 // import { CharacterCreationModal } from '@/components/game/CharacterCreationModal'; // Removed, moved to ChapterSelect
 import { TransitionScreen } from '@/components/game/TransitionScreen';
 import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
+import { CharacterCastModal } from '@/components/game/CharacterCastModal';
 import { DayBriefingModal } from '@/components/game/DayBriefingModal';
 import { ChapterCompleteModal } from '@/components/game/ChapterCompleteModal';
 import { Chapter2CompleteModal } from '@/components/game/Chapter2CompleteModal';
@@ -67,8 +68,7 @@ export default function Game() {
   const DebugOverlay = () => (
     <div className="fixed top-0 left-0 bg-black/80 text-green-400 p-2 z-[9999] text-xs font-mono pointer-events-none">
       <div>Day: {day} | Ch: {chapter} | Phase: {phase}</div>
-      <div>Modal: {showChapterComplete ? 'OPEN' : 'CLOSED'}</div>
-      <div>Intro Seen: {flags['chapter_intro_seen'] ? 'YES' : 'NO'}</div>
+      <div>Cast: {flags['character_cast_seen'] ? 'Y' : 'N'} | Intro: {flags['chapter_intro_seen'] ? 'Y' : 'N'}</div>
     </div>
   );
 
@@ -657,7 +657,13 @@ export default function Game() {
           onSelect={decisionProps?.onSelect || (() => { })}
         />
 
-        <ChapterIntroModal />
+        {flags['character_created'] && !flags['character_cast_seen'] && (
+          <CharacterCastModal 
+            chapter={chapter} 
+            onContinue={() => setFlag('character_cast_seen', true)} 
+          />
+        )}
+        {flags['character_cast_seen'] && !flags['chapter_intro_seen'] && <ChapterIntroModal />}
         <DayBriefingModal />
         <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
         {/* Modals & Screens */}
