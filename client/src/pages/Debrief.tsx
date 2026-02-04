@@ -44,7 +44,7 @@ export default function Debrief() {
               <div className="text-3xl font-black text-blue-400">{(lpi.flowEfficiency + lpi.teamMorale) / 2}%</div>
             </div>
             <div className="w-12 h-12 rounded-full border-4 border-blue-500/30 border-t-blue-500 flex items-center justify-center">
-               <span className="text-xl">📊</span>
+               <span className="text-xl font-bold">LPI</span>
             </div>
           </div>
         </div>
@@ -140,7 +140,7 @@ export default function Debrief() {
 
         <div className="flex flex-col md:flex-row justify-between items-center bg-blue-600/5 p-8 rounded-[2rem] border border-blue-500/20 gap-6">
           <div className="flex items-center gap-6 text-center md:text-left">
-            <div className="text-5xl">👷</div>
+            <div className="text-5xl font-black text-white">DEV</div>
             <div>
               <h4 className="font-black text-white text-xl uppercase tracking-tight">"Stability is the foundation of Improvement."</h4>
               <p className="text-blue-400/80 text-sm font-bold uppercase tracking-widest mt-1">Site Engineer's Observation</p>

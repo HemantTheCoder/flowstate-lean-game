@@ -34,7 +34,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                         <div className="bg-gradient-to-r from-green-400 to-emerald-600 h-40 flex flex-col items-center justify-center relative overflow-hidden">
                             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 animate-slide"></div>
                             <h1 className="text-5xl md:text-6xl font-black text-white z-10 drop-shadow-lg text-center tracking-tighter transform -rotate-2">
-                                VICTORY! 🏆
+                                VICTORY!
                             </h1>
                             <p className="text-green-100 font-bold tracking-widest uppercase mt-2">Chapter 1 Complete</p>
                         </div>
@@ -47,7 +47,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                             {/* Metrics Graph */}
                             <div className="mb-8 p-4 bg-slate-50 rounded-2xl border border-slate-200 shadow-inner">
                                 <h3 className="text-slate-800 font-bold text-sm uppercase mb-4 flex items-center justify-center gap-2">
-                                    📈 Weekly Flow Performance
+                                    Weekly Flow Performance
                                 </h3>
                                 <div className="h-48 w-full">
                                     <ResponsiveContainer width="100%" height="100%">

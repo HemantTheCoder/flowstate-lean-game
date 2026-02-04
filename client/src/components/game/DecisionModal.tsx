@@ -56,8 +56,8 @@ export const DecisionModal: React.FC<Props> = ({ isOpen, title, prompt, options,
                                         <span className={`text-lg font-bold ${opt.type === 'risky' ? 'text-red-700' : opt.type === 'safe' ? 'text-blue-700' : 'text-slate-700'}`}>
                                             {opt.text}
                                         </span>
-                                        <span className="opacity-0 group-hover:opacity-100 transition-opacity text-2xl">
-                                            {opt.type === 'risky' ? '🔥' : opt.type === 'safe' ? '🛡️' : '➡️'}
+                                        <span className="opacity-0 group-hover:opacity-100 transition-opacity text-sm font-bold uppercase">
+                                            {opt.type === 'risky' ? 'RISK' : opt.type === 'safe' ? 'SAFE' : 'GO'}
                                         </span>
                                     </div>
                                     {opt.description && (

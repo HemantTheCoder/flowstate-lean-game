@@ -31,7 +31,7 @@ export const DayBriefingModal: React.FC = () => {
                         <h2 className="text-sm font-bold text-blue-400 uppercase tracking-wider">Day {day} Briefing</h2>
                         <h1 className="text-2xl font-black text-white">{dayConfig.title}</h1>
                     </div>
-                    <div className="text-4xl">📋</div>
+                    <div className="text-2xl font-black text-blue-400">BRIEF</div>
                 </div>
 
                 <div className="space-y-6">
@@ -56,7 +56,7 @@ export const DayBriefingModal: React.FC = () => {
                     onClick={handleAcknowledge}
                     className="w-full mt-8 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-blue-900/50"
                 >
-                    Let's Work 🛠️
+                    Let's Work
                 </button>
             </motion.div>
         </div>

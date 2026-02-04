@@ -95,7 +95,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         <div className="bg-blue-600 px-4 py-2 rounded-xl text-lg shadow-xl text-right">
                             Click the Chart <br /> to open Kanban!
                         </div>
-                        <div className="text-4xl animate-bounce-horizontal">➡️</div>
+                        <div className="text-4xl font-bold text-blue-400 animate-bounce-horizontal">--&gt;</div>
                     </motion.div>
                 )}
 
@@ -158,7 +158,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                     >
                         <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-blue-500 relative">
                             <div className="absolute -top-3 left-6 w-6 h-6 bg-white border-t-4 border-l-4 border-blue-500 transform rotate-45"></div>
-                            <h3 className="font-black text-blue-600 text-lg mb-1">👀 Smart Advisor</h3>
+                            <h3 className="font-black text-blue-600 text-lg mb-1">Smart Advisor</h3>
                             <p className="text-sm font-medium mb-3 leading-snug">
                                 Always check here! I will warn you about <b>Bottlenecks</b> (Too much WIP) and <b>Starvation</b> (Idle workers).
                             </p>
@@ -166,7 +166,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 onClick={() => useGameStore.getState().setTutorialStep(6)}
                                 className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-blue-700 transition-colors"
                             >
-                                Next: Stats 💰
+                                Next: Stats
                             </button>
                         </div>
                     </motion.div>
@@ -181,16 +181,16 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                     >
                         <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-green-500 relative">
                             <div className="absolute -top-3 left-6 w-6 h-6 bg-white border-t-4 border-l-4 border-green-500 transform rotate-45"></div>
-                            <h3 className="font-black text-green-600 text-lg mb-1">📈 Project Health</h3>
+                            <h3 className="font-black text-green-600 text-lg mb-1">Project Health</h3>
                             <ul className="text-sm font-medium mb-3 space-y-2">
-                                <li>💰 <b>Funds</b>: You earn money when tasks reach <b>Done</b>. Don't run out!</li>
-                                <li>😊 <b>Morale</b>: Tracks site stability. It drops if you violate <b>WIP Limits</b> or push workers too hard, and rises when flow is steady.</li>
+                                <li><b>Funds</b>: You earn money when tasks reach <b>Done</b>. Don't run out!</li>
+                                <li><b>Morale</b>: Tracks site stability. It drops if you violate <b>WIP Limits</b> or push workers too hard, and rises when flow is steady.</li>
                             </ul>
                             <button
                                 onClick={() => useGameStore.getState().setTutorialStep(7)}
                                 className="bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-green-700 transition-colors"
                             >
-                                Next: Saving 💾
+                                Next: Saving
                             </button>
                         </div>
                     </motion.div>
@@ -205,7 +205,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                     >
                         <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-purple-500 relative">
                             <div className="absolute -top-3 right-6 w-6 h-6 bg-white border-t-4 border-l-4 border-purple-500 transform rotate-45"></div>
-                            <h3 className="font-black text-purple-600 text-lg mb-1">💾 Save Your Game</h3>
+                            <h3 className="font-black text-purple-600 text-lg mb-1">Save Your Game</h3>
                             <p className="text-sm font-medium mb-3 leading-snug">
                                 Click the Gear icon to access <b>Settings</b>. <br /> From there, you can <b>Export</b> your save file to keep it safe!
                             </p>
@@ -213,7 +213,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 onClick={() => useGameStore.getState().setTutorialStep(8)}
                                 className="bg-purple-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-purple-700 transition-colors"
                             >
-                                Finish Tutorial 🚀
+                                Finish Tutorial
                             </button>
                         </div>
                     </motion.div>
@@ -226,7 +226,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-auto z-[90]"
                     >
                         <div className="bg-yellow-400 text-black px-8 py-6 rounded-3xl shadow-2xl text-center border-4 border-white max-w-md">
-                            <h2 className="text-3xl font-black mb-2">🎉 Great Job!</h2>
+                            <h2 className="text-3xl font-black mb-2">Great Job!</h2>
                             <p className="mb-4 font-medium">You've learned the flow of work! <br /> Respect WIP limits to keep the workers happy.</p>
                             <button
                                 onClick={() => completeTutorial()}
@@ -244,7 +244,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 {tutorialStep === 10 && (
                     <div className="absolute top-20 right-20 z-[90] w-72 pointer-events-auto">
                         <div className="bg-blue-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-blue-400">
-                            <h3 className="font-bold text-blue-300 text-lg mb-1">📅 Lookahead Window</h3>
+                            <h3 className="font-bold text-blue-300 text-lg mb-1">Lookahead Window</h3>
                             <p className="text-sm mb-3">
                                 Tasks here are <b>planned</b> but not yet ready. <br />
                                 <span className="text-red-400 font-bold">RED Icons</span> = Constraints (Blocked). <br />
@@ -283,7 +283,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 {tutorialStep === 12 && (
                     <div className="absolute bottom-20 right-20 z-[90] w-72 pointer-events-auto">
                         <div className="bg-green-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-green-500">
-                            <h3 className="font-bold text-green-300 text-lg mb-1">🤝 The Weekly Promise</h3>
+                            <h3 className="font-bold text-green-300 text-lg mb-1">The Weekly Promise</h3>
                             <p className="text-sm mb-3">
                                 Only commit to tasks that are <b>Sound</b> (Green). <br />
                                 If you commit to Red tasks, they will likely fail and hurt Morale!
@@ -295,7 +295,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 }}
                                 className="bg-green-500 w-full py-1 rounded text-sm font-bold"
                             >
-                                Let's Plan! 🚀
+                                Let's Plan!
                             </button>
                         </div>
                     </div>

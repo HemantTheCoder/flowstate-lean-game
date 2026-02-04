@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { GameCanvas } from '@/components/game/GameCanvas';
-import { PlanningRoom } from '@/components/game/PlanningRoom'; // Import
+import { PlanningRoom } from '@/components/game/PlanningRoom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { KanbanBoard } from '@/components/game/KanbanBoard';
 import { DialogueBox } from '@/components/game/DialogueBox';
 import { TutorialOverlay } from '@/components/game/TutorialOverlay';
-import { DailySummary } from '@/components/game/DailySummary'; // Import
+import { DailySummary } from '@/components/game/DailySummary';
 import { useGameStore } from '@/store/gameStore';
 import { WEEK_1_SCHEDULE, DAY_5_GOOD, DAY_5_BAD } from '@/data/chapters/chapter1';
 import { WEEK_2_SCHEDULE } from '@/data/chapters/chapter2';
 import { DecisionModal } from '@/components/game/DecisionModal';
-// import { CharacterCreationModal } from '@/components/game/CharacterCreationModal'; // Removed, moved to ChapterSelect
 import { TransitionScreen } from '@/components/game/TransitionScreen';
 import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
 import { CharacterCastModal } from '@/components/game/CharacterCastModal';
@@ -21,6 +20,7 @@ import { Chapter2CompleteModal } from '@/components/game/Chapter2CompleteModal';
 import { SettingsModal } from '@/components/game/SettingsModal';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
+import { LayoutDashboard, HardHat, Save, Settings } from 'lucide-react';
 
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
@@ -254,7 +254,7 @@ export default function Game() {
   // Bankruptcy Check
   useEffect(() => {
     if (funds < 0) {
-      alert("💸 BANKRUPTCY 💸\n\nYou ran out of funds! The project has been shut down.\n\nTip: Keep the flow moving to generate revenue faster than the Daily Overhead expenses.");
+      alert("BANKRUPTCY\n\nYou ran out of funds! The project has been shut down.\n\nTip: Keep the flow moving to generate revenue faster than the Daily Overhead expenses.");
       window.location.reload();
     }
   }, [funds]);
@@ -297,7 +297,7 @@ export default function Game() {
           window.location.reload(); // Cleanest way to restart day logic
         } else {
           // GAME OVER
-          alert("⛔ GAME OVER ⛔\n\nThe funding was pulled due to poor management and excessive waste. The project has been cancelled.\n\nReturning to Title Screen...");
+          alert("GAME OVER\n\nThe funding was pulled due to poor management and excessive waste. The project has been cancelled.\n\nReturning to Title Screen...");
           // Reset Game State completely
           useGameStore.getState().startChapter(1); // Reset store basics if needed, or just let server reset
           // Use the mutation if available or just hard reload to clear session if local?
@@ -437,21 +437,21 @@ export default function Game() {
     // CHAPTER 2 SPECIFIC GUIDANCE (LPS Teaching)
     if (chapter === 2) {
       if (day === 6) {
-        if (readyCount < 3) return "📅 Monday Goal: Check the Backlog. Pull at least 3 tasks to 'Looking Ahead'.";
-        return "✅ Good. We have a Lookahead plan. End the day to let the Foreman check it.";
+        if (readyCount < 3) return "Monday Goal: Check the Backlog. Pull at least 3 tasks to 'Looking Ahead'.";
+        return "Good. We have a Lookahead plan. End the day to let the Foreman check it.";
       }
       if (day === 7) {
-        return "🔍 Tuesday Goal: Click tasks in Lookahead. Find the RED constraints.";
+        return "Tuesday Goal: Click tasks in Lookahead. Find the RED constraints.";
       }
       if (day === 8) {
         const hasGreen = ready?.tasks.some(t => (t.constraints?.length || 0) === 0);
-        if (!hasGreen) return "🛠️ Wednesday Goal: Use Funds/Action to FIX constraints. Make tasks Green.";
-        return "✅ Constraints removed! We are ready to commit tomorrow.";
+        if (!hasGreen) return "Wednesday Goal: Use Funds/Action to FIX constraints. Make tasks Green.";
+        return "Constraints removed! We are ready to commit tomorrow.";
       }
       if (day === 9) {
-        return "🤝 Thursday Goal: COMMIT! Click 'Run Week'. Do NOT commit Red tasks!";
+        return "Thursday Goal: COMMIT! Click 'Run Week'. Do NOT commit Red tasks!";
       }
-      if (day === 10) return "📊 Friday Goal: Check PPC. Did we deliver our promise?";
+      if (day === 10) return "Friday Goal: Check PPC. Did we deliver our promise?";
     }
 
     // 0. NARRATIVE SPECIFIC ADVICE & "END DAY" TRIGGERS
@@ -459,45 +459,45 @@ export default function Game() {
     // Day 1: WIP Limits & Flow
     if (day === 1) {
       if (doingCount === 0 && readyCount === 0) { // Simple start
-        return "✅ Objective Complete! Click 'End Day' ☀️ to finish Day 1.";
+        return "Objective Complete! Click 'End Day' to finish Day 1.";
       }
       if (doingCount === 0) {
-        return "✅ Good job! 'Doing' is clear. Click 'End Day' ☀️ now. (No need to clear the backlog yet!)";
+        return "Good job! 'Doing' is clear. Click 'End Day' now. (No need to clear the backlog yet!)";
       }
-      return "👷 Day 1 Goal: Move tasks from 'Ready' to 'Doing' and finish them. Keep 'Doing' under limit (2).";
+      return "Day 1 Goal: Move tasks from 'Ready' to 'Doing' and finish them. Keep 'Doing' under limit (2).";
     }
 
     // Day 2: Supply Shortage
     if (day === 2) {
       if (doingCount > 0) {
-        return "📦 Keep working. Finish active tasks.";
+        return "Keep working. Finish active tasks.";
       }
 
       const hasPrep = allPending.some(t => t.cost === 0);
       if (hasPrep) {
-        return "🚚 SUPPLY DELAY: Materials 0! But you can still do 'Prep' tasks (0 Cost). Pull them now!";
+        return "SUPPLY DELAY: Materials 0! But you can still do 'Prep' tasks (0 Cost). Pull them now!";
       }
 
       // Only if NO DOING and NO PREP and NO MATERIALS
       if (state.materials < 10) {
-        return "✅ Supply Delay Survived! No more work possible. Click 'End Day' ☀️.";
+        return "Supply Delay Survived! No more work possible. Click 'End Day'.";
       }
 
       // Fallback
-      return "📦 Day 2 Goal: Keep working until materials run out.";
+      return "Day 2 Goal: Keep working until materials run out.";
     }
 
     // Day 3: Rain
     if (day === 3) {
       const hasIndoor = allPending.some(t => t.type !== 'Structural' && state.materials >= t.cost);
       if (!hasIndoor && doingCount === 0) {
-        return "✅ Rain has stopped outdoor work. Click 'End Day' ☀️ to wait for clear skies.";
+        return "Rain has stopped outdoor work. Click 'End Day' to wait for clear skies.";
       }
       const hasStructuralReady = ready?.tasks.some(t => t.type === 'Structural');
       if (hasStructuralReady) {
-        return "🌧️ RAIN ALERT: Structural tasks are BLOCKED. Focus on Interior/Systems or End Day.";
+        return "RAIN ALERT: Structural tasks are BLOCKED. Focus on Interior/Systems or End Day.";
       }
-      return "☔ Day 3 Goal: Do what you can indoors. Don't force outdoor work.";
+      return "Day 3 Goal: Do what you can indoors. Don't force outdoor work.";
     }
 
     // Day 4: Push vs Pull
@@ -505,18 +505,18 @@ export default function Game() {
       // Prioritize the decision advice logic specific to the choice made
       if (flags['decision_pull_enforced']) {
         if (doingCount === 0 && readyCount === 0) {
-          return "✅ Flow Protected. Rao is annoyed, but the site is stable. Click 'End Day' ☀️.";
+          return "Flow Protected. Rao is annoyed, but the site is stable. Click 'End Day'.";
         }
-        return "✅ Good Choice! Now, ONLY pull work if you have space. Don't let Rao pressure you.";
+        return "Good Choice! Now, ONLY pull work if you have space. Don't let Rao pressure you.";
       }
 
       if (flags['decision_push_made']) {
         const hasWaste = doing?.tasks.some(t => t.id.includes('waste'));
         if (hasWaste) {
-          return "⚠️ REWORK DETECTED: You pushed! Finish the 'Rework' task IMMEDIATELY to fix the waste.";
+          return "REWORK DETECTED: You pushed! Finish the 'Rework' task IMMEDIATELY to fix the waste.";
         }
         if (doingCount === 0) {
-          return "✅ Waste cleared. hopefully the Inspector is lenient. Click 'End Day' ☀️.";
+          return "Waste cleared. hopefully the Inspector is lenient. Click 'End Day'.";
         }
       }
 
@@ -537,15 +537,15 @@ export default function Game() {
 
     // 3. Bottleneck
     if (doingCount >= doingLimit) {
-      return "⛔ BOTTLENECK: 'Doing' is full! Finish current work before pulling more.";
+      return "BOTTLENECK: 'Doing' is full! Finish current work before pulling more.";
     }
 
     // 4. Starvation
     if (doingCount === 0 && readyCount > 0) {
-      return "⚠️ STARVATION: Workers are idle. Pull a task!";
+      return "STARVATION: Workers are idle. Pull a task!";
     }
 
-    return "✅ Flow is stable. Keep moving tasks to 'Done'.";
+    return "Flow is stable. Keep moving tasks to 'Done'.";
   };
 
   return (
@@ -575,7 +575,7 @@ export default function Game() {
               onClick={handleEndDay}
               className={`bg-blue-500 hover:bg-blue-600 text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center border-b-4 border-blue-700 text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') ? 'animate-bounce ring-4 ring-yellow-400' : ''}`}
             >
-              End Day ☀️
+              End Day
             </button>
           </div>
 
@@ -591,10 +591,14 @@ export default function Game() {
             <button
               onClick={() => handleSave()}
               disabled={saveGame.isPending}
-              className="bg-white hover:bg-slate-50 border-2 border-slate-200 p-2 rounded-lg shadow-sm transition-all active:scale-95"
+              className="bg-white hover:bg-slate-50 border-2 border-slate-200 p-1.5 sm:p-2 rounded-lg shadow-sm transition-all active:scale-95"
               title="Save Game"
             >
-              {saveGame.isPending ? '⏳' : '💾'}
+              {saveGame.isPending ? (
+                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Save className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
+              )}
             </button>
             <button
               id="btn-settings"
@@ -602,10 +606,10 @@ export default function Game() {
                 soundManager.playSFX('click', audioSettings.sfxVolume);
                 setShowSettings(true);
               }}
-              className="bg-white hover:bg-slate-50 border-2 border-slate-200 p-2 rounded-lg shadow-sm transition-all active:scale-95 pointer-events-auto"
+              className="bg-white hover:bg-slate-50 border-2 border-slate-200 p-1.5 sm:p-2 rounded-lg shadow-sm transition-all active:scale-95 pointer-events-auto"
               title="Settings"
             >
-              ⚙️
+              <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
             </button>
           </div>
         </motion.div>
@@ -614,28 +618,28 @@ export default function Game() {
         <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="flex justify-center pointer-events-auto pb-4"
+          className="flex justify-center pointer-events-auto pb-2 sm:pb-4"
         >
-          <div className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-2xl shadow-lg border-2 border-slate-100">
-            <div className="flex gap-4 items-center">
+          <div className="bg-white/90 backdrop-blur-md px-3 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg border-2 border-slate-100">
+            <div className="flex gap-2 sm:gap-4 items-center">
               <button
                 id="btn-kanban"
                 onClick={() => setShowKanban(true)}
-                className="bg-white/90 backdrop-blur-sm p-4 rounded-2xl shadow-xl hover:scale-105 transition-transform group relative"
+                className="bg-white/90 backdrop-blur-sm p-2 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl hover:scale-105 transition-transform group relative"
               >
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                  📊
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-colors text-sm sm:text-base">
+                  <LayoutDashboard className="w-4 h-4 sm:w-6 sm:h-6" />
                 </div>
-                <span className="text-xs font-bold text-slate-600">Kanban</span>
+                <span className="text-[10px] sm:text-xs font-bold text-slate-600">Kanban</span>
               </button>
               <button
                 onClick={() => setShowKanban(false)}
                 className="flex flex-col items-center gap-1 group"
               >
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:bg-purple-500 group-hover:text-white transition-colors">
-                  🏗️
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                  <HardHat className="w-4 h-4 sm:w-6 sm:h-6" />
                 </div>
-                <span className="text-xs font-bold text-slate-600">Site</span>
+                <span className="text-[10px] sm:text-xs font-bold text-slate-600">Site</span>
               </button>
             </div>
           </div>

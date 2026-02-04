@@ -12,52 +12,52 @@ export const ComingSoonModal: React.FC<ComingSoonModalProps> = ({ isOpen, onClos
     // Content Configuration
     const content = mode === 'multiplayer' ? {
         title: "Coming Soon — Collaborative Mode",
-        subtitle: "🤝 Multiplayer (Under Development)",
+        subtitle: "Multiplayer (Under Development)",
         intro: "Construction is never a solo effort. Soon, FLOWSTATE will support collaborative project delivery, where multiple players manage the same project in real time — each responsible for a different part of the system.",
         sections: [
             {
                 title: "Planned Features",
                 items: [
-                    { icon: "👷", title: "Planner", desc: "Creates weekly commitments, manages lookahead, removes constraints." },
-                    { icon: "🏗️", title: "Site Manager", desc: "Controls crews, sequencing, daily execution, and site conditions." },
-                    { icon: "🚚", title: "Supply Coordinator", desc: "Handles materials, deliveries, and logistics timing." },
-                    { icon: "🧪", title: "Quality & Safety Lead", desc: "Manages inspections, defects, and compliance." }
+                    { icon: "P", title: "Planner", desc: "Creates weekly commitments, manages lookahead, removes constraints." },
+                    { icon: "S", title: "Site Manager", desc: "Controls crews, sequencing, daily execution, and site conditions." },
+                    { icon: "L", title: "Supply Coordinator", desc: "Handles materials, deliveries, and logistics timing." },
+                    { icon: "Q", title: "Quality & Safety Lead", desc: "Manages inspections, defects, and compliance." }
                 ]
             },
             {
                 title: "Multiplayer Modes",
                 items: [
-                    { icon: "🎮", title: "Co-Op Mode", desc: "Work together to deliver projects with high Lean performance." },
-                    { icon: "🏆", title: "Challenge Mode", desc: "Teams compete on identical projects to achieve best PPC and flow." },
-                    { icon: "🏫", title: "Scenario Mode", desc: "Instructor-led simulations for classrooms and workshops." }
+                    { icon: "CO", title: "Co-Op Mode", desc: "Work together to deliver projects with high Lean performance." },
+                    { icon: "VS", title: "Challenge Mode", desc: "Teams compete on identical projects to achieve best PPC and flow." },
+                    { icon: "ED", title: "Scenario Mode", desc: "Instructor-led simulations for classrooms and workshops." }
                 ]
             }
         ],
         roleThinking: {
-            title: "🧠 Role-Based Thinking (Single Player)",
+            title: "Role-Based Thinking (Single Player)",
             desc: "Even in single-player, future updates will allow you to switch perspectives. Learn to think like an integrated project team — not just an individual engineer."
         },
         footer: "These features are designed to reflect real-world construction collaboration and Lean project delivery."
     } : {
         title: "Real-World Project Scenarios",
-        subtitle: "🚧 Case-Based Mini Levels (Under Development)",
+        subtitle: "Case-Based Mini Levels (Under Development)",
         intro: "Soon, FLOWSTATE will include case-based project levels inspired by real civil engineering works. These are short, focused scenarios where you apply Lean concepts to realistic construction problems.",
         sections: [
             {
                 title: "Planned Case Categories",
                 items: [
-                    { icon: "🛣️", title: "Highway Construction", desc: "Manage earthwork, paving, and traffic constraints while maintaining flow." },
-                    { icon: "🏢", title: "High-Rise Building", desc: "Coordinate multiple trades across floors with limited space and strict sequencing." },
-                    { icon: "🌧️", title: "Urban Drainage System", desc: "Handle unpredictable weather, approvals, and underground utilities." },
-                    { icon: "🚆", title: "Transit Corridor", desc: "Deliver long linear projects with inspection dependencies and public disruption." }
+                    { icon: "HW", title: "Highway Construction", desc: "Manage earthwork, paving, and traffic constraints while maintaining flow." },
+                    { icon: "HR", title: "High-Rise Building", desc: "Coordinate multiple trades across floors with limited space and strict sequencing." },
+                    { icon: "UD", title: "Urban Drainage System", desc: "Handle unpredictable weather, approvals, and underground utilities." },
+                    { icon: "TC", title: "Transit Corridor", desc: "Deliver long linear projects with inspection dependencies and public disruption." }
                 ]
             },
             {
                 title: "How Case Levels Work",
                 items: [
-                    { icon: "📋", title: "Project Brief", desc: "Specific scope, deadline, and risks." },
-                    { icon: "🛠️", title: "Limited Lean Tools", desc: "Test your skills with constraints." },
-                    { icon: "📈", title: "Performance Grading", desc: "Graded on PPC, Flow Efficiency, and Waste Reduction." }
+                    { icon: "1", title: "Project Brief", desc: "Specific scope, deadline, and risks." },
+                    { icon: "2", title: "Limited Lean Tools", desc: "Test your skills with constraints." },
+                    { icon: "3", title: "Performance Grading", desc: "Graded on PPC, Flow Efficiency, and Waste Reduction." }
                 ]
             }
         ],

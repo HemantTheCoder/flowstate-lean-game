@@ -29,7 +29,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         // Block Structural in Rain (Moving to Doing)
         if (day === 3 && task.type === 'Structural' && destColId === 'doing' && sourceColId !== 'doing') {
             soundManager.playSFX('alert', audioSettings.sfxVolume);
-            alert("🌧️ ENVIRONMENTAL VARIATION DETECTED!\n\nPrecipitation exceeds safety thresholds for structural work. Continuing would compromise quality and safety standards.\n\n✅ LEAN RESPONSE: Pivot to interior fit-out or MEP systems in the Ready column to maintain throughput.");
+            alert("ENVIRONMENTAL VARIATION DETECTED!\n\nPrecipitation exceeds safety thresholds for structural work. Continuing would compromise quality and safety standards.\n\nLEAN RESPONSE: Pivot to interior fit-out or MEP systems in the Ready column to maintain throughput.");
             return;
         }
 
@@ -37,9 +37,9 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         if (destColId === 'doing' && sourceColId !== 'doing' && materials < task.cost) {
             soundManager.playSFX('alert', audioSettings.sfxVolume);
             const isDay2 = day === 2;
-            const reason = isDay2 ? "Logistics failure: Concrete delivery delayed 🚚" : "Resource constraint detected.";
+            const reason = isDay2 ? "Logistics failure: Concrete delivery delayed" : "Resource constraint detected.";
 
-            alert(`⛔ RESOURCE CONSTRAINT!\n\n${reason}\nAvailable Materials: ${materials} units. Required: ${task.cost} units.\n\n✅ LEAN RESPONSE: Identify non-material dependent tasks (Management/Prep) to minimize idle time waste.`);
+            alert(`RESOURCE CONSTRAINT!\n\n${reason}\nAvailable Materials: ${materials} units. Required: ${task.cost} units.\n\nLEAN RESPONSE: Identify non-material dependent tasks (Management/Prep) to minimize idle time waste.`);
             return;
         }
 
@@ -52,7 +52,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         // Allow moving forward by exactly 1 step OR backward by exactly 1 step
         if (Math.abs(destIndex - sourceIndex) !== 1) {
             soundManager.playSFX('alert', audioSettings.sfxVolume);
-            alert("⛔ INVALID MOVE!\n\nYou must follow the flow:\nBacklog ➡️ Ready ➡️ Doing ➡️ Done\n\nYou cannot skip steps!");
+            alert("INVALID MOVE!\n\nYou must follow the flow:\nBacklog > Ready > Doing > Done\n\nYou cannot skip steps!");
             return;
         }
 
@@ -94,7 +94,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 <div className="bg-white p-4 md:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center z-10 gap-2 md:gap-4">
                     <div>
                         <h2 className="text-xl md:text-3xl font-black text-slate-800 flex items-center gap-2">
-                            {day > 5 ? '🚧 Site Execution Board (Week Work)' : '📋 Project Kanban Board'}
+                            {day > 5 ? 'Site Execution Board (Week Work)' : 'Project Kanban Board'}
                         </h2>
                         <div className="flex gap-2 md:gap-4 mt-1 md:mt-2">
                             <div className="px-2 md:px-3 py-0.5 md:py-1 bg-blue-50 text-blue-700 rounded-lg font-mono font-bold border border-blue-100 text-[10px] md:text-sm">
@@ -184,7 +184,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                 >
                                                                     <div className="flex justify-between items-start">
                                                                         <h4 className="font-bold text-slate-700 group-hover:text-blue-600 transition-colors text-sm md:text-base flex-1">{task.title}</h4>
-                                                                        {hasRedConstraints && <span className="text-lg animate-pulse" title="Blocked by Constraints">⛔</span>}
+                                                                        {hasRedConstraints && <span className="text-xs font-black text-red-600 animate-pulse" title="Blocked by Constraints">BLOCKED</span>}
                                                                     </div>
 
                                                                     <p className="text-[10px] md:text-xs text-slate-400 line-clamp-2 mt-1">{task.description}</p>

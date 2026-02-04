@@ -66,7 +66,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                         onClick={onClose}
                         className="w-full bg-black text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-transform"
                     >
-                        Start Day {day + 1} ☀️
+                        Start Day {day + 1}
                     </button>
                 </div>
             </motion.div>

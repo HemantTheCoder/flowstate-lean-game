@@ -122,7 +122,7 @@ export default function ChapterSelect() {
                                     <span className={`px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${isUnlocked ? 'bg-white/10 text-white border-white/20' : 'bg-slate-800 text-slate-500 border-slate-700'}`}>
                                         Episode {chapter.id}
                                     </span>
-                                    {!isUnlocked && <span className="text-2xl">🔒</span>}
+                                    {!isUnlocked && <span className="text-sm font-bold text-slate-500 uppercase">[LOCKED]</span>}
                                 </div>
 
                                 <h2 className={`text-3xl font-black mb-2 ${isUnlocked ? 'text-white' : 'text-slate-600'}`}>

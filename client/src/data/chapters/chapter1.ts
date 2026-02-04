@@ -35,7 +35,7 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         event: 'supply_delay',
         briefing: {
             objective: "Mitigate Starvation.",
-            action: "Material inventory is zero 🚚. Execute 'Management' or 'Prep' tasks (0 Cost) to maintain value-added activity while we wait for the delivery."
+            action: "Material inventory is zero. Execute 'Management' or 'Prep' tasks (0 Cost) to maintain value-added activity while we wait for the delivery."
         }
     },
     {
@@ -54,7 +54,7 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         event: 'rain',
         briefing: {
             objective: "Adapt to Variation.",
-            action: "Rain 🌧️ blocks all Structural (outdoor) work today. Pivot to Interior or Systems tasks to maintain throughput."
+            action: "Rain blocks all Structural (outdoor) work today. Pivot to Interior or Systems tasks to maintain throughput."
         }
     },
     {

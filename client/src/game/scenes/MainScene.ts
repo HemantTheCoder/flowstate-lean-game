@@ -15,32 +15,21 @@ export class MainScene extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
 
-        // 1. Background (Tiled Ground) - Covers entire screen
-        this.ground = this.add.tileSprite(width / 2, height / 2, width, height, 'ground');
-        this.ground.setAlpha(1); // Full visibility
-        this.ground.setScrollFactor(0); // Optional: if we had camera movement
-
-        // 2. Isometric Grid Overlay - Dynamic size
-        const graphics = this.add.graphics();
-        graphics.lineStyle(2, 0xffffff, 0.2);
-
-        const tileWidth = 64;
-        const tileHeight = 32;
-        // Calculate how many tiles we need to cover the screen plus buffer
-        const mapSize = Math.ceil(Math.max(width, height) / tileHeight) + 5;
-
-        for (let x = 0; x < mapSize; x++) {
-            for (let y = 0; y < mapSize; y++) {
-                const isoX = (x - y) * (tileWidth / 2) + width / 2; // Center horizontal
-                const isoY = (x + y) * (tileHeight / 2); // Start from top
-
-                graphics.moveTo(isoX, isoY);
-                graphics.lineTo(isoX + tileWidth / 2, isoY + tileHeight / 2);
-                graphics.lineTo(isoX, isoY + tileHeight);
-                graphics.lineTo(isoX - tileWidth / 2, isoY + tileHeight / 2);
-                graphics.lineTo(isoX, isoY);
-            }
+        // 1. Background Image - Full screen cover
+        if (this.textures.exists('construction_bg')) {
+            const bg = this.add.image(width / 2, height / 2, 'construction_bg');
+            const scaleX = width / bg.width;
+            const scaleY = height / bg.height;
+            const scale = Math.max(scaleX, scaleY);
+            bg.setScale(scale);
+            bg.setScrollFactor(0);
+            (this as any).bgImage = bg;
         }
+
+        // Fallback tiled ground (hidden behind bg)
+        this.ground = this.add.tileSprite(width / 2, height / 2, width, height, 'ground');
+        this.ground.setAlpha(0.3);
+        this.ground.setScrollFactor(0);
 
         // Rain Particles (initially paused)
         this.rainEmitter = this.add.particles(0, 0, 'rain_drop', {
@@ -63,39 +52,57 @@ export class MainScene extends Phaser.Scene {
             g.generateTexture('rain_drop', 2, 10);
         }
 
-        // 3. Add Workers - Distributed across the screen
+        // 3. Add Workers - Distributed across the lower portion of screen (ground level)
         const workerTypes = ['worker_blue', 'worker_orange', 'worker_green'];
 
-        for (let i = 0; i < 12; i++) { // Increased count for full screen
-            // Random position within sensible bounds (padded from edges)
-            const startX = Phaser.Math.Between(100, width - 100);
-            const startY = Phaser.Math.Between(100, height - 100);
+        for (let i = 0; i < 8; i++) {
+            // Position workers in the lower 40% of the screen (where ground would be)
+            const startX = Phaser.Math.Between(80, width - 80);
+            const startY = Phaser.Math.Between(height * 0.55, height - 100);
             const type = Phaser.Math.RND.pick(workerTypes);
 
             const worker = this.add.sprite(startX, startY, type);
-            worker.setScale(1.2);
+            worker.setScale(0.9);
+            worker.setDepth(startY); // Depth sorting based on Y position
 
             // Interactivity
             worker.setInteractive({ cursor: 'pointer' });
-            worker.on('pointerover', () => worker.setScale(1.4));
-            worker.on('pointerout', () => worker.setScale(1.2));
+            worker.on('pointerover', () => worker.setScale(1.1));
+            worker.on('pointerout', () => worker.setScale(0.9));
             worker.on('pointerdown', () => {
-                this.spawnWorkerBark("I'm fast!");
-                this.tweens.add({ targets: worker, y: '-=10', duration: 100, yoyo: true });
+                const barks = ["Working hard!", "Almost done!", "Need more materials!", "Following the plan!"];
+                this.spawnWorkerBark(Phaser.Utils.Array.GetRandom(barks));
+                this.tweens.add({ targets: worker, y: '-=15', duration: 150, yoyo: true });
             });
 
-            // Random velocity
-            (worker as any).vx = (Math.random() - 0.5) * 1.5;
-            (worker as any).vy = (Math.random() - 0.5) * 1.5;
+            // Give each worker a work state and behavior
+            const workerData: any = worker;
+            workerData.vx = (Math.random() - 0.5) * 0.8;
+            workerData.vy = (Math.random() - 0.5) * 0.4;
+            workerData.workState = Math.random() > 0.3 ? 'working' : 'walking';
+            workerData.workTimer = Phaser.Math.Between(2000, 5000);
+            workerData.workStartTime = this.time.now;
 
-            // Bobbing animation (Walking simulation)
-            this.tweens.add({
-                targets: worker,
-                y: '+=5',
-                duration: 250,
-                yoyo: true,
-                repeat: -1
-            });
+            // Working animation (bending/hammering motion)
+            if (workerData.workState === 'working') {
+                this.tweens.add({
+                    targets: worker,
+                    scaleY: 0.85,
+                    duration: 400,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut'
+                });
+            } else {
+                // Walking bobbing animation
+                this.tweens.add({
+                    targets: worker,
+                    y: '+=4',
+                    duration: 200,
+                    yoyo: true,
+                    repeat: -1
+                });
+            }
 
             this.workers.push(worker);
         }
@@ -120,12 +127,12 @@ export class MainScene extends Phaser.Scene {
 
             if (currDone > prevDone) {
                 this.spawnBuildingEffect();
-                this.showFloatingText("Value Added! 💰", '#10b981'); // Green
+                this.showFloatingText("+VALUE", '#10b981');
             }
 
             if (currDoing > prevDoing) {
                 // Task started
-                this.showFloatingText("Pulling Materials... 🧱", '#f59e0b'); // Orange
+                this.showFloatingText("PULLING MATERIALS", '#f59e0b');
 
                 // Random worker bark
                 const barks = [
@@ -145,15 +152,15 @@ export class MainScene extends Phaser.Scene {
             // Watch for Funds/Morale Change logic continues...
             if (state.funds !== prevState.funds) {
                 const diff = state.funds - prevState.funds;
-                if (diff > 0) this.showFloatingText(`Funds +$${diff} 💰`, '#10b981');
-                else this.showFloatingText(`Funds -$${Math.abs(diff)} 💸`, '#ef4444');
+                if (diff > 0) this.showFloatingText(`+$${diff}`, '#10b981');
+                else this.showFloatingText(`-$${Math.abs(diff)}`, '#ef4444');
             }
 
             // Watch for Morale Change
             if (state.lpi.teamMorale !== prevState.lpi.teamMorale) {
                 const diff = state.lpi.teamMorale - prevState.lpi.teamMorale;
-                if (diff > 0) this.showFloatingText(`Morale +${diff} 😊`, '#10b981');
-                else this.showFloatingText(`Morale ${diff} 😓`, '#ef4444');
+                if (diff > 0) this.showFloatingText(`MORALE +${diff}`, '#10b981');
+                else this.showFloatingText(`MORALE ${diff}`, '#ef4444');
             }
 
             // Watch for Chapter Change
@@ -202,6 +209,15 @@ export class MainScene extends Phaser.Scene {
         const height = gameSize.height;
 
         this.cameras.main.setViewport(0, 0, width, height);
+
+        // Resize background image
+        const bgImage = (this as any).bgImage;
+        if (bgImage) {
+            bgImage.setPosition(width / 2, height / 2);
+            const scaleX = width / bgImage.texture.getSourceImage().width;
+            const scaleY = height / bgImage.texture.getSourceImage().height;
+            bgImage.setScale(Math.max(scaleX, scaleY));
+        }
 
         if (this.ground) {
             this.ground.setPosition(width / 2, height / 2);
@@ -341,7 +357,7 @@ export class MainScene extends Phaser.Scene {
                 repeat: 3,
                 ease: 'Bounce.out'
             });
-            this.spawnWorkerBark("YAY! We did it! 🎉");
+            this.spawnWorkerBark("We did it!");
         });
 
         // 3. Spawn Buildings everywhere to show "Complete"
