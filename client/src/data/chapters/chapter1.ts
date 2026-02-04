@@ -1,17 +1,6 @@
+import { DayConfig } from './types';
 import { DialogueLine } from '@/store/gameStore';
-
-export interface DayConfig {
-    day: number;
-    title: string;
-    description: string;
-    lesson: string; // The Civil Engineering/Lean concept
-    dialogue: DialogueLine[];
-    event?: 'rain' | 'supply_delay' | 'inspection' | 'decision_push';
-    briefing?: {
-        objective: string;
-        action: string;
-    };
-}
+export type { DayConfig } from './types';
 
 export const WEEK_1_SCHEDULE: DayConfig[] = [
     {

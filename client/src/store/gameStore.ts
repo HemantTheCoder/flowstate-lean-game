@@ -210,18 +210,42 @@ export const useGameStore = create<GameState>((set, get) => ({
         columns: INITIAL_COLUMNS,
         funds: 2500,
         materials: 300,
+        dailyMetrics: [],
+        previousDoneCount: 0,
+        weeklyPlan: [],
         flags: { ...state.flags, chapter_intro_seen: false }
       };
     }
 
     if (chapter === 2) {
+      const chapter2Tasks: Task[] = CONSTRUCTION_TASKS.slice(0, 10).map(t => ({
+        ...t,
+        id: uuidv4(),
+        status: 'backlog' as const,
+        originalId: t.id,
+        constraints: t.constraints || []
+      }));
+
+      const chapter2Columns: Column[] = [
+        { id: 'backlog', title: 'Master Schedule', tasks: chapter2Tasks, wipLimit: 0 },
+        { id: 'ready', title: 'Lookahead', tasks: [], wipLimit: 5 },
+        { id: 'doing', title: 'Doing', tasks: [], wipLimit: 3 },
+        { id: 'done', title: 'Done', tasks: [], wipLimit: 0 },
+      ];
+
       return {
         ...commonUpdates,
         day: 6,
         week: 2,
         phase: 'planning',
+        columns: chapter2Columns,
+        funds: 3000,
+        materials: 400,
+        dailyMetrics: [],
+        previousDoneCount: 0,
+        weeklyPlan: [],
+        ppcHistory: state.ppcHistory,
         flags: { ...state.flags, chapter_intro_seen: false, day_6_started: false }
-        // Note: keeping existing funds/materials could be an option here if we want continuity
       };
     }
 

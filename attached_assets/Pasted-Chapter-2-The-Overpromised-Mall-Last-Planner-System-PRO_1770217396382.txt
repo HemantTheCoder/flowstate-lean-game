@@ -1,0 +1,348 @@
+Chapter 2: The Overpromised Mall (Last Planner System)
+PROJECT CONTEXT
+
+Build Chapter 2 of a web-based, anime-style, story-driven Lean construction game called:
+
+FLOWSTATE: Saga of the Flow Architect.
+
+Chapter 1 (Kanban) is already implemented.
+
+Chapter 2 must teach Last Planner System (LPS) using a five-day interactive week (Week 2 in-game).
+
+Target learners: Civil engineering students and construction professionals.
+
+Learning must occur through:
+
+Narrative
+
+Daily decisions
+
+Visual cause-and-effect
+
+Emotional character reactions
+
+Performance metrics (PPC)
+
+Avoid textbook explanations. Concepts emerge from gameplay.
+
+CHAPTER 2 OVERVIEW
+
+Location: Riverside Market Mall redevelopment.
+
+Visual tone:
+
+Bright anime city
+
+Half-built food stalls
+
+Cranes, scaffolding
+
+Warm pastel palette
+
+Expressive NPC portraits
+
+Theme:
+Reliable commitments vs optimistic schedules.
+
+Core learning goals:
+
+Lookahead planning
+
+Constraint identification
+
+Constraint removal
+
+Weekly commitments
+
+Overcommitment consequences
+
+PPC (Percent Plan Complete)
+
+Human impact of broken promises
+
+Chapter structure:
+
+Intro Story
+→ Planning Day (Day 0)
+→ Day 1
+→ Day 2
+→ Day 3
+→ Day 4
+→ Day 5 Inspection
+→ PPC + Debrief
+→ Chapter 3 Unlock
+
+INTRO CUTSCENE
+
+Client NPC:
+
+“Last week your flow improved. This time I need dates.”
+
+Isha:
+
+“I already prepared the schedule.”
+
+Mira:
+
+“A schedule is not a promise.”
+
+Old Foreman:
+
+“Promises break faster than concrete.”
+
+Overlay:
+
+CHAPTER 2 — THE OVERPROMISED MALL
+LAST PLANNER SYSTEM
+
+Learning goals appear:
+
+This chapter teaches:
+• Making reliable weekly commitments
+• Removing constraints before promising
+• Avoiding overcommitment
+• Using PPC to measure trust
+
+Button: BEGIN PLANNING
+
+DAY 0 — PLANNING DAY (Last Planner Setup)
+
+Player enters Planning Room.
+
+PLANNING ROOM UI
+
+Desktop layout:
+
+LEFT PANEL — Master Plan (all tasks, read-only)
+CENTER PANEL — Lookahead Board (task cards with constraint icons)
+RIGHT PANEL — Task Inspector (task details + actions)
+BOTTOM — Weekly Work Plan slots (4–6)
+BOTTOM BAR — Budget, Morale
+CENTER BOTTOM — START DAY 1
+
+Task colors:
+Red = blocked
+Yellow = risky
+Green = ready
+
+Only GREEN tasks can be committed without penalty.
+
+Yellow/Red tasks can be forced but become fragile.
+
+SPOTLIGHT TUTORIAL SYSTEM (Day 0)
+
+Guided overlays:
+
+Lookahead Board
+Mira: “These are upcoming tasks. Not all are ready.”
+
+Constraint Icons
+Old Foreman: “Red blocked. Yellow risky. Green ready. No green — no promise.”
+
+Task Inspector
+Isha: “Every task hides reasons it might fail.”
+
+Constraint Removal Buttons
+Mira: “Last Planner means making work ready.”
+
+Player must remove at least one constraint.
+
+Buttons:
+
+Call Supplier
+
+Reassign Crew
+
+Request Approval
+
+Resequence
+
+Each has visual effects and resource cost.
+
+Weekly Work Plan
+Old Foreman: “This is your promise board.”
+
+START DAY 1
+Tooltip: “Once Day 1 starts, promises are locked.”
+
+TASK MODEL
+
+Each task:
+
+id
+name
+duration
+constraints {material, crew, approval, weather}
+promised
+completed
+fragile
+
+Fragile tasks have +30% failure probability.
+
+DAILY GAMEPLAY FLOW (Day 1–Day 5)
+
+Each day consists of:
+
+Morning briefing (story)
+→ Site interaction
+→ Player choices
+→ Visual consequences
+→ End-of-day summary
+
+DAY 1 — Commitments
+
+Toolbox meeting.
+
+Isha:
+
+“These are today’s promises.”
+
+Player assigns crews to promised tasks.
+
+Learning:
+Difference between planned and promised.
+
+DAY 2 — Constraints
+
+Event:
+Material delay or missing approval.
+
+Player chooses:
+
+Call supplier
+
+Resequence
+
+Ignore
+
+Ignoring stalls tasks.
+
+Mira:
+
+“This is why we clear constraints first.”
+
+DAY 3 — Client Pressure
+
+Client:
+
+“Can you also finish café roofing?”
+
+Choice:
+Accept / Decline.
+
+Accept adds unplanned work and increases PPC denominator.
+
+Learning:
+Overcommitment.
+
+DAY 4 — Recovery or Collapse
+
+Based on previous choices:
+
+Either:
+Smooth flow
+OR
+Multiple stalled tasks + defects
+
+Player may:
+
+Reassign crews
+
+Drop low-priority task
+
+Do nothing
+
+Learning:
+Preparation vs firefighting.
+
+DAY 5 — Inspection
+
+Inspector NPC arrives.
+
+Counts:
+
+Promised tasks
+
+Completed tasks
+
+Defects
+
+Then PPC displayed:
+
+PPC = Completed Promised / Total Promised × 100
+
+Animated gauge.
+
+Characters react emotionally.
+
+PPC EFFECTS
+
+80%:
+Morale +10
+Trust +15
+
+50–80%:
+Neutral
+
+<50%:
+Morale −10
+Trust −15
+
+FINAL DEBRIEF
+
+Show:
+
+PPC %
+
+Failed promises
+
+Unplanned work
+
+Constraint misses
+
+Narrative summary:
+
+“You promised X tasks and completed Y.
+
+Failures came from:
+• Hidden constraints
+• Overcommitment
+• Unplanned work
+
+Last Planner teaches:
+Remove constraints before committing.
+Promise only what can be done.”
+
+Award badges:
+Promise Keeper
+Constraint Crusher
+Reliable Planner
+
+CHAPTER END
+
+VN scene.
+
+Mall partially opens.
+
+Old Foreman:
+
+“Now promises are honest. Next we clean the mess.”
+
+Title:
+
+CHAPTER 3 UNLOCKED — THE TANGLED DEPOT (5S)
+
+Save progress.
+
+Return to Chapter Select.
+
+EDUCATIONAL OUTCOME
+
+Player must internalize:
+
+Planning ≠ Promising
+Constraints cause failure
+PPC measures reliability
+Overcommitment destroys trust
+
+Especially framed for civil engineers.
