@@ -1,17 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Play } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
+import { Play, CheckCircle2, AlertTriangle, TrendingUp, Target, Award, Lightbulb, ChevronRight, Zap } from 'lucide-react';
+
+interface DayBreakdown {
+  day: number;
+  efficiency: number;
+  tasksCompletedToday: number;
+  potentialCapacity: number;
+  cumulativeEfficiency: number;
+  insight: string;
+}
 
 export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => void; onContinue: () => void }> = ({ isOpen, onClose, onContinue }) => {
-    const { funds, lpi, dailyMetrics } = useGameStore();
+    const { funds, lpi, dailyMetrics, flags, cumulativeTasksCompleted, cumulativePotentialCapacity } = useGameStore();
+    const [activeDay, setActiveDay] = useState<number | null>(null);
+    const [showInsights, setShowInsights] = useState(false);
 
     // Play sound on open
     useEffect(() => {
         if (isOpen) {
             soundManager.playSFX('success', 0.8);
+            // Delay showing insights for dramatic effect
+            const timer = setTimeout(() => setShowInsights(true), 1500);
+            return () => clearTimeout(timer);
+        } else {
+            setShowInsights(false);
+            setActiveDay(null);
         }
     }, [isOpen]);
 
@@ -19,6 +36,104 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
         onClose();
         onContinue();
     };
+
+    // Calculate final efficiency
+    const finalEfficiency = cumulativePotentialCapacity > 0 
+        ? Math.round((cumulativeTasksCompleted / cumulativePotentialCapacity) * 100)
+        : lpi.flowEfficiency;
+
+    // Determine performance tier
+    const getPerformanceTier = (eff: number) => {
+        if (eff >= 90) return { label: 'Master Flow Architect', color: 'text-yellow-500', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30' };
+        if (eff >= 70) return { label: 'Skilled Practitioner', color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/30' };
+        if (eff >= 50) return { label: 'Developing Leader', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30' };
+        return { label: 'Learning Journey', color: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/30' };
+    };
+
+    const tier = getPerformanceTier(finalEfficiency);
+
+    // Generate improvement suggestions based on performance
+    const getImprovementSuggestions = () => {
+        const suggestions: { icon: any; text: string; priority: 'high' | 'medium' | 'low' }[] = [];
+        
+        const metrics = dailyMetrics as DayBreakdown[];
+        
+        // Check each day's performance
+        metrics.forEach((m) => {
+            if (m.efficiency < 50) {
+                if (m.day === 1) {
+                    suggestions.push({ 
+                        icon: Target, 
+                        text: 'Day 1: Complete tasks up to WIP limit for maximum throughput', 
+                        priority: 'high' 
+                    });
+                }
+                if (m.day === 2) {
+                    suggestions.push({ 
+                        icon: Zap, 
+                        text: 'Day 2: When materials run out, pivot to zero-cost tasks', 
+                        priority: 'high' 
+                    });
+                }
+                if (m.day === 3) {
+                    suggestions.push({ 
+                        icon: AlertTriangle, 
+                        text: 'Day 3: Rain blocks structural work - adapt with indoor tasks', 
+                        priority: 'medium' 
+                    });
+                }
+            }
+        });
+
+        // Day 4 decision feedback
+        if (flags['decision_push_made']) {
+            suggestions.push({ 
+                icon: Lightbulb, 
+                text: 'Day 4: Choosing Pull over Push avoids creating rework waste', 
+                priority: 'high' 
+            });
+        }
+
+        // Add general tips if performance was good
+        if (suggestions.length === 0 && finalEfficiency >= 80) {
+            suggestions.push({ 
+                icon: Award, 
+                text: 'Excellent flow management! You understood WIP limits and adaptation.', 
+                priority: 'low' 
+            });
+        }
+
+        return suggestions.slice(0, 3); // Max 3 suggestions
+    };
+
+    const suggestions = getImprovementSuggestions();
+    
+    // What went well
+    const getSuccesses = () => {
+        const successes: string[] = [];
+        const metrics = dailyMetrics as DayBreakdown[];
+        
+        metrics.forEach((m) => {
+            if (m.efficiency >= 80) {
+                if (m.day === 1) successes.push('Mastered WIP limits on Day 1');
+                if (m.day === 2) successes.push('Adapted to material constraints');
+                if (m.day === 3) successes.push('Handled weather variation');
+                if (m.day === 4 && !flags['decision_push_made']) successes.push('Made the right Pull decision');
+                if (m.day === 5) successes.push('Passed inspection with clean flow');
+            }
+        });
+        
+        return successes.length > 0 ? successes : ['Completed the chapter - keep learning!'];
+    };
+
+    const successes = getSuccesses();
+
+    // Chart data with cumulative efficiency line
+    const chartData = (dailyMetrics as DayBreakdown[]).map(m => ({
+        ...m,
+        dayLabel: `Day ${m.day}`,
+        fill: m.efficiency >= 80 ? '#22c55e' : m.efficiency >= 50 ? '#3b82f6' : '#f59e0b'
+    }));
 
     return (
         <AnimatePresence>
@@ -29,92 +144,265 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                         animate={{ scale: 1, rotateX: 0, opacity: 1 }}
                         exit={{ scale: 0.5, opacity: 0, rotateX: -45 }}
                         transition={{ type: "spring", bounce: 0.5 }}
-                        className="bg-white w-full max-w-2xl max-h-[90vh] rounded-3xl shadow-[0_0_50px_rgba(34,197,94,0.3)] overflow-hidden border-4 border-green-400 relative flex flex-col"
+                        className="bg-white w-full max-w-3xl max-h-[95vh] rounded-3xl shadow-[0_0_50px_rgba(34,197,94,0.3)] overflow-hidden border-4 border-green-400 relative flex flex-col"
                     >
-                        {/* Confetti / Celebration Header */}
-                        <div className="bg-gradient-to-r from-green-400 to-emerald-600 h-40 flex flex-col items-center justify-center relative overflow-hidden">
+                        {/* Header with Performance Tier */}
+                        <div className="bg-gradient-to-r from-green-400 to-emerald-600 px-6 py-8 flex flex-col items-center justify-center relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-30"></div>
-                            <h1 className="text-5xl md:text-6xl font-black text-white z-10 drop-shadow-lg text-center tracking-tighter transform -rotate-2">
-                                VICTORY!
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.3, type: "spring", bounce: 0.6 }}
+                                className="mb-2"
+                            >
+                                <Award className="w-12 h-12 text-white drop-shadow-lg" />
+                            </motion.div>
+                            <h1 className="text-4xl md:text-5xl font-black text-white z-10 drop-shadow-lg text-center tracking-tighter">
+                                CHAPTER 1 COMPLETE
                             </h1>
-                            <p className="text-green-100 font-bold tracking-widest uppercase mt-2">Chapter 1 Complete</p>
+                            <p className="text-green-100 font-bold tracking-widest uppercase mt-1 text-sm">The Kanban Chronicles</p>
+                            
+                            {/* Final Efficiency Score */}
+                            <motion.div 
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ delay: 0.5 }}
+                                className={`mt-4 px-6 py-2 rounded-full ${tier.bg} ${tier.border} border-2 flex items-center gap-2`}
+                            >
+                                <TrendingUp className={`w-5 h-5 ${tier.color}`} />
+                                <span className={`font-black text-2xl ${tier.color}`}>{finalEfficiency}%</span>
+                                <span className="text-white/80 text-sm font-medium">Flow Efficiency</span>
+                            </motion.div>
+                            <p className={`mt-2 text-sm font-bold ${tier.color}`}>{tier.label}</p>
                         </div>
 
-                        <div className="p-6 md:p-8 text-center overflow-y-auto flex-1">
-                            <p className="text-lg text-slate-600 mb-6 font-medium">
-                                The site flow is stable. The Inspector is impressed. Your crew is happy.
-                            </p>
-
-                            {/* Metrics Graph */}
-                            <div className="mb-8 p-4 bg-slate-50 rounded-2xl border border-slate-200 shadow-inner">
-                                <h3 className="text-slate-800 font-bold text-sm uppercase mb-4 flex items-center justify-center gap-2">
-                                    Weekly Flow Performance
+                        <div className="p-6 overflow-y-auto flex-1 space-y-6">
+                            {/* Performance Graph - Interactive */}
+                            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 shadow-inner">
+                                <h3 className="text-slate-800 font-bold text-sm uppercase mb-3 flex items-center gap-2">
+                                    <TrendingUp className="w-4 h-4 text-blue-500" />
+                                    Your Flow Journey
                                 </h3>
                                 <div className="h-48 w-full">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={dailyMetrics.length > 0 ? dailyMetrics : [{ day: 1, efficiency: 50, tasksCompletedToday: 0, potentialCapacity: 2 }]}>
+                                        <AreaChart data={chartData} onMouseMove={(e) => {
+                                            if (e.activePayload) {
+                                                setActiveDay(e.activePayload[0]?.payload?.day);
+                                            }
+                                        }} onMouseLeave={() => setActiveDay(null)}>
+                                            <defs>
+                                                <linearGradient id="efficiencyGradient" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                                                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                                </linearGradient>
+                                                <linearGradient id="cumulativeGradient" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
+                                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.05}/>
+                                                </linearGradient>
+                                            </defs>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                             <XAxis 
-                                                dataKey="day" 
-                                                label={{ value: 'Work Day', position: 'insideBottom', offset: -5, fontSize: 10 }} 
-                                                tick={{ fontSize: 10 }}
+                                                dataKey="dayLabel" 
+                                                tick={{ fontSize: 11, fontWeight: 500 }}
+                                                tickLine={false}
+                                                axisLine={false}
                                             />
                                             <YAxis 
-                                                label={{ value: 'Efficiency %', angle: -90, position: 'insideLeft', fontSize: 10 }} 
-                                                tick={{ fontSize: 10 }}
                                                 domain={[0, 100]}
+                                                tick={{ fontSize: 10 }}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                tickFormatter={(v) => `${v}%`}
                                             />
+                                            <ReferenceLine y={100} stroke="#22c55e" strokeDasharray="5 5" strokeOpacity={0.5} />
                                             <Tooltip 
-                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
+                                                contentStyle={{ 
+                                                    borderRadius: '12px', 
+                                                    border: 'none', 
+                                                    boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.2)', 
+                                                    fontSize: '12px',
+                                                    padding: '12px'
+                                                }}
+                                                formatter={(value: number, name: string) => {
+                                                    if (name === 'cumulativeEfficiency') return [`${value}%`, 'Cumulative'];
+                                                    return [`${value}%`, 'Daily'];
+                                                }}
                                             />
-                                            <Line 
+                                            <Area 
                                                 type="monotone" 
-                                                dataKey="efficiency" 
-                                                name="Efficiency %"
-                                                stroke="#3b82f6" 
-                                                strokeWidth={3} 
-                                                dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }}
-                                                activeDot={{ r: 6 }}
-                                                animationDuration={1500}
-                                            />
-                                            <Line 
-                                                type="monotone" 
-                                                dataKey="tasksCompletedToday" 
-                                                name="Tasks Completed"
+                                                dataKey="cumulativeEfficiency"
+                                                name="cumulativeEfficiency"
                                                 stroke="#10b981" 
-                                                strokeWidth={2} 
-                                                strokeDasharray="5 5"
-                                                dot={{ r: 3, fill: '#10b981' }}
+                                                strokeWidth={3}
+                                                fill="url(#cumulativeGradient)"
+                                                dot={{ r: 5, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
+                                                activeDot={{ r: 7, stroke: '#10b981', strokeWidth: 2 }}
                                             />
-                                        </LineChart>
+                                            <Line 
+                                                type="monotone" 
+                                                dataKey="efficiency"
+                                                name="efficiency"
+                                                stroke="#3b82f6" 
+                                                strokeWidth={2}
+                                                strokeDasharray="4 4"
+                                                dot={{ r: 3, fill: '#3b82f6' }}
+                                            />
+                                        </AreaChart>
                                     </ResponsiveContainer>
                                 </div>
-                                <div className="flex justify-center gap-4 mt-3">
-                                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-blue-600">
-                                        <div className="w-3 h-0.5 bg-blue-600"></div> Efficiency
+                                <div className="flex justify-center gap-6 mt-3">
+                                    <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+                                        <div className="w-4 h-1 bg-emerald-500 rounded"></div> Cumulative Efficiency
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600">
-                                        <div className="w-3 h-0.5 bg-emerald-600 border-t border-dashed"></div> Throughput
+                                    <div className="flex items-center gap-1.5 text-xs font-medium text-blue-500">
+                                        <div className="w-4 h-0.5 bg-blue-500 border-t border-dashed"></div> Daily Rate
                                     </div>
+                                </div>
+                                
+                                {/* Day Insight on hover */}
+                                <AnimatePresence>
+                                    {activeDay && chartData.find(d => d.day === activeDay) && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0 }}
+                                            className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800"
+                                        >
+                                            <strong>Day {activeDay}:</strong> {chartData.find(d => d.day === activeDay)?.insight}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
+                            {/* Day-by-Day Breakdown */}
+                            <div className="grid grid-cols-5 gap-2">
+                                {chartData.map((day, i) => (
+                                    <motion.div
+                                        key={day.day}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.8 + i * 0.1 }}
+                                        className={`p-3 rounded-xl border-2 text-center cursor-pointer transition-all
+                                            ${day.efficiency >= 80 
+                                                ? 'bg-green-50 border-green-200 hover:border-green-400' 
+                                                : day.efficiency >= 50 
+                                                    ? 'bg-blue-50 border-blue-200 hover:border-blue-400'
+                                                    : 'bg-orange-50 border-orange-200 hover:border-orange-400'
+                                            }`}
+                                        onClick={() => setActiveDay(activeDay === day.day ? null : day.day)}
+                                    >
+                                        <div className="text-[10px] font-bold text-slate-500 uppercase">Day {day.day}</div>
+                                        <div className={`text-xl font-black ${
+                                            day.efficiency >= 80 ? 'text-green-600' : 
+                                            day.efficiency >= 50 ? 'text-blue-600' : 'text-orange-600'
+                                        }`}>
+                                            {day.tasksCompletedToday}/{day.potentialCapacity}
+                                        </div>
+                                        <div className="text-[10px] text-slate-500">tasks</div>
+                                    </motion.div>
+                                ))}
+                            </div>
+
+                            {/* Interactive Learning Section */}
+                            <AnimatePresence>
+                                {showInsights && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        className="space-y-4"
+                                    >
+                                        {/* What Went Well */}
+                                        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                                            <h4 className="font-bold text-green-800 text-sm uppercase mb-3 flex items-center gap-2">
+                                                <CheckCircle2 className="w-4 h-4" /> What Went Well
+                                            </h4>
+                                            <ul className="space-y-2">
+                                                {successes.map((s, i) => (
+                                                    <motion.li 
+                                                        key={i}
+                                                        initial={{ opacity: 0, x: -20 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        transition={{ delay: 1.8 + i * 0.15 }}
+                                                        className="flex items-center gap-2 text-green-700 text-sm"
+                                                    >
+                                                        <ChevronRight className="w-3 h-3 text-green-500" />
+                                                        {s}
+                                                    </motion.li>
+                                                ))}
+                                            </ul>
+                                        </div>
+
+                                        {/* Improvement Tips (only if below 100%) */}
+                                        {finalEfficiency < 100 && suggestions.length > 0 && (
+                                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                                <h4 className="font-bold text-amber-800 text-sm uppercase mb-3 flex items-center gap-2">
+                                                    <Lightbulb className="w-4 h-4" /> How to Improve
+                                                </h4>
+                                                <ul className="space-y-2">
+                                                    {suggestions.map((s, i) => (
+                                                        <motion.li 
+                                                            key={i}
+                                                            initial={{ opacity: 0, x: -20 }}
+                                                            animate={{ opacity: 1, x: 0 }}
+                                                            transition={{ delay: 2.2 + i * 0.15 }}
+                                                            className="flex items-start gap-2 text-amber-700 text-sm"
+                                                        >
+                                                            <s.icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
+                                                                s.priority === 'high' ? 'text-red-500' : 
+                                                                s.priority === 'medium' ? 'text-amber-500' : 'text-green-500'
+                                                            }`} />
+                                                            {s.text}
+                                                        </motion.li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+
+                                        {/* Key Learnings */}
+                                        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                                            <h4 className="font-bold text-purple-800 text-sm uppercase mb-3 flex items-center gap-2">
+                                                <Award className="w-4 h-4" /> Key Learnings
+                                            </h4>
+                                            <div className="grid grid-cols-3 gap-2 text-center">
+                                                <div className="bg-white/60 rounded-lg p-2">
+                                                    <div className="text-purple-600 font-bold text-xs">WIP Limits</div>
+                                                    <div className="text-[10px] text-purple-500">Control work-in-progress</div>
+                                                </div>
+                                                <div className="bg-white/60 rounded-lg p-2">
+                                                    <div className="text-purple-600 font-bold text-xs">Pull System</div>
+                                                    <div className="text-[10px] text-purple-500">Pull work, don't push</div>
+                                                </div>
+                                                <div className="bg-white/60 rounded-lg p-2">
+                                                    <div className="text-purple-600 font-bold text-xs">Adaptation</div>
+                                                    <div className="text-[10px] text-purple-500">Respond to constraints</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {/* Stats Row */}
+                            <div className="grid grid-cols-3 gap-3">
+                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                                    <div className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Funds</div>
+                                    <div className="text-xl font-mono font-bold text-slate-800">${funds}</div>
+                                </div>
+                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                                    <div className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Morale</div>
+                                    <div className="text-xl font-mono font-bold text-green-500">{lpi.teamMorale}%</div>
+                                </div>
+                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                                    <div className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Tasks Done</div>
+                                    <div className="text-xl font-mono font-bold text-blue-500">{cumulativeTasksCompleted}/{cumulativePotentialCapacity}</div>
                                 </div>
                             </div>
 
-                            {/* Report Card */}
-                            <div className="grid grid-cols-2 gap-4 mb-6">
-                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                    <div className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Funds Earned</div>
-                                    <div className="text-2xl font-mono font-bold text-slate-800">${funds}</div>
-                                </div>
-                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                    <div className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Team Morale</div>
-                                    <div className="text-2xl font-mono font-bold text-green-500">{lpi.teamMorale}%</div>
-                                </div>
-                            </div>
-
-                            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-left rounded-r-lg mb-6">
-                                <h4 className="font-bold text-yellow-800 text-sm uppercase mb-1">Coming Up in Chapter 2...</h4>
-                                <p className="text-yellow-700 text-sm italic">
-                                    "The Monsoon Drift". Can your system handle random variation? Learn about <strong>Buffers</strong> and <strong>Robustness</strong>.
+                            {/* Next Chapter Teaser */}
+                            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-400 p-4 rounded-r-lg">
+                                <h4 className="font-bold text-indigo-800 text-sm uppercase mb-1">Coming Up: Chapter 2</h4>
+                                <p className="text-indigo-700 text-sm italic">
+                                    "The Promise System". Master the Last Planner System with <strong>Should/Can/Will</strong> planning and constraint management.
                                 </p>
                             </div>
 

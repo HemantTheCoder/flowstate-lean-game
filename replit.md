@@ -25,6 +25,24 @@ This is a fullstack TypeScript application featuring:
 - **Tutorial**: 8-step interactive guide teaching Kanban board mechanics
 - **Visual Polish**: All icons use Lucide, no external dependencies, responsive modals
 
+**Efficiency System (Cumulative)**:
+- Flow efficiency = (cumulative tasks completed / cumulative possible) * 100
+- Increases progressively day-by-day if player completes all available work
+- 100% achievable only if all possible tasks completed each day
+- Day-specific constraints affect potential capacity:
+  - Day 2: Only zero-cost tasks count (material shortage)
+  - Day 3: Only non-Structural tasks count (weather)
+  - Day 4-5: Push decision creates waste that reduces value-adding work
+- Waste/rework tasks excluded from value calculation
+
+**Chapter Complete Modal**:
+- Interactive performance graph (cumulative + daily efficiency)
+- Day-by-day breakdown with click-to-view insights
+- "What Went Well" section with successes
+- "How to Improve" section with prioritized tips (if below 100%)
+- Key Learnings summary (WIP Limits, Pull System, Adaptation)
+- Performance tiers: Master Flow Architect (90%+), Skilled Practitioner (70%+), etc.
+
 ### Chapter 2: The Promise System (Last Planner System)
 - Teaches Should/Can/Will planning workflow
 - Days 6-11 with constraint management and PPC review
