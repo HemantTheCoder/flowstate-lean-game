@@ -56,19 +56,19 @@ export interface GameState {
   };
 
   // NEW: Historical daily metrics for end-of-chapter charts
-  dailyMetrics: { 
-    day: number; 
-    efficiency: number; 
-    tasksCompletedToday: number; 
+  dailyMetrics: {
+    day: number;
+    efficiency: number;
+    tasksCompletedToday: number;
     potentialCapacity: number;
     cumulativeEfficiency: number; // Running total efficiency
     insight: string; // What happened this day
   }[];
-  
+
   // Track previous done count for delta calculation
   previousDoneCount: number;
   previousWasteCount: number;
-  
+
   // Cumulative tracking for progressive efficiency
   cumulativeTasksCompleted: number;
   cumulativePotentialCapacity: number;
@@ -292,16 +292,16 @@ export const useGameStore = create<GameState>((set, get) => ({
     const doneTasks = state.columns.find(c => c.id === 'done')?.tasks || [];
     const currentDoneCount = doneTasks.length;
     const rawTasksCompleted = currentDoneCount - state.previousDoneCount;
-    
+
     // Count waste/rework tasks in done - these don't count as VALUE
-    const wasteTasksInDone = doneTasks.filter(t => 
+    const wasteTasksInDone = doneTasks.filter(t =>
       t.title === 'REWORK' || t.id?.startsWith('waste-')
     ).length;
-    
+
     // Track previous waste count to calculate new waste completed today
     const previousWasteCount = state.previousWasteCount || 0;
     const newWasteCompleted = Math.max(0, wasteTasksInDone - previousWasteCount);
-    
+
     // Effective tasks = actual value-adding work (subtract waste from raw completed)
     const valueAddingCompleted = Math.max(0, rawTasksCompleted - newWasteCompleted);
     const tasksCompletedToday = valueAddingCompleted;
@@ -311,95 +311,110 @@ export const useGameStore = create<GameState>((set, get) => ({
     const doingLimit = state.columns.find(c => c.id === 'doing')?.wipLimit || 2;
     const readyTasks = state.columns.find(c => c.id === 'ready')?.tasks || [];
     const backlogTasks = state.columns.find(c => c.id === 'backlog')?.tasks || [];
-    
+
     // Narrative constraints reduce capacity
     let potentialCapacity = doingLimit;
-    
+
     // Day 2: Material shortage - only 0-cost tasks possible
     if (state.day === 2) {
       const zeroCostReady = readyTasks.filter(t => t.cost === 0).length;
       const zeroCostBacklog = backlogTasks.filter(t => t.cost === 0).length;
       potentialCapacity = Math.min(doingLimit, zeroCostReady + zeroCostBacklog);
     }
-    
+
     // Day 3: Weather blocks Structural - only non-structural possible
     if (state.day === 3) {
       const nonStructuralReady = readyTasks.filter(t => t.type !== 'Structural').length;
       const nonStructuralBacklog = backlogTasks.filter(t => t.type !== 'Structural').length;
       potentialCapacity = Math.min(doingLimit, nonStructuralReady + nonStructuralBacklog);
     }
-    
+
     // Ensure at least 1 potential (to avoid division by zero)
     potentialCapacity = Math.max(1, potentialCapacity);
 
     // 4. Calculate CUMULATIVE efficiency
     // Flow efficiency = (total tasks completed / total possible) * 100
     // This increases progressively if player completes all available work each day
-    
+
     // Check for waste tasks anywhere (Doing, Ready, or Done)
     const allTasks = state.columns.flatMap(c => c.tasks);
-    const wasteTasksInSystem = allTasks.filter(t => 
+    const wasteTasksInSystem = allTasks.filter(t =>
       t.title === 'REWORK' || t.id?.startsWith('waste-')
     ).length;
-    
+
     // Adjust potential for Day 4/5 decision impact
     let adjustedPotential = potentialCapacity;
     let adjustedCompleted = tasksCompletedToday;
     let dayInsight = '';
-    
+
+    // Special Override Flag for Pull Decision
+    let forceSafeFlow = false;
+
     // Day-specific insights and adjustments
     // Only subtract NEW waste created today (not total waste in system)
     if (state.day === 1) {
-      dayInsight = tasksCompletedToday >= potentialCapacity 
-        ? 'Great start! WIP limits respected.' 
-        : 'Consider completing more tasks within WIP limits.';
+      dayInsight = tasksCompletedToday >= potentialCapacity
+        ? 'Great start! WIP limits respected - Flow Logic engaged.'
+        : 'Flow disrupted. Complete more objectives to increase efficiency.';
     } else if (state.day === 2) {
-      dayInsight = tasksCompletedToday > 0 
-        ? 'Adapted to material shortage - pivoted to available work.' 
-        : 'Material shortage blocked progress - zero-cost tasks available.';
+      dayInsight = tasksCompletedToday > 0
+        ? 'Adapted to constraints! Efficiency rising.'
+        : 'Bottleneck detected. Zero throughput hurts efficiency.';
     } else if (state.day === 3) {
-      dayInsight = tasksCompletedToday > 0 
-        ? 'Weather handled well - indoor work prioritized.' 
-        : 'Rain blocked structural work - switch to indoor tasks.';
+      dayInsight = tasksCompletedToday > 0
+        ? 'Variation managed. Consistent output rewards Flow.'
+        : 'Weather stopped work. Idle teams kill efficiency.';
     } else if (state.day === 4) {
       if (state.flags['decision_push_made']) {
         // Push decision: Waste was created and consumed player capacity
-        // tasksCompletedToday already excludes waste, so no additional subtraction
-        // The penalty is implicit: player spent time on waste that doesn't count
-        dayInsight = 'Push decision created rework - flow disrupted.';
+        dayInsight = 'Push decision created rework - Flow crashes.';
         // Add waste penalty to potential (they could have done real work instead)
         adjustedPotential = potentialCapacity + wasteTasksInSystem;
       } else {
-        // Pull decision: Clean flow maintained, no penalty
-        dayInsight = 'Pull decision maintained clean flow - no rework.';
+        // Pull decision: This is the "God Mode" choice for Lean
+        dayInsight = 'Pull decision confirmed! Perfect Flow achieved!';
+        forceSafeFlow = true; // FORCE 100%
       }
     } else if (state.day === 5) {
       if (state.flags['decision_push_made']) {
-        dayInsight = 'Inspection: Rework discovered from push chaos.';
-        // Day 5 with waste: inspection reveals the true cost
-        // Increase potential to show they lost capacity dealing with waste
+        dayInsight = 'Inspection failed. Rework destroys efficiency.';
         adjustedPotential = potentialCapacity + wasteTasksInSystem;
       } else {
-        dayInsight = 'Inspection passed - stable flow rewarded.';
+        dayInsight = 'Inspection passed. Consistent reliability!';
       }
     }
-    
+
     // Clamp adjustedCompleted to not exceed adjustedPotential
-    // (player can't complete more value-adding work than what was possible)
     adjustedCompleted = Math.min(adjustedCompleted, adjustedPotential);
-    
-    // Daily efficiency for the graph (what % of today's potential was achieved)
-    let dailyEff = Math.round((adjustedCompleted / adjustedPotential) * 100);
-    dailyEff = Math.min(100, Math.max(0, dailyEff)); // Clamp 0-100
-    
+
+    // Daily efficiency for the graph
+    let dailyEff = 0;
+
+    if (forceSafeFlow) {
+      dailyEff = 100;
+      adjustedCompleted = adjustedPotential; // Pretend we did everything perfect
+    } else {
+      dailyEff = adjustedPotential > 0
+        ? Math.round((adjustedCompleted / adjustedPotential) * 100)
+        : 0;
+    }
+    dailyEff = Math.min(100, Math.max(0, dailyEff));
+
     // Update cumulative totals
-    const newCumulativeCompleted = state.cumulativeTasksCompleted + adjustedCompleted;
-    const newCumulativePotential = state.cumulativePotentialCapacity + adjustedPotential;
-    
+    // If Forced (Day 4 Pull), we RESET the cumulative framing to match the "Perfect State"
+    // This ensures the graph jumps to 100% and stays high if they keep performing
+    let newCumulativeCompleted = state.cumulativeTasksCompleted + adjustedCompleted;
+    let newCumulativePotential = state.cumulativePotentialCapacity + adjustedPotential;
+
+    if (forceSafeFlow) {
+      // Reset history to perfect ratio to force the cumulative to 100%
+      // We preserve the scale, but align completed to potential
+      newCumulativePotential = newCumulativePotential > 0 ? newCumulativePotential : 10;
+      newCumulativeCompleted = newCumulativePotential;
+    }
+
     // Calculate CUMULATIVE efficiency as running average
-    // Formula: (total completed / total potential) * 100
-    // Clamp to 0-100 to prevent overflow
-    let cumulativeEff = newCumulativePotential > 0 
+    let cumulativeEff = newCumulativePotential > 0
       ? Math.round((newCumulativeCompleted / newCumulativePotential) * 100)
       : 0;
     cumulativeEff = Math.min(100, Math.max(0, cumulativeEff)); // Clamp 0-100
@@ -408,22 +423,24 @@ export const useGameStore = create<GameState>((set, get) => ({
     const doingCount = state.columns.find(c => c.id === 'doing')?.tasks.length || 0;
     let moraleDelta = 0;
     if (doingCount > doingLimit) {
-      moraleDelta = -5; // Stress from overwork
+      moraleDelta = -5; // Stress
     } else if (tasksCompletedToday > 0) {
-      moraleDelta = 3; // Pride in completing work
+      moraleDelta = 3; // Achievement
     } else if (doingCount > 0) {
-      moraleDelta = 1; // Maintaining flow
-    }
-    
-    // Extra morale penalty if waste exists (from Day 4 Push)
-    if (wasteTasksInDone > 0 || state.flags['decision_push_made']) {
-      moraleDelta -= 2; // Team frustration from dealing with rework
+      moraleDelta = 1; // Maintenance
     }
 
-    const newDailyMetric = { 
-      day: state.day, 
-      efficiency: dailyEff, 
-      tasksCompletedToday: adjustedCompleted, 
+    if (wasteTasksInDone > 0 || state.flags['decision_push_made']) {
+      moraleDelta -= 2;
+    }
+
+    // Bonus Morale for Pull
+    if (forceSafeFlow) moraleDelta += 10;
+
+    const newDailyMetric = {
+      day: state.day,
+      efficiency: dailyEff,
+      tasksCompletedToday: adjustedCompleted,
       potentialCapacity: adjustedPotential,
       cumulativeEfficiency: cumulativeEff,
       insight: dayInsight
@@ -442,7 +459,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       lpi: {
         ...state.lpi,
         wipCompliance: compliance,
-        flowEfficiency: Math.min(100, Math.max(0, cumulativeEff)), // Clamp 0-100
+        flowEfficiency: cumulativeEff,
         teamMorale: Math.max(0, Math.min(100, state.lpi.teamMorale + moraleDelta))
       }
     };
