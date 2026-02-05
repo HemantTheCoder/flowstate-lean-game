@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronRight } from 'lucide-react';
 
 export const DialogueBox: React.FC = () => {
     const { currentDialogue, dialogueIndex, advanceDialogue, playerName, playerGender } = useGameStore();
@@ -92,8 +93,8 @@ export const DialogueBox: React.FC = () => {
                         </p>
 
                         {/* Continue Indicator */}
-                        <div className="absolute bottom-4 right-6 text-slate-400 text-sm animate-pulse font-bold tracking-widest uppercase flex items-center gap-2">
-                            Next <span className="text-lg">▶</span>
+                        <div className="absolute bottom-4 right-6 text-slate-400 text-sm animate-pulse font-bold tracking-widest uppercase flex items-center gap-1">
+                            Next <ChevronRight className="w-5 h-5" />
                         </div>
                     </div>
                 </div>

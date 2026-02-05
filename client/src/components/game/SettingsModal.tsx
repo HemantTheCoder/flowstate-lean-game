@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
 import { useGame } from '@/hooks/use-game';
+import { Volume2, VolumeX, Download, Upload } from 'lucide-react';
 
 export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
     const { audioSettings, setAudioVolume, toggleMute, importState } = useGameStore();
@@ -52,13 +53,13 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
                                 onClick={() => setActiveTab('audio')}
                                 className={`flex-1 py-4 font-bold text-sm uppercase tracking-wide transition-colors ${activeTab === 'audio' ? 'bg-white text-blue-600 border-b-2 border-blue-600' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
                             >
-                                🔊 Audio
+                                <Volume2 className="w-4 h-4 inline mr-1" /> Audio
                             </button>
                             <button
                                 onClick={() => setActiveTab('system')}
                                 className={`flex-1 py-4 font-bold text-sm uppercase tracking-wide transition-colors ${activeTab === 'system' ? 'bg-white text-blue-600 border-b-2 border-blue-600' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
                             >
-                                💾 System
+                                <Download className="w-4 h-4 inline mr-1" /> System
                             </button>
                         </div>
 
@@ -116,7 +117,7 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
                                         }}
                                         className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-3 border-4 ${audioSettings.isMuted ? 'bg-red-50 border-red-200 text-red-600' : 'bg-green-50 border-green-200 text-green-600'}`}
                                     >
-                                        <span className="text-2xl">{audioSettings.isMuted ? '🔇' : '🔊'}</span>
+                                        {audioSettings.isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
                                         {audioSettings.isMuted ? 'UNMUTE AUDIO' : 'MUTE ALL AUDIO'}
                                     </button>
                                 </>
@@ -219,11 +220,11 @@ const SystemSettings: React.FC<{ importState: (data: any) => void }> = ({ import
                         onClick={handleExport}
                         className="bg-white border-2 border-blue-200 hover:border-blue-400 text-blue-700 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md"
                     >
-                        <span>⬇️</span> Export Save
+                        <Download className="w-5 h-5" /> Export Save
                     </button>
 
                     <label className="bg-white border-2 border-slate-200 hover:border-slate-400 text-slate-700 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md cursor-pointer">
-                        <span>📂</span> Import Save
+                        <Upload className="w-5 h-5" /> Import Save
                         <input type="file" accept=".json" onChange={handleImport} className="hidden" />
                     </label>
                 </div>

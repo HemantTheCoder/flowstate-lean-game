@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowDown, ChevronRight, Ban, ArrowRight } from 'lucide-react';
 
 interface Props {
     showKanban: boolean;
@@ -95,7 +96,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         <div className="bg-blue-600 px-4 py-2 rounded-xl text-lg shadow-xl text-right">
                             Click the Chart <br /> to open Kanban!
                         </div>
-                        <div className="text-4xl font-bold text-blue-400 animate-bounce-horizontal">--&gt;</div>
+                        <ArrowRight className="w-10 h-10 text-blue-400 animate-bounce-horizontal" />
                     </motion.div>
                 )}
 
@@ -109,7 +110,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 style={{ top: spotlightPos.y - 100, left: spotlightPos.x }}
                                 className="absolute z-[90] w-64 pointer-events-none"
                             >
-                                <div className="text-5xl animate-bounce mb-2 text-center">⬇️</div>
+                                <div className="flex justify-center mb-2">
+                                    <ArrowDown className="w-12 h-12 text-orange-400 animate-bounce" />
+                                </div>
                                 <div className="bg-orange-500 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
                                     <p className="font-bold text-lg">Step 1: PULL</p>
                                     <p className="text-sm"><b>Drag</b> a task from here to <b>Ready</b>.</p>
@@ -124,7 +127,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 style={{ top: spotlightPos.y - 120, left: spotlightPos.x }}
                                 className="absolute z-[90] w-64 pointer-events-none"
                             >
-                                <div className="text-5xl animate-bounce mb-2 text-center">⬇️</div>
+                                <div className="flex justify-center mb-2">
+                                    <ArrowDown className="w-12 h-12 text-purple-400 animate-bounce" />
+                                </div>
                                 <div className="bg-purple-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
                                     <p className="font-bold text-lg">Step 2: START</p>
                                     <p className="text-sm"><b>Drag</b> it to <b>Doing</b> to start work. <br />(Commits Materials)</p>
@@ -139,7 +144,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 style={{ top: spotlightPos.y - 120, left: spotlightPos.x }}
                                 className="absolute z-[90] w-64 pointer-events-none"
                             >
-                                <div className="text-5xl animate-bounce mb-2 text-center">⬇️</div>
+                                <div className="flex justify-center mb-2">
+                                    <ArrowDown className="w-12 h-12 text-green-400 animate-bounce" />
+                                </div>
                                 <div className="bg-green-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
                                     <p className="font-bold text-lg">Step 3: FINISH</p>
                                     <p className="text-sm"><b>Drag</b> it to <b>Done</b> to get Paid! <br />(Value Added)</p>
@@ -264,7 +271,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 {tutorialStep === 11 && (
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[90] w-80 pointer-events-auto">
                         <div className="bg-red-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-red-500">
-                            <h3 className="font-bold text-red-300 text-lg mb-1">🚫 Remove Constraints!</h3>
+                            <h3 className="font-bold text-red-300 text-lg mb-1 flex items-center gap-2"><Ban className="w-5 h-5" /> Remove Constraints!</h3>
                             <p className="text-sm mb-3">
                                 You cannot do work with missing materials or approvals! <br />
                                 Click the <span className="text-xs bg-red-700 px-1 rounded border border-red-500">Fix</span> button on a task to pay for removal.

@@ -13,10 +13,17 @@ This is a fullstack TypeScript application featuring:
 
 ## Game Chapters
 
-### Chapter 1: The Kanban Chronicles
+### Chapter 1: The Kanban Chronicles (PRESENTATION READY)
 - Teaches WIP Limits, Pull Systems, and Flow Management
 - Days 1-5 with progressive difficulty
 - Characters: Mira (PM), Rao (Supervisor), Old Foreman, Isha (Planner)
+- **Day 1**: WIP limits introduction - control the Doing column
+- **Day 2**: Supply chain variability - pivot to zero-cost tasks when materials run out
+- **Day 3**: Monsoon Drift - rain blocks structural work, adapt with indoor tasks
+- **Day 4**: Push vs Pull decision - critical choice with Day 5 consequences
+- **Day 5**: Inspector review - outcome based on Day 4 choice
+- **Tutorial**: 8-step interactive guide teaching Kanban board mechanics
+- **Visual Polish**: All icons use Lucide, no external dependencies, responsive modals
 
 ### Chapter 2: The Promise System (Last Planner System)
 - Teaches Should/Can/Will planning workflow
