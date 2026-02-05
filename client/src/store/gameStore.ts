@@ -384,23 +384,25 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     }
     
+    // Clamp adjustedCompleted to not exceed adjustedPotential
+    // (player can't complete more value-adding work than what was possible)
+    adjustedCompleted = Math.min(adjustedCompleted, adjustedPotential);
+    
     // Daily efficiency for the graph (what % of today's potential was achieved)
     let dailyEff = Math.round((adjustedCompleted / adjustedPotential) * 100);
-    dailyEff = Math.min(100, Math.max(0, dailyEff));
+    dailyEff = Math.min(100, Math.max(0, dailyEff)); // Clamp 0-100
     
     // Update cumulative totals
     const newCumulativeCompleted = state.cumulativeTasksCompleted + adjustedCompleted;
     const newCumulativePotential = state.cumulativePotentialCapacity + adjustedPotential;
     
     // Calculate CUMULATIVE efficiency as running average
-    // This naturally increases if player keeps completing all possible tasks
     // Formula: (total completed / total potential) * 100
-    // With 5 days and 2 tasks per day potential, if all done: 10/10 = 100%
-    // Progressive: Day 1: 2/2=100%, Day 2: 4/4=100%, etc.
-    // Partial: Day 1: 1/2=50%, Day 2: 3/4=75% (goes UP if Day 2 was 100%)
-    const cumulativeEff = newCumulativePotential > 0 
+    // Clamp to 0-100 to prevent overflow
+    let cumulativeEff = newCumulativePotential > 0 
       ? Math.round((newCumulativeCompleted / newCumulativePotential) * 100)
       : 0;
+    cumulativeEff = Math.min(100, Math.max(0, cumulativeEff)); // Clamp 0-100
 
     // 5. Morale logic
     const doingCount = state.columns.find(c => c.id === 'doing')?.tasks.length || 0;
@@ -440,7 +442,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       lpi: {
         ...state.lpi,
         wipCompliance: compliance,
-        flowEfficiency: cumulativeEff, // Use cumulative for main LPI
+        flowEfficiency: Math.min(100, Math.max(0, cumulativeEff)), // Clamp 0-100
         teamMorale: Math.max(0, Math.min(100, state.lpi.teamMorale + moraleDelta))
       }
     };
