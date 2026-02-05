@@ -60,6 +60,7 @@ export interface GameState {
   
   // Track previous done count for delta calculation
   previousDoneCount: number;
+  previousWasteCount: number;
 
   // NEW: Historical PPC for trending
   ppcHistory: { week: number, ppc: number }[];
@@ -162,6 +163,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   ppcHistory: [],
   dailyMetrics: [],
   previousDoneCount: 0,
+  previousWasteCount: 0,
 
   currentDialogue: null,
   dialogueIndex: 0,
@@ -212,6 +214,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         materials: 300,
         dailyMetrics: [],
         previousDoneCount: 0,
+        previousWasteCount: 0,
         weeklyPlan: [],
         flags: { ...state.flags, chapter_intro_seen: false }
       };
@@ -243,6 +246,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         materials: 400,
         dailyMetrics: [],
         previousDoneCount: 0,
+        previousWasteCount: 0,
         weeklyPlan: [],
         ppcHistory: state.ppcHistory,
         flags: { ...state.flags, chapter_intro_seen: false, day_6_started: false }
@@ -268,8 +272,22 @@ export const useGameStore = create<GameState>((set, get) => ({
     const compliance = violatingCols.length > 0 ? 50 : 100;
 
     // 2. Calculate actual tasks completed TODAY (delta from previous day)
-    const currentDoneCount = state.columns.find(c => c.id === 'done')?.tasks.length || 0;
-    const tasksCompletedToday = currentDoneCount - state.previousDoneCount;
+    const doneTasks = state.columns.find(c => c.id === 'done')?.tasks || [];
+    const currentDoneCount = doneTasks.length;
+    const rawTasksCompleted = currentDoneCount - state.previousDoneCount;
+    
+    // Count waste/rework tasks in done - these don't count as VALUE
+    const wasteTasksInDone = doneTasks.filter(t => 
+      t.title === 'REWORK' || t.id?.startsWith('waste-')
+    ).length;
+    
+    // Track previous waste count to calculate new waste completed today
+    const previousWasteCount = state.previousWasteCount || 0;
+    const newWasteCompleted = Math.max(0, wasteTasksInDone - previousWasteCount);
+    
+    // Effective tasks = actual value-adding work (subtract waste from raw completed)
+    const valueAddingCompleted = Math.max(0, rawTasksCompleted - newWasteCompleted);
+    const tasksCompletedToday = valueAddingCompleted;
 
     // 3. Calculate POTENTIAL capacity for today
     // Based on: WIP limit in Doing column + constraints
@@ -297,8 +315,39 @@ export const useGameStore = create<GameState>((set, get) => ({
     // Ensure at least 1 potential (to avoid division by zero)
     potentialCapacity = Math.max(1, potentialCapacity);
 
-    // 4. Calculate efficiency: (Actual / Potential) * 100
+    // 4. Calculate efficiency: (Actual Value / Potential) * 100
+    // Value-adding work is already calculated as tasksCompletedToday (waste excluded)
     let eff = Math.round((tasksCompletedToday / potentialCapacity) * 100);
+    
+    // Check for waste tasks anywhere (Doing, Ready, or Done) - represents active waste in system
+    const allTasks = state.columns.flatMap(c => c.tasks);
+    const wasteTasksInSystem = allTasks.filter(t => 
+      t.title === 'REWORK' || t.id?.startsWith('waste-')
+    ).length;
+    
+    // Day 4: If Push decision was made, apply waste penalty
+    // Penalty based on DECISION, not just completed waste - the act of pushing creates dysfunction
+    if (state.day === 4 && state.flags['decision_push_made']) {
+      // Base penalty for making the wrong choice (25%)
+      // Additional penalty per waste task in system (10% each)
+      const wastePenalty = 25 + (wasteTasksInSystem * 10);
+      eff = Math.max(0, eff - wastePenalty);
+    }
+    
+    // Day 5: Efficiency reflects inspection outcome
+    // Based on DECISION FLAG + waste in system for consistent narrative
+    if (state.day === 5) {
+      if (state.flags['decision_push_made']) {
+        // Failed inspection: The push decision created chaos
+        // Cap varies by waste: 0 waste = 50%, 1 waste = 40%, 2+ waste = 25%
+        const wasteBasedCap = Math.max(25, 50 - (wasteTasksInSystem * 10));
+        eff = Math.min(eff, wasteBasedCap);
+      } else {
+        // Passed inspection: clean flow bonus (smooth operations)
+        eff = Math.min(100, eff + 15); // Bonus for resisting push pressure
+      }
+    }
+    
     eff = Math.min(100, Math.max(0, eff)); // Clamp 0-100
 
     // 5. Morale logic
@@ -310,6 +359,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       moraleDelta = 3; // Pride in completing work
     } else if (doingCount > 0) {
       moraleDelta = 1; // Maintaining flow
+    }
+    
+    // Extra morale penalty if waste exists (from Day 4 Push)
+    if (wasteTasksInDone > 0 || state.flags['decision_push_made']) {
+      moraleDelta -= 2; // Team frustration from dealing with rework
     }
 
     const newDailyMetric = { 
@@ -326,6 +380,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       funds: state.funds - dailyCost,
       dailyMetrics: [...state.dailyMetrics, newDailyMetric],
       previousDoneCount: currentDoneCount,
+      previousWasteCount: wasteTasksInDone,
       lpi: {
         ...state.lpi,
         wipCompliance: compliance,
@@ -536,6 +591,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     lpi: data.metrics ?? state.lpi,
     ppcHistory: (data.metrics?.ppcHistory as any) ?? state.ppcHistory,
     weeklyPlan: data.weeklyPlan ?? state.weeklyPlan,
+    previousDoneCount: data.previousDoneCount ?? 0,
+    previousWasteCount: data.previousWasteCount ?? 0,
+    dailyMetrics: data.dailyMetrics ?? state.dailyMetrics,
   })),
 
   // Chapter 2 Actions
