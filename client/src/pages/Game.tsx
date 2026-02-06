@@ -265,8 +265,8 @@ export default function Game() {
     if (showKanban && tutorialStep === 1) {
       setTutorialStep(2);
     }
-    // Step 5: Close Kanban to show Advisor Spotlight
-    if (tutorialStep === 5 && showKanban) {
+    // Step 6: Close Kanban to show Advisor Spotlight (after WIP slider step)
+    if (tutorialStep === 6 && showKanban) {
       setShowKanban(false);
     }
   }, [showKanban, tutorialStep, setTutorialStep]);

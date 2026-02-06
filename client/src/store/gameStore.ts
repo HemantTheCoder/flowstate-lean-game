@@ -308,25 +308,38 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     // 3. Calculate POTENTIAL capacity for today
     // Based on: WIP limit in Doing column + constraints
-    const doingLimit = state.columns.find(c => c.id === 'doing')?.wipLimit || 2;
+    const doingCol = state.columns.find(c => c.id === 'doing');
+    const doingLimit = doingCol?.wipLimit || 2;
+    const doingTasks = doingCol?.tasks || [];
     const readyTasks = state.columns.find(c => c.id === 'ready')?.tasks || [];
     const backlogTasks = state.columns.find(c => c.id === 'backlog')?.tasks || [];
 
-    // Narrative constraints reduce capacity
-    let potentialCapacity = doingLimit;
+    // Non-waste tasks still in Doing (could have been finished)
+    const doingNonWaste = doingTasks.filter(t => !t.id?.startsWith('waste-') && t.title !== 'REWORK').length;
 
-    // Day 2: Material shortage - only 0-cost tasks possible
+    // Total tasks available across the pipeline (remaining + already completed today)
+    const totalAvailableNonWaste = readyTasks.length + backlogTasks.length + doingNonWaste + valueAddingCompleted;
+
+    // Base potential: WIP limit, but capped by total available tasks
+    let potentialCapacity = Math.min(doingLimit, totalAvailableNonWaste);
+
+    // Day 2: Material shortage - only 0-cost tasks can ENTER Doing
+    // But tasks already in Doing (from prior day) can still finish
     if (state.day === 2) {
       const zeroCostReady = readyTasks.filter(t => t.cost === 0).length;
       const zeroCostBacklog = backlogTasks.filter(t => t.cost === 0).length;
-      potentialCapacity = Math.min(doingLimit, zeroCostReady + zeroCostBacklog);
+      // Available = tasks already in pipeline (doing + completed today) + constrained new entries
+      const availableForDay2 = doingNonWaste + valueAddingCompleted + zeroCostReady + zeroCostBacklog;
+      potentialCapacity = Math.min(doingLimit, availableForDay2);
     }
 
-    // Day 3: Weather blocks Structural - only non-structural possible
+    // Day 3: Weather blocks Structural - only non-structural can ENTER Doing
+    // Tasks already in Doing can still finish regardless of type
     if (state.day === 3) {
       const nonStructuralReady = readyTasks.filter(t => t.type !== 'Structural').length;
       const nonStructuralBacklog = backlogTasks.filter(t => t.type !== 'Structural').length;
-      potentialCapacity = Math.min(doingLimit, nonStructuralReady + nonStructuralBacklog);
+      const availableForDay3 = doingNonWaste + valueAddingCompleted + nonStructuralReady + nonStructuralBacklog;
+      potentialCapacity = Math.min(doingLimit, availableForDay3);
     }
 
     // Ensure at least 1 potential (to avoid division by zero)

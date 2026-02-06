@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowDown, ChevronRight, Ban, ArrowRight } from 'lucide-react';
+import { ArrowDown, ChevronRight, Ban, ArrowRight, Gauge } from 'lucide-react';
 
 interface Props {
     showKanban: boolean;
 }
 
 export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
-    const { tutorialStep, tutorialActive, completeTutorial } = useGameStore();
+    const { tutorialStep, tutorialActive, completeTutorial, setTutorialStep, setFlag } = useGameStore();
     const [spotlightPos, setSpotlightPos] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
 
-    // Dynamic Spotlight Logic
-    // Dynamic Spotlight Logic
     useEffect(() => {
         if (!tutorialActive) return;
 
@@ -24,9 +22,10 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
             if (tutorialStep === 2) targetId = 'col-backlog';
             if (tutorialStep === 3) targetId = 'col-ready';
             if (tutorialStep === 4) targetId = 'col-doing';
-            if (tutorialStep === 5) targetId = 'smart-advisor-box';
-            if (tutorialStep === 6) targetId = 'stats-box';
-            if (tutorialStep === 7) targetId = 'btn-settings';
+            if (tutorialStep === 5) targetId = 'col-doing';
+            if (tutorialStep === 6) targetId = 'smart-advisor-box';
+            if (tutorialStep === 7) targetId = 'stats-box';
+            if (tutorialStep === 8) targetId = 'btn-settings';
 
             if (targetId) {
                 const el = document.getElementById(targetId);
@@ -50,11 +49,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 setSpotlightPos(prev => prev ? null : prev);
             }
 
-            // Loop
             animationFrameId = requestAnimationFrame(updateSpotlight);
         };
 
-        // Start loop
         updateSpotlight();
 
         return () => {
@@ -65,11 +62,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
 
     if (!tutorialActive || tutorialStep === 0) return null;
 
-    // SVG Path for Spotlight (Hollow Box)
     const getMaskPath = () => {
-        if (!spotlightPos) return "M0 0 h100% v100% h-100% z"; // Full cover
+        if (!spotlightPos) return "M0 0 h100% v100% h-100% z";
         const { x, y, w, h } = spotlightPos;
-        // Outer box (Clockwise) + Inner box (Counter-clockwise) = Hole
         return `
             M0 0 h${window.innerWidth} v${window.innerHeight} h-${window.innerWidth} z 
             M${x} ${y} v${h} h${w} v-${h} z
@@ -79,7 +74,6 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
     return (
         <div className="absolute inset-0 z-[70] pointer-events-none overflow-hidden text-white font-bold text-shadow-lg">
 
-            {/* Dark Overlay with Hole */}
             <svg className="absolute inset-0 w-full h-full opacity-60 pointer-events-none">
                 <path d={getMaskPath()} fill="black" fillRule="evenodd" />
             </svg>
@@ -156,8 +150,48 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                     </>
                 )}
 
-                {/* Step 5: Smart Advisor Spotlight */}
-                {tutorialStep === 5 && spotlightPos && (
+                {/* Step 5: WIP Slider Explanation */}
+                {tutorialStep === 5 && showKanban && spotlightPos && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                        style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x }}
+                        className="absolute z-[90] w-80 pointer-events-auto"
+                    >
+                        <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-cyan-500 relative">
+                            <div className="absolute -top-3 left-6 w-6 h-6 bg-white border-t-4 border-l-4 border-cyan-500 transform rotate-45"></div>
+                            <h3 className="font-black text-cyan-600 text-lg mb-1 flex items-center gap-2">
+                                <Gauge className="w-5 h-5" /> WIP Limit Slider
+                            </h3>
+                            <ul className="text-sm font-medium mb-3 space-y-2 leading-snug">
+                                <li>
+                                    Use the <b>+/-</b> buttons on the Doing column to set your <b>Work-In-Progress limit</b>.
+                                </li>
+                                <li>
+                                    <b>Lower WIP</b> = fewer tasks at once, but faster flow and higher <span className="text-green-600 font-bold">Morale</span>.
+                                </li>
+                                <li>
+                                    <b>Higher WIP</b> = more tasks at once, but risk overloading workers. <span className="text-red-500 font-bold">Morale drops -5</span> if you exceed it!
+                                </li>
+                                <li>
+                                    Your <b>Flow Efficiency</b> is measured against this limit &mdash; it defines how many tasks you <i>could</i> complete each day.
+                                </li>
+                            </ul>
+                            <div className="bg-cyan-50 border border-cyan-200 rounded-lg px-3 py-2 text-xs text-cyan-800 mb-3">
+                                <b>Lean Principle:</b> Limiting WIP prevents congestion and helps work flow smoothly &mdash; just like limiting cars on a highway reduces traffic jams.
+                            </div>
+                            <button
+                                onClick={() => setTutorialStep(6)}
+                                className="bg-cyan-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-cyan-700 transition-colors"
+                                data-testid="button-tutorial-wip-next"
+                            >
+                                Next: Smart Advisor
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Step 6: Smart Advisor Spotlight */}
+                {tutorialStep === 6 && spotlightPos && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                         style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x }}
@@ -170,7 +204,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 Always check here! I will warn you about <b>Bottlenecks</b> (Too much WIP) and <b>Starvation</b> (Idle workers).
                             </p>
                             <button
-                                onClick={() => useGameStore.getState().setTutorialStep(6)}
+                                onClick={() => setTutorialStep(7)}
                                 className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-blue-700 transition-colors"
                             >
                                 Next: Stats
@@ -179,8 +213,8 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                     </motion.div>
                 )}
 
-                {/* Step 6: Funds & Morale */}
-                {tutorialStep === 6 && spotlightPos && (
+                {/* Step 7: Funds & Morale */}
+                {tutorialStep === 7 && spotlightPos && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                         style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x }}
@@ -190,11 +224,12 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                             <div className="absolute -top-3 left-6 w-6 h-6 bg-white border-t-4 border-l-4 border-green-500 transform rotate-45"></div>
                             <h3 className="font-black text-green-600 text-lg mb-1">Project Health</h3>
                             <ul className="text-sm font-medium mb-3 space-y-2">
-                                <li><b>Funds</b>: You earn money when tasks reach <b>Done</b>. Don't run out!</li>
-                                <li><b>Morale</b>: Tracks site stability. It drops if you violate <b>WIP Limits</b> or push workers too hard, and rises when flow is steady.</li>
+                                <li><b>Funds</b>: You earn money when tasks reach <b>Done</b>. Each day costs $250 overhead. Don't run out!</li>
+                                <li><b>Morale</b>: Stays high with steady flow. <span className="text-red-500">Drops</span> if you exceed WIP limits or push workers. <span className="text-green-600">Rises</span> when you complete tasks within limits.</li>
+                                <li><b>Efficiency</b>: Tasks completed vs. what was possible (set by your WIP limit). Higher WIP limit = higher bar to reach!</li>
                             </ul>
                             <button
-                                onClick={() => useGameStore.getState().setTutorialStep(7)}
+                                onClick={() => setTutorialStep(8)}
                                 className="bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-green-700 transition-colors"
                             >
                                 Next: Saving
@@ -203,8 +238,8 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                     </motion.div>
                 )}
 
-                {/* Step 7: Settings & Save */}
-                {tutorialStep === 7 && spotlightPos && (
+                {/* Step 8: Settings & Save */}
+                {tutorialStep === 8 && spotlightPos && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                         style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x - 150 }}
@@ -217,7 +252,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 Click the Gear icon to access <b>Settings</b>. <br /> From there, you can <b>Export</b> your save file to keep it safe!
                             </p>
                             <button
-                                onClick={() => useGameStore.getState().setTutorialStep(8)}
+                                onClick={() => setTutorialStep(9)}
                                 className="bg-purple-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-purple-700 transition-colors"
                             >
                                 Finish Tutorial
@@ -226,18 +261,19 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                     </motion.div>
                 )}
 
-                {/* Step 8: Complete */}
-                {tutorialStep === 8 && (
+                {/* Step 9: Complete */}
+                {tutorialStep === 9 && (
                     <motion.div
                         initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-auto z-[90]"
                     >
                         <div className="bg-yellow-400 text-black px-8 py-6 rounded-3xl shadow-2xl text-center border-4 border-white max-w-md">
                             <h2 className="text-3xl font-black mb-2">Great Job!</h2>
-                            <p className="mb-4 font-medium">You've learned the flow of work! <br /> Respect WIP limits to keep the workers happy.</p>
+                            <p className="mb-4 font-medium">You've learned the flow of work! <br /> Respect WIP limits to keep the workers happy and efficiency high.</p>
                             <button
                                 onClick={() => completeTutorial()}
                                 className="bg-black text-white px-6 py-2 rounded-full font-bold hover:scale-105 transition-transform"
+                                data-testid="button-tutorial-complete"
                             >
                                 Close Tutorial
                             </button>
@@ -258,7 +294,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 <span className="text-green-400 font-bold">GREEN</span> = Ready to Commit.
                             </p>
                             <button
-                                onClick={() => useGameStore.getState().setTutorialStep(11)}
+                                onClick={() => setTutorialStep(11)}
                                 className="bg-blue-500 w-full py-1 rounded text-sm font-bold"
                             >
                                 Next: Fix Constraints
@@ -277,7 +313,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 Click the <span className="text-xs bg-red-700 px-1 rounded border border-red-500">Fix</span> button on a task to pay for removal.
                             </p>
                             <button
-                                onClick={() => useGameStore.getState().setTutorialStep(12)}
+                                onClick={() => setTutorialStep(12)}
                                 className="bg-red-500 w-full py-1 rounded text-sm font-bold"
                             >
                                 Got it!
@@ -297,8 +333,8 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                             </p>
                             <button
                                 onClick={() => {
-                                    useGameStore.getState().setTutorialStep(99);
-                                    useGameStore.getState().setFlag('tutorial_planning_complete', true);
+                                    setTutorialStep(99);
+                                    setFlag('tutorial_planning_complete', true);
                                 }}
                                 className="bg-green-500 w-full py-1 rounded text-sm font-bold"
                             >
