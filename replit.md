@@ -29,7 +29,9 @@ This is a fullstack TypeScript application featuring:
 - Flow efficiency = (cumulative tasks completed / cumulative possible) * 100
 - Increases progressively day-by-day if player completes all available work
 - 100% achievable only if all possible tasks completed each day
+- **Day 1 is always forgiving**: forceSafeFlow = true so tutorial doesn't penalize efficiency
 - Day-specific constraints affect potential capacity:
+  - Day 1: Tutorial day - always 100% efficiency (no penalty)
   - Day 2: Only zero-cost tasks count (material shortage)
   - Day 3: Only non-Structural tasks count (weather)
   - Day 4-5: Push decision creates waste that reduces value-adding work
@@ -41,8 +43,18 @@ This is a fullstack TypeScript application featuring:
 - Day-specific insights based on performance
 
 **Reflection Quiz** (after Day 5, before Chapter Complete):
-- 3 multiple-choice questions testing WIP Limits, Pull vs Push, Adaptation
+- 5 multiple-choice questions testing WIP Limits, Pull vs Push, Adaptation, Bottleneck, Flow Efficiency
 - Score passed to Chapter Complete modal for display
+- **Missed Questions Recap**: Results screen shows which questions were wrong, correct answers, and explanations
+
+**Day 5 "Finish Chapter" Button**:
+- End Day button relabeled to "Finish Chapter" on Day 5
+- Distinct amber/orange gradient styling to signal chapter conclusion
+- Smart Advisor references "Finish Chapter" instead of "End Day" on Day 5
+
+**Mobile Toolbar**:
+- Tighter spacing (gap-1.5, px-2, text-[9px]) on small screens
+- Consistent icon-only sizing on mobile, expanding on desktop
 
 **GlossaryPanel**:
 - Slide-out panel with 12 Lean Construction terms (WIP, Pull, Push, Flow, Waste, etc.)
