@@ -368,7 +368,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (state.day === 1) {
       dayInsight = tasksCompletedToday >= potentialCapacity
         ? 'Great start! WIP limits respected - Flow Logic engaged.'
-        : 'Flow disrupted. Complete more objectives to increase efficiency.';
+        : 'Tutorial day - learning the ropes!';
+      forceSafeFlow = true;
     } else if (state.day === 2) {
       dayInsight = tasksCompletedToday > 0
         ? 'Adapted to constraints! Efficiency rising.'

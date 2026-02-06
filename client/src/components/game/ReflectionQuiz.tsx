@@ -305,9 +305,33 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
                     : score >= QUESTIONS.length - 1
                       ? 'Excellent! Strong understanding of Lean concepts.'
                       : score >= Math.ceil(QUESTIONS.length / 2)
-                        ? 'Good grasp of the basics. Review the missed concepts.'
-                        : 'Keep learning! Review the key principles and try again.'}
+                        ? 'Good grasp of the basics. Review the missed concepts below.'
+                        : 'Keep learning! Review the concepts you missed below.'}
                 </motion.div>
+
+                {score < QUESTIONS.length && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 w-full space-y-3">
+                    <div className="font-semibold text-red-900 text-sm flex items-center gap-2">
+                      <XCircle className="w-4 h-4" />
+                      Concepts to Review
+                    </div>
+                    {QUESTIONS.map((q, idx) => {
+                      const playerAnswer = selectedAnswers[idx];
+                      const wasCorrect = q.options.find(o => o.id === playerAnswer)?.isCorrect;
+                      if (wasCorrect) return null;
+                      const correctOption = q.options.find(o => o.isCorrect);
+                      return (
+                        <div key={q.id} className="border-t border-red-100 pt-2 first:border-0 first:pt-0">
+                          <div className="text-sm font-bold text-red-800">{q.text}</div>
+                          <div className="text-xs text-red-600 mt-1">
+                            Correct answer: <span className="font-semibold">{correctOption?.text}</span>
+                          </div>
+                          <div className="text-xs text-red-500 mt-0.5 italic">{q.explanation}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
 
                 <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 w-full space-y-2">
                   <div className="font-semibold text-indigo-900 text-sm">Key Takeaways</div>

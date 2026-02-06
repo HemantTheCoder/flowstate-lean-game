@@ -563,6 +563,9 @@ export default function Game() {
 
     // Day 5: Inspection
     if (day === 5) {
+      if (doingCount === 0 && readyCount === 0 && backlogCount === 0) {
+        return "Inspection complete! Click 'Finish Chapter' to see your results.";
+      }
       return "INSPECTION DAY: The outcome depends on your Day 4 choice. Watch the dialogue!";
     }
 
@@ -610,9 +613,9 @@ export default function Game() {
             <button
               onClick={handleEndDay}
               data-testid="button-end-day"
-              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center border-b-4 border-blue-700 text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') ? 'animate-bounce ring-4 ring-yellow-400' : ''}`}
+              className={`${day === 5 ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-b-4 border-amber-700 ring-2 ring-amber-300' : 'bg-blue-500 hover:bg-blue-600 border-b-4 border-blue-700'} text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') ? 'animate-bounce ring-4 ring-yellow-400' : ''}`}
             >
-              End Day
+              {day === 5 ? 'Finish Chapter' : 'End Day'}
             </button>
           </div>
 
@@ -657,36 +660,36 @@ export default function Game() {
           animate={{ y: 0, opacity: 1 }}
           className="flex justify-center pointer-events-auto pb-2 sm:pb-4"
         >
-          <div className="bg-white/90 backdrop-blur-md px-3 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg border-2 border-slate-100">
-            <div className="flex gap-2 sm:gap-4 items-center">
+          <div className="bg-white/90 backdrop-blur-md px-2 sm:px-6 py-1.5 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg border-2 border-slate-100">
+            <div className="flex gap-1.5 sm:gap-4 items-center">
               <button
                 id="btn-kanban"
                 onClick={() => setShowKanban(true)}
-                className="bg-white/90 backdrop-blur-sm p-2 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl hover:scale-105 transition-transform group relative"
+                className="flex flex-col items-center gap-0.5 sm:gap-1 group"
               >
-                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-colors text-sm sm:text-base">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-colors">
                   <LayoutDashboard className="w-4 h-4 sm:w-6 sm:h-6" />
                 </div>
-                <span className="text-[10px] sm:text-xs font-bold text-slate-600">Kanban</span>
+                <span className="text-[9px] sm:text-xs font-bold text-slate-600">Kanban</span>
               </button>
               <button
                 onClick={() => setShowKanban(false)}
-                className="flex flex-col items-center gap-1 group"
+                className="flex flex-col items-center gap-0.5 sm:gap-1 group"
               >
                 <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:bg-purple-500 group-hover:text-white transition-colors">
                   <HardHat className="w-4 h-4 sm:w-6 sm:h-6" />
                 </div>
-                <span className="text-[10px] sm:text-xs font-bold text-slate-600">Site</span>
+                <span className="text-[9px] sm:text-xs font-bold text-slate-600">Site</span>
               </button>
               <button
                 onClick={() => setShowGlossary(true)}
-                className="flex flex-col items-center gap-1 group"
+                className="flex flex-col items-center gap-0.5 sm:gap-1 group"
                 data-testid="button-glossary"
               >
                 <div className="w-8 h-8 sm:w-12 sm:h-12 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
                   <BookOpen className="w-4 h-4 sm:w-6 sm:h-6" />
                 </div>
-                <span className="text-[10px] sm:text-xs font-bold text-slate-600">Glossary</span>
+                <span className="text-[9px] sm:text-xs font-bold text-slate-600">Glossary</span>
               </button>
             </div>
           </div>
