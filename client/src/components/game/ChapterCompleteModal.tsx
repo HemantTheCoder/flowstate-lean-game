@@ -154,7 +154,7 @@ const KanbanBadge: React.FC<{ tier: { label: string; color: string } }> = ({ tie
     );
 };
 
-export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => void; onContinue: () => void }> = ({ isOpen, onClose, onContinue }) => {
+export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => void; onContinue: () => void; quizScore?: number }> = ({ isOpen, onClose, onContinue, quizScore }) => {
     const { funds, lpi, dailyMetrics, flags, cumulativeTasksCompleted, cumulativePotentialCapacity } = useGameStore();
     const [activeDay, setActiveDay] = useState<number | null>(null);
     const [showInsights, setShowInsights] = useState(false);
@@ -487,22 +487,42 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
 
                                         <CharacterReactions pushed={pushed} efficiency={finalEfficiency} />
 
+                                        {quizScore !== undefined && (
+                                            <div className={`rounded-xl p-4 border ${quizScore === 3 ? 'bg-green-50 border-green-200' : quizScore >= 2 ? 'bg-blue-50 border-blue-200' : 'bg-amber-50 border-amber-200'}`}>
+                                                <h4 className={`font-bold text-sm uppercase mb-2 flex items-center gap-2 ${quizScore === 3 ? 'text-green-800' : quizScore >= 2 ? 'text-blue-800' : 'text-amber-800'}`}>
+                                                    <Award className="w-4 h-4" /> Reflection Quiz: {quizScore}/3
+                                                </h4>
+                                                <p className={`text-sm ${quizScore === 3 ? 'text-green-700' : quizScore >= 2 ? 'text-blue-700' : 'text-amber-700'}`}>
+                                                    {quizScore === 3 ? 'Perfect understanding of Lean concepts!' : quizScore >= 2 ? 'Good grasp of core principles. Review the missed concept.' : 'Consider replaying to strengthen your understanding.'}
+                                                </p>
+                                            </div>
+                                        )}
+
                                         <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
                                             <h4 className="font-bold text-purple-800 text-sm uppercase mb-3 flex items-center gap-2">
                                                 <Lightbulb className="w-4 h-4" /> Key Learnings
                                             </h4>
-                                            <div className="space-y-2 text-sm text-purple-700">
+                                            <div className="space-y-3 text-sm text-purple-700">
                                                 <div className="flex items-start gap-2">
                                                     <CheckCircle2 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
-                                                    <span><strong>Limiting WIP</strong> improves flow and prevents congestion</span>
+                                                    <div>
+                                                        <strong>WIP Limits prevent congestion.</strong>
+                                                        <p className="text-xs text-purple-600 mt-0.5 italic">In construction: limiting active work fronts to 2-3 zones keeps crews focused and prevents spreading resources too thin across the site.</p>
+                                                    </div>
                                                 </div>
                                                 <div className="flex items-start gap-2">
                                                     <CheckCircle2 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
-                                                    <span><strong>Pull reduces inventory</strong> and eliminates waste from rushing</span>
+                                                    <div>
+                                                        <strong>Pull systems eliminate waste from rushing.</strong>
+                                                        <p className="text-xs text-purple-600 mt-0.5 italic">In construction: excavating before pipes arrive creates mud pits needing re-work. Pull-based scheduling waits until materials and prerequisites are ready.</p>
+                                                    </div>
                                                 </div>
                                                 <div className="flex items-start gap-2">
                                                     <CheckCircle2 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
-                                                    <span><strong>Bottlenecks reveal system constraints</strong> - fix the flow, not the blame</span>
+                                                    <div>
+                                                        <strong>Adaptation keeps flow alive under constraints.</strong>
+                                                        <p className="text-xs text-purple-600 mt-0.5 italic">In construction: experienced contractors keep indoor work (MEP, drywall) ready for rainy days instead of idling crews.</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

@@ -1,6 +1,6 @@
-import React from 'react';
 import { useGameStore } from '@/store/gameStore';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { TrendingUp, BookOpen, Lightbulb } from 'lucide-react';
 
 interface Props {
     isOpen: boolean;
@@ -8,65 +8,124 @@ interface Props {
     completedTasks: number;
 }
 
+const LEAN_LESSONS: Record<number, { concept: string; explanation: string; example: string }> = {
+    1: {
+        concept: "WIP Limits & Kanban",
+        explanation: "Limiting Work-In-Progress prevents bottlenecks and keeps the team focused on finishing tasks, not just starting them.",
+        example: "On a real site, limiting active work fronts to 2-3 zones prevents crews from spreading too thin across the building."
+    },
+    2: {
+        concept: "Buffer Management & Adaptation",
+        explanation: "When materials are constrained, a Pull system pivots to available work. Never let workers stand idle when there are zero-cost tasks available.",
+        example: "When concrete delivery is delayed, smart site managers redirect crews to safety inspections, formwork checks, or tool organization."
+    },
+    3: {
+        concept: "Variation & Robustness",
+        explanation: "Weather, supply delays, and equipment failures are inevitable variations. A robust system has backup tasks ready to maintain flow.",
+        example: "During monsoon season, experienced contractors keep a backlog of interior work (MEP rough-in, drywall) ready for rainy days."
+    },
+    4: {
+        concept: "Push vs Pull Systems",
+        explanation: "Pushing unready work creates waste and rework. Pulling only ready work creates genuine value and avoids false progress.",
+        example: "Excavating trenches before drainage pipes arrive creates mud pits that need re-grading. Pull-based scheduling waits for materials."
+    },
+    5: {
+        concept: "Reliability & Flow",
+        explanation: "Reliability comes from finishing what you start, not from looking busy. Consistent, predictable output builds trust with clients and inspectors.",
+        example: "A site with 2 completed zones beats a site with 5 half-finished zones. Inspectors judge completion, not activity."
+    }
+};
+
 export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks }) => {
     if (!isOpen) return null;
 
     const day = useGameStore(s => s.day);
     const funds = useGameStore(s => s.funds);
-    const lpi = useGameStore(s => s.lpi);
-    const efficiency = lpi.flowEfficiency; // Use actual calculated efficiency
+    const dailyMetrics = useGameStore(s => s.dailyMetrics);
+
+    const displayDay = day - 1;
+
+    const latestMetric = dailyMetrics.length > 0 ? dailyMetrics[dailyMetrics.length - 1] : null;
+    const dailyEfficiency = latestMetric?.efficiency ?? 0;
+    const cumulativeEfficiency = latestMetric?.cumulativeEfficiency ?? 0;
+    const insight = latestMetric?.insight ?? '';
+
+    const lesson = LEAN_LESSONS[displayDay];
 
     return (
         <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 pointer-events-auto">
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border-4 border-slate-200"
+                className="bg-white w-full max-w-md max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden border-4 border-slate-200 flex flex-col"
             >
-                <div className="bg-blue-600 p-6 text-center">
-                    <h2 className="text-3xl font-black text-white uppercase tracking-wider">Day {day} Complete</h2>
+                <div className="bg-blue-600 p-6 text-center shrink-0">
+                    <h2 className="text-3xl font-black text-white uppercase tracking-wider">Day {displayDay} Complete</h2>
                     <p className="text-blue-100 font-medium mt-1">Site Report</p>
                 </div>
 
-                <div className="p-8 space-y-6">
-                    <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                <div className="p-6 space-y-4 overflow-y-auto flex-1">
+                    <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                         <div className="text-slate-500 font-bold">Tasks Finished</div>
-                        <div className="text-4xl font-black text-slate-800">{completedTasks}</div>
+                        <div className="text-3xl font-black text-slate-800">{completedTasks}</div>
                     </div>
 
-                    <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-                        <div className="text-slate-500 font-bold">Flow Efficiency</div>
-                        <div className={`text-4xl font-black ${efficiency > 50 ? 'text-green-500' : 'text-orange-500'}`}>
-                            {efficiency}%
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-blue-50 rounded-xl p-3 border border-blue-100 text-center">
+                            <div className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Daily Efficiency</div>
+                            <div className={`text-2xl font-black ${dailyEfficiency >= 80 ? 'text-green-500' : dailyEfficiency >= 50 ? 'text-blue-500' : 'text-orange-500'}`}>
+                                {dailyEfficiency}%
+                            </div>
+                        </div>
+                        <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100 text-center">
+                            <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider flex items-center justify-center gap-1">
+                                <TrendingUp className="w-3 h-3" /> Cumulative
+                            </div>
+                            <div className={`text-2xl font-black ${cumulativeEfficiency >= 80 ? 'text-green-500' : cumulativeEfficiency >= 50 ? 'text-blue-500' : 'text-orange-500'}`}>
+                                {cumulativeEfficiency}%
+                            </div>
                         </div>
                     </div>
 
-                    <div className="bg-red-50 p-4 rounded-xl border border-red-100">
+                    {insight && (
+                        <div className={`p-3 rounded-xl text-sm font-bold border ${dailyEfficiency >= 80 ? 'bg-green-50 border-green-200 text-green-700' : dailyEfficiency >= 50 ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-orange-50 border-orange-200 text-orange-700'}`}>
+                            {insight}
+                        </div>
+                    )}
+
+                    <div className="bg-red-50 p-3 rounded-xl border border-red-100">
                         <div className="flex justify-between items-center mb-1">
-                            <span className="text-red-800 font-bold">Daily Overhead</span>
+                            <span className="text-red-800 font-bold text-sm">Daily Overhead</span>
                             <span className="text-red-600 font-mono font-bold">-$250</span>
                         </div>
                         <p className="text-xs text-red-600">Salaries, Equipment, Rent.</p>
                     </div>
 
-                    <div className={`text-center font-bold ${funds < 0 ? 'text-red-600' : 'text-slate-600'}`}>
+                    <div className={`text-center font-bold text-sm ${funds < 0 ? 'text-red-600' : 'text-slate-600'}`}>
                         Current Funds: <span className="font-mono">${funds}</span>
                     </div>
 
-                    <div className="bg-slate-50 p-4 rounded-xl text-sm text-slate-600 italic border-l-4 border-blue-400">
-                        {day === 1 && "\"Limiting Work In Progress prevents bottlenecks and keeps the team focused on finishing, not just starting.\""}
-                        {day === 2 && "\"When materials are constrained, a Pull system pivots to available work—never let workers stand idle.\""}
-                        {day === 3 && "\"Variation is inevitable. A robust system has backup tasks ready to maintain flow.\""}
-                        {day === 4 && "\"Pushing unready work creates waste. Pulling ready work creates value.\""}
-                        {day === 5 && "\"Reliability comes from finishing what you start, not from looking busy.\""}
-                        {day > 5 && "\"Lean Construction isn't just about speed. It's about consistency. A steady flow beats a rushed chaos.\""}
-                    </div>
+                    {lesson && (
+                        <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-200">
+                            <h4 className="font-bold text-indigo-800 text-sm uppercase mb-2 flex items-center gap-2">
+                                <BookOpen className="w-4 h-4" /> Today's Lesson: {lesson.concept}
+                            </h4>
+                            <p className="text-sm text-indigo-700 leading-relaxed mb-2">
+                                {lesson.explanation}
+                            </p>
+                            <div className="flex items-start gap-2 text-xs text-indigo-600 bg-indigo-100/50 rounded-lg p-2 border border-indigo-200/50">
+                                <Lightbulb className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                                <span className="italic">{lesson.example}</span>
+                            </div>
+                        </div>
+                    )}
 
                     <button
                         onClick={onClose}
+                        data-testid="button-next-day"
                         className="w-full bg-black text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-transform"
                     >
-                        Start Day {day + 1}
+                        {displayDay >= 5 ? 'View Results' : `Start Day ${displayDay + 1}`}
                     </button>
                 </div>
             </motion.div>

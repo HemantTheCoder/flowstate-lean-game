@@ -20,7 +20,9 @@ import { Chapter2CompleteModal } from '@/components/game/Chapter2CompleteModal';
 import { SettingsModal } from '@/components/game/SettingsModal';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
-import { LayoutDashboard, HardHat, Save, Settings } from 'lucide-react';
+import { LayoutDashboard, HardHat, Save, Settings, BookOpen } from 'lucide-react';
+import { GlossaryPanel } from '@/components/game/GlossaryPanel';
+import { ReflectionQuiz } from '@/components/game/ReflectionQuiz';
 
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
@@ -28,6 +30,9 @@ export default function Game() {
   const [showSettings, setShowSettings] = useState(false);
   const [completedToday, setCompletedToday] = useState(0);
   const [showChapterComplete, setShowChapterComplete] = useState(false);
+  const [showGlossary, setShowGlossary] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizScore, setQuizScore] = useState(0);
   const [showTransition, setShowTransition] = useState(false);
 
   // Decision State
@@ -381,34 +386,38 @@ export default function Game() {
   };
 
   const handleEndDay = () => {
-    const todaysCompleted = useGameStore.getState().columns.find(c => c.id === 'done')?.tasks.length || 0;
-    setCompletedToday(todaysCompleted);
-    setShowSummary(true); // Show Modal instead of immediate advance
+    const state = useGameStore.getState();
+    const previousDoneCount = state.previousDoneCount;
+    const currentDoneCount = state.columns.find(c => c.id === 'done')?.tasks.length || 0;
+    const todaysCompleted = currentDoneCount - previousDoneCount;
+    setCompletedToday(Math.max(0, todaysCompleted));
+    advanceDay();
+    handleSave(true);
+    setShowSummary(true);
   };
 
   const handleNextDayStart = () => {
     setShowSummary(false);
-    advanceDay();
-    // Auto-save progress
-    handleSave(true);
-    // Use NEXT day (current day + 1) logic, but 'day' state updates in advanceDay?
-    // advanceDay updates store, but 'day' local var here is old?
-    // Better to use getState().day inside the action or pass calculated next day.
-    // simpler: allow addDailyTasks to read state.day if not passed, OR pass day + 1.
-    useGameStore.getState().addDailyTasks(3, day + 1);
+    const currentDay = useGameStore.getState().day;
 
-    // Check for Friday end (End of Chapter 1)
-    if (day === 5) {
-      navigate('/debrief');
+    if (currentDay > 5 && chapter === 1) {
+      setShowQuiz(true);
+      return;
     }
 
-    // Check for Week 2 End (PPC Review)
-    if (day === 10) {
-      // Trigger PPC Calculation
+    if (currentDay > 10 && chapter === 2) {
       const ppc = useGameStore.getState().calculatePPC();
-      // Show Chapter Complete / Weekly Review Modal
       setShowChapterComplete(true);
+      return;
     }
+
+    useGameStore.getState().addDailyTasks(3, currentDay);
+  };
+
+  const handleQuizComplete = (score: number) => {
+    setQuizScore(score);
+    setShowQuiz(false);
+    setShowChapterComplete(true);
   };
 
   // Smart Advisor Logic
@@ -484,46 +493,47 @@ export default function Game() {
 
     // Day 1: WIP Limits & Flow
     if (day === 1) {
-      if (doingCount === 0 && readyCount === 0) { // Simple start
-        return "Objective Complete! Click 'End Day' to finish Day 1.";
+      if (doingCount === 0 && readyCount === 0) {
+        return "Objective Complete! Click 'End Day'. Lean Tip: Finishing beats starting. WIP limits ensure focus.";
       }
       if (doingCount === 0) {
-        return "Good job! 'Doing' is clear. Click 'End Day' now. (No need to clear the backlog yet!)";
+        return "Good job! 'Doing' is clear. Click 'End Day' now.";
       }
-      return "Day 1 Goal: Move tasks from 'Ready' to 'Doing' and finish them. Keep 'Doing' under limit (2).";
+      if (doingCount >= doingLimit) {
+        return "WIP Limit reached! Finish active tasks before pulling more. This prevents bottlenecks.";
+      }
+      return "Day 1: Move tasks Ready -> Doing -> Done. Keep 'Doing' under the WIP limit (2). Focus on finishing!";
     }
 
     // Day 2: Supply Shortage
     if (day === 2) {
       if (doingCount > 0) {
-        return "Keep working. Finish active tasks.";
+        return "Keep working. Finish active tasks before pulling more.";
       }
 
       const hasPrep = allPending.some(t => t.cost === 0);
       if (hasPrep) {
-        return "SUPPLY DELAY: Materials 0! But you can still do 'Prep' tasks (0 Cost). Pull them now!";
+        return "SUPPLY DELAY: Materials exhausted! Lean Response: pivot to zero-cost tasks (Prep/Management). Never idle when work exists!";
       }
 
-      // Only if NO DOING and NO PREP and NO MATERIALS
       if (state.materials < 10) {
-        return "Supply Delay Survived! No more work possible. Click 'End Day'.";
+        return "Supply Delay Survived! No more work possible. Click 'End Day'. Lean Tip: Buffer management keeps flow alive.";
       }
 
-      // Fallback
-      return "Day 2 Goal: Keep working until materials run out.";
+      return "Day 2: Work normally until materials run out. Then adapt - pull zero-cost tasks to maintain flow.";
     }
 
     // Day 3: Rain
     if (day === 3) {
       const hasIndoor = allPending.some(t => t.type !== 'Structural' && state.materials >= t.cost);
       if (!hasIndoor && doingCount === 0) {
-        return "Rain has stopped outdoor work. Click 'End Day' to wait for clear skies.";
+        return "Rain has stopped all viable work. Click 'End Day'. Lean Tip: keep a backlog of indoor tasks for weather days.";
       }
       const hasStructuralReady = ready?.tasks.some(t => t.type === 'Structural');
       if (hasStructuralReady) {
-        return "RAIN ALERT: Structural tasks are BLOCKED. Focus on Interior/Systems or End Day.";
+        return "MONSOON: Structural tasks are BLOCKED by rain. Lean Response: pivot to Interior/Systems work. Adaptation beats idle time.";
       }
-      return "Day 3 Goal: Do what you can indoors. Don't force outdoor work.";
+      return "Day 3: Heavy rain blocks outdoor work. Pull indoor tasks (Interior, Systems, Management) to maintain flow.";
     }
 
     // Day 4: Push vs Pull
@@ -668,6 +678,16 @@ export default function Game() {
                 </div>
                 <span className="text-[10px] sm:text-xs font-bold text-slate-600">Site</span>
               </button>
+              <button
+                onClick={() => setShowGlossary(true)}
+                className="flex flex-col items-center gap-1 group"
+                data-testid="button-glossary"
+              >
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                  <BookOpen className="w-4 h-4 sm:w-6 sm:h-6" />
+                </div>
+                <span className="text-[10px] sm:text-xs font-bold text-slate-600">Glossary</span>
+              </button>
             </div>
           </div>
         </motion.div>
@@ -701,6 +721,10 @@ export default function Game() {
           completedTasks={completedToday}
         />
 
+        <GlossaryPanel isOpen={showGlossary} onClose={() => setShowGlossary(false)} />
+
+        <ReflectionQuiz isOpen={showQuiz} onComplete={handleQuizComplete} />
+
       </div >
 
       <TransitionScreen
@@ -719,14 +743,15 @@ export default function Game() {
         />
       )}
       {flags['character_cast_seen'] && !flags['chapter_intro_seen'] && <ChapterIntroModal />}
-      {showChapterComplete && chapter === 1 && day === 5 && (
+      {showChapterComplete && chapter === 1 && (
         <ChapterCompleteModal
           isOpen={true}
           onClose={() => setShowChapterComplete(false)}
           onContinue={handleChapterContinue}
+          quizScore={quizScore}
         />
       )}
-      {showChapterComplete && chapter === 2 && day === 11 && (
+      {showChapterComplete && chapter === 2 && (
         <Chapter2CompleteModal
           isOpen={true}
           onClose={() => setShowChapterComplete(false)}

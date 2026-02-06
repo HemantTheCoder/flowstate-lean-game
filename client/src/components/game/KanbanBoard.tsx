@@ -3,7 +3,7 @@ import { useGameStore, Column, Task } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import soundManager from '@/lib/soundManager';
-import { AlertTriangle, Gauge, Minus, Plus, Cloud, Sparkles, Flame } from 'lucide-react';
+import { AlertTriangle, Gauge, Minus, Plus, Cloud, Sparkles, Flame, CloudRain, PackageX } from 'lucide-react';
 
 const WipSlider: React.FC<{ column: Column; onChangeWip: (id: string, limit: number) => void }> = ({ column, onChangeWip }) => {
     const currentCount = column.tasks.length;
@@ -158,6 +158,40 @@ const WasteTaskOverlay: React.FC<{ isWaste: boolean; isInDone: boolean }> = ({ i
     );
 };
 
+const ConstraintBanner: React.FC<{ day: number; materials: number }> = ({ day, materials }) => {
+    if (day === 2 && materials <= 0) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mx-4 mt-3 mb-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-3 rounded-xl flex items-center gap-3 shadow-lg"
+            >
+                <PackageX className="w-6 h-6 flex-shrink-0" />
+                <div>
+                    <div className="font-black text-sm uppercase tracking-wide">Material Shortage</div>
+                    <div className="text-xs text-amber-100">Concrete delivery delayed. Only zero-cost tasks (Management/Prep) can enter Doing. Adapt your workflow!</div>
+                </div>
+            </motion.div>
+        );
+    }
+    if (day === 3) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mx-4 mt-3 mb-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-3 rounded-xl flex items-center gap-3 shadow-lg"
+            >
+                <CloudRain className="w-6 h-6 flex-shrink-0" />
+                <div>
+                    <div className="font-black text-sm uppercase tracking-wide">Monsoon Warning</div>
+                    <div className="text-xs text-blue-100">Heavy rain blocks all Structural work. Only Interior, Systems, and Management tasks can enter Doing.</div>
+                </div>
+            </motion.div>
+        );
+    }
+    return null;
+};
+
 export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     const { columns, moveTask, setWipLimit, funds, materials, tutorialStep, setTutorialStep, day, audioSettings, chapter } = useGameStore();
 
@@ -259,6 +293,8 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                         Close View
                     </button>
                 </div>
+
+                <ConstraintBanner day={day} materials={materials} />
 
                 <DragDropContext onDragEnd={onDragEnd}>
                     <div className={`flex-1 flex flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-hidden ${chapter > 1 ? 'bg-slate-800/50' : 'bg-slate-200/50'}`}>
