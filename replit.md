@@ -35,13 +35,40 @@ This is a fullstack TypeScript application featuring:
   - Day 4-5: Push decision creates waste that reduces value-adding work
 - Waste/rework tasks excluded from value calculation
 
+**Daily Summary Modal**:
+- Shows daily + cumulative efficiency from store's dailyMetrics
+- "Today's Lesson" section with Lean concept name, explanation, and real construction example per day
+- Day-specific insights based on performance
+
+**Reflection Quiz** (after Day 5, before Chapter Complete):
+- 3 multiple-choice questions testing WIP Limits, Pull vs Push, Adaptation
+- Score passed to Chapter Complete modal for display
+
+**GlossaryPanel**:
+- Slide-out panel with 12 Lean Construction terms (WIP, Pull, Push, Flow, Waste, etc.)
+- Search/filter functionality, categorized into Core Concepts, Flow States, Lean Principles
+- Accessible via Glossary button in game toolbar
+
+**Constraint Banners**:
+- Day 2: Amber gradient banner showing "Material Shortage" with explanation
+- Day 3: Blue gradient banner showing "Monsoon Warning" with blocked task info
+
+**Smart Advisor**:
+- Day-specific contextual Lean tips with construction examples
+- Enhanced messages for Days 1-5 with Lean terminology
+
 **Chapter Complete Modal**:
 - Interactive performance graph (cumulative + daily efficiency)
 - Day-by-day breakdown with click-to-view insights
 - "What Went Well" section with successes
 - "How to Improve" section with prioritized tips (if below 100%)
-- Key Learnings summary (WIP Limits, Pull System, Adaptation)
+- Key Learnings with real-world construction examples for each concept
+- Quiz score display with contextual feedback
 - Performance tiers: Master Flow Architect (90%+), Skilled Practitioner (70%+), etc.
+
+**Efficiency Bug Fix**:
+- advanceDay() now runs BEFORE showing DailySummary, ensuring accurate efficiency display
+- previousDoneCount delta calculation ensures correct task counting per day
 
 ### Chapter 2: The Promise System (Last Planner System)
 - Teaches Should/Can/Will planning workflow
