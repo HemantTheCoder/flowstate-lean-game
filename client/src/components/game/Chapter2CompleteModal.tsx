@@ -106,9 +106,21 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
 
     const tier = getPerformanceTier();
 
+    const fragileTasks = doneTasks.filter(t => t.fragile);
+    const failedFragile = columns.flatMap(c => c.tasks).filter(t => t.failed);
+    const unfinishedPromises = weeklyPlan.length - completedPromises;
+
+    const failureReasons: { reason: string; count: number; icon: React.ReactNode }[] = [];
+    if (failedFragile.length > 0) failureReasons.push({ reason: 'Fragile tasks failed (unresolved constraints)', count: failedFragile.length, icon: <AlertTriangle className="w-4 h-4 text-amber-500" /> });
+    if (overcommitted) failureReasons.push({ reason: 'Unplanned work added under pressure', count: 1, icon: <XCircle className="w-4 h-4 text-red-500" /> });
+    if (unfinishedPromises > 0 && !overcommitted && failedFragile.length === 0) failureReasons.push({ reason: 'Not enough time to complete all promised tasks', count: unfinishedPromises, icon: <AlertTriangle className="w-4 h-4 text-orange-500" /> });
+
+    const constraintsRemoved = flags['constraints_discovered'] ? true : false;
+
     const badges = [];
     if (ppc >= 80) badges.push({ name: 'Promise Keeper', icon: <CheckCircle className="w-6 h-6" />, color: 'bg-green-500' });
     if (!overcommitted) badges.push({ name: 'Reliable Planner', icon: <Target className="w-6 h-6" />, color: 'bg-blue-500' });
+    if (constraintsRemoved && failedFragile.length === 0) badges.push({ name: 'Constraint Crusher', icon: <AlertTriangle className="w-6 h-6" />, color: 'bg-orange-500' });
     if (ppc === 100) badges.push({ name: 'Perfect Week', icon: <Award className="w-6 h-6" />, color: 'bg-yellow-500' });
     if (quizScore !== undefined && quizScore >= 5) badges.push({ name: 'LPS Scholar', icon: <BookOpen className="w-6 h-6" />, color: 'bg-purple-500' });
 
@@ -198,6 +210,43 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                     </h4>
                                     <p className="text-orange-700 text-sm">
                                         You accepted extra work under client pressure. This increased your promise count and made failure more likely. In real projects, protecting your commitments is a sign of professionalism, not weakness.
+                                    </p>
+                                </div>
+                            )}
+
+                            {failureReasons.length > 0 && (
+                                <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                                    <h4 className="font-bold text-slate-700 text-sm uppercase mb-3 flex items-center gap-2">
+                                        <XCircle className="w-4 h-4 text-red-400" />
+                                        Reasons Analysis - Why Promises Failed
+                                    </h4>
+                                    <div className="space-y-2">
+                                        {failureReasons.map((r, i) => (
+                                            <div key={i} className="flex items-center gap-3 text-sm">
+                                                {r.icon}
+                                                <span className="text-slate-700">{r.reason}</span>
+                                                <span className="text-slate-400 text-xs ml-auto">x{r.count}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-3 italic border-t border-slate-200 pt-2">
+                                        In real LPS projects, teams conduct weekly Reasons Analysis to track WHY promises were broken. Over time, patterns emerge - and that is how reliability improves.
+                                    </p>
+                                </div>
+                            )}
+
+                            {fragileTasks.length > 0 && (
+                                <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl">
+                                    <h4 className="font-bold text-amber-800 text-sm uppercase mb-1 flex items-center gap-2">
+                                        <AlertTriangle className="w-4 h-4" />
+                                        Fragile Tasks Report
+                                    </h4>
+                                    <p className="text-amber-700 text-sm">
+                                        {fragileTasks.length} task{fragileTasks.length > 1 ? 's were' : ' was'} committed with unresolved constraints (fragile). 
+                                        {failedFragile.length > 0 
+                                            ? ` ${failedFragile.length} failed during execution - this is why Make Ready matters!` 
+                                            : ' All survived execution - you got lucky, but next time fix constraints first!'
+                                        }
                                     </p>
                                 </div>
                             )}

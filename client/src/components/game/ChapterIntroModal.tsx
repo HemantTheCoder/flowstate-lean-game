@@ -45,25 +45,37 @@ export const ChapterIntroModal: React.FC = () => {
                 className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border-4 border-slate-100"
             >
                 {/* Header Image/Banner Area */}
-                <div className="bg-blue-600 h-32 flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/blueprint.png')]"></div>
-                    <h1 className="text-4xl md:text-5xl font-black text-white z-10 text-center px-4 tracking-tighter">
+                <div className={`${chapter === 2 ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600' : 'bg-blue-600'} h-36 flex flex-col items-center justify-center relative overflow-hidden`}>
+                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/blueprint.png')]"></div>
+                    <h1 className="text-3xl md:text-4xl font-black text-white z-10 text-center px-4 tracking-tighter">
                         {content.subtitle.toUpperCase()}
                     </h1>
+                    <p className="text-white/70 text-sm font-bold z-10 mt-1 uppercase tracking-widest">{content.title}</p>
                 </div>
 
                 <div className="p-8 md:p-12">
-                    <h2 className="text-2xl font-bold text-slate-800 mb-4">{content.title}</h2>
-                    <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+                    <p className="text-lg text-slate-600 mb-6 leading-relaxed">
                         {content.description}
                     </p>
+
+                    {chapter === 2 && (
+                        <div className="bg-indigo-50 p-5 rounded-2xl border border-indigo-200 mb-6">
+                            <h3 className="text-sm font-bold text-indigo-500 uppercase tracking-widest mb-3">You Will Learn</h3>
+                            <ul className="space-y-2 text-sm text-indigo-800">
+                                <li className="flex items-center gap-2"><span className="text-indigo-400">{'>'}</span> How to make reliable commitments</li>
+                                <li className="flex items-center gap-2"><span className="text-indigo-400">{'>'}</span> How to remove constraints before promising</li>
+                                <li className="flex items-center gap-2"><span className="text-indigo-400">{'>'}</span> Why overcommitment fails</li>
+                                <li className="flex items-center gap-2"><span className="text-indigo-400">{'>'}</span> How PPC measures trust</li>
+                            </ul>
+                        </div>
+                    )}
 
                     <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 mb-8">
                         <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Core Objectives</h3>
                         <ul className="space-y-3">
                             {content.objectives.map((obj, i) => (
                                 <li key={i} className="flex items-center gap-3 text-slate-700 font-medium">
-                                    <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">
+                                    <div className={`w-6 h-6 rounded-full ${chapter === 2 ? 'bg-indigo-100 text-indigo-600' : 'bg-green-100 text-green-600'} flex items-center justify-center text-xs font-bold`}>
                                         {i + 1}
                                     </div>
                                     {obj}
@@ -74,10 +86,10 @@ export const ChapterIntroModal: React.FC = () => {
 
                     <button
                         onClick={handleStart}
-                        className="w-full bg-black text-white text-xl font-bold py-4 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                        className={`w-full ${chapter === 2 ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700' : 'bg-black hover:bg-slate-800'} text-white text-xl font-bold py-4 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2`}
                         data-testid="button-start-chapter"
                     >
-                        Start Chapter
+                        {chapter === 2 ? 'Begin Day 6 Planning' : 'Start Chapter'}
                     </button>
                 </div>
             </motion.div>

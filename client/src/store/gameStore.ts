@@ -14,7 +14,9 @@ export type GamePhase = 'planning' | 'action' | 'review';
 export interface Task extends TaskType {
   status: 'backlog' | 'ready' | 'doing' | 'done';
   originalId?: string;
-  constraints?: ConstraintType[]; // If empty, task is "Sound" (Green)
+  constraints?: ConstraintType[];
+  fragile?: boolean;
+  failed?: boolean;
 }
 
 export interface Column {
@@ -549,6 +551,30 @@ export const useGameStore = create<GameState>((set, get) => ({
       newMaterials += task.cost;
     }
 
+    // Fragile task failure check (30% chance of failure when completing)
+    if (destColId === 'done' && sourceColId === 'doing' && task.fragile && state.chapter === 2) {
+      const failRoll = Math.random();
+      if (failRoll < 0.3) {
+        const failedTask = { ...task, failed: true, fragile: true };
+        set({
+          materials: newMaterials,
+          funds: newFunds,
+          lpi: { ...state.lpi, teamMorale: Math.max(0, state.lpi.teamMorale - 5) },
+          columns: state.columns.map(col => {
+            if (col.id === sourceColId) {
+              return { ...col, tasks: col.tasks.filter(t => t.id !== taskId) };
+            }
+            if (col.id === 'ready') {
+              return { ...col, tasks: [...col.tasks, { ...failedTask, status: 'ready' as const }] };
+            }
+            return col;
+          }),
+          logs: [...state.logs, `FRAGILE FAILURE: "${task.title}" failed during execution! Constraint was not properly resolved. Task returned to Ready. -5% Morale.`]
+        });
+        return false;
+      }
+    }
+
     // Moving TO DONE rewards Funds (unless already coming from Done)
     if (destColId === 'done' && sourceColId !== 'done') {
       newFunds += task.reward;
@@ -571,7 +597,6 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
         return col;
       }),
-      // Tutorial Progression logic can be refined later if needed
     });
 
     return true;
@@ -721,7 +746,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   commitPlan: (taskIds) => set((state) => {
     const readyCol = state.columns.find(c => c.id === 'ready');
     const backlogCol = state.columns.find(c => c.id === 'backlog');
-    const committedTasks = readyCol?.tasks.filter(t => taskIds.includes(t.id)) || [];
+    const committedTasks = readyCol?.tasks.filter(t => taskIds.includes(t.id)).map(t => {
+      const hasConstraints = (t.constraints?.length || 0) > 0;
+      return hasConstraints ? { ...t, fragile: true, constraints: [] } : t;
+    }) || [];
     const uncommittedReady = readyCol?.tasks.filter(t => !taskIds.includes(t.id)) || [];
 
     return {

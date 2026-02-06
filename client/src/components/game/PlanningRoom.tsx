@@ -84,7 +84,7 @@ export const PlanningRoom: React.FC = () => {
 
     const selectedTask = [...backlog, ...ready].find(t => t.id === selectedTaskId);
     const readyTasksCount = lookaheadTasks.filter(t => (t.constraints?.length || 0) === 0).length;
-    const blockedCount = lookaheadTasks.filter(t => (t.constraints?.length || 0) > 0).length;
+    const constrainedCount = lookaheadTasks.filter(t => (t.constraints?.length || 0) > 0).length;
     
     const dayObjective = DAY_OBJECTIVES[day] || DAY_OBJECTIVES[6];
 
@@ -116,7 +116,7 @@ export const PlanningRoom: React.FC = () => {
     }, [day, flags, setFlag]);
 
     useEffect(() => {
-        if (day === 7 && lookaheadTasks.length > 0 && blockedCount > 0 && !flags['constraints_discovered']) {
+        if (day === 7 && lookaheadTasks.length > 0 && constrainedCount > 0 && !flags['constraints_discovered']) {
             if (selectedTaskId) {
                 const task = lookaheadTasks.find(t => t.id === selectedTaskId);
                 if (task && (task.constraints?.length || 0) > 0) {
@@ -133,7 +133,7 @@ export const PlanningRoom: React.FC = () => {
                 }
             }
         }
-    }, [selectedTaskId, day, flags, setFlag, lookaheadTasks, blockedCount]);
+    }, [selectedTaskId, day, flags, setFlag, lookaheadTasks, constrainedCount]);
 
     const tutorialSteps = [
         { title: "Master Schedule", content: "This is your Master Schedule - tasks that SHOULD happen this week. Click a task to pull it into the Lookahead.", highlight: "master" },
@@ -165,11 +165,34 @@ export const PlanningRoom: React.FC = () => {
         }
     };
 
+    const [showForceWarning, setShowForceWarning] = useState(false);
+    const [forceCommitIds, setForceCommitIds] = useState<string[]>([]);
+    
+    const riskyTasks = lookaheadTasks.filter(t => (t.constraints?.length || 0) === 1);
+    const riskyCount = riskyTasks.length;
+
     const handleCommitPlan = () => {
         if (!canCommit) return;
-        const committedTasks = lookaheadTasks.filter(t => (t.constraints?.length || 0) === 0);
-        if (committedTasks.length === 0) return;
-        commitPlan(committedTasks.map(t => t.id));
+        const greenTasks = lookaheadTasks.filter(t => (t.constraints?.length || 0) === 0);
+        if (greenTasks.length === 0 && riskyCount === 0) return;
+        
+        if (riskyCount > 0 && forceCommitIds.length === 0) {
+            setShowForceWarning(true);
+            return;
+        }
+        
+        const allCommitIds = [...greenTasks.map(t => t.id), ...forceCommitIds];
+        commitPlan(allCommitIds);
+    };
+    
+    const handleForceCommitConfirm = (includeRisky: boolean) => {
+        setShowForceWarning(false);
+        const greenTasks = lookaheadTasks.filter(t => (t.constraints?.length || 0) === 0);
+        const riskyIds = includeRisky ? riskyTasks.map(t => t.id) : [];
+        setForceCommitIds(riskyIds);
+        const allCommitIds = [...greenTasks.map(t => t.id), ...riskyIds];
+        if (allCommitIds.length === 0) return;
+        commitPlan(allCommitIds);
     };
 
     const handleSelectTask = (taskId: string) => {
@@ -191,14 +214,14 @@ export const PlanningRoom: React.FC = () => {
 
     const getEndDayTooltip = () => {
         if (day === 6 && lookaheadTasks.length < 3) return "Pull at least 3 tasks to Lookahead before ending the day";
-        if (day === 7 && blockedCount > 0 && !constraintsDiscovered) return "Click on each RED task to discover its constraints first";
+        if (day === 7 && constrainedCount > 0 && !constraintsDiscovered) return "Click on each constrained task to discover its constraints first";
         if (day === 9 && phase === 'planning') return "You must click 'Start Week' to commit your promises before ending the day";
         return "";
     };
 
     const canEndDay = () => {
         if (day === 6) return lookaheadTasks.length >= 3;
-        if (day === 7) return constraintsDiscovered || blockedCount === 0;
+        if (day === 7) return constraintsDiscovered || constrainedCount === 0;
         if (day === 9) return phase === 'action';
         return true;
     };
@@ -349,7 +372,11 @@ export const PlanningRoom: React.FC = () => {
                         </div>
                         <div className="flex justify-between text-xs">
                             <span className="text-red-300">Blocked:</span>
-                            <span className="text-red-400 font-mono font-bold">{blockedCount}</span>
+                            <span className="text-red-400 font-mono font-bold">{lookaheadTasks.filter(t => (t.constraints?.length || 0) > 1).length}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                            <span className="text-amber-300">Risky:</span>
+                            <span className="text-amber-400 font-mono font-bold">{riskyCount}</span>
                         </div>
                         <div className="flex justify-between text-xs">
                             <span className="text-green-300">Sound:</span>
@@ -437,7 +464,10 @@ export const PlanningRoom: React.FC = () => {
                                 </div>
                                 <div className="flex gap-2">
                                     <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">
-                                        {blockedCount} Blocked
+                                        {lookaheadTasks.filter(t => (t.constraints?.length || 0) > 1).length} Blocked
+                                    </span>
+                                    <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded text-xs font-bold">
+                                        {riskyCount} Risky
                                     </span>
                                     <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">
                                         {readyTasksCount} Sound
@@ -448,7 +478,10 @@ export const PlanningRoom: React.FC = () => {
                             <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 gap-3 content-start">
                                 <AnimatePresence>
                                     {lookaheadTasks.map(task => {
-                                        const hasConstraints = (task.constraints?.length || 0) > 0;
+                                        const constraintCount = task.constraints?.length || 0;
+                                        const isBlocked = constraintCount > 1;
+                                        const isRisky = constraintCount === 1;
+                                        const isSound = constraintCount === 0;
                                         const isSelected = selectedTaskId === task.id;
                                         const isInspected = flags[`inspected_${task.id}`];
                                         return (
@@ -460,14 +493,18 @@ export const PlanningRoom: React.FC = () => {
                                                 exit={{ opacity: 0, scale: 0.9 }}
                                                 onClick={() => handleSelectTask(task.id)}
                                                 className={`p-3 rounded-xl border-l-4 cursor-pointer transition-all shadow-sm hover:shadow-md ${
-                                                    hasConstraints ? 'border-red-500 bg-red-50 hover:bg-red-100' : 'border-green-500 bg-green-50 hover:bg-green-100'
+                                                    isBlocked ? 'border-red-500 bg-red-50 hover:bg-red-100' : 
+                                                    isRisky ? 'border-amber-500 bg-amber-50 hover:bg-amber-100' :
+                                                    'border-green-500 bg-green-50 hover:bg-green-100'
                                                 } ${isSelected ? 'ring-2 ring-blue-400 scale-[1.02]' : ''}`}
                                                 data-testid={`task-lookahead-${task.id}`}
                                             >
                                                 <div className="flex justify-between items-start mb-2">
                                                     <span className="font-bold text-sm text-slate-800 leading-tight">{task.title}</span>
-                                                    {hasConstraints ? (
+                                                    {isBlocked ? (
                                                         <AlertTriangle className="w-4 h-4 text-red-500" />
+                                                    ) : isRisky ? (
+                                                        <AlertTriangle className="w-4 h-4 text-amber-500" />
                                                     ) : (
                                                         <CheckCircle className="w-4 h-4 text-green-500" />
                                                     )}
@@ -481,20 +518,21 @@ export const PlanningRoom: React.FC = () => {
                                                                     {constraintConfig[c].label}
                                                                 </span>
                                                             ))}
-                                                            {!hasConstraints && <span className="text-[10px] text-green-600 font-bold">SOUND - Ready to Commit</span>}
+                                                            {isSound && <span className="text-[10px] text-green-600 font-bold">SOUND - Ready to Commit</span>}
+                                                            {isRisky && <span className="text-[10px] text-amber-600 font-bold ml-1">RISKY - Can force commit</span>}
                                                         </>
                                                     ) : (
-                                                        hasConstraints ? (
+                                                        constraintCount > 0 ? (
                                                             <span className="text-[10px] text-red-500 font-bold flex items-center gap-1">
                                                                 <Ban className="w-3 h-3" />
-                                                                {task.constraints?.length} hidden constraint{(task.constraints?.length || 0) > 1 ? 's' : ''} - discover tomorrow
+                                                                {constraintCount} hidden constraint{constraintCount > 1 ? 's' : ''} - discover tomorrow
                                                             </span>
                                                         ) : (
                                                             <span className="text-[10px] text-green-600 font-bold">No constraints detected</span>
                                                         )
                                                     )}
                                                 </div>
-                                                {day === 7 && hasConstraints && isInspected && (
+                                                {day === 7 && constraintCount > 0 && isInspected && (
                                                     <div className="mt-1">
                                                         <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold">INSPECTED</span>
                                                     </div>
@@ -521,14 +559,17 @@ export const PlanningRoom: React.FC = () => {
                                         Weekly Work Plan
                                     </h3>
                                     <p className="text-[10px] text-indigo-300">
-                                        {canCommit ? 'Your PROMISES - Click Start Week to commit GREEN tasks' : `Commitment unlocks on Day 9 (currently Day ${day})`}
+                                        {canCommit 
+                                            ? `${readyTasksCount} Sound (GREEN)${riskyCount > 0 ? ` + ${riskyCount} Risky (YELLOW)` : ''} - Click Start Week to commit`
+                                            : `Commitment unlocks on Day 9 (currently Day ${day})`
+                                        }
                                     </p>
                                 </div>
                                 <button
                                     onClick={handleCommitPlan}
-                                    disabled={!canCommit || readyTasksCount === 0}
+                                    disabled={!canCommit || (readyTasksCount === 0 && riskyCount === 0)}
                                     className={`px-5 py-2 rounded-lg text-sm font-bold shadow-lg transition-all active:scale-95 ${
-                                        canCommit && readyTasksCount > 0
+                                        canCommit && (readyTasksCount > 0 || riskyCount > 0)
                                             ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white shadow-green-900/30 ring-2 ring-green-400/50' 
                                             : 'bg-indigo-800/50 text-indigo-400 cursor-not-allowed'
                                     }`}
@@ -537,7 +578,7 @@ export const PlanningRoom: React.FC = () => {
                                     {!canCommit ? (
                                         <span className="flex items-center gap-1"><Lock className="w-3 h-3" /> Day 9</span>
                                     ) : (
-                                        `Start Week (${readyTasksCount} tasks)`
+                                        `Start Week (${readyTasksCount + riskyCount} tasks)`
                                     )}
                                 </button>
                             </div>
@@ -554,7 +595,17 @@ export const PlanningRoom: React.FC = () => {
                                                 <span className="text-[10px] font-bold text-green-100 leading-tight">{t.title}</span>
                                             </motion.div>
                                         ))}
-                                        {Array.from({ length: Math.max(0, 8 - readyTasksCount) }).map((_, i) => (
+                                        {riskyTasks.slice(0, Math.max(0, 8 - readyTasksCount)).map((t) => (
+                                            <motion.div
+                                                initial={{ scale: 0 }} 
+                                                animate={{ scale: 1 }}
+                                                key={t.id}
+                                                className="flex-1 bg-amber-500/30 border-2 border-amber-400 border-dashed rounded-lg flex items-center justify-center p-2 text-center"
+                                            >
+                                                <span className="text-[10px] font-bold text-amber-100 leading-tight">{t.title}</span>
+                                            </motion.div>
+                                        ))}
+                                        {Array.from({ length: Math.max(0, 8 - readyTasksCount - riskyCount) }).map((_, i) => (
                                             <div key={`empty-${i}`} className="flex-1 border-2 border-dashed border-indigo-600/50 rounded-lg flex items-center justify-center bg-indigo-800/20">
                                                 <span className="text-indigo-500 text-xs">Empty</span>
                                             </div>
@@ -715,6 +766,70 @@ export const PlanningRoom: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Force Commit Warning */}
+            <AnimatePresence>
+                {showForceWarning && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 z-[150] bg-black/70 flex items-center justify-center"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            className="bg-white rounded-2xl shadow-2xl p-6 max-w-lg mx-4"
+                        >
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                                    <AlertTriangle className="w-6 h-6 text-amber-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-800">Risky Tasks Detected</h3>
+                                    <p className="text-sm text-slate-500">You have {riskyCount} task{riskyCount > 1 ? 's' : ''} with unresolved constraints</p>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                                <p className="text-sm text-amber-800 leading-relaxed">
+                                    <strong>YELLOW tasks</strong> have 1 remaining constraint. You CAN force-commit them, but they become <strong>FRAGILE</strong> - 
+                                    there's a <strong>30% chance they'll fail</strong> during execution and hurt your PPC.
+                                </p>
+                                <p className="text-xs text-amber-600 mt-2 italic">
+                                    "A smaller plan that's 100% complete is better than a big plan that's 40% complete." - Lean Principle
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <button
+                                    onClick={() => handleForceCommitConfirm(true)}
+                                    className="w-full p-3 rounded-xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 text-left transition-colors"
+                                    data-testid="button-force-commit-risky"
+                                >
+                                    <span className="font-bold text-amber-800 text-sm">Include Risky Tasks (Overcommit)</span>
+                                    <p className="text-xs text-amber-600 mt-1">Commit {readyTasksCount + riskyCount} tasks total. {riskyCount} may fail. Higher risk, higher reward.</p>
+                                </button>
+                                <button
+                                    onClick={() => handleForceCommitConfirm(false)}
+                                    className="w-full p-3 rounded-xl border-2 border-green-300 bg-green-50 hover:bg-green-100 text-left transition-colors"
+                                    data-testid="button-commit-safe"
+                                >
+                                    <span className="font-bold text-green-800 text-sm">Only Sound Tasks (Safe)</span>
+                                    <p className="text-xs text-green-600 mt-1">Commit {readyTasksCount} reliable tasks. Safer PPC. More reliable promises.</p>
+                                </button>
+                                <button
+                                    onClick={() => setShowForceWarning(false)}
+                                    className="w-full text-center text-xs text-slate-400 hover:text-slate-600 py-2"
+                                    data-testid="button-cancel-commit"
+                                >
+                                    Go back and fix more constraints
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Tutorial Overlay */}
             <AnimatePresence>

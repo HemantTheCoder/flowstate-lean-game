@@ -139,9 +139,27 @@ This is a fullstack TypeScript application featuring:
 - Day-by-day expandable breakdown (Days 6-11) with LPS concepts and real-world examples
 - Quiz score integration with contextual feedback
 - Overcommitment detection warning
-- Badges: Promise Keeper, Reliable Planner, Perfect Week, LPS Scholar
+- Badges: Promise Keeper, Reliable Planner, Constraint Crusher, Perfect Week, LPS Scholar
+- Constraint Crusher badge: awarded for discovering constraints AND avoiding fragile task failures
+- PPC Failure Reasons Analysis section showing WHY promises broke (fragile failures, overcommitment, time pressure)
+- Fragile Tasks Report with outcome feedback
 - Key Learnings with 4 real-world construction insights
 - Budget and Morale stats display
+
+**Fragile/Risky Task System** (Three-Tier Readiness):
+- RED (Blocked): 2+ constraints, cannot be committed
+- YELLOW (Risky): 1 constraint, can be force-committed but becomes FRAGILE
+- GREEN (Sound): 0 constraints, safe to commit
+- Force-commit warning modal presents strategic choice: safe (GREEN only) vs risky (GREEN + YELLOW)
+- Fragile tasks have 30% failure probability when moved to Done
+- Failed fragile tasks return to Ready column, -5% morale penalty
+- Teaches consequence of overcommitment through gameplay mechanics
+- All UI stat displays (sidebar, lookahead header, weekly plan) show Blocked/Risky/Sound breakdowns
+
+**Chapter 2 Intro Modal**:
+- Purple/indigo gradient theme differentiating from Chapter 1's blue theme
+- "You Will Learn" objectives overlay for Chapter 2
+- Chapter-specific CTA button text ("Begin Day 6 Planning" vs "Start Chapter")
 
 **Day 11 Flow**:
 - Day 11 dialogue -> End Day (amber "Finish Chapter" button) -> Daily Summary -> Quiz -> Chapter Complete
