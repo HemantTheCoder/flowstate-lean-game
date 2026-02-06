@@ -1,0 +1,114 @@
+🧹 Chapter 3 — Coming Soon
+The Tangled Depot
+5S: Order Creates Energy
+(On Chapters Page — Card)
+
+Display as locked card:
+
+🧹 Chapter 3
+
+The Tangled Depot
+5S: Order Creates Energy
+
+Status badge:
+
+🚧 Coming Soon
+
+Short subtitle:
+
+Organize the site. Reduce wasted motion. Build stability.
+
+On click → open overview.
+
+📖 Chapter 3 Overview (Modal / Page)
+Story Preview
+
+After improving flow (Kanban) and making reliable promises (Last Planner), you arrive at the mall’s material depot.
+
+Tools are scattered. Walk paths are blocked. Materials are stacked randomly. Workers spend more time searching than building.
+
+Old Foreman looks around and sighs:
+
+“We fixed promises. Now fix the chaos.”
+
+Your next challenge is to transform a cluttered depot into an organized, efficient work environment.
+
+🧠 What You’ll Learn
+
+This chapter introduces 5S, the Lean method for workplace organization.
+
+You’ll learn how to:
+
+Reduce wasted motion and searching
+
+Improve productivity through layout
+
+Create visual order on site
+
+Support reliable execution with organized workspaces
+
+You’ll practice:
+
+Sorting unnecessary materials
+
+Setting fixed locations for tools
+
+Cleaning work zones
+
+Standardizing layouts
+
+Sustaining improvements over multiple days
+
+🎮 Planned Gameplay
+
+Hands-on, visual interactions:
+
+Drag-and-drop organization of tools and materials
+
+Creating storage zones and walk paths
+
+Before/after site transformation
+
+Daily mini-challenges for each “S”
+
+Visual feedback on worker speed, safety, and morale
+
+This chapter focuses on physical workspace optimization, not planning boards.
+
+🎯 Learning Outcome
+
+By the end of Chapter 3, you will understand:
+
+How site organization directly affects productivity, safety, and flow.
+
+✨ Status
+
+🚧 Under Development — Coming Soon
+
+Footer Line (Optional)
+
+Build flow. Keep promises. Create order.
+
+🎯 UX Behavior
+
+Chapter 3 card remains locked
+
+Clicking opens overview only
+
+Play button disabled
+
+Tooltip on card:
+
+“Coming soon — Learn 5S through hands-on site organization.”
+
+🧠 Why This Works
+
+This gives players:
+
+✅ Narrative continuity
+✅ Clear expectation of next concept
+✅ Professional Lean framing
+✅ Motivation to return
+✅ Clean MVP scope
+
+Without committing you to implementation yet.
