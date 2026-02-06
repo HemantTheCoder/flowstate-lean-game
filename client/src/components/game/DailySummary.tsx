@@ -33,6 +33,36 @@ const LEAN_LESSONS: Record<number, { concept: string; explanation: string; examp
         concept: "Reliability & Flow",
         explanation: "Reliability comes from finishing what you start, not from looking busy. Consistent, predictable output builds trust with clients and inspectors.",
         example: "A site with 2 completed zones beats a site with 5 half-finished zones. Inspectors judge completion, not activity."
+    },
+    6: {
+        concept: "Should / Can / Will Planning",
+        explanation: "The Last Planner System uses three levels of planning. The Master Schedule shows what SHOULD happen. The Lookahead Window checks what CAN happen (by identifying constraints). The Weekly Work Plan commits to what WILL happen.",
+        example: "Before pouring a foundation, the Master Schedule says it SHOULD happen this week. But the Lookahead reveals the rebar delivery is late (constraint). So it CAN'T happen yet. Only when the rebar arrives do you commit: it WILL happen Thursday."
+    },
+    7: {
+        concept: "Constraints & Prerequisites",
+        explanation: "A constraint is anything that prevents a task from being executed: missing materials, unavailable crew, pending approvals, or bad weather. Identifying constraints BEFORE committing is what separates reliable planning from wishful thinking.",
+        example: "On a real site, the foreman checks: Do we have drawings? Are materials on site? Is the crew available? Is the previous task complete? If ANY answer is no, the task has a constraint and is NOT ready."
+    },
+    8: {
+        concept: "Make Ready Process",
+        explanation: "Making work ready means actively removing constraints so tasks become 'Sound' (executable). This is proactive management - don't wait for problems to appear during execution. Fix them during planning.",
+        example: "If steel delivery is the constraint, the planner calls the supplier, confirms delivery date, arranges crane time, and ensures the crew is briefed. Only when ALL prerequisites are met is the task 'Sound' and ready for commitment."
+    },
+    9: {
+        concept: "Reliable Commitments",
+        explanation: "In LPS, a commitment is a promise to complete specific tasks this week. Only promise what you CAN deliver - tasks that are 'Sound' (green, no constraints). Overcommitting under pressure destroys trust and reliability.",
+        example: "A superintendent who promises 10 tasks but delivers 6 has a PPC of 60%. One who promises 7 and delivers 7 has 100% PPC. The second is MORE valuable because the team can depend on their promises."
+    },
+    10: {
+        concept: "Execution & Promise Keeping",
+        explanation: "Execution day reveals the truth of your planning. If you made work ready and committed only to Sound tasks, execution should flow smoothly. Broken promises indicate planning failures, not worker failures.",
+        example: "When a crew arrives Monday morning and all materials, drawings, and prerequisites are in place, they can focus 100% on building. No searching, no waiting, no improvising. That's the power of Make Ready."
+    },
+    11: {
+        concept: "PPC - Percent Plan Complete",
+        explanation: "PPC measures reliability: (Tasks Completed / Tasks Promised) x 100. It's NOT about how much work you did - it's about how many PROMISES you kept. High PPC means the team can trust your plans.",
+        example: "World-class construction projects target 80%+ PPC. Every broken promise is analyzed: Why did it fail? Was there a hidden constraint? This weekly learning cycle is what makes LPS powerful."
     }
 };
 
@@ -40,6 +70,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
     if (!isOpen) return null;
 
     const day = useGameStore(s => s.day);
+    const chapter = useGameStore(s => s.chapter);
     const funds = useGameStore(s => s.funds);
     const dailyMetrics = useGameStore(s => s.dailyMetrics);
 
@@ -125,7 +156,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                         data-testid="button-next-day"
                         className="w-full bg-black text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-transform"
                     >
-                        {displayDay >= 5 ? 'View Results' : `Start Day ${displayDay + 1}`}
+                        {(displayDay >= 5 && chapter === 1) || (displayDay >= 11 && chapter === 2) ? 'View Results' : `Start Day ${displayDay + 1}`}
                     </button>
                 </div>
             </motion.div>

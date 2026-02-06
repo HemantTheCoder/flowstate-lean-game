@@ -244,12 +244,8 @@ export default function Game() {
       if (dayConfig.event === 'client_pressure' && chapter === 2) {
         setTimeout(() => triggerClientPressureDecision(), 1000);
       }
-      if (dayConfig.event === 'inspection' && chapter === 2) {
-        useGameStore.getState().calculatePPC();
-        setTimeout(() => {
-          setShowChapterComplete(true);
-        }, 2000);
-      }
+      // Day 11 inspection: Don't auto-show chapter complete here.
+      // The flow is: Day 11 dialogue -> End Day -> Summary -> Quiz -> Chapter Complete
 
       if (dayConfig.day === 3) {
         soundManager.playSFX('storm', audioSettings.sfxVolume);
@@ -407,9 +403,9 @@ export default function Game() {
       return;
     }
 
-    if (currentDay > 10 && chapter === 2) {
-      const ppc = useGameStore.getState().calculatePPC();
-      setShowChapterComplete(true);
+    if (currentDay > 11 && chapter === 2) {
+      useGameStore.getState().calculatePPC();
+      setShowQuiz(true);
       return;
     }
 
@@ -488,7 +484,7 @@ export default function Game() {
         const doneFromPlan = doing?.tasks.filter(t => state.weeklyPlan.includes(t.id)).length || 0;
         return `Day 10: Execution Day - ${doneFromPlan}/${weeklyPlanCount} committed tasks in progress.`;
       }
-      if (day === 11) return "Day 11: PPC Review - Did you keep your promises?";
+      if (day === 11) return "Day 11: PPC Review. Click 'Finish Chapter' to see your results!";
     }
 
     // 0. NARRATIVE SPECIFIC ADVICE & "END DAY" TRIGGERS
@@ -615,9 +611,9 @@ export default function Game() {
             <button
               onClick={handleEndDay}
               data-testid="button-end-day"
-              className={`${day === 5 ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-b-4 border-amber-700 ring-2 ring-amber-300' : 'bg-blue-500 hover:bg-blue-600 border-b-4 border-blue-700'} text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') ? 'animate-bounce ring-4 ring-yellow-400' : ''}`}
+              className={`${(day === 5 && chapter === 1) || (day === 11 && chapter === 2) ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-b-4 border-amber-700 ring-2 ring-amber-300' : 'bg-blue-500 hover:bg-blue-600 border-b-4 border-blue-700'} text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') ? 'animate-bounce ring-4 ring-yellow-400' : ''}`}
             >
-              {day === 5 ? 'Finish Chapter' : 'End Day'}
+              {(day === 5 && chapter === 1) || (day === 11 && chapter === 2) ? 'Finish Chapter' : 'End Day'}
             </button>
           </div>
 
@@ -729,15 +725,16 @@ export default function Game() {
       </div >
 
       <GlossaryPanel isOpen={showGlossary} onClose={() => setShowGlossary(false)} />
-      <ReflectionQuiz isOpen={showQuiz} onComplete={handleQuizComplete} />
+      <ReflectionQuiz isOpen={showQuiz} onComplete={handleQuizComplete} chapter={chapter} />
 
       <TransitionScreen
         isOpen={showTransition}
         onComplete={() => setShowTransition(false)}
         title="Plan Committed"
-        subtitle="Phase Complete"
-        description="The weekly plan is set. The crew is ready to execute. Let's build!"
+        subtitle="Last Planner System"
+        description="Your weekly promises are locked. Time to deliver."
         type="execution"
+        committedTasks={useGameStore.getState().weeklyPlan.length}
       />
       {/* Root Level Modals (Interactive) */}
       {flags['character_created'] && !flags['character_cast_seen'] && (
@@ -760,6 +757,7 @@ export default function Game() {
           isOpen={true}
           onClose={() => setShowChapterComplete(false)}
           onContinue={handleChapter2Continue}
+          quizScore={quizScore}
         />
       )}
     </div >

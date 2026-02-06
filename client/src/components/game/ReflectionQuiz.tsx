@@ -5,6 +5,7 @@ import { CheckCircle2, XCircle, Brain, ChevronRight, Award } from 'lucide-react'
 interface ReflectionQuizProps {
   isOpen: boolean;
   onComplete: (score: number) => void;
+  chapter?: number;
 }
 
 interface QuizOption {
@@ -20,7 +21,7 @@ interface Question {
   explanation: string;
 }
 
-const QUESTIONS: Question[] = [
+const CHAPTER_1_QUESTIONS: Question[] = [
   {
     id: 'wip-limits',
     text: 'What is the primary benefit of limiting Work-In-Progress (WIP)?',
@@ -78,7 +79,66 @@ const QUESTIONS: Question[] = [
   },
 ];
 
-export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComplete }) => {
+const CHAPTER_2_QUESTIONS: Question[] = [
+  {
+    id: 'should-can-will',
+    text: 'In the Last Planner System, what do SHOULD, CAN, and WILL represent?',
+    options: [
+      { id: 'a', text: 'Three different types of construction workers', isCorrect: false },
+      { id: 'b', text: 'Three levels of planning: Master Schedule, Lookahead (constraint check), and Weekly Commitment', isCorrect: true },
+      { id: 'c', text: 'Three phases of building: Design, Build, Inspect', isCorrect: false },
+      { id: 'd', text: 'Three ways to measure project speed', isCorrect: false },
+    ],
+    explanation: 'SHOULD = what the Master Schedule says needs to happen. CAN = what is actually possible after checking constraints in the Lookahead. WILL = what you commit to deliver in the Weekly Work Plan. Only Sound (green) tasks should become WILL commitments.',
+  },
+  {
+    id: 'constraints',
+    text: 'What is a "constraint" in the Last Planner System?',
+    options: [
+      { id: 'a', text: 'A budget limit set by the client', isCorrect: false },
+      { id: 'b', text: 'Any prerequisite that prevents a task from being executed - like missing materials, unavailable crew, or pending approvals', isCorrect: true },
+      { id: 'c', text: 'A rule that says workers cannot work overtime', isCorrect: false },
+      { id: 'd', text: 'The maximum number of tasks allowed per week', isCorrect: false },
+    ],
+    explanation: 'Constraints are the hidden reasons tasks fail. They include missing materials, unavailable crews, pending design approvals, incomplete prerequisite work, and weather. Identifying constraints BEFORE committing is what makes LPS reliable.',
+  },
+  {
+    id: 'ppc',
+    text: 'What does PPC (Percent Plan Complete) actually measure?',
+    options: [
+      { id: 'a', text: 'How much of the total project is finished', isCorrect: false },
+      { id: 'b', text: 'How fast the workers are building', isCorrect: false },
+      { id: 'c', text: 'The percentage of PROMISES that were KEPT - tasks committed vs. tasks completed', isCorrect: true },
+      { id: 'd', text: 'The percentage of the budget that has been spent', isCorrect: false },
+    ],
+    explanation: 'PPC = (Tasks Completed / Tasks Promised) x 100. It measures RELIABILITY, not productivity. A team that promises 5 tasks and completes all 5 (100% PPC) is more valuable than a team that promises 10 and completes 7 (70% PPC), because downstream trades can trust their schedule.',
+  },
+  {
+    id: 'overcommitment',
+    text: 'When the Client pressured you to add extra work, why is accepting risky?',
+    options: [
+      { id: 'a', text: 'Because the Client might change their mind later', isCorrect: false },
+      { id: 'b', text: 'Because extra work costs more money', isCorrect: false },
+      { id: 'c', text: 'Because adding unverified work increases your PPC denominator, making failure more likely and damaging team trust', isCorrect: true },
+      { id: 'd', text: 'Because the Inspector does not allow changes to the plan', isCorrect: false },
+    ],
+    explanation: 'Overcommitment is the #1 enemy of reliable planning. When you add tasks without checking constraints, you inflate your promise list. If those tasks fail (which unchecked tasks often do), your PPC drops and the entire team loses trust in your planning.',
+  },
+  {
+    id: 'make-ready',
+    text: 'What is the "Make Ready" process?',
+    options: [
+      { id: 'a', text: 'Cleaning the construction site before work begins', isCorrect: false },
+      { id: 'b', text: 'Training new workers on safety procedures', isCorrect: false },
+      { id: 'c', text: 'Actively removing constraints (calling suppliers, reassigning crews, getting approvals) so tasks become Sound and executable', isCorrect: true },
+      { id: 'd', text: 'Writing a detailed project schedule with milestones', isCorrect: false },
+    ],
+    explanation: 'Make Ready is the proactive process of removing every constraint that blocks a task. Instead of waiting for problems during execution, you solve them during planning. Call the supplier, book the crane, reassign the crew, expedite the approval. Only when ALL constraints are removed is a task "Sound" (green).',
+  },
+];
+
+export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComplete, chapter = 1 }) => {
+  const QUESTIONS = chapter === 2 ? CHAPTER_2_QUESTIONS : CHAPTER_1_QUESTIONS;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -336,26 +396,53 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
                 <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 w-full space-y-2">
                   <div className="font-semibold text-indigo-900 text-sm">Key Takeaways</div>
                   <ul className="text-sm text-indigo-800 space-y-1">
-                    <li className="flex items-start gap-2">
-                      <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <span>WIP limits prevent congestion and improve flow</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <span>Pull systems eliminate waste better than push</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <span>Adapt to constraints instead of ignoring them</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <span>Bottlenecks slow everything - fix the system, not the blame</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <span>Flow efficiency measures value-adding time vs. waiting</span>
-                    </li>
+                    {chapter === 2 ? (
+                      <>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>SHOULD, CAN, WILL - three levels of reliable planning</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Identify and remove constraints BEFORE committing</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>PPC measures promises kept, not total productivity</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Overcommitment destroys trust - say no to protect your promises</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Make Ready turns blocked tasks into Sound, executable work</span>
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>WIP limits prevent congestion and improve flow</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Pull systems eliminate waste better than push</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Adapt to constraints instead of ignoring them</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Bottlenecks slow everything - fix the system, not the blame</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Flow efficiency measures value-adding time vs. waiting</span>
+                        </li>
+                      </>
+                    )}
                   </ul>
                 </div>
 

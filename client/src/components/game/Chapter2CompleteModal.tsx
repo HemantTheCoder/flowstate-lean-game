@@ -2,17 +2,58 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
-import { CheckCircle, XCircle, AlertTriangle, Award, TrendingUp, Users, Target } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Award, TrendingUp, Users, Target, Lightbulb, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Chapter2CompleteModalProps {
     isOpen: boolean;
     onClose: () => void;
     onContinue: () => void;
+    quizScore?: number;
 }
 
-export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ isOpen, onClose, onContinue }) => {
+const DAY_INSIGHTS: Record<number, { title: string; concept: string; lesson: string; example: string }> = {
+    6: {
+        title: "The Planning Room",
+        concept: "Should / Can / Will",
+        lesson: "You learned the three levels of planning: what SHOULD happen, what CAN happen, and what WILL happen.",
+        example: "Real LPS projects use weekly planning meetings where foremen review the Lookahead and commit only to Sound tasks."
+    },
+    7: {
+        title: "Constraint Discovery",
+        concept: "Constraint Analysis",
+        lesson: "You identified hidden blockers that would have caused failures during execution.",
+        example: "On real sites, 30-50% of planned tasks have at least one constraint. Finding them early prevents costly delays."
+    },
+    8: {
+        title: "Making Work Ready",
+        concept: "Make Ready Process",
+        lesson: "You actively removed constraints to turn blocked tasks into Sound activities.",
+        example: "Make Ready meetings happen weekly. Planners call suppliers, coordinate crews, and chase approvals to ensure tasks are executable."
+    },
+    9: {
+        title: "The Weekly Promise",
+        concept: "Reliable Commitments",
+        lesson: "You made a commitment based on what you CAN do, not just what you SHOULD do.",
+        example: "Top-performing sites protect their commitments. When a client asks for extra work, they negotiate timelines rather than overcommitting."
+    },
+    10: {
+        title: "Execution Day",
+        concept: "Promise Keeping",
+        lesson: "You executed your plan. Sound tasks flow smoothly; unready tasks create chaos.",
+        example: "When Make Ready is done well, crews spend 70%+ of their time on value-adding work instead of searching, waiting, or improvising."
+    },
+    11: {
+        title: "PPC Review",
+        concept: "Percent Plan Complete",
+        lesson: "Your PPC was measured - the ratio of promises kept to promises made.",
+        example: "World-class construction projects maintain 80%+ PPC. Every broken promise is analyzed in a 'Reasons Analysis' to prevent repeat failures."
+    }
+};
+
+export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ isOpen, onClose, onContinue, quizScore }) => {
     const { funds, lpi, weeklyPlan, columns, flags } = useGameStore();
     const [animatedPPC, setAnimatedPPC] = useState(0);
+    const [expandedDay, setExpandedDay] = useState<number | null>(null);
 
     const doneTasks = columns.find(c => c.id === 'done')?.tasks || [];
     const completedPromises = doneTasks.filter(t => weeklyPlan.includes(t.id) || weeklyPlan.includes(t.originalId || '')).length;
@@ -56,10 +97,20 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
         return 'from-red-400 to-rose-600';
     };
 
+    const getPerformanceTier = () => {
+        if (ppc >= 90 && !overcommitted) return { title: "Master Planner", desc: "You promised carefully and delivered reliably. The crew trusts your word completely." };
+        if (ppc >= 80) return { title: "Reliable Leader", desc: "Strong planning with solid execution. Your team can depend on your commitments." };
+        if (ppc >= 60) return { title: "Growing Planner", desc: "Decent reliability with room for improvement. Focus on better constraint analysis." };
+        return { title: "Learning Planner", desc: "Overcommitment hurt your reliability. Next time, promise less and deliver more." };
+    };
+
+    const tier = getPerformanceTier();
+
     const badges = [];
     if (ppc >= 80) badges.push({ name: 'Promise Keeper', icon: <CheckCircle className="w-6 h-6" />, color: 'bg-green-500' });
     if (!overcommitted) badges.push({ name: 'Reliable Planner', icon: <Target className="w-6 h-6" />, color: 'bg-blue-500' });
     if (ppc === 100) badges.push({ name: 'Perfect Week', icon: <Award className="w-6 h-6" />, color: 'bg-yellow-500' });
+    if (quizScore !== undefined && quizScore >= 5) badges.push({ name: 'LPS Scholar', icon: <BookOpen className="w-6 h-6" />, color: 'bg-purple-500' });
 
     return (
         <AnimatePresence>
@@ -72,53 +123,40 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                         transition={{ type: "spring", bounce: 0.4 }}
                         className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden relative"
                     >
-                        {/* Header */}
                         <div className={`bg-gradient-to-r ${getPPCBg()} h-32 flex flex-col items-center justify-center relative overflow-hidden`}>
                             <h1 className="text-4xl font-black text-white z-10 drop-shadow-lg text-center">
-                                PPC Review
+                                Chapter 2 Complete
                             </h1>
-                            <p className="text-white/80 font-bold tracking-widest uppercase mt-1">Week 2 Complete</p>
+                            <p className="text-white/80 font-bold tracking-widest uppercase mt-1">{tier.title}</p>
                         </div>
 
-                        <div className="p-6 max-h-[70vh] overflow-y-auto">
-                            {/* PPC Gauge */}
-                            <div className="flex flex-col items-center mb-6">
-                                <div className="relative w-48 h-48">
-                                    <svg className="w-48 h-48 transform -rotate-90">
-                                        <circle
-                                            cx="96"
-                                            cy="96"
-                                            r="80"
-                                            stroke="#e5e7eb"
-                                            strokeWidth="16"
-                                            fill="none"
-                                        />
+                        <div className="p-6 max-h-[70vh] overflow-y-auto space-y-6">
+                            <div className="flex flex-col items-center">
+                                <div className="relative w-44 h-44">
+                                    <svg className="w-44 h-44 transform -rotate-90">
+                                        <circle cx="88" cy="88" r="74" stroke="#e5e7eb" strokeWidth="14" fill="none" />
                                         <motion.circle
-                                            cx="96"
-                                            cy="96"
-                                            r="80"
+                                            cx="88" cy="88" r="74"
                                             stroke={ppc >= 80 ? '#22c55e' : ppc >= 50 ? '#eab308' : '#ef4444'}
-                                            strokeWidth="16"
-                                            fill="none"
-                                            strokeLinecap="round"
-                                            strokeDasharray={502}
-                                            initial={{ strokeDashoffset: 502 }}
-                                            animate={{ strokeDashoffset: 502 - (502 * animatedPPC / 100) }}
+                                            strokeWidth="14" fill="none" strokeLinecap="round"
+                                            strokeDasharray={465}
+                                            initial={{ strokeDashoffset: 465 }}
+                                            animate={{ strokeDashoffset: 465 - (465 * animatedPPC / 100) }}
                                             transition={{ duration: 1.5, ease: "easeOut" }}
                                         />
                                     </svg>
                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span className={`text-5xl font-black ${getPPCColor()}`}>{animatedPPC}%</span>
+                                        <span className={`text-4xl font-black ${getPPCColor()}`}>{animatedPPC}%</span>
                                         <span className="text-slate-400 text-sm font-bold uppercase">PPC</span>
                                     </div>
                                 </div>
                                 <p className="text-slate-600 text-center mt-2">
                                     You promised <strong>{totalPromises}</strong> tasks and completed <strong>{completedPromises}</strong>.
                                 </p>
+                                <p className="text-slate-500 text-sm text-center mt-1 italic">{tier.desc}</p>
                             </div>
 
-                            {/* Result Message */}
-                            <div className={`p-4 rounded-xl mb-6 ${
+                            <div className={`p-4 rounded-xl ${
                                 ppcLevel === 'excellent' ? 'bg-green-50 border border-green-200' :
                                 ppcLevel === 'average' ? 'bg-yellow-50 border border-yellow-200' :
                                 'bg-red-50 border border-red-200'
@@ -128,7 +166,7 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                         <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
                                         <div>
                                             <h4 className="font-bold text-green-800">Excellent Reliability!</h4>
-                                            <p className="text-green-700 text-sm">You promised carefully and delivered reliably. The crew trusts your plans.</p>
+                                            <p className="text-green-700 text-sm">You promised carefully and delivered reliably. Every trade downstream can trust your schedule.</p>
                                         </div>
                                     </div>
                                 )}
@@ -137,7 +175,7 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                         <AlertTriangle className="w-6 h-6 text-yellow-500 flex-shrink-0 mt-0.5" />
                                         <div>
                                             <h4 className="font-bold text-yellow-800">Room for Improvement</h4>
-                                            <p className="text-yellow-700 text-sm">Some promises were broken. Were there hidden constraints you missed?</p>
+                                            <p className="text-yellow-700 text-sm">Some promises were broken. Analyze what went wrong - were there hidden constraints you missed during the Lookahead?</p>
                                         </div>
                                     </div>
                                 )}
@@ -146,28 +184,83 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                         <XCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
                                         <div>
                                             <h4 className="font-bold text-red-800">Trust Damaged</h4>
-                                            <p className="text-red-700 text-sm">More than half your promises were broken. Overcommitment destroys trust.</p>
+                                            <p className="text-red-700 text-sm">More than half your promises were broken. Overcommitment and insufficient Make Ready led to unreliable execution.</p>
                                         </div>
                                     </div>
                                 )}
                             </div>
 
-                            {/* Failure Analysis */}
                             {overcommitted && (
-                                <div className="bg-orange-50 border-l-4 border-orange-400 p-4 rounded-r-lg mb-6">
+                                <div className="bg-orange-50 border border-orange-200 p-4 rounded-xl">
                                     <h4 className="font-bold text-orange-800 text-sm uppercase mb-1 flex items-center gap-2">
                                         <AlertTriangle className="w-4 h-4" />
                                         Overcommitment Detected
                                     </h4>
                                     <p className="text-orange-700 text-sm">
-                                        You accepted extra work under client pressure. This increased your PPC denominator and made failure more likely.
+                                        You accepted extra work under client pressure. This increased your promise count and made failure more likely. In real projects, protecting your commitments is a sign of professionalism, not weakness.
                                     </p>
                                 </div>
                             )}
 
-                            {/* Badges */}
+                            {quizScore !== undefined && (
+                                <div className={`rounded-xl p-4 border ${quizScore >= 5 ? 'bg-green-50 border-green-200' : quizScore >= 3 ? 'bg-blue-50 border-blue-200' : 'bg-amber-50 border-amber-200'}`}>
+                                    <h4 className={`font-bold text-sm uppercase mb-2 flex items-center gap-2 ${quizScore >= 5 ? 'text-green-800' : quizScore >= 3 ? 'text-blue-800' : 'text-amber-800'}`}>
+                                        <Award className="w-4 h-4" /> Reflection Quiz: {quizScore}/5
+                                    </h4>
+                                    <p className={`text-sm ${quizScore >= 5 ? 'text-green-700' : quizScore >= 3 ? 'text-blue-700' : 'text-amber-700'}`}>
+                                        {quizScore >= 5 ? 'Perfect understanding of Last Planner System concepts!' : quizScore >= 3 ? 'Good grasp of LPS principles. Review the missed concepts.' : 'Consider replaying to strengthen your understanding of LPS.'}
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="space-y-2">
+                                <h4 className="font-bold text-slate-700 text-sm uppercase flex items-center gap-2">
+                                    <BookOpen className="w-4 h-4" /> Day-by-Day Breakdown
+                                </h4>
+                                {[6, 7, 8, 9, 10, 11].map(d => {
+                                    const insight = DAY_INSIGHTS[d];
+                                    const isExpanded = expandedDay === d;
+                                    return (
+                                        <div key={d} className="border border-slate-200 rounded-xl overflow-hidden">
+                                            <button
+                                                onClick={() => setExpandedDay(isExpanded ? null : d)}
+                                                className="w-full flex items-center justify-between p-3 hover:bg-slate-50 transition-colors text-left"
+                                                data-testid={`day-breakdown-${d}`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <span className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-black">{d}</span>
+                                                    <div>
+                                                        <span className="font-bold text-slate-800 text-sm">{insight.title}</span>
+                                                        <span className="text-slate-400 text-xs ml-2">{insight.concept}</span>
+                                                    </div>
+                                                </div>
+                                                {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                                            </button>
+                                            <AnimatePresence>
+                                                {isExpanded && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: 'auto', opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        className="border-t border-slate-100"
+                                                    >
+                                                        <div className="p-3 space-y-2">
+                                                            <p className="text-sm text-slate-700">{insight.lesson}</p>
+                                                            <div className="flex items-start gap-2 text-xs text-indigo-600 bg-indigo-50 rounded-lg p-2 border border-indigo-100">
+                                                                <Lightbulb className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                                                                <span className="italic">{insight.example}</span>
+                                                            </div>
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
                             {badges.length > 0 && (
-                                <div className="mb-6">
+                                <div>
                                     <h4 className="text-slate-700 font-bold text-sm uppercase mb-3">Badges Earned</h4>
                                     <div className="flex gap-3 flex-wrap">
                                         {badges.map((badge, i) => (
@@ -186,8 +279,7 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                 </div>
                             )}
 
-                            {/* Stats Grid */}
-                            <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                                     <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">
                                         <TrendingUp className="w-3 h-3" />
@@ -206,19 +298,45 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                 </div>
                             </div>
 
-                            {/* Learning Summary */}
-                            <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-6">
-                                <h4 className="font-bold text-blue-800 text-sm uppercase mb-2">Last Planner System Takeaways</h4>
-                                <ul className="text-blue-700 text-sm space-y-1">
-                                    <li>Planning is not promising. Remove constraints before committing.</li>
-                                    <li>PPC measures reliability, not productivity.</li>
-                                    <li>Overcommitment destroys trust. Say no to protect your promises.</li>
-                                </ul>
+                            <div className="bg-indigo-50 border border-indigo-200 p-4 rounded-xl">
+                                <h4 className="font-bold text-indigo-800 text-sm uppercase mb-3 flex items-center gap-2">
+                                    <Lightbulb className="w-4 h-4" /> Key Learnings
+                                </h4>
+                                <div className="space-y-3">
+                                    <div className="flex items-start gap-2">
+                                        <CheckCircle className="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <span className="font-bold text-indigo-800 text-sm">Planning is not promising.</span>
+                                            <p className="text-indigo-700 text-xs">A schedule says SHOULD. Only after removing constraints can you say WILL.</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <CheckCircle className="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <span className="font-bold text-indigo-800 text-sm">PPC measures reliability, not productivity.</span>
+                                            <p className="text-indigo-700 text-xs">Keeping 5 out of 5 promises (100% PPC) is better than keeping 7 out of 10 (70% PPC).</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <CheckCircle className="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <span className="font-bold text-indigo-800 text-sm">Overcommitment destroys trust.</span>
+                                            <p className="text-indigo-700 text-xs">Say no to protect your promises. A reliable "not yet" is better than a broken "yes".</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <CheckCircle className="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <span className="font-bold text-indigo-800 text-sm">Make Ready prevents failure.</span>
+                                            <p className="text-indigo-700 text-xs">Proactively removing constraints during planning prevents 80% of execution failures.</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <button
                                 onClick={handleContinue}
-                                className="w-full bg-blue-500 hover:bg-blue-600 text-white text-xl font-black py-4 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
+                                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xl font-black py-4 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
                                 data-testid="button-continue-chapter"
                             >
                                 Continue to Chapter 3

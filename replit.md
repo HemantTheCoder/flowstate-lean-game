@@ -82,15 +82,59 @@ This is a fullstack TypeScript application featuring:
 - advanceDay() now runs BEFORE showing DailySummary, ensuring accurate efficiency display
 - previousDoneCount delta calculation ensures correct task counting per day
 
-### Chapter 2: The Promise System (Last Planner System)
+### Chapter 2: The Promise System (Last Planner System) - PRESENTATION READY
 - Teaches Should/Can/Will planning workflow
 - Days 6-11 with constraint management and PPC review
-- Characters: Client, Old Foreman, Isha, Advisor (Dr. Lean)
+- Characters: Client, Old Foreman, Isha, Advisor (Dr. Lean), Mira, Rao, Inspector
 - Features: Planning Room UI, Constraint Removal, PPC Calculation, Badges
 - **Distinct Visual Design**: Purple/indigo theme differentiates from Chapter 1's blue theme
 - **Day Objective Banner**: Shows daily goals clearly at top of Planning Room
 - **Tutorial Timing**: Tutorial only shows after story dialogue ends on Day 6
 - **LPS Workflow Sidebar**: Visual progress tracker for SHOULD/CAN/WILL phases
+
+**Rich Dialogue Narratives** (Days 6-11):
+- Day 6: Planning Room introduction - SHOULD/CAN/WILL workflow explained
+- Day 7: Constraint discovery - Old Foreman reveals hidden blockers
+- Day 8: Make Ready process - Client pressure vs. proper preparation
+- Day 9: Commitment day - pressure to overcommit vs. reliable promises
+- Day 10: Execution day - Sound tasks flow smoothly
+- Day 11: PPC Review - Inspector evaluates promise reliability
+
+**Daily Summary Lean Lessons** (Days 6-11):
+- Each day has concept name, detailed explanation, and real construction example
+- Topics: Should/Can/Will, Constraints, Make Ready, Reliable Commitments, Execution, PPC
+
+**Phase Transition Screen**:
+- 3-step educational walkthrough when transitioning from Planning to Execution
+- Step 1: "Planning Phase Complete" - constraint removal summary
+- Step 2: "{N} Tasks Committed" - explains locked Weekly Work Plan promises
+- Step 3: "Execution Begins" - Kanban board instructions
+- Progress dots and animated transitions between steps
+
+**Reflection Quiz** (Chapter 2):
+- 5 multiple-choice questions: Should/Can/Will, Constraints, PPC, Overcommitment, Make Ready
+- Chapter-aware: different questions for Chapter 1 vs Chapter 2
+- Missed-question recap with correct answers and explanations
+- Chapter-specific Key Takeaways section
+
+**Chapter 2 Complete Modal**:
+- PPC gauge with animated fill (green/yellow/red based on score)
+- Performance tiers: Master Planner (90%+), Reliable Leader (80%+), Growing/Learning Planner
+- Day-by-day expandable breakdown (Days 6-11) with LPS concepts and real-world examples
+- Quiz score integration with contextual feedback
+- Overcommitment detection warning
+- Badges: Promise Keeper, Reliable Planner, Perfect Week, LPS Scholar
+- Key Learnings with 4 real-world construction insights
+- Budget and Morale stats display
+
+**Day 11 Flow**:
+- Day 11 dialogue -> End Day (amber "Finish Chapter" button) -> Daily Summary -> Quiz -> Chapter Complete
+- PPC calculated after quiz, not during dialogue
+
+**Glossary** (expanded):
+- 4 categories: Core Concepts, Flow States, Lean Principles, Last Planner System
+- 8 new LPS terms: LPS, Should/Can/Will, Constraint, Make Ready, Sound Activity, PPC, Weekly Work Plan, Reliable Promise
+- Total: 20+ terms with definitions and examples
 
 ## Project Structure
 

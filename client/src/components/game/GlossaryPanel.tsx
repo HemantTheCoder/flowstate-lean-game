@@ -90,6 +90,48 @@ const glossaryData: GlossaryCategory[] = [
       },
     ],
   },
+  {
+    category: 'Last Planner System',
+    terms: [
+      {
+        term: 'Last Planner System (LPS)',
+        definition: 'A production planning system that works backward from commitments. Plans are made at the last responsible moment by the people who will do the work.',
+        example: 'Instead of a PM dictating tasks, the foreman and crew plan what they WILL do based on what they CAN do.',
+      },
+      {
+        term: 'Should / Can / Will',
+        definition: 'Three levels of planning. SHOULD = Master Schedule (what needs to happen). CAN = Lookahead (what is possible after checking constraints). WILL = Weekly Work Plan (what you commit to deliver).',
+      },
+      {
+        term: 'Constraint',
+        definition: 'Any prerequisite or condition that prevents a task from being executed. Common types: material delivery, crew availability, design approvals, weather conditions.',
+        example: 'A task to install windows has a constraint if the window supplier hasn\'t delivered yet.',
+      },
+      {
+        term: 'Make Ready',
+        definition: 'The process of actively identifying and removing constraints so that tasks become "Sound" and executable. This happens during the Lookahead phase.',
+        example: 'Calling the supplier to confirm delivery, booking the crane, and briefing the crew are all Make Ready actions.',
+      },
+      {
+        term: 'Sound Activity',
+        definition: 'A task with ALL constraints removed. It is fully ready to execute - materials are on site, crew is available, approvals are granted, and prerequisites are complete.',
+      },
+      {
+        term: 'PPC (Percent Plan Complete)',
+        definition: 'The key metric of LPS reliability. PPC = (Tasks Completed / Tasks Promised) x 100. Measures how many promises were kept, not total productivity.',
+        example: 'If you promised 8 tasks and completed 6, your PPC is 75%. Target: 80%+.',
+      },
+      {
+        term: 'Weekly Work Plan',
+        definition: 'The set of tasks committed for the current week. Only Sound activities (green, no constraints) should be included. This is your PROMISE to the team.',
+      },
+      {
+        term: 'Reliable Promise',
+        definition: 'A commitment made only after verifying all prerequisites are met. Reliable promises build trust between trades, with clients, and within the team.',
+        example: 'Saying "I WILL finish the electrical rough-in by Friday" after confirming conduit is delivered, crew is scheduled, and walls are framed.',
+      },
+    ],
+  },
 ];
 
 export const GlossaryPanel = ({ isOpen, onClose }: GlossaryPanelProps) => {
