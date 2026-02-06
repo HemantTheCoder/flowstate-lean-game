@@ -73,12 +73,25 @@ export default function Game() {
   const { saveGame, gameState, isLoading: isServerLoading } = useGame();
   const [_, navigate] = useLocation();
 
-  // Redirect to chapters if character not created
+  // 1. Hydrate Store from Server on Load
+  const hydratedRef = React.useRef(false);
   useEffect(() => {
+    if (gameState && !hydratedRef.current) {
+      importState(gameState);
+      setFlag('hydrated', true);
+      hydratedRef.current = true;
+    }
+  }, [gameState, importState, setFlag]);
+
+  // Redirect to chapters if character not created
+  // Must wait for server load + hydration to complete before checking
+  useEffect(() => {
+    if (isServerLoading) return;
+    if (gameState && !hydratedRef.current) return;
     if (!flags['character_created']) {
       navigate('/chapters');
     }
-  }, [flags, navigate]);
+  }, [flags, navigate, isServerLoading, gameState]);
 
   const handleChapterContinue = async () => {
     try {
@@ -101,22 +114,6 @@ export default function Game() {
       console.error("Transition Error:", e);
     }
   };
-
-  // 1. Hydrate Store from Server on Load
-  const hydratedRef = React.useRef(false);
-  useEffect(() => {
-    if (gameState && !hydratedRef.current) {
-      // Logic Check: If loaded state claims Day 5+ but flag says we are new, trust server.
-      // BUT if we want to FORCE new game behavior when requested...
-      // The issue user reported: "skips name/story -> goes to construction complete".
-      // This implies `chapter` or `day` is loaded as High Value.
-      // Or `character_created` flag is missing but other things are present.
-
-      importState(gameState);
-      setFlag('hydrated', true);
-      hydratedRef.current = true;
-    }
-  }, [gameState, importState, setFlag]);
 
   // Audio Control Loop
   const audioSettings = useGameStore(s => s.audioSettings);
@@ -158,7 +155,17 @@ export default function Game() {
           budget: state.funds,
           materials: state.materials
         },
-        kanbanState: { columns: state.columns } as any,
+        kanbanState: {
+          columns: state.columns,
+          day: state.day,
+          tutorialActive: state.tutorialActive,
+          tutorialStep: state.tutorialStep,
+          dailyMetrics: state.dailyMetrics,
+          previousDoneCount: state.previousDoneCount,
+          previousWasteCount: state.previousWasteCount,
+          cumulativeTasksCompleted: state.cumulativeTasksCompleted,
+          cumulativePotentialCapacity: state.cumulativePotentialCapacity,
+        } as any,
         flags: state.flags,
         metrics: { ...state.lpi, ppcHistory: state.ppcHistory },
         weeklyPlan: state.weeklyPlan,

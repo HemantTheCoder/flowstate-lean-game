@@ -664,28 +664,34 @@ export const useGameStore = create<GameState>((set, get) => ({
     };
   }),
 
-  importState: (data: any) => set((state) => ({
-    chapter: data.chapter ?? state.chapter,
-    unlockedChapters: data.completedChapters
-      ? [1, ...data.completedChapters.map((c: number) => c + 1)]
-      : [1],
-    day: data.day ?? state.day,
-    week: data.week ?? state.week,
-    playerName: data.playerName ?? state.playerName,
-    playerGender: data.playerGender ?? state.playerGender,
-    funds: data.resources?.budget ?? state.funds,
-    materials: data.resources?.materials ?? data.materials ?? state.materials,
-    flags: data.flags ?? state.flags,
-    columns: data.kanbanState?.columns ?? state.columns,
-    lpi: data.metrics ?? state.lpi,
-    ppcHistory: (data.metrics?.ppcHistory as any) ?? state.ppcHistory,
-    weeklyPlan: data.weeklyPlan ?? state.weeklyPlan,
-    previousDoneCount: data.previousDoneCount ?? 0,
-    previousWasteCount: data.previousWasteCount ?? 0,
-    cumulativeTasksCompleted: data.cumulativeTasksCompleted ?? 0,
-    cumulativePotentialCapacity: data.cumulativePotentialCapacity ?? 0,
-    dailyMetrics: data.dailyMetrics ?? state.dailyMetrics,
-  })),
+  importState: (data: any) => set((state) => {
+    const ks = data.kanbanState || {};
+    const restoredDay = ks.day ?? data.day ?? state.day;
+    return {
+      chapter: data.chapter ?? state.chapter,
+      unlockedChapters: data.completedChapters
+        ? [1, ...data.completedChapters.map((c: number) => c + 1)]
+        : [1],
+      day: restoredDay,
+      week: data.week ?? state.week,
+      playerName: data.playerName ?? state.playerName,
+      playerGender: data.playerGender ?? state.playerGender,
+      funds: data.resources?.budget ?? state.funds,
+      materials: data.resources?.materials ?? data.materials ?? state.materials,
+      flags: data.flags ?? state.flags,
+      columns: ks.columns ?? state.columns,
+      lpi: data.metrics ?? state.lpi,
+      ppcHistory: (data.metrics?.ppcHistory as any) ?? state.ppcHistory,
+      weeklyPlan: data.weeklyPlan ?? state.weeklyPlan,
+      previousDoneCount: ks.previousDoneCount ?? data.previousDoneCount ?? 0,
+      previousWasteCount: ks.previousWasteCount ?? data.previousWasteCount ?? 0,
+      cumulativeTasksCompleted: ks.cumulativeTasksCompleted ?? data.cumulativeTasksCompleted ?? 0,
+      cumulativePotentialCapacity: ks.cumulativePotentialCapacity ?? data.cumulativePotentialCapacity ?? 0,
+      dailyMetrics: ks.dailyMetrics ?? data.dailyMetrics ?? state.dailyMetrics,
+      tutorialActive: ks.tutorialActive ?? (restoredDay > 1 ? false : true),
+      tutorialStep: ks.tutorialStep ?? (restoredDay > 1 ? 99 : 0),
+    };
+  }),
 
   // Chapter 2 Actions
   removeConstraint: (taskId, constraint) => set((state) => {
