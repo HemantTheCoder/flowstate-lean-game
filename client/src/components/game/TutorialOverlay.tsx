@@ -150,15 +150,14 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                     </>
                 )}
 
-                {/* Step 5: WIP Slider Explanation */}
-                {tutorialStep === 5 && showKanban && spotlightPos && (
+                {/* Step 5: WIP Slider Explanation - centered on screen */}
+                {tutorialStep === 5 && showKanban && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                        style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x }}
-                        className="absolute z-[90] w-80 pointer-events-auto"
+                        className="fixed z-[90] w-80 pointer-events-auto"
+                        style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                     >
                         <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-cyan-500 relative">
-                            <div className="absolute -top-3 left-6 w-6 h-6 bg-white border-t-4 border-l-4 border-cyan-500 transform rotate-45"></div>
                             <h3 className="font-black text-cyan-600 text-lg mb-1 flex items-center gap-2">
                                 <Gauge className="w-5 h-5" /> WIP Limit Slider
                             </h3>
