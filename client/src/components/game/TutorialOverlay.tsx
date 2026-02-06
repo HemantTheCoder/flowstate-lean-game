@@ -152,10 +152,10 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
 
                 {/* Step 5: WIP Slider Explanation - centered on screen */}
                 {tutorialStep === 5 && showKanban && (
+                    <div className="absolute inset-0 flex items-center justify-center z-[90] pointer-events-none">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                        className="fixed z-[90] w-80 pointer-events-auto"
-                        style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                        className="w-80 pointer-events-auto"
                     >
                         <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-cyan-500 relative">
                             <h3 className="font-black text-cyan-600 text-lg mb-1 flex items-center gap-2">
@@ -187,6 +187,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                             </button>
                         </div>
                     </motion.div>
+                    </div>
                 )}
 
                 {/* Step 6: Smart Advisor Spotlight */}
