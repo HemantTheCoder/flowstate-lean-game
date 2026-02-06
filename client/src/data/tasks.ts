@@ -43,6 +43,26 @@ export const CONSTRUCTION_TASKS: TaskType[] = [
     { id: 'prep_6', title: 'Team Stretching', description: 'Morning warm-up for safety.', type: 'Management', cost: 0, reward: 50, difficulty: 1, leanTip: 'Respect for people.' }
 ];
 
+export const CHAPTER_2_TASKS: TaskType[] = [
+    { id: 'ch2_struct_1', title: 'Mall Entrance Canopy', description: 'Install steel and glass canopy structure over main entrance.', type: 'Structural', cost: 120, reward: 3800, difficulty: 4, leanTip: 'Complex assemblies need all prerequisites cleared before starting.', constraints: ['material', 'approval'] },
+    { id: 'ch2_struct_2', title: 'Parking Deck Ramp', description: 'Pour concrete ramp connecting parking levels.', type: 'Structural', cost: 100, reward: 3200, difficulty: 4, leanTip: 'Concrete pours are time-critical - crew readiness is essential.', constraints: ['crew'] },
+    { id: 'ch2_struct_3', title: 'Escalator Pit Prep', description: 'Excavate and form escalator machine room pit.', type: 'Structural', cost: 80, reward: 2600, difficulty: 3, leanTip: 'Equipment foundations require precise tolerances - no rework allowed.' },
+    { id: 'ch2_struct_4', title: 'Loading Dock Frame', description: 'Erect steel frame for rear loading dock area.', type: 'Structural', cost: 90, reward: 2800, difficulty: 3, leanTip: 'Sequencing steel erection prevents trade stacking.', constraints: ['weather'] },
+    { id: 'ch2_struct_5', title: 'Food Court Slab', description: 'Pour reinforced concrete slab for food court area.', type: 'Structural', cost: 110, reward: 3500, difficulty: 4, leanTip: 'Slab-on-grade needs soil compaction verified first.', constraints: ['material'] },
+    { id: 'ch2_sys_1', title: 'Elevator Shaft Wiring', description: 'Run power and control cables for passenger elevators.', type: 'Systems', cost: 55, reward: 2200, difficulty: 3, leanTip: 'Elevator work is on the critical path - delays cascade everywhere.', constraints: ['approval'] },
+    { id: 'ch2_sys_2', title: 'Sprinkler Main Loop', description: 'Install main fire suppression loop for all floors.', type: 'Systems', cost: 65, reward: 2400, difficulty: 3, leanTip: 'Fire safety systems need inspection approvals before walls close.' },
+    { id: 'ch2_sys_3', title: 'Chiller Plant Hookup', description: 'Connect central HVAC chiller to distribution system.', type: 'Systems', cost: 70, reward: 2600, difficulty: 4, leanTip: 'Mechanical equipment needs tested before handover.', constraints: ['crew', 'material'] },
+    { id: 'ch2_sys_4', title: 'Security System Rough-in', description: 'Install conduit and wiring for CCTV and access control.', type: 'Systems', cost: 35, reward: 1600, difficulty: 2, leanTip: 'Low-voltage systems are often forgotten until too late.' },
+    { id: 'ch2_int_1', title: 'Retail Storefront Glass', description: 'Install frameless glass facades for anchor tenant spaces.', type: 'Interior', cost: 85, reward: 3000, difficulty: 3, leanTip: 'Glass installation requires clean, controlled environment.', constraints: ['material'] },
+    { id: 'ch2_int_2', title: 'Food Court Tiling', description: 'Lay anti-slip ceramic tiles in food court service area.', type: 'Interior', cost: 40, reward: 1400, difficulty: 2, leanTip: 'Floor finishes must follow MEP rough-in completion.' },
+    { id: 'ch2_int_3', title: 'Mall Signage Install', description: 'Mount wayfinding signs and tenant directory boards.', type: 'Interior', cost: 25, reward: 900, difficulty: 1, leanTip: 'Signage installation is a downstream task - keep it for last.' },
+    { id: 'ch2_int_4', title: 'Washroom Fit-out', description: 'Install public washroom fixtures, partitions and mirrors.', type: 'Interior', cost: 45, reward: 1800, difficulty: 2, leanTip: 'Washrooms have many trades overlapping - coordination is key.', constraints: ['crew'] },
+    { id: 'ch2_int_5', title: 'Ceiling Grid Install', description: 'Hang suspended ceiling grid and acoustic tiles.', type: 'Interior', cost: 30, reward: 1200, difficulty: 2, leanTip: 'Ceiling work must wait for above-ceiling MEP to be inspected.' },
+    { id: 'ch2_mgmt_1', title: 'Permit Coordination', description: 'Coordinate with city inspectors for occupancy permits.', type: 'Management', cost: 0, reward: 400, difficulty: 2, leanTip: 'Proactive permit coordination prevents schedule delays.' },
+    { id: 'ch2_mgmt_2', title: 'Subcontractor Alignment', description: 'Hold coordination meeting with all active subcontractors.', type: 'Management', cost: 0, reward: 350, difficulty: 1, leanTip: 'Weekly coordination meetings are the heartbeat of LPS.' },
+    { id: 'ch2_mgmt_3', title: 'Material Staging Plan', description: 'Organize laydown area and material delivery sequence.', type: 'Management', cost: 0, reward: 300, difficulty: 1, leanTip: 'Just-in-time material delivery reduces site congestion.' },
+];
+
 export const getRandomTask = (): TaskType => {
     return CONSTRUCTION_TASKS[Math.floor(Math.random() * CONSTRUCTION_TASKS.length)];
 };

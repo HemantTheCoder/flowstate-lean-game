@@ -83,14 +83,30 @@ This is a fullstack TypeScript application featuring:
 - previousDoneCount delta calculation ensures correct task counting per day
 
 ### Chapter 2: The Promise System (Last Planner System) - PRESENTATION READY
-- Teaches Should/Can/Will planning workflow
-- Days 6-11 with constraint management and PPC review
+- Teaches Should/Can/Will planning workflow via day-gated interactions
+- Days 6-11 with progressive capability unlocking and events
+- 17 construction-specific tasks (CHAPTER_2_TASKS array) with diverse constraints
 - Characters: Client, Old Foreman, Isha, Advisor (Dr. Lean), Mira, Rao, Inspector
 - Features: Planning Room UI, Constraint Removal, PPC Calculation, Badges
 - **Distinct Visual Design**: Purple/indigo theme differentiates from Chapter 1's blue theme
 - **Day Objective Banner**: Shows daily goals clearly at top of Planning Room
 - **Tutorial Timing**: Tutorial only shows after story dialogue ends on Day 6
 - **LPS Workflow Sidebar**: Visual progress tracker for SHOULD/CAN/WILL phases
+- **Lookahead WIP**: 8 tasks, Doing WIP: 4, Starting funds: $3500, materials: 500
+
+**Day-Gated Planning (Progressive Unlocking)**:
+- Day 6: Pull tasks ONLY (canPullTasks). Constraints hidden. End Day requires 3+ tasks in Lookahead.
+- Day 7: Constraints revealed (canInspectConstraints). Must click all RED tasks to discover blockers. End Day requires all blocked tasks inspected.
+- Day 8: Fix constraints enabled (canFixConstraints). applyDayEvent(8) adds NEW constraints to 2 sound tasks. Teaches Make Ready with cost/morale tradeoffs.
+- Day 9: Commit unlocked (canCommit). Must click 'Start Week' before End Day. GREEN tasks become promises.
+- Day 10: Execution phase. Emergency Pipe Repair task injected via applyDayEvent(10). Kanban board with committed tasks.
+- Day 11: Final execution. Crew constraint added to active task via applyDayEvent(11). Finish Chapter button.
+
+**Event System (applyDayEvent)**:
+- Day 8: Adds weather/crew constraints to unconstrained Lookahead tasks (complications)
+- Day 10: Injects 'Emergency Pipe Repair' task into Ready column
+- Day 11: Adds crew constraint to first task in Doing column
+- Event banners with dismissible notifications explain LPS lessons
 
 **Rich Dialogue Narratives** (Days 6-11):
 - Day 6: Planning Room introduction - SHOULD/CAN/WILL workflow explained

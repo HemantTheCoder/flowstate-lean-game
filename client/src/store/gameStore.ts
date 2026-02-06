@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { getRandomTask, TaskType, CONSTRUCTION_TASKS } from '@/data/tasks';
+import { getRandomTask, TaskType, CONSTRUCTION_TASKS, CHAPTER_2_TASKS } from '@/data/tasks';
 
 export interface DialogueLine {
   character: string;
@@ -138,6 +138,8 @@ export interface GameState {
   commitPlan: (taskIds: string[]) => void;
   enterPlanningPhase: () => void;
   calculatePPC: () => number;
+  applyDayEvent: (day: number) => void;
+  addConstraintsToRandomTasks: (count: number, constraintType: ConstraintType) => void;
   // Generic Task Update (for events)
   updateTask: (taskId: string, updates: Partial<Task>) => void;
 }
@@ -236,18 +238,18 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     if (chapter === 2) {
-      const chapter2Tasks: Task[] = CONSTRUCTION_TASKS.slice(0, 10).map(t => ({
+      const chapter2Tasks: Task[] = CHAPTER_2_TASKS.map(t => ({
         ...t,
         id: uuidv4(),
         status: 'backlog' as const,
         originalId: t.id,
-        constraints: t.constraints || []
+        constraints: t.constraints ? [...t.constraints] : []
       }));
 
       const chapter2Columns: Column[] = [
         { id: 'backlog', title: 'Master Schedule', tasks: chapter2Tasks, wipLimit: 0 },
-        { id: 'ready', title: 'Lookahead', tasks: [], wipLimit: 5 },
-        { id: 'doing', title: 'Doing', tasks: [], wipLimit: 3 },
+        { id: 'ready', title: 'Lookahead', tasks: [], wipLimit: 8 },
+        { id: 'doing', title: 'Doing', tasks: [], wipLimit: 4 },
         { id: 'done', title: 'Done', tasks: [], wipLimit: 0 },
       ];
 
@@ -257,8 +259,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         week: 2,
         phase: 'planning',
         columns: chapter2Columns,
-        funds: 3000,
-        materials: 400,
+        funds: 3500,
+        materials: 500,
         dailyMetrics: [],
         previousDoneCount: 0,
         previousWasteCount: 0,
@@ -716,14 +718,128 @@ export const useGameStore = create<GameState>((set, get) => ({
     };
   }),
 
-  commitPlan: (taskIds) => set((state) => ({
-    weeklyPlan: taskIds,
-    phase: 'action', // Start the week!
-    // Move committed tasks to Ready if not there (Drag and Drop handles this visually, but store ensures)
-    // For now, we assume UI put them in Ready/Lookahead column.
-  })),
+  commitPlan: (taskIds) => set((state) => {
+    const readyCol = state.columns.find(c => c.id === 'ready');
+    const backlogCol = state.columns.find(c => c.id === 'backlog');
+    const committedTasks = readyCol?.tasks.filter(t => taskIds.includes(t.id)) || [];
+    const uncommittedReady = readyCol?.tasks.filter(t => !taskIds.includes(t.id)) || [];
+
+    return {
+      weeklyPlan: taskIds,
+      phase: 'action',
+      columns: state.columns.map(col => {
+        if (col.id === 'ready') {
+          return { ...col, tasks: committedTasks };
+        }
+        if (col.id === 'backlog') {
+          return { ...col, tasks: [...(backlogCol?.tasks || []), ...uncommittedReady] };
+        }
+        return col;
+      })
+    };
+  }),
 
   enterPlanningPhase: () => set({ phase: 'planning' }),
+
+  applyDayEvent: (day: number) => set((state) => {
+    if (state.chapter !== 2) return {};
+
+    if (day === 8) {
+      const readyTasks = state.columns.find(c => c.id === 'ready')?.tasks || [];
+      const unconstrained = readyTasks.filter(t => (t.constraints?.length || 0) === 0);
+      const toAdd = unconstrained.slice(0, 2);
+      if (toAdd.length === 0) return {};
+
+      return {
+        columns: state.columns.map(col => {
+          if (col.id === 'ready') {
+            return {
+              ...col,
+              tasks: col.tasks.map(t => {
+                if (toAdd.some(a => a.id === t.id)) {
+                  const newConstraint: ConstraintType = t.type === 'Structural' ? 'weather' : 'crew';
+                  return { ...t, constraints: [...(t.constraints || []), newConstraint] };
+                }
+                return t;
+              })
+            };
+          }
+          return col;
+        })
+      };
+    }
+
+    if (day === 10) {
+      const emergencyTask: Task = {
+        id: `emergency-${Date.now()}`,
+        title: 'Emergency Pipe Repair',
+        description: 'A burst water main threatens the food court area. Immediate repair needed!',
+        type: 'Systems',
+        cost: 30,
+        reward: 1500,
+        status: 'ready',
+        difficulty: 3,
+        leanTip: 'Unplanned work disrupts flow - this is why reliable planning matters.',
+      };
+
+      return {
+        columns: state.columns.map(col => {
+          if (col.id === 'ready') {
+            return { ...col, tasks: [...col.tasks, emergencyTask] };
+          }
+          return col;
+        })
+      };
+    }
+
+    if (day === 11) {
+      const doingTasks = state.columns.find(c => c.id === 'doing')?.tasks || [];
+      if (doingTasks.length > 0) {
+        const targetTask = doingTasks[0];
+        return {
+          columns: state.columns.map(col => {
+            if (col.id === 'doing') {
+              return {
+                ...col,
+                tasks: col.tasks.map(t =>
+                  t.id === targetTask.id
+                    ? { ...t, constraints: [...(t.constraints || []), 'crew' as ConstraintType] }
+                    : t
+                )
+              };
+            }
+            return col;
+          })
+        };
+      }
+    }
+
+    return {};
+  }),
+
+  addConstraintsToRandomTasks: (count: number, constraintType: ConstraintType) => set((state) => {
+    const readyTasks = state.columns.find(c => c.id === 'ready')?.tasks || [];
+    const unconstrained = readyTasks.filter(t => (t.constraints?.length || 0) === 0);
+    const targets = unconstrained.slice(0, count);
+    if (targets.length === 0) return {};
+
+    return {
+      columns: state.columns.map(col => {
+        if (col.id === 'ready') {
+          return {
+            ...col,
+            tasks: col.tasks.map(t => {
+              if (targets.some(tgt => tgt.id === t.id)) {
+                return { ...t, constraints: [...(t.constraints || []), constraintType] };
+              }
+              return t;
+            })
+          };
+        }
+        return col;
+      })
+    };
+  }),
 
   calculatePPC: () => {
     const state = get();

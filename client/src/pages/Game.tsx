@@ -244,6 +244,21 @@ export default function Game() {
       if (dayConfig.event === 'client_pressure' && chapter === 2) {
         setTimeout(() => triggerClientPressureDecision(), 1000);
       }
+
+      // Day 10: Emergency pipe repair injection
+      if (day === 10 && chapter === 2) {
+        setTimeout(() => {
+          useGameStore.getState().applyDayEvent(10);
+        }, 2000);
+      }
+
+      // Day 11: Crew constraint on active task
+      if (day === 11 && chapter === 2) {
+        setTimeout(() => {
+          useGameStore.getState().applyDayEvent(11);
+        }, 2000);
+      }
+
       // Day 11 inspection: Don't auto-show chapter complete here.
       // The flow is: Day 11 dialogue -> End Day -> Summary -> Quiz -> Chapter Complete
 
@@ -409,6 +424,10 @@ export default function Game() {
       return;
     }
 
+    if (chapter === 2 && currentDay >= 6 && currentDay <= 9) {
+      return;
+    }
+
     useGameStore.getState().addDailyTasks(3, currentDay);
   };
 
@@ -448,43 +467,58 @@ export default function Game() {
       if (day === 6) {
         if (isPlanning) {
           const lookaheadCount = ready?.tasks.length || 0;
-          if (lookaheadCount < 3) return "Day 6: Pull 3-4 tasks from Master Schedule to Lookahead Window.";
-          const hasRed = ready?.tasks.some(t => (t.constraints?.length || 0) > 0);
-          if (hasRed) return "Good! Tasks in Lookahead. Notice the RED constraints? Those block execution.";
-          return "Tasks are green! You're ready to learn about constraints tomorrow.";
+          if (lookaheadCount < 3) return "Day 6: Pull 4-6 tasks from Master Schedule to Lookahead. You cannot fix constraints yet - just review what's available.";
+          if (lookaheadCount < 6) return "Good start! Pull a few more tasks to give yourself options. Constraints are hidden today - you'll discover them tomorrow.";
+          return "Lookahead is filling up! End Day when you've pulled enough tasks to plan around.";
         }
         return "Planning Room is open. Review your Master Schedule and Lookahead.";
       }
       if (day === 7) {
         if (isPlanning) {
-          return "Day 7: Click each RED task in Lookahead. Identify what's blocking them.";
+          const blockedTasks = ready?.tasks.filter(t => (t.constraints?.length || 0) > 0) || [];
+          const allInspected = blockedTasks.every(t => state.flags[`inspected_${t.id}`]);
+          if (blockedTasks.length > 0 && !allInspected) return "Day 7: Click each RED task in Lookahead to DISCOVER its constraints. You must inspect all blocked tasks before moving on.";
+          if (allInspected) return "All constraints discovered! You now understand what's blocking your tasks. End Day to start fixing them tomorrow.";
+          return "No blocked tasks found. You can End Day and move to the Make Ready phase.";
         }
         return "Constraint Discovery: Find all the blockers before trying to fix them.";
       }
       if (day === 8) {
         if (isPlanning) {
           const greenCount = ready?.tasks.filter(t => (t.constraints?.length || 0) === 0).length || 0;
-          if (greenCount < 2) return "Day 8: Click 'Fix' on constraints to make tasks GREEN (Sound).";
-          return "Tasks are becoming Sound! Keep fixing constraints or End Day.";
+          const totalInLookahead = ready?.tasks.length || 0;
+          if (greenCount < 2) return "Day 8: Make Ready! Click 'Fix' on constraints to turn RED tasks GREEN. Each fix costs budget or morale - choose wisely!";
+          if (greenCount < totalInLookahead) return `${greenCount}/${totalInLookahead} tasks are Sound. Keep fixing or pull new tasks. You can also End Day.`;
+          return "All tasks are Sound! You're ready for tomorrow's commitment. End Day.";
         }
         return "Make Ready: Remove blockers so tasks can flow.";
       }
       if (day === 9) {
         if (isPlanning) {
           const greenCount = ready?.tasks.filter(t => (t.constraints?.length || 0) === 0).length || 0;
-          if (greenCount === 0) return "Day 9: You need GREEN tasks to commit! Fix more constraints.";
-          return "Day 9: Click 'Start Week' to COMMIT your GREEN tasks. Only promise what you CAN do!";
+          if (greenCount === 0) return "Day 9: You need GREEN tasks to commit! Fix remaining constraints or pull easier tasks.";
+          return `Day 9: ${greenCount} Sound tasks ready. Click 'Start Week' to COMMIT your promises. Only promise what you CAN deliver!`;
         }
         return "Commitment Day: Lock in your Weekly Work Plan.";
       }
       if (day === 10) {
-        if (isPlanning) return "Planning complete. The week's execution begins!";
-        if (doingCount > 0) return "Day 10: Execute! Complete the tasks you committed to.";
+        const doneTasks = state.columns.find(c => c.id === 'done')?.tasks || [];
         const weeklyPlanCount = state.weeklyPlan.length;
-        const doneFromPlan = doing?.tasks.filter(t => state.weeklyPlan.includes(t.id)).length || 0;
-        return `Day 10: Execution Day - ${doneFromPlan}/${weeklyPlanCount} committed tasks in progress.`;
+        const doneFromPlan = doneTasks.filter(t => state.weeklyPlan.includes(t.id) || state.weeklyPlan.includes(t.originalId || '')).length;
+        if (doingCount >= doingLimit) return "WIP limit reached! Finish active tasks before pulling more. Every completed promise improves your PPC.";
+        if (doingCount > 0) return `Day 10: Execute! ${doneFromPlan}/${weeklyPlanCount} promises kept. Keep tasks flowing through Doing to Done.`;
+        if (readyCount > 0) return `Day 10: Pull tasks from Ready to Doing. You have ${readyCount} tasks waiting. Complete them to keep your promises!`;
+        if (doneFromPlan >= weeklyPlanCount) return "All promises kept! Click 'End Day' to see your progress.";
+        return `Day 10: Execution Day - ${doneFromPlan}/${weeklyPlanCount} committed tasks completed. Move tasks to finish your promises!`;
       }
-      if (day === 11) return "Day 11: PPC Review. Click 'Finish Chapter' to see your results!";
+      if (day === 11) {
+        const doneTasks = state.columns.find(c => c.id === 'done')?.tasks || [];
+        const weeklyPlanCount = state.weeklyPlan.length;
+        const doneFromPlan = doneTasks.filter(t => state.weeklyPlan.includes(t.id) || state.weeklyPlan.includes(t.originalId || '')).length;
+        if (doingCount > 0) return `Day 11: Final push! Finish remaining tasks before the PPC Review. ${doneFromPlan}/${weeklyPlanCount} promises kept.`;
+        if (readyCount > 0) return `Day 11: Last chance to complete your commitments! ${readyCount} tasks still in Ready.`;
+        return "Day 11: PPC Review time! Click 'Finish Chapter' to see how reliable your promises were.";
+      }
     }
 
     // 0. NARRATIVE SPECIFIC ADVICE & "END DAY" TRIGGERS
