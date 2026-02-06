@@ -158,6 +158,7 @@ export default function Game() {
         kanbanState: {
           columns: state.columns,
           day: state.day,
+          playerGender: state.playerGender,
           tutorialActive: state.tutorialActive,
           tutorialStep: state.tutorialStep,
           dailyMetrics: state.dailyMetrics,

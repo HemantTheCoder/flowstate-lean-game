@@ -675,7 +675,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       day: restoredDay,
       week: data.week ?? state.week,
       playerName: data.playerName ?? state.playerName,
-      playerGender: data.playerGender ?? state.playerGender,
+      playerGender: ks.playerGender ?? data.playerGender ?? state.playerGender,
       funds: data.resources?.budget ?? state.funds,
       materials: data.resources?.materials ?? data.materials ?? state.materials,
       flags: data.flags ?? state.flags,
