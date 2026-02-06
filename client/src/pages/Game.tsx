@@ -200,14 +200,8 @@ export default function Game() {
           setFlag('decision_retry_seen', true);
           triggerRetryDecision();
         } else if (!flags['decision_push_made']) {
-          // Good Outcome -> Chapter Complete!
-          // Good Outcome -> Chapter Complete!
-          setTimeout(() => {
-            setShowKanban(false);
-            setShowSummary(false);
-            setShowDecision(false);
-            setShowChapterComplete(true);
-          }, 1000);
+          // Good Outcome -> Don't skip to chapter complete here
+          // Let the normal flow handle it: End Day -> Summary -> Quiz -> Chapter Complete
         }
       }
     }

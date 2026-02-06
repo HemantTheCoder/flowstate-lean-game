@@ -488,12 +488,12 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         <CharacterReactions pushed={pushed} efficiency={finalEfficiency} />
 
                                         {quizScore !== undefined && (
-                                            <div className={`rounded-xl p-4 border ${quizScore === 3 ? 'bg-green-50 border-green-200' : quizScore >= 2 ? 'bg-blue-50 border-blue-200' : 'bg-amber-50 border-amber-200'}`}>
-                                                <h4 className={`font-bold text-sm uppercase mb-2 flex items-center gap-2 ${quizScore === 3 ? 'text-green-800' : quizScore >= 2 ? 'text-blue-800' : 'text-amber-800'}`}>
-                                                    <Award className="w-4 h-4" /> Reflection Quiz: {quizScore}/3
+                                            <div className={`rounded-xl p-4 border ${quizScore >= 5 ? 'bg-green-50 border-green-200' : quizScore >= 3 ? 'bg-blue-50 border-blue-200' : 'bg-amber-50 border-amber-200'}`}>
+                                                <h4 className={`font-bold text-sm uppercase mb-2 flex items-center gap-2 ${quizScore >= 5 ? 'text-green-800' : quizScore >= 3 ? 'text-blue-800' : 'text-amber-800'}`}>
+                                                    <Award className="w-4 h-4" /> Reflection Quiz: {quizScore}/5
                                                 </h4>
-                                                <p className={`text-sm ${quizScore === 3 ? 'text-green-700' : quizScore >= 2 ? 'text-blue-700' : 'text-amber-700'}`}>
-                                                    {quizScore === 3 ? 'Perfect understanding of Lean concepts!' : quizScore >= 2 ? 'Good grasp of core principles. Review the missed concept.' : 'Consider replaying to strengthen your understanding.'}
+                                                <p className={`text-sm ${quizScore >= 5 ? 'text-green-700' : quizScore >= 3 ? 'text-blue-700' : 'text-amber-700'}`}>
+                                                    {quizScore >= 5 ? 'Perfect understanding of Lean concepts!' : quizScore >= 3 ? 'Good grasp of core principles. Review the missed concepts.' : 'Consider replaying to strengthen your understanding.'}
                                                 </p>
                                             </div>
                                         )}
