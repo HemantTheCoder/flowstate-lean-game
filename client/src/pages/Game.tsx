@@ -721,11 +721,11 @@ export default function Game() {
           completedTasks={completedToday}
         />
 
-        <GlossaryPanel isOpen={showGlossary} onClose={() => setShowGlossary(false)} />
-
         <ReflectionQuiz isOpen={showQuiz} onComplete={handleQuizComplete} />
 
       </div >
+
+      <GlossaryPanel isOpen={showGlossary} onClose={() => setShowGlossary(false)} />
 
       <TransitionScreen
         isOpen={showTransition}

@@ -113,7 +113,7 @@ export const GlossaryPanel = ({ isOpen, onClose }: GlossaryPanelProps) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-sm"
           />
 
           <motion.div
@@ -122,7 +122,7 @@ export const GlossaryPanel = ({ isOpen, onClose }: GlossaryPanelProps) => {
             exit={{ x: 500, opacity: 0 }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             data-testid="panel-glossary"
-            className="fixed right-0 top-0 h-screen w-full max-w-md z-50 bg-white rounded-l-3xl shadow-2xl flex flex-col"
+            className="fixed right-0 top-0 h-screen w-full max-w-md z-[301] bg-white rounded-l-3xl shadow-2xl flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-slate-100">
