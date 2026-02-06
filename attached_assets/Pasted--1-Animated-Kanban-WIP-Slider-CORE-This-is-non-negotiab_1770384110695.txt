@@ -1,0 +1,172 @@
+⭐ 1. Animated Kanban + WIP Slider (CORE)
+
+This is non-negotiable.
+
+You already have Kanban — now add:
+
+Add:
+
+WIP slider on “In Progress”
+
+Cards visibly queue if WIP exceeded
+
+Workers slow down
+
+Small congestion clouds appear
+
+Player learns:
+
+Less work in progress = faster completion
+
+⭐ 2. Push vs Pull Decision Moment
+
+Once per chapter:
+
+Rao asks to push.
+
+Popup:
+
+Rao: "Let’s start painting too."
+
+[ Push Work ]
+[ Wait for Pull ]
+
+
+Push creates inventory + delays.
+
+Pull creates smooth animation.
+
+Player learns:
+
+Push causes waste.
+
+⭐ 3. Bottleneck Heatspot (Visual)
+
+Show pulsing red hotspot where work accumulates.
+
+Clicking shows:
+
+Waiting time
+
+Which tasks are causing it
+
+This is HUGE for engineering thinking.
+
+⭐ 4. Daily Mini Decisions (2–3 total)
+
+Instead of passive watching:
+
+Let player:
+
+Adjust WIP
+
+Respond to push request
+
+Reassign crew once
+
+Tiny choices → big visual effects.
+
+Keeps engagement high.
+
+⭐ 5. Waste Gremlins (Simple Visual Metaphor)
+
+Tiny shadows over:
+
+Inventory piles
+
+Waiting workers
+
+When player fixes issue → sparkle + sound.
+
+Low effort, high clarity.
+
+⭐ 6. End-of-Chapter Visual Performance Summary (VERY IMPORTANT)
+
+This is what you mentioned — and yes, this is essential.
+
+Let’s design it properly.
+
+🎨 End-of-Chapter Visual Summary (Kanban)
+
+This appears after Day 5.
+
+This is NOT just numbers.
+
+It is VISUAL.
+
+Screen Layout
+
+Split screen:
+
+LEFT — Before Site (Snapshot)
+
+Messy:
+
+Piles
+
+Long queues
+
+Grey clouds
+
+Label:
+
+“Before Kanban”
+RIGHT — After Site (Snapshot)
+
+Clean:
+
+Smooth movement
+
+Few cards
+
+Happy workers
+
+Label:
+
+“After Kanban”
+Center Panel — Lean Results
+
+Big card:
+
+🟢 Flow Score
+
+Animated bar.
+
+Below:
+
+Avg WIP
+
+Tasks completed
+
+Avg waiting time
+
+Bottleneck location
+
+Use icons, not tables.
+
+Character Reaction Panel
+
+Mira:
+
+“See how limiting work helped everything move?”
+
+Old Foreman:
+
+“Finish beats busy.”
+
+Rao:
+(Changes based on choices)
+
+Learning Panel (3 bullets max)
+
+Example:
+
+You learned:
+
+✓ Limiting WIP improves flow
+✓ Pull reduces inventory
+✓ Bottlenecks reveal system constraints
+
+Small Badge
+
+🏅 Kanban Practitioner

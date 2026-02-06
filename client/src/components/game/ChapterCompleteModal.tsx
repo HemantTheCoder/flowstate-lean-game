@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
-import { Play, CheckCircle2, AlertTriangle, TrendingUp, Target, Award, Lightbulb, ChevronRight, Zap } from 'lucide-react';
+import { Play, CheckCircle2, AlertTriangle, TrendingUp, Target, Award, Lightbulb, ChevronRight, Zap, Users, Hammer, CloudRain, Shield } from 'lucide-react';
 
 interface DayBreakdown {
   day: number;
@@ -14,16 +14,154 @@ interface DayBreakdown {
   insight: string;
 }
 
+const BeforeAfterComparison: React.FC<{ pushed: boolean }> = ({ pushed }) => {
+    return (
+        <div className="grid grid-cols-2 gap-3">
+            <div className="bg-slate-100 rounded-xl p-4 border border-slate-200 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 bg-red-500/80 text-white text-[10px] font-bold text-center py-0.5 uppercase tracking-wider">
+                    Before Kanban
+                </div>
+                <div className="mt-5 space-y-2">
+                    <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map(i => (
+                            <motion.div
+                                key={i}
+                                className="h-6 w-full bg-red-200 rounded border border-red-300"
+                                animate={{ opacity: [0.5, 0.8, 0.5] }}
+                                transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
+                            />
+                        ))}
+                    </div>
+                    <div className="flex gap-1">
+                        {[1, 2, 3].map(i => (
+                            <motion.div
+                                key={i}
+                                className="h-4 w-full bg-orange-200 rounded border border-orange-300"
+                                animate={{ opacity: [0.4, 0.7, 0.4] }}
+                                transition={{ duration: 2, delay: i * 0.3, repeat: Infinity }}
+                            />
+                        ))}
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-medium mt-1 text-center">
+                        Congested queues, idle workers
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-green-50 rounded-xl p-4 border border-green-200 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 bg-green-500/80 text-white text-[10px] font-bold text-center py-0.5 uppercase tracking-wider">
+                    After Kanban
+                </div>
+                <div className="mt-5 space-y-2">
+                    <div className="flex gap-1">
+                        {[1, 2].map(i => (
+                            <motion.div
+                                key={i}
+                                className="h-6 w-full bg-green-300 rounded border border-green-400"
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.5 + i * 0.3 }}
+                            />
+                        ))}
+                    </div>
+                    <motion.div
+                        className="h-4 w-1/2 bg-blue-200 rounded border border-blue-300"
+                        initial={{ width: 0 }}
+                        animate={{ width: '50%' }}
+                        transition={{ delay: 1.2, duration: 0.5 }}
+                    />
+                    <div className="text-[10px] text-green-700 font-medium mt-1 text-center">
+                        {pushed ? 'Flow improved, but waste created' : 'Smooth flow, focused teams'}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const CharacterReactions: React.FC<{ pushed: boolean; efficiency: number }> = ({ pushed, efficiency }) => {
+    const reactions = [
+        {
+            name: 'Mira',
+            text: efficiency >= 80
+                ? "See how limiting work helped everything move?"
+                : "We have room to improve, but the system works.",
+            color: 'bg-blue-50 border-blue-200 text-blue-800'
+        },
+        {
+            name: 'Old Foreman',
+            text: "Finish beats busy. Always has, always will.",
+            color: 'bg-amber-50 border-amber-200 text-amber-800'
+        },
+        {
+            name: 'Rao',
+            text: pushed
+                ? "Fine. Maybe pushing wasn't the answer. But I still want results!"
+                : "I hate to admit it... the site IS calmer. And the Inspector was impressed.",
+            color: pushed ? 'bg-red-50 border-red-200 text-red-800' : 'bg-green-50 border-green-200 text-green-800'
+        }
+    ];
+
+    return (
+        <div className="space-y-2">
+            <h4 className="font-bold text-slate-700 text-sm uppercase flex items-center gap-2">
+                <Users className="w-4 h-4 text-slate-500" /> Team Reactions
+            </h4>
+            {reactions.map((r, i) => (
+                <motion.div
+                    key={r.name}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 2.0 + i * 0.2 }}
+                    className={`p-3 rounded-lg border text-sm ${r.color}`}
+                >
+                    <span className="font-bold">{r.name}:</span> "{r.text}"
+                </motion.div>
+            ))}
+        </div>
+    );
+};
+
+const KanbanBadge: React.FC<{ tier: { label: string; color: string } }> = ({ tier }) => {
+    return (
+        <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 2.5, type: "spring", bounce: 0.5 }}
+            className="flex flex-col items-center gap-2 py-3"
+        >
+            <div className="relative">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-300 to-amber-500 flex items-center justify-center shadow-lg">
+                    <Shield className="w-8 h-8 text-white" />
+                </div>
+                <motion.div
+                    className="absolute inset-0 rounded-full"
+                    animate={{
+                        boxShadow: [
+                            '0 0 0 0 rgba(251, 191, 36, 0)',
+                            '0 0 0 8px rgba(251, 191, 36, 0.3)',
+                            '0 0 0 0 rgba(251, 191, 36, 0)',
+                        ],
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                />
+            </div>
+            <div className="text-center">
+                <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Badge Earned</div>
+                <div className={`text-lg font-black ${tier.color}`}>{tier.label}</div>
+            </div>
+        </motion.div>
+    );
+};
+
 export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => void; onContinue: () => void }> = ({ isOpen, onClose, onContinue }) => {
     const { funds, lpi, dailyMetrics, flags, cumulativeTasksCompleted, cumulativePotentialCapacity } = useGameStore();
     const [activeDay, setActiveDay] = useState<number | null>(null);
     const [showInsights, setShowInsights] = useState(false);
 
-    // Play sound on open
     useEffect(() => {
         if (isOpen) {
             soundManager.playSFX('success', 0.8);
-            // Delay showing insights for dramatic effect
             const timer = setTimeout(() => setShowInsights(true), 1500);
             return () => clearTimeout(timer);
         } else {
@@ -37,12 +175,10 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
         onContinue();
     };
 
-    // Calculate final efficiency
     const finalEfficiency = cumulativePotentialCapacity > 0 
-        ? Math.round((cumulativeTasksCompleted / cumulativePotentialCapacity) * 100)
+        ? Math.min(100, Math.max(0, Math.round((cumulativeTasksCompleted / cumulativePotentialCapacity) * 100)))
         : lpi.flowEfficiency;
 
-    // Determine performance tier
     const getPerformanceTier = (eff: number) => {
         if (eff >= 90) return { label: 'Master Flow Architect', color: 'text-yellow-500', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30' };
         if (eff >= 70) return { label: 'Skilled Practitioner', color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/30' };
@@ -51,14 +187,13 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
     };
 
     const tier = getPerformanceTier(finalEfficiency);
+    const pushed = !!flags['decision_push_made'];
 
-    // Generate improvement suggestions based on performance
     const getImprovementSuggestions = () => {
         const suggestions: { icon: any; text: string; priority: 'high' | 'medium' | 'low' }[] = [];
         
         const metrics = dailyMetrics as DayBreakdown[];
         
-        // Check each day's performance
         metrics.forEach((m) => {
             if (m.efficiency < 50) {
                 if (m.day === 1) {
@@ -85,8 +220,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
             }
         });
 
-        // Day 4 decision feedback
-        if (flags['decision_push_made']) {
+        if (pushed) {
             suggestions.push({ 
                 icon: Lightbulb, 
                 text: 'Day 4: Choosing Pull over Push avoids creating rework waste', 
@@ -94,7 +228,6 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
             });
         }
 
-        // Add general tips if performance was good
         if (suggestions.length === 0 && finalEfficiency >= 80) {
             suggestions.push({ 
                 icon: Award, 
@@ -103,12 +236,11 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
             });
         }
 
-        return suggestions.slice(0, 3); // Max 3 suggestions
+        return suggestions.slice(0, 3);
     };
 
     const suggestions = getImprovementSuggestions();
     
-    // What went well
     const getSuccesses = () => {
         const successes: string[] = [];
         const metrics = dailyMetrics as DayBreakdown[];
@@ -118,7 +250,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                 if (m.day === 1) successes.push('Mastered WIP limits on Day 1');
                 if (m.day === 2) successes.push('Adapted to material constraints');
                 if (m.day === 3) successes.push('Handled weather variation');
-                if (m.day === 4 && !flags['decision_push_made']) successes.push('Made the right Pull decision');
+                if (m.day === 4 && !pushed) successes.push('Made the right Pull decision');
                 if (m.day === 5) successes.push('Passed inspection with clean flow');
             }
         });
@@ -128,7 +260,6 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
 
     const successes = getSuccesses();
 
-    // Chart data with cumulative efficiency line
     const chartData = (dailyMetrics as DayBreakdown[]).map(m => ({
         ...m,
         dayLabel: `Day ${m.day}`,
@@ -146,7 +277,6 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                         transition={{ type: "spring", bounce: 0.5 }}
                         className="bg-white w-full max-w-3xl max-h-[95vh] rounded-3xl shadow-[0_0_50px_rgba(34,197,94,0.3)] overflow-hidden border-4 border-green-400 relative flex flex-col"
                     >
-                        {/* Header with Performance Tier */}
                         <div className="bg-gradient-to-r from-green-400 to-emerald-600 px-6 py-8 flex flex-col items-center justify-center relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-30"></div>
                             <motion.div
@@ -162,7 +292,6 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                             </h1>
                             <p className="text-green-100 font-bold tracking-widest uppercase mt-1 text-sm">The Kanban Chronicles</p>
                             
-                            {/* Final Efficiency Score */}
                             <motion.div 
                                 initial={{ scale: 0, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
@@ -171,13 +300,15 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                             >
                                 <TrendingUp className={`w-5 h-5 ${tier.color}`} />
                                 <span className={`font-black text-2xl ${tier.color}`}>{finalEfficiency}%</span>
-                                <span className="text-white/80 text-sm font-medium">Flow Efficiency</span>
+                                <span className="text-white/80 text-sm font-medium">Flow Score</span>
                             </motion.div>
                             <p className={`mt-2 text-sm font-bold ${tier.color}`}>{tier.label}</p>
                         </div>
 
-                        <div className="p-6 overflow-y-auto flex-1 space-y-6">
-                            {/* Performance Graph - Interactive */}
+                        <div className="p-6 overflow-y-auto flex-1 space-y-5">
+
+                            <BeforeAfterComparison pushed={pushed} />
+
                             <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 shadow-inner">
                                 <h3 className="text-slate-800 font-bold text-sm uppercase mb-3 flex items-center gap-2">
                                     <TrendingUp className="w-4 h-4 text-blue-500" />
@@ -259,7 +390,6 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                     </div>
                                 </div>
                                 
-                                {/* Day Insight on hover */}
                                 <AnimatePresence>
                                     {activeDay && chartData.find(d => d.day === activeDay) && (
                                         <motion.div 
@@ -274,7 +404,6 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 </AnimatePresence>
                             </div>
 
-                            {/* Day-by-Day Breakdown */}
                             <div className="grid grid-cols-5 gap-2">
                                 {chartData.map((day, i) => (
                                     <motion.div
@@ -290,6 +419,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                                     : 'bg-orange-50 border-orange-200 hover:border-orange-400'
                                             }`}
                                         onClick={() => setActiveDay(activeDay === day.day ? null : day.day)}
+                                        data-testid={`card-day-${day.day}`}
                                     >
                                         <div className="text-[10px] font-bold text-slate-500 uppercase">Day {day.day}</div>
                                         <div className={`text-xl font-black ${
@@ -303,7 +433,6 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 ))}
                             </div>
 
-                            {/* Interactive Learning Section */}
                             <AnimatePresence>
                                 {showInsights && (
                                     <motion.div
@@ -311,7 +440,6 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         animate={{ opacity: 1, height: 'auto' }}
                                         className="space-y-4"
                                     >
-                                        {/* What Went Well */}
                                         <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                                             <h4 className="font-bold text-green-800 text-sm uppercase mb-3 flex items-center gap-2">
                                                 <CheckCircle2 className="w-4 h-4" /> What Went Well
@@ -332,7 +460,6 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                             </ul>
                                         </div>
 
-                                        {/* Improvement Tips (only if below 100%) */}
                                         {finalEfficiency < 100 && suggestions.length > 0 && (
                                             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                                                 <h4 className="font-bold text-amber-800 text-sm uppercase mb-3 flex items-center gap-2">
@@ -358,31 +485,33 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                             </div>
                                         )}
 
-                                        {/* Key Learnings */}
+                                        <CharacterReactions pushed={pushed} efficiency={finalEfficiency} />
+
                                         <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
                                             <h4 className="font-bold text-purple-800 text-sm uppercase mb-3 flex items-center gap-2">
-                                                <Award className="w-4 h-4" /> Key Learnings
+                                                <Lightbulb className="w-4 h-4" /> Key Learnings
                                             </h4>
-                                            <div className="grid grid-cols-3 gap-2 text-center">
-                                                <div className="bg-white/60 rounded-lg p-2">
-                                                    <div className="text-purple-600 font-bold text-xs">WIP Limits</div>
-                                                    <div className="text-[10px] text-purple-500">Control work-in-progress</div>
+                                            <div className="space-y-2 text-sm text-purple-700">
+                                                <div className="flex items-start gap-2">
+                                                    <CheckCircle2 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                                                    <span><strong>Limiting WIP</strong> improves flow and prevents congestion</span>
                                                 </div>
-                                                <div className="bg-white/60 rounded-lg p-2">
-                                                    <div className="text-purple-600 font-bold text-xs">Pull System</div>
-                                                    <div className="text-[10px] text-purple-500">Pull work, don't push</div>
+                                                <div className="flex items-start gap-2">
+                                                    <CheckCircle2 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                                                    <span><strong>Pull reduces inventory</strong> and eliminates waste from rushing</span>
                                                 </div>
-                                                <div className="bg-white/60 rounded-lg p-2">
-                                                    <div className="text-purple-600 font-bold text-xs">Adaptation</div>
-                                                    <div className="text-[10px] text-purple-500">Respond to constraints</div>
+                                                <div className="flex items-start gap-2">
+                                                    <CheckCircle2 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                                                    <span><strong>Bottlenecks reveal system constraints</strong> - fix the flow, not the blame</span>
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <KanbanBadge tier={tier} />
                                     </motion.div>
                                 )}
                             </AnimatePresence>
 
-                            {/* Stats Row */}
                             <div className="grid grid-cols-3 gap-3">
                                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
                                     <div className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Funds</div>
@@ -398,7 +527,6 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 </div>
                             </div>
 
-                            {/* Next Chapter Teaser */}
                             <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-400 p-4 rounded-r-lg">
                                 <h4 className="font-bold text-indigo-800 text-sm uppercase mb-1">Coming Up: Chapter 2</h4>
                                 <p className="text-indigo-700 text-sm italic">
