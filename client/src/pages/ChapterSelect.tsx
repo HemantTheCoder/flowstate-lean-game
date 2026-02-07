@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CharacterCreationModal } from '@/components/game/CharacterCreationModal';
 import { useGame } from '@/hooks/use-game';
 import { Lock, Construction, X, BookOpen, Gamepad2, Target, Lightbulb, ArrowRight, ChevronRight } from 'lucide-react';
+import soundManager from '@/lib/soundManager';
 
 const CHAPTERS = [
     {
@@ -28,6 +29,10 @@ export default function ChapterSelect() {
     const startChapter = useGameStore(s => s.startChapter);
     const flags = useGameStore(s => s.flags);
     const [showCh3Modal, setShowCh3Modal] = useState(false);
+
+    useEffect(() => {
+        soundManager.playBGM('menu', 0.3);
+    }, []);
 
     const [_, navigate] = useLocation();
     const { saveGame } = useGame();

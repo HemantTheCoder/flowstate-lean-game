@@ -2,6 +2,7 @@ import React from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { WEEK_1_SCHEDULE } from '@/data/chapters/chapter1';
 import { motion, AnimatePresence } from 'framer-motion';
+import soundManager from '@/lib/soundManager';
 
 export const DayBriefingModal: React.FC = () => {
     const { day, flags, setFlag } = useGameStore();
@@ -16,6 +17,7 @@ export const DayBriefingModal: React.FC = () => {
     if (!flags[introKey] || !dayConfig || !dayConfig.briefing || flags[dayKey]) return null;
 
     const handleAcknowledge = () => {
+        soundManager.playSFX('click', 0.5);
         setFlag(dayKey, true);
     };
 

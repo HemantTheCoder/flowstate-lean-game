@@ -203,6 +203,47 @@ The project runs on port 5000 with the Express server handling both the API and 
 - **Framer Motion**: Animations
 - **react-hook-form**: Form handling with Zod validation
 
+## Sound System
+
+**Architecture**: Dual-layer audio using Web Audio API for SFX (instant, zero-latency synthesis) and Howler.js for BGM (streaming from Pixabay CDN).
+
+**SFX (Synthesized via Web Audio API)** - 22+ sound effects, zero external dependencies:
+- UI: click, ding, whoosh
+- Game Feedback: success, complete, alert, warning, money
+- Interaction: drag, drop, card_flip, typing
+- Quiz: quiz_correct, quiz_wrong
+- Transitions: day_transition, fanfare, unlock
+- Game State: constraint, badge, morale_up, morale_down, storm
+
+**BGM Tracks** (Howler.js, streamed from CDN):
+- `menu`: Title screen and Chapter Select ambient music
+- `cozy`: Relaxed construction planning
+- `tense`: High-WIP urgency (triggers when Doing column >= 3 tasks)
+- `rain`: Day 3 monsoon ambience
+- `construction`: Default gameplay BGM
+- `planning`: Chapter 2 Planning Room (purple theme BGM)
+
+**Music Switching Logic** (Game.tsx):
+- Chapter 2 Planning Room -> 'planning' BGM
+- Day 3 -> 'rain' BGM
+- High WIP (>=3 in Doing) -> 'tense' BGM
+- Default -> 'construction' BGM
+- Home/ChapterSelect -> 'menu' BGM
+
+**SFX Wiring**:
+- DialogueBox: typing sound on advance
+- KanbanBoard: click/money on task moves, alert on invalid moves
+- PlanningRoom: card_flip on task select, drop/drag on pull/return, constraint on fix, warning/success on commit
+- ReflectionQuiz: quiz_correct/quiz_wrong on answer, fanfare on quiz complete
+- DailySummary: day_transition on open
+- ChapterCompleteModal/Chapter2CompleteModal: success/complete on open
+- ChapterIntroModal: whoosh on start
+- DayBriefingModal: click on acknowledge
+- Home: whoosh on Start Game, menu BGM on mount
+- SettingsModal: click on SFX volume change (preview)
+
+**Volume Controls**: bgmVolume, sfxVolume, isMuted managed via gameStore.audioSettings
+
 ## Deployment
 
 - **Build**: `npm run build` - Compiles frontend with Vite and backend with esbuild

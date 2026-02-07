@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { motion } from 'framer-motion';
 import { TrendingUp, BookOpen, Lightbulb } from 'lucide-react';
+import soundManager from '@/lib/soundManager';
 
 interface Props {
     isOpen: boolean;
@@ -67,6 +69,12 @@ const LEAN_LESSONS: Record<number, { concept: string; explanation: string; examp
 };
 
 export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks }) => {
+    useEffect(() => {
+        if (isOpen) {
+            soundManager.playSFX('day_transition', 0.6);
+        }
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     const day = useGameStore(s => s.day);

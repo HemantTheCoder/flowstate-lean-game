@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useGameStore, Task, ConstraintType } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, CheckCircle, Package, Users, FileCheck, Cloud, ArrowRight, Briefcase, Target, Lock, Calendar, ClipboardCheck, Wrench, HandshakeIcon, Play, BarChart3, Sun, ShieldAlert, Eye, Ban } from 'lucide-react';
+import soundManager from '@/lib/soundManager';
 
 const constraintConfig: Record<ConstraintType, { icon: React.ReactNode, label: string, color: string, action: string, cost: string }> = {
     material: { icon: <Package className="w-4 h-4" />, label: 'Material', color: 'red', action: 'Call Supplier', cost: '$200' },
@@ -156,10 +157,12 @@ export const PlanningRoom: React.FC = () => {
         if (!canPullTasks) return;
         if (ready.length >= 8) return;
         moveTask(taskId, 'backlog', 'ready');
+        soundManager.playSFX('drop', 0.5);
     };
 
     const moveToBacklog = (taskId: string) => {
         moveTask(taskId, 'ready', 'backlog');
+        soundManager.playSFX('drag', 0.4);
         if (selectedTaskId === taskId) {
             setSelectedTaskId(null);
         }
@@ -178,11 +181,13 @@ export const PlanningRoom: React.FC = () => {
         
         if (riskyCount > 0 && forceCommitIds.length === 0) {
             setShowForceWarning(true);
+            soundManager.playSFX('warning', 0.6);
             return;
         }
         
         const allCommitIds = [...greenTasks.map(t => t.id), ...forceCommitIds];
         commitPlan(allCommitIds);
+        soundManager.playSFX('success', 0.7);
     };
     
     const handleForceCommitConfirm = (includeRisky: boolean) => {
@@ -193,15 +198,18 @@ export const PlanningRoom: React.FC = () => {
         const allCommitIds = [...greenTasks.map(t => t.id), ...riskyIds];
         if (allCommitIds.length === 0) return;
         commitPlan(allCommitIds);
+        soundManager.playSFX(includeRisky ? 'alert' : 'success', 0.7);
     };
 
     const handleSelectTask = (taskId: string) => {
+        soundManager.playSFX('card_flip', 0.5);
         setSelectedTaskId(taskId);
     };
 
     const handleConstraintRemoval = (type: ConstraintType) => {
         if (!selectedTask || !canFixConstraints) return;
         removeConstraint(selectedTask.id, type);
+        soundManager.playSFX('constraint', 0.6);
     };
 
     const getInspectorMessage = () => {

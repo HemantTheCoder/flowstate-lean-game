@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, XCircle, Brain, ChevronRight, Award } from 'lucide-react';
+import soundManager from '@/lib/soundManager';
 
 interface ReflectionQuizProps {
   isOpen: boolean;
@@ -167,6 +168,8 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
     const newAnswers = [...selectedAnswers];
     newAnswers[currentQuestionIndex] = optionId;
     setSelectedAnswers(newAnswers);
+    const isOptionCorrect = currentQuestion.options.find((o) => o.id === optionId)?.isCorrect;
+    soundManager.playSFX(isOptionCorrect ? 'quiz_correct' : 'quiz_wrong', 0.7);
   };
 
   const handleNext = () => {
@@ -176,6 +179,7 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
       setShowFeedback(false);
     } else {
       setQuizComplete(true);
+      soundManager.playSFX('fanfare', 0.7);
     }
   };
 

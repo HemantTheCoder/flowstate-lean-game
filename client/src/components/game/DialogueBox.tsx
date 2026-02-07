@@ -2,6 +2,7 @@ import React from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
+import soundManager from '@/lib/soundManager';
 
 export const DialogueBox: React.FC = () => {
     const { currentDialogue, dialogueIndex, advanceDialogue, playerName, playerGender } = useGameStore();
@@ -80,7 +81,10 @@ export const DialogueBox: React.FC = () => {
                     {/* Text Box Container */}
                     <div
                         className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border-4 border-slate-100 p-6 md:p-8 cursor-pointer z-10 min-h-[160px] flex flex-col justify-center"
-                        onClick={advanceDialogue}
+                        onClick={() => {
+                            soundManager.playSFX('typing', 0.6);
+                            advanceDialogue();
+                        }}
                     >
                         {/* Character Name Tag */}
                         <div className={`absolute -top-5 left-8 px-6 py-2 rounded-xl text-white font-black text-lg shadow-lg transform -rotate-1 ${bgColor}`}>

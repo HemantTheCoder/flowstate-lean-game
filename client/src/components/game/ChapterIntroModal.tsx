@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import soundManager from '@/lib/soundManager';
 
 export const ChapterIntroModal: React.FC = () => {
     const { flags, setFlag, chapter } = useGameStore();
@@ -10,6 +11,7 @@ export const ChapterIntroModal: React.FC = () => {
     if (!flags['character_created'] || flags['chapter_intro_seen']) return null;
 
     const handleStart = () => {
+        soundManager.playSFX('whoosh', 0.6);
         setFlag('chapter_intro_seen', true);
     };
 

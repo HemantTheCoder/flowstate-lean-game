@@ -118,17 +118,21 @@ export default function Game() {
   // Audio Control Loop
   const audioSettings = useGameStore(s => s.audioSettings);
   useEffect(() => {
-    // Choose BGM based on situation
-    if (day === 3) {
+    if (chapter === 2 && phase === 'planning') {
+      soundManager.playBGM('planning', audioSettings.bgmVolume * 0.8);
+    } else if (day === 3) {
       soundManager.playBGM('rain', audioSettings.bgmVolume);
-    } else if (columns.find(c => c.id === 'doing')?.tasks.length || 0 >= 3) {
+    } else if ((columns.find(c => c.id === 'doing')?.tasks.length || 0) >= 3) {
       soundManager.playBGM('tense', audioSettings.bgmVolume);
     } else {
       soundManager.playBGM('construction', audioSettings.bgmVolume);
     }
-  }, [day, columns, audioSettings.bgmVolume]);
+  }, [day, chapter, phase, columns, audioSettings.bgmVolume]);
 
-  // Unlock Audio on first interaction
+  useEffect(() => {
+    soundManager.updateVolumes(audioSettings.bgmVolume, audioSettings.sfxVolume, audioSettings.isMuted);
+  }, [audioSettings.bgmVolume, audioSettings.sfxVolume, audioSettings.isMuted]);
+
   useEffect(() => {
     const handleInteraction = () => {
       soundManager.resumeAudio();

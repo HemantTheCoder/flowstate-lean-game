@@ -1,11 +1,22 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
+import soundManager from '@/lib/soundManager';
 
 import { ComingSoonModal } from '../components/game/ComingSoonModal';
 
 export default function Home() {
-  const [pendingFeature, setPendingFeature] = React.useState<'multiplayer' | 'cases' | null>(null);
+  const [pendingFeature, setPendingFeature] = useState<'multiplayer' | 'cases' | null>(null);
+
+  useEffect(() => {
+    soundManager.playBGM('menu', 0.3);
+    const handleInteraction = () => {
+      soundManager.resumeAudio();
+      window.removeEventListener('click', handleInteraction);
+    };
+    window.addEventListener('click', handleInteraction);
+    return () => window.removeEventListener('click', handleInteraction);
+  }, []);
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-blue-200 to-purple-100 flex flex-col items-center justify-center p-4">
@@ -29,7 +40,10 @@ export default function Home() {
 
         <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
           <Link href="/chapters">
-            <button className="w-full py-4 text-xl font-bold text-white bg-blue-500 rounded-2xl shadow-lg hover:bg-blue-600 hover:shadow-xl hover:scale-105 transition-all transform active:scale-95">
+            <button
+              onClick={() => soundManager.playSFX('whoosh', 0.6)}
+              className="w-full py-4 text-xl font-bold text-white bg-blue-500 rounded-2xl shadow-lg hover:bg-blue-600 hover:shadow-xl hover:scale-105 transition-all transform active:scale-95"
+            >
               START GAME
             </button>
           </Link>
