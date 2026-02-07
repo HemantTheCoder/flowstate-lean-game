@@ -20,7 +20,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-blue-200 to-purple-100 flex flex-col items-center justify-center p-4">
+    <div className="relative w-full min-h-screen bg-gradient-to-b from-blue-200 to-purple-100 flex flex-col items-center justify-center p-4 overflow-y-auto">
       {/* Animated Background Placeholder - Could be SVG or Canvas later */}
       <div className="absolute inset-0 -z-10 opacity-30">
         {/* Add moving clouds/cityscape here later */}
@@ -49,21 +49,6 @@ export default function Home() {
             </button>
           </Link>
 
-          <button
-            onClick={() => setPendingFeature('multiplayer')}
-            className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200"
-          >
-            MULTIPLAYER — Coming Soon
-          </button>
-
-          <button
-            onClick={() => setPendingFeature('cases')}
-            className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200"
-          >
-            CASE LEVELS — Coming Soon
-          </button>
-
-
           <Link href="/dashboard">
             <button
               data-testid="button-dashboard"
@@ -84,6 +69,21 @@ export default function Home() {
             </button>
           </Link>
 
+
+          <button
+            onClick={() => setPendingFeature('multiplayer')}
+            className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200"
+          >
+            MULTIPLAYER — Coming Soon
+          </button>
+
+          <button
+            onClick={() => setPendingFeature('cases')}
+            className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200"
+          >
+            CASE LEVELS — Coming Soon
+          </button>
+
           <Link href="/settings">
             <button className="w-full py-3 text-lg font-medium text-slate-700 bg-white rounded-2xl shadow-sm hover:bg-slate-50 transition-colors">
               SETTINGS
@@ -97,7 +97,7 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.5 }}
-        className="absolute bottom-4 text-center w-full"
+        className="mt-8 mb-4 text-center w-full"
       >
         <p className="text-slate-500 text-sm font-medium">
           Made by <a href="https://www.linkedin.com/in/hemantkumar2430/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 hover:underline">Hemant Kumar</a>
