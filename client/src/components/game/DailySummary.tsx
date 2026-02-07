@@ -69,6 +69,11 @@ const LEAN_LESSONS: Record<number, { concept: string; explanation: string; examp
 };
 
 export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks }) => {
+    const day = useGameStore(s => s.day);
+    const chapter = useGameStore(s => s.chapter);
+    const funds = useGameStore(s => s.funds);
+    const dailyMetrics = useGameStore(s => s.dailyMetrics);
+
     useEffect(() => {
         if (isOpen) {
             soundManager.playSFX('day_transition', 0.6);
@@ -76,11 +81,6 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
     }, [isOpen]);
 
     if (!isOpen) return null;
-
-    const day = useGameStore(s => s.day);
-    const chapter = useGameStore(s => s.chapter);
-    const funds = useGameStore(s => s.funds);
-    const dailyMetrics = useGameStore(s => s.dailyMetrics);
 
     const displayDay = day - 1;
 
