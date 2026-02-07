@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
+import { apiRequest } from '@/lib/queryClient';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
-import { Play, CheckCircle2, AlertTriangle, TrendingUp, Target, Award, Lightbulb, ChevronRight, Zap, Users, Hammer, CloudRain, Shield } from 'lucide-react';
+import { Play, CheckCircle2, AlertTriangle, TrendingUp, Target, Award, Lightbulb, ChevronRight, Zap, Users, Hammer, CloudRain, Shield, Download } from 'lucide-react';
+import { exportChapterReport } from '@/lib/exportPDF';
 
 interface DayBreakdown {
   day: number;
@@ -155,14 +157,30 @@ const KanbanBadge: React.FC<{ tier: { label: string; color: string } }> = ({ tie
 };
 
 export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => void; onContinue: () => void; quizScore?: number }> = ({ isOpen, onClose, onContinue, quizScore }) => {
-    const { funds, lpi, dailyMetrics, flags, cumulativeTasksCompleted, cumulativePotentialCapacity } = useGameStore();
+    const { funds, lpi, dailyMetrics, flags, cumulativeTasksCompleted, cumulativePotentialCapacity, playerName } = useGameStore();
     const [activeDay, setActiveDay] = useState<number | null>(null);
     const [showInsights, setShowInsights] = useState(false);
+    const submittedRef = useRef(false);
 
     useEffect(() => {
         if (isOpen) {
             soundManager.playSFX('success', 0.8);
             const timer = setTimeout(() => setShowInsights(true), 1500);
+            if (!submittedRef.current) {
+                submittedRef.current = true;
+                const eff = cumulativePotentialCapacity > 0
+                    ? Math.min(100, Math.round((cumulativeTasksCompleted / cumulativePotentialCapacity) * 100))
+                    : lpi.flowEfficiency;
+                const totalScore = Math.round(eff * 0.6 + (quizScore || 0) * 8);
+                apiRequest('POST', '/api/leaderboard', {
+                    playerName: playerName || 'Architect',
+                    chapter: 1,
+                    efficiency: eff,
+                    ppc: 0,
+                    quizScore: quizScore || 0,
+                    totalScore,
+                }).catch(() => {});
+            }
             return () => clearTimeout(timer);
         } else {
             setShowInsights(false);
@@ -554,13 +572,47 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 </p>
                             </div>
 
-                            <button
-                                onClick={handleContinue}
-                                className="w-full bg-green-500 hover:bg-green-600 text-white text-xl font-black py-4 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
-                                data-testid="button-start-chapter-2"
-                            >
-                                Start Chapter 2 <Play className="w-5 h-5" />
-                            </button>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        const metrics = dailyMetrics as DayBreakdown[];
+                                        const keyDecisions: { label: string; outcome: 'good' | 'bad' }[] = [];
+                                        if (pushed) {
+                                            keyDecisions.push({ label: 'Chose to Push work on Day 4 (created rework waste)', outcome: 'bad' });
+                                        } else if (flags['decision_pull_made']) {
+                                            keyDecisions.push({ label: 'Chose Pull over Push on Day 4 (avoided waste)', outcome: 'good' });
+                                        }
+                                        exportChapterReport({
+                                            playerName,
+                                            chapter: 1,
+                                            chapterTitle: 'The Kanban Chronicles',
+                                            dailyMetrics: metrics,
+                                            finalEfficiency,
+                                            quizScore,
+                                            quizTotal: quizScore !== undefined ? 5 : undefined,
+                                            keyDecisions,
+                                            keyLearnings: [
+                                                'WIP Limits prevent congestion - limiting active work fronts keeps crews focused and prevents spreading resources too thin.',
+                                                'Pull systems eliminate waste from rushing - wait until materials and prerequisites are ready before starting work.',
+                                                'Adaptation keeps flow alive under constraints - keep alternative work ready for disruptions like weather or material shortages.',
+                                                'Flow Efficiency measures value-adding completion vs. potential capacity across all days.',
+                                            ],
+                                            badges: [tier.label],
+                                        });
+                                    }}
+                                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-colors"
+                                    data-testid="button-export-report-ch1"
+                                >
+                                    <Download className="w-4 h-4" /> Export Report
+                                </button>
+                                <button
+                                    onClick={handleContinue}
+                                    className="flex-1 bg-green-500 hover:bg-green-600 text-white text-xl font-black py-4 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
+                                    data-testid="button-start-chapter-2"
+                                >
+                                    Start Chapter 2 <Play className="w-5 h-5" />
+                                </button>
+                            </div>
                         </div>
                     </motion.div>
                 </div>

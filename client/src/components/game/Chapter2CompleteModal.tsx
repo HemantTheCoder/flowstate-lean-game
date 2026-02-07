@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
-import { CheckCircle, XCircle, AlertTriangle, Award, TrendingUp, Users, Target, Lightbulb, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
+import { CheckCircle, XCircle, AlertTriangle, Award, TrendingUp, Users, Target, Lightbulb, BookOpen, ChevronDown, ChevronUp, Download } from 'lucide-react';
+import { exportChapterReport } from '@/lib/exportPDF';
 
 interface Chapter2CompleteModalProps {
     isOpen: boolean;
@@ -51,7 +53,7 @@ const DAY_INSIGHTS: Record<number, { title: string; concept: string; lesson: str
 };
 
 export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ isOpen, onClose, onContinue, quizScore }) => {
-    const { funds, lpi, weeklyPlan, columns, flags } = useGameStore();
+    const { funds, lpi, weeklyPlan, columns, flags, playerName, dailyMetrics } = useGameStore();
     const [animatedPPC, setAnimatedPPC] = useState(0);
     const [expandedDay, setExpandedDay] = useState<number | null>(null);
 
@@ -62,6 +64,8 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
 
     const ppcLevel = ppc >= 80 ? 'excellent' : ppc >= 50 ? 'average' : 'poor';
     const overcommitted = flags['overcommitment_accepted'];
+
+    const submittedRef = useRef(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -76,6 +80,18 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                     setAnimatedPPC(current);
                 }
             }, 30);
+            if (!submittedRef.current) {
+                submittedRef.current = true;
+                const totalScore = Math.round(ppc * 0.5 + (lpi.flowEfficiency || 0) * 0.3 + (quizScore || 0) * 8);
+                apiRequest('POST', '/api/leaderboard', {
+                    playerName: playerName || 'Architect',
+                    chapter: 2,
+                    efficiency: lpi.flowEfficiency || 0,
+                    ppc,
+                    quizScore: quizScore || 0,
+                    totalScore,
+                }).catch(() => {});
+            }
             return () => clearInterval(interval);
         }
     }, [isOpen, ppc, ppcLevel]);
@@ -117,7 +133,7 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
 
     const constraintsRemoved = flags['constraints_discovered'] ? true : false;
 
-    const badges = [];
+    const badges: { name: string; icon: React.ReactNode; color: string }[] = [];
     if (ppc >= 80) badges.push({ name: 'Promise Keeper', icon: <CheckCircle className="w-6 h-6" />, color: 'bg-green-500' });
     if (!overcommitted) badges.push({ name: 'Reliable Planner', icon: <Target className="w-6 h-6" />, color: 'bg-blue-500' });
     if (constraintsRemoved && failedFragile.length === 0) badges.push({ name: 'Constraint Crusher', icon: <AlertTriangle className="w-6 h-6" />, color: 'bg-orange-500' });
@@ -383,13 +399,42 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                 </div>
                             </div>
 
-                            <button
-                                onClick={handleContinue}
-                                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xl font-black py-4 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
-                                data-testid="button-continue-chapter"
-                            >
-                                Continue to Chapter 3
-                            </button>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        const metricsData = (dailyMetrics as { day: number; efficiency: number; tasksCompletedToday: number; potentialCapacity: number; cumulativeEfficiency: number; insight: string }[]);
+                                        exportChapterReport({
+                                            playerName,
+                                            chapter: 2,
+                                            chapterTitle: 'The Promise System',
+                                            dailyMetrics: metricsData,
+                                            finalEfficiency: ppc,
+                                            ppc,
+                                            quizScore,
+                                            quizTotal: quizScore !== undefined ? 5 : undefined,
+                                            keyLearnings: [
+                                                'Planning is not promising - a schedule says SHOULD. Only after removing constraints can you say WILL.',
+                                                'PPC measures reliability, not productivity - keeping 5 out of 5 promises (100% PPC) is better than keeping 7 out of 10 (70% PPC).',
+                                                'Overcommitment destroys trust - say no to protect your promises. A reliable "not yet" is better than a broken "yes".',
+                                                'Make Ready prevents failure - proactively removing constraints during planning prevents 80% of execution failures.',
+                                                'Should / Can / Will framework separates what the master schedule demands from what is actually executable.',
+                                            ],
+                                            badges: badges.map(b => b.name),
+                                        });
+                                    }}
+                                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-colors"
+                                    data-testid="button-export-report-ch2"
+                                >
+                                    <Download className="w-4 h-4" /> Export Report
+                                </button>
+                                <button
+                                    onClick={handleContinue}
+                                    className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xl font-black py-4 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
+                                    data-testid="button-continue-chapter"
+                                >
+                                    Continue to Chapter 3
+                                </button>
+                            </div>
                         </div>
                     </motion.div>
                 </div>

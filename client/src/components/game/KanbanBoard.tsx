@@ -388,6 +388,10 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                             ? 'border-red-500 bg-red-50/80'
                                                                             : hasRedConstraints
                                                                                 ? 'border-red-500 bg-red-50'
+                                                                                : task.type === 'Structural' ? 'border-blue-500'
+                                                                                : task.type === 'Systems' ? 'border-emerald-500'
+                                                                                : task.type === 'Interior' ? 'border-amber-500'
+                                                                                : task.type === 'Management' ? 'border-purple-500'
                                                                                 : 'border-blue-400'
                                                                     } ${snapshot.isDragging ? 'shadow-2xl ring-2 rotate-2' : ''} ${
                                                                         isOverWip && col.id === 'doing' ? 'opacity-80' : ''
@@ -414,7 +418,10 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                     ))}
 
                                                                     <div className="mt-2 flex flex-wrap gap-1 md:gap-2 text-[10px] font-mono font-bold">
-                                                                        <span className={`px-1 rounded border ${task.type === 'Structural' ? 'bg-orange-100 text-orange-800 border-orange-200' :
+                                                                        <span className={`px-1 rounded border ${
+                                                                            task.type === 'Structural' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                                                                            task.type === 'Systems' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
+                                                                            task.type === 'Interior' ? 'bg-amber-100 text-amber-800 border-amber-200' :
                                                                             task.type === 'Management' ? 'bg-purple-100 text-purple-800 border-purple-200' :
                                                                                 'bg-sky-100 text-sky-800 border-sky-200'
                                                                             }`}>

@@ -92,6 +92,25 @@ export type SaveGameRequest = InsertGameState;
 // API Response types
 export type GameStateResponse = GameState;
 
+export const leaderboardEntries = pgTable("leaderboard_entries", {
+  id: serial("id").primaryKey(),
+  playerName: text("player_name").notNull(),
+  chapter: integer("chapter").notNull(),
+  efficiency: integer("efficiency").default(0),
+  ppc: integer("ppc").default(0),
+  quizScore: integer("quiz_score").default(0),
+  totalScore: integer("total_score").default(0),
+  completedAt: timestamp("completed_at").defaultNow(),
+});
+
+export const insertLeaderboardEntrySchema = createInsertSchema(leaderboardEntries).omit({
+  id: true,
+  completedAt: true,
+});
+
+export type LeaderboardEntry = typeof leaderboardEntries.$inferSelect;
+export type InsertLeaderboardEntry = z.infer<typeof insertLeaderboardEntrySchema>;
+
 export const GAME_CONSTANTS = {
   INITIAL_RESOURCES: {
     morale: 50,

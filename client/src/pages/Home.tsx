@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
+import { BarChart3, Trophy } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 
 import { ComingSoonModal } from '../components/game/ComingSoonModal';
@@ -62,6 +63,26 @@ export default function Home() {
             CASE LEVELS — Coming Soon
           </button>
 
+
+          <Link href="/dashboard">
+            <button
+              data-testid="button-dashboard"
+              className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200 flex items-center justify-center gap-3"
+            >
+              <BarChart3 className="w-5 h-5" />
+              MY PERFORMANCE
+            </button>
+          </Link>
+
+          <Link href="/leaderboard">
+            <button
+              data-testid="button-leaderboard"
+              className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200 flex items-center justify-center gap-3"
+            >
+              <Trophy className="w-5 h-5" />
+              LEADERBOARD
+            </button>
+          </Link>
 
           <Link href="/settings">
             <button className="w-full py-3 text-lg font-medium text-slate-700 bg-white rounded-2xl shadow-sm hover:bg-slate-50 transition-colors">

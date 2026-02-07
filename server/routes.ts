@@ -81,5 +81,46 @@ export async function registerRoutes(
     }
   });
 
+  // Get Leaderboard (all chapters)
+  app.get(api.leaderboard.list.path, async (_req, res) => {
+    try {
+      const entries = await storage.getLeaderboard();
+      res.json(entries);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch leaderboard" });
+    }
+  });
+
+  // Get Leaderboard by Chapter
+  app.get(api.leaderboard.byChapter.path, async (req, res) => {
+    try {
+      const chapter = parseInt(req.params.chapter as string, 10);
+      if (isNaN(chapter)) {
+        return res.status(400).json({ message: "Invalid chapter number" });
+      }
+      const entries = await storage.getLeaderboardByChapter(chapter);
+      res.json(entries);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch leaderboard" });
+    }
+  });
+
+  // Submit Leaderboard Entry
+  app.post(api.leaderboard.submit.path, async (req, res) => {
+    try {
+      const input = api.leaderboard.submit.input.parse(req.body);
+      const entry = await storage.addLeaderboardEntry(input);
+      res.status(201).json(entry);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      res.status(500).json({ message: "Failed to submit leaderboard entry" });
+    }
+  });
+
   return httpServer;
 }

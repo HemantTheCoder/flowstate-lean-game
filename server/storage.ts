@@ -1,5 +1,5 @@
 // import { db } from "./db"; // DB Disabled for Local Mode
-import { gameStates, type GameState, type InsertGameState, GAME_CONSTANTS } from "@shared/schema";
+import { gameStates, type GameState, type InsertGameState, type LeaderboardEntry, type InsertLeaderboardEntry, GAME_CONSTANTS } from "@shared/schema";
 // import { eq } from "drizzle-orm"; // DB Disabled
 
 export interface IStorage {
@@ -7,15 +7,22 @@ export interface IStorage {
   createOrUpdateGameState(gameState: InsertGameState): Promise<GameState>;
   updateGameState(sessionId: string, updates: Partial<InsertGameState>): Promise<GameState>;
   deleteGameState(sessionId: string): Promise<void>;
+  getLeaderboard(): Promise<LeaderboardEntry[]>;
+  getLeaderboardByChapter(chapter: number): Promise<LeaderboardEntry[]>;
+  addLeaderboardEntry(entry: InsertLeaderboardEntry): Promise<LeaderboardEntry>;
 }
 
 export class MemStorage implements IStorage {
   private states: Map<string, GameState>;
   private currentId: number;
+  private leaderboard: LeaderboardEntry[];
+  private leaderboardId: number;
 
   constructor() {
     this.states = new Map();
     this.currentId = 1;
+    this.leaderboard = [];
+    this.leaderboardId = 1;
   }
 
   async getGameState(sessionId: string): Promise<GameState | undefined> {
@@ -61,6 +68,34 @@ export class MemStorage implements IStorage {
 
   async deleteGameState(sessionId: string): Promise<void> {
     this.states.delete(sessionId);
+  }
+
+  async getLeaderboard(): Promise<LeaderboardEntry[]> {
+    return [...this.leaderboard]
+      .sort((a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0))
+      .slice(0, 50);
+  }
+
+  async getLeaderboardByChapter(chapter: number): Promise<LeaderboardEntry[]> {
+    return this.leaderboard
+      .filter((e) => e.chapter === chapter)
+      .sort((a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0))
+      .slice(0, 50);
+  }
+
+  async addLeaderboardEntry(entry: InsertLeaderboardEntry): Promise<LeaderboardEntry> {
+    const created: LeaderboardEntry = {
+      id: this.leaderboardId++,
+      playerName: entry.playerName,
+      chapter: entry.chapter,
+      efficiency: entry.efficiency ?? 0,
+      ppc: entry.ppc ?? 0,
+      quizScore: entry.quizScore ?? 0,
+      totalScore: entry.totalScore ?? 0,
+      completedAt: new Date(),
+    };
+    this.leaderboard.push(created);
+    return created;
   }
 }
 

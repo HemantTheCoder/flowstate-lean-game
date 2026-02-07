@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { insertGameStateSchema, gameStates } from './schema';
+import { insertGameStateSchema, insertLeaderboardEntrySchema, gameStates, type LeaderboardEntry } from './schema';
 export type { UpdateGameRequest } from './schema';
 
 // ============================================
@@ -61,6 +61,31 @@ export const api = {
         204: z.void(),
       },
     }
+  },
+  leaderboard: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/leaderboard',
+      responses: {
+        200: z.array(z.custom<LeaderboardEntry>()),
+      },
+    },
+    byChapter: {
+      method: 'GET' as const,
+      path: '/api/leaderboard/:chapter',
+      responses: {
+        200: z.array(z.custom<LeaderboardEntry>()),
+      },
+    },
+    submit: {
+      method: 'POST' as const,
+      path: '/api/leaderboard',
+      input: insertLeaderboardEntrySchema,
+      responses: {
+        201: z.custom<LeaderboardEntry>(),
+        400: errorSchemas.validation,
+      },
+    },
   },
 };
 

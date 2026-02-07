@@ -1,250 +1,62 @@
 # FLOWSTATE - Saga of the Flow Architect
 
-A browser-based game built with React, TypeScript, Express, and Phaser that teaches Lean Construction principles through visual novel narrative.
-
 ## Overview
 
-This is a fullstack TypeScript application featuring:
-- **Frontend**: React with Vite, using Phaser for game logic
-- **Backend**: Express.js server
-- **Styling**: Tailwind CSS with shadcn/ui components
-- **State Management**: Zustand
-- **Data Fetching**: TanStack Query
+FLOWSTATE is a browser-based game designed to educate players on Lean Construction principles through an interactive visual novel narrative. Built with React, TypeScript, Express, and Phaser, it provides an engaging fullstack experience. The game focuses on simulating real-world construction scenarios where players apply Lean methodologies to improve project efficiency and reliability. Its key capabilities include teaching Work-In-Progress (WIP) limits, Pull Systems, Flow Management, and the Last Planner System (LPS) through two distinct chapters. The project aims to provide an accessible and interactive learning platform for construction professionals and students, fostering a deeper understanding of Lean practices and their practical application.
 
-## Game Chapters
+## User Preferences
 
-### Chapter 1: The Kanban Chronicles (PRESENTATION READY - VERIFIED)
-- Teaches WIP Limits, Pull Systems, and Flow Management
-- Days 1-5 with progressive difficulty
-- Characters: Mira (PM), Rao (Supervisor), Old Foreman, Isha (Planner)
-- **Day 1**: WIP limits introduction - control the Doing column
-- **Day 2**: Supply chain variability - pivot to zero-cost tasks when materials run out
-- **Day 3**: Monsoon Drift - rain blocks structural work, adapt with indoor tasks
-- **Day 4**: Push vs Pull decision - critical choice with Day 5 consequences
-- **Day 5**: Inspector review - outcome based on Day 4 choice
-- **Tutorial**: 8-step interactive guide teaching Kanban board mechanics
-- **Visual Polish**: All icons use Lucide, no external dependencies, responsive modals
+- I prefer a clear and concise communication style.
+- I appreciate detailed explanations for complex concepts.
+- I like iterative development, with frequent updates and feedback.
+- Ask me before making any major architectural changes or introducing new dependencies.
+- Ensure the game logic and educational content remain the top priority.
+- Do not make changes to the `attached_assets` folder without explicit instruction.
 
-**Efficiency System (Cumulative)**:
-- Flow efficiency = (cumulative tasks completed / cumulative possible) * 100
-- Increases progressively day-by-day if player completes all available work
-- 100% achievable only if all possible tasks completed each day
-- **Day 1 is always forgiving**: forceSafeFlow = true so tutorial doesn't penalize efficiency
-- Day-specific constraints affect potential capacity:
-  - Day 1: Tutorial day - always 100% efficiency (no penalty)
-  - Day 2: Only zero-cost tasks count (material shortage)
-  - Day 3: Only non-Structural tasks count (weather)
-  - Day 4-5: Push decision creates waste that reduces value-adding work
-- Waste/rework tasks excluded from value calculation
+## System Architecture
 
-**Daily Summary Modal**:
-- Shows daily + cumulative efficiency from store's dailyMetrics
-- "Today's Lesson" section with Lean concept name, explanation, and real construction example per day
-- Day-specific insights based on performance
+The project is a fullstack TypeScript application comprising a React frontend with Phaser for game logic, and an Express.js backend. Tailwind CSS with shadcn/ui components is used for styling, Zustand for state management, and TanStack Query for data fetching.
 
-**Reflection Quiz** (after Day 5, before Chapter Complete):
-- 5 multiple-choice questions testing WIP Limits, Pull vs Push, Adaptation, Bottleneck, Flow Efficiency
-- Score passed to Chapter Complete modal for display
-- **Missed Questions Recap**: Results screen shows which questions were wrong, correct answers, and explanations
+**UI/UX Decisions:**
+- **Thematic Chapters:** Chapter 1 utilizes a blue theme for Kanban concepts, while Chapter 2 uses a purple/indigo theme for the Last Planner System, providing clear visual differentiation.
+- **Responsive Design:** Mobile toolbars and components are optimized for smaller screens, with consistent icon sizing.
+- **Interactive Modals:** Use interactive, responsive modals for daily summaries, chapter completion, and reflection quizzes.
+- **Contextual Help:** LeanTooltipText highlights and defines Lean terms in dialogue, enhancing learning.
+- **Visual Kanban:** Task cards are color-coded by type (Structural, Systems, Interior, Management) with badges and borders.
 
-**Day 5 "Finish Chapter" Button**:
-- End Day button relabeled to "Finish Chapter" on Day 5
-- Distinct amber/orange gradient styling to signal chapter conclusion
-- Smart Advisor references "Finish Chapter" instead of "End Day" on Day 5
+**Technical Implementations:**
+- **Game Engine:** Phaser 3 is used for interactive gameplay elements, particularly for the Kanban board and planning room interactions.
+- **State Management:** Zustand manages global and game-specific states, including player progress, efficiency metrics, and audio settings.
+- **Routing:** Wouter is used for client-side routing within the React application.
+- **Animations:** Framer Motion is employed for smooth UI transitions and animations.
+- **Form Handling:** react-hook-form with Zod validation is used for robust form management.
+- **Audio System:** A dual-layer audio architecture uses the Web Audio API for synthesized sound effects (22+ SFX) and Howler.js for background music streamed from a CDN. Audio logic adapts BGM based on game state (e.g., "tense" music for high WIP).
 
-**Mobile Toolbar**:
-- Tighter spacing (gap-1.5, px-2, text-[9px]) on small screens
-- Consistent icon-only sizing on mobile, expanding on desktop
+**Feature Specifications:**
+- **Chapter 1: The Kanban Chronicles:** Teaches WIP Limits, Pull Systems, and Flow Management through a 5-day simulation. Includes a tutorial, efficiency tracking, daily summaries with Lean lessons, and a reflection quiz. Features constraint banners and a Smart Advisor for contextual tips.
+- **Chapter 2: The Promise System (Last Planner System):** Teaches Should/Can/Will planning via a 6-day simulation. Features a Planning Room UI, constraint removal mechanics, PPC calculation, and a "Fragile/Risky Task System" to simulate overcommitment consequences. Includes an event system to introduce dynamic challenges.
+- **Performance Dashboard:** A `/dashboard` route provides a comprehensive overview of player performance, including efficiency, PPC, morale, and waste removed, with trend charts and a day-by-day breakdown.
+- **Leaderboard:** A database-backed `/leaderboard` tracks and displays player scores, filtered by chapter, with weighted scoring based on efficiency, PPC, and quiz results.
+- **PDF Export:** Chapter completion modals offer an "Export Report" button to generate a detailed PDF report of player performance, key decisions, and learnings using jsPDF.
 
-**GlossaryPanel**:
-- Slide-out panel with 12 Lean Construction terms (WIP, Pull, Push, Flow, Waste, etc.)
-- Search/filter functionality, categorized into Core Concepts, Flow States, Lean Principles
-- Accessible via Glossary button in game toolbar
+**System Design Choices:**
+- **Modularity:** The project structure separates client, server, and shared logic, promoting maintainability.
+- **Data Persistence:** Game state and player progress are managed to allow for consistent gameplay experience across sessions.
+- **Education Integration:** Lean Construction principles are woven into dialogue, gameplay mechanics, and post-day summaries, reinforced by quizzes and explanations.
 
-**Constraint Banners**:
-- Day 2: Amber gradient banner showing "Material Shortage" with explanation
-- Day 3: Blue gradient banner showing "Monsoon Warning" with blocked task info
+## External Dependencies
 
-**Smart Advisor**:
-- Day-specific contextual Lean tips with construction examples
-- Enhanced messages for Days 1-5 with Lean terminology
-
-**Chapter Complete Modal**:
-- Interactive performance graph (cumulative + daily efficiency)
-- Day-by-day breakdown with click-to-view insights
-- "What Went Well" section with successes
-- "How to Improve" section with prioritized tips (if below 100%)
-- Key Learnings with real-world construction examples for each concept
-- Quiz score display with contextual feedback
-- Performance tiers: Master Flow Architect (90%+), Skilled Practitioner (70%+), etc.
-
-**Efficiency Bug Fix**:
-- advanceDay() now runs BEFORE showing DailySummary, ensuring accurate efficiency display
-- previousDoneCount delta calculation ensures correct task counting per day
-
-### Chapter 2: The Promise System (Last Planner System) - PRESENTATION READY
-- Teaches Should/Can/Will planning workflow via day-gated interactions
-- Days 6-11 with progressive capability unlocking and events
-- 17 construction-specific tasks (CHAPTER_2_TASKS array) with diverse constraints
-- Characters: Client, Old Foreman, Isha, Advisor (Dr. Lean), Mira, Rao, Inspector
-- Features: Planning Room UI, Constraint Removal, PPC Calculation, Badges
-- **Distinct Visual Design**: Purple/indigo theme differentiates from Chapter 1's blue theme
-- **Day Objective Banner**: Shows daily goals clearly at top of Planning Room
-- **Tutorial Timing**: Tutorial only shows after story dialogue ends on Day 6
-- **LPS Workflow Sidebar**: Visual progress tracker for SHOULD/CAN/WILL phases
-- **Lookahead WIP**: 8 tasks, Doing WIP: 4, Starting funds: $3500, materials: 500
-
-**Day-Gated Planning (Progressive Unlocking)**:
-- Day 6: Pull tasks ONLY (canPullTasks). Constraints hidden. End Day requires 3+ tasks in Lookahead.
-- Day 7: Constraints revealed (canInspectConstraints). Must click all RED tasks to discover blockers. End Day requires all blocked tasks inspected.
-- Day 8: Fix constraints enabled (canFixConstraints). applyDayEvent(8) adds NEW constraints to 2 sound tasks. Teaches Make Ready with cost/morale tradeoffs.
-- Day 9: Commit unlocked (canCommit). Must click 'Start Week' before End Day. GREEN tasks become promises.
-- Day 10: Execution phase. Emergency Pipe Repair task injected via applyDayEvent(10). Kanban board with committed tasks.
-- Day 11: Final execution. Crew constraint added to active task via applyDayEvent(11). Finish Chapter button.
-
-**Event System (applyDayEvent)**:
-- Day 8: Adds weather/crew constraints to unconstrained Lookahead tasks (complications)
-- Day 10: Injects 'Emergency Pipe Repair' task into Ready column
-- Day 11: Adds crew constraint to first task in Doing column
-- Event banners with dismissible notifications explain LPS lessons
-
-**Rich Dialogue Narratives** (Days 6-11):
-- Day 6: Planning Room introduction - SHOULD/CAN/WILL workflow explained
-- Day 7: Constraint discovery - Old Foreman reveals hidden blockers
-- Day 8: Make Ready process - Client pressure vs. proper preparation
-- Day 9: Commitment day - pressure to overcommit vs. reliable promises
-- Day 10: Execution day - Sound tasks flow smoothly
-- Day 11: PPC Review - Inspector evaluates promise reliability
-
-**Daily Summary Lean Lessons** (Days 6-11):
-- Each day has concept name, detailed explanation, and real construction example
-- Topics: Should/Can/Will, Constraints, Make Ready, Reliable Commitments, Execution, PPC
-
-**Phase Transition Screen**:
-- 3-step educational walkthrough when transitioning from Planning to Execution
-- Step 1: "Planning Phase Complete" - constraint removal summary
-- Step 2: "{N} Tasks Committed" - explains locked Weekly Work Plan promises
-- Step 3: "Execution Begins" - Kanban board instructions
-- Progress dots and animated transitions between steps
-
-**Reflection Quiz** (Chapter 2):
-- 5 multiple-choice questions: Should/Can/Will, Constraints, PPC, Overcommitment, Make Ready
-- Chapter-aware: different questions for Chapter 1 vs Chapter 2
-- Missed-question recap with correct answers and explanations
-- Chapter-specific Key Takeaways section
-
-**Chapter 2 Complete Modal**:
-- PPC gauge with animated fill (green/yellow/red based on score)
-- Performance tiers: Master Planner (90%+), Reliable Leader (80%+), Growing/Learning Planner
-- Day-by-day expandable breakdown (Days 6-11) with LPS concepts and real-world examples
-- Quiz score integration with contextual feedback
-- Overcommitment detection warning
-- Badges: Promise Keeper, Reliable Planner, Constraint Crusher, Perfect Week, LPS Scholar
-- Constraint Crusher badge: awarded for discovering constraints AND avoiding fragile task failures
-- PPC Failure Reasons Analysis section showing WHY promises broke (fragile failures, overcommitment, time pressure)
-- Fragile Tasks Report with outcome feedback
-- Key Learnings with 4 real-world construction insights
-- Budget and Morale stats display
-
-**Fragile/Risky Task System** (Three-Tier Readiness):
-- RED (Blocked): 2+ constraints, cannot be committed
-- YELLOW (Risky): 1 constraint, can be force-committed but becomes FRAGILE
-- GREEN (Sound): 0 constraints, safe to commit
-- Force-commit warning modal presents strategic choice: safe (GREEN only) vs risky (GREEN + YELLOW)
-- Fragile tasks have 30% failure probability when moved to Done
-- Failed fragile tasks return to Ready column, -5% morale penalty
-- Teaches consequence of overcommitment through gameplay mechanics
-- All UI stat displays (sidebar, lookahead header, weekly plan) show Blocked/Risky/Sound breakdowns
-
-**Chapter 2 Intro Modal**:
-- Purple/indigo gradient theme differentiating from Chapter 1's blue theme
-- "You Will Learn" objectives overlay for Chapter 2
-- Chapter-specific CTA button text ("Begin Day 6 Planning" vs "Start Chapter")
-
-**Day 11 Flow**:
-- Day 11 dialogue -> End Day (amber "Finish Chapter" button) -> Daily Summary -> Quiz -> Chapter Complete
-- PPC calculated after quiz, not during dialogue
-
-**Glossary** (expanded):
-- 4 categories: Core Concepts, Flow States, Lean Principles, Last Planner System
-- 8 new LPS terms: LPS, Should/Can/Will, Constraint, Make Ready, Sound Activity, PPC, Weekly Work Plan, Reliable Promise
-- Total: 20+ terms with definitions and examples
-
-## Project Structure
-
-```
-├── client/              # Frontend React application
-│   ├── src/
-│   │   ├── components/  # UI components
-│   │   ├── pages/       # Route pages
-│   │   ├── hooks/       # Custom hooks
-│   │   └── lib/         # Utilities
-│   └── index.html
-├── server/              # Express backend
-│   ├── index.ts         # Server entry point
-│   ├── routes.ts        # API routes
-│   ├── storage.ts       # Data storage interface
-│   └── vite.ts          # Vite dev server integration
-├── shared/              # Shared types/schemas
-└── attached_assets/     # Static assets
-```
-
-## Development
-
-The project runs on port 5000 with the Express server handling both the API and the Vite dev server in development mode.
-
-**Start Command**: `npm run dev` - Runs tsx to start the Express server with embedded Vite
-
-## Key Technologies
-
-- **Phaser 3**: Game engine for interactive gameplay
-- **Drizzle ORM**: Database schema and queries
-- **Wouter**: Client-side routing
-- **Framer Motion**: Animations
-- **react-hook-form**: Form handling with Zod validation
-
-## Sound System
-
-**Architecture**: Dual-layer audio using Web Audio API for SFX (instant, zero-latency synthesis) and Howler.js for BGM (streaming from Pixabay CDN).
-
-**SFX (Synthesized via Web Audio API)** - 22+ sound effects, zero external dependencies:
-- UI: click, ding, whoosh
-- Game Feedback: success, complete, alert, warning, money
-- Interaction: drag, drop, card_flip, typing
-- Quiz: quiz_correct, quiz_wrong
-- Transitions: day_transition, fanfare, unlock
-- Game State: constraint, badge, morale_up, morale_down, storm
-
-**BGM Tracks** (Howler.js, streamed from CDN):
-- `menu`: Title screen and Chapter Select ambient music
-- `cozy`: Relaxed construction planning
-- `tense`: High-WIP urgency (triggers when Doing column >= 3 tasks)
-- `rain`: Day 3 monsoon ambience
-- `construction`: Default gameplay BGM
-- `planning`: Chapter 2 Planning Room (purple theme BGM)
-
-**Music Switching Logic** (Game.tsx):
-- Chapter 2 Planning Room -> 'planning' BGM
-- Day 3 -> 'rain' BGM
-- High WIP (>=3 in Doing) -> 'tense' BGM
-- Default -> 'construction' BGM
-- Home/ChapterSelect -> 'menu' BGM
-
-**SFX Wiring**:
-- DialogueBox: typing sound on advance
-- KanbanBoard: click/money on task moves, alert on invalid moves
-- PlanningRoom: card_flip on task select, drop/drag on pull/return, constraint on fix, warning/success on commit
-- ReflectionQuiz: quiz_correct/quiz_wrong on answer, fanfare on quiz complete
-- DailySummary: day_transition on open
-- ChapterCompleteModal/Chapter2CompleteModal: success/complete on open
-- ChapterIntroModal: whoosh on start
-- DayBriefingModal: click on acknowledge
-- Home: whoosh on Start Game, menu BGM on mount
-- SettingsModal: click on SFX volume change (preview)
-
-**Volume Controls**: bgmVolume, sfxVolume, isMuted managed via gameStore.audioSettings
-
-## Deployment
-
-- **Build**: `npm run build` - Compiles frontend with Vite and backend with esbuild
-- **Start**: `npm run start` - Runs the production build
+- **Phaser 3:** Game engine for interactive gameplay.
+- **Drizzle ORM:** Database Object-Relational Mapper.
+- **Wouter:** Client-side routing library.
+- **Framer Motion:** Animation library.
+- **react-hook-form:** Library for form handling.
+- **Zod:** Schema declaration and validation library (used with react-hook-form).
+- **Zustand:** State management library.
+- **TanStack Query:** Data fetching library.
+- **Tailwind CSS:** Utility-first CSS framework.
+- **shadcn/ui:** UI component library built with Tailwind CSS.
+- **Howler.js:** JavaScript audio library for background music (streaming from Pixabay CDN).
+- **jsPDF:** Library for generating PDF documents.
+- **PostgreSQL:** Relational database for leaderboard and player data storage.
+- **Lucide:** Icon library (used for all UI icons).

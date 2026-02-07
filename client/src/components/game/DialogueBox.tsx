@@ -3,6 +3,7 @@ import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
+import { LeanTooltipText } from './LeanTooltip';
 
 export const DialogueBox: React.FC = () => {
     const { currentDialogue, dialogueIndex, advanceDialogue, playerName, playerGender } = useGameStore();
@@ -92,9 +93,9 @@ export const DialogueBox: React.FC = () => {
                         </div>
 
                         {/* Text Content */}
-                        <p className="text-xl md:text-2xl text-slate-800 font-medium leading-relaxed font-sans mt-2">
-                            {line.text.replace(/Engineer/g, playerName)}
-                        </p>
+                        <div className="text-xl md:text-2xl text-slate-800 font-medium leading-relaxed font-sans mt-2">
+                            <LeanTooltipText text={line.text.replace(/Engineer/g, playerName)} />
+                        </div>
 
                         {/* Continue Indicator */}
                         <div className="absolute bottom-4 right-6 text-slate-400 text-sm animate-pulse font-bold tracking-widest uppercase flex items-center gap-1">

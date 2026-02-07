@@ -569,7 +569,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             }
             return col;
           }),
-          logs: [...state.logs, `FRAGILE FAILURE: "${task.title}" failed during execution! Constraint was not properly resolved. Task returned to Ready. -5% Morale.`]
+          log: [...state.log, `FRAGILE FAILURE: "${task.title}" failed during execution! Constraint was not properly resolved. Task returned to Ready. -5% Morale.`]
         });
         return false;
       }
