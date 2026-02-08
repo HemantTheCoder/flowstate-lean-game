@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
 import { apiRequest } from '@/lib/queryClient';
-import { CheckCircle, XCircle, AlertTriangle, Award, TrendingUp, Users, Target, Lightbulb, BookOpen, ChevronDown, ChevronUp, Download } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Award, TrendingUp, Users, Target, Lightbulb, BookOpen, ChevronDown, ChevronUp, Download, Trophy } from 'lucide-react';
 import { exportChapterReport } from '@/lib/exportPDF';
 
 interface Chapter2CompleteModalProps {
@@ -65,7 +65,7 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
     const ppcLevel = ppc >= 80 ? 'excellent' : ppc >= 50 ? 'average' : 'poor';
     const overcommitted = flags['overcommitment_accepted'];
 
-    const submittedRef = useRef(false);
+    const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
     useEffect(() => {
         if (isOpen) {
@@ -80,21 +80,35 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                     setAnimatedPPC(current);
                 }
             }, 30);
-            if (!submittedRef.current) {
-                submittedRef.current = true;
-                const totalScore = Math.round(ppc * 0.5 + (lpi.flowEfficiency || 0) * 0.3 + (quizScore || 0) * 8);
-                apiRequest('POST', '/api/leaderboard', {
-                    playerName: playerName || 'Architect',
-                    chapter: 2,
-                    efficiency: lpi.flowEfficiency || 0,
-                    ppc,
-                    quizScore: quizScore || 0,
-                    totalScore,
-                }).catch(() => {});
-            }
             return () => clearInterval(interval);
+        } else {
+            setSubmissionStatus('idle');
         }
     }, [isOpen, ppc, ppcLevel]);
+
+    const handleSubmitScore = async () => {
+        if (submissionStatus === 'success' || submissionStatus === 'submitting') return;
+
+        setSubmissionStatus('submitting');
+        const totalScore = Math.round(ppc * 0.5 + (lpi.flowEfficiency || 0) * 0.3 + (quizScore || 0) * 8);
+
+        try {
+            await apiRequest('POST', '/api/leaderboard', {
+                playerName: playerName || 'Architect',
+                chapter: 2,
+                efficiency: lpi.flowEfficiency || 0,
+                ppc,
+                quizScore: quizScore || 0,
+                totalScore,
+            });
+            setSubmissionStatus('success');
+            soundManager.playSFX('success', 0.5);
+        } catch (error) {
+            console.error(error);
+            setSubmissionStatus('error');
+            soundManager.playSFX('warning', 0.5);
+        }
+    };
 
     const handleContinue = () => {
         onClose();
@@ -184,11 +198,10 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                 <p className="text-slate-500 text-sm text-center mt-1 italic">{tier.desc}</p>
                             </div>
 
-                            <div className={`p-4 rounded-xl ${
-                                ppcLevel === 'excellent' ? 'bg-green-50 border border-green-200' :
+                            <div className={`p-4 rounded-xl ${ppcLevel === 'excellent' ? 'bg-green-50 border border-green-200' :
                                 ppcLevel === 'average' ? 'bg-yellow-50 border border-yellow-200' :
-                                'bg-red-50 border border-red-200'
-                            }`}>
+                                    'bg-red-50 border border-red-200'
+                                }`}>
                                 {ppcLevel === 'excellent' && (
                                     <div className="flex items-start gap-3">
                                         <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
@@ -258,9 +271,9 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                         Fragile Tasks Report
                                     </h4>
                                     <p className="text-amber-700 text-sm">
-                                        {fragileTasks.length} task{fragileTasks.length > 1 ? 's were' : ' was'} committed with unresolved constraints (fragile). 
-                                        {failedFragile.length > 0 
-                                            ? ` ${failedFragile.length} failed during execution - this is why Make Ready matters!` 
+                                        {fragileTasks.length} task{fragileTasks.length > 1 ? 's were' : ' was'} committed with unresolved constraints (fragile).
+                                        {failedFragile.length > 0
+                                            ? ` ${failedFragile.length} failed during execution - this is why Make Ready matters!`
                                             : ' All survived execution - you got lucky, but next time fix constraints first!'
                                         }
                                     </p>
@@ -399,7 +412,7 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                 </div>
                             </div>
 
-                            <div className="flex gap-3">
+                            <div className="grid grid-cols-2 gap-3">
                                 <button
                                     onClick={() => {
                                         const metricsData = (dailyMetrics as { day: number; efficiency: number; tasksCompletedToday: number; potentialCapacity: number; cumulativeEfficiency: number; insight: string }[]);
@@ -422,14 +435,36 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                             badges: badges.map(b => b.name),
                                         });
                                     }}
-                                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-colors"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-colors w-full"
                                     data-testid="button-export-report-ch2"
                                 >
                                     <Download className="w-4 h-4" /> Export Report
                                 </button>
+
+                                <button
+                                    onClick={() => window.location.href = '/leaderboard'}
+                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-colors w-full"
+                                >
+                                    <Trophy className="w-4 h-4" /> View Leaderboard
+                                </button>
+
+                                <button
+                                    onClick={handleSubmitScore}
+                                    disabled={submissionStatus === 'submitting' || submissionStatus === 'success'}
+                                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-colors font-bold w-full ${submissionStatus === 'success' ? 'bg-green-100 border-green-300 text-green-700' :
+                                        submissionStatus === 'error' ? 'bg-red-50 border-red-200 text-red-700' :
+                                            'border-slate-200 text-slate-700 hover:bg-slate-50'
+                                        }`}
+                                >
+                                    {submissionStatus === 'submitting' && <span className="animate-spin">⏳</span>}
+                                    {submissionStatus === 'success' && <CheckCircle className="w-4 h-4" />}
+                                    {submissionStatus === 'success' ? 'Score Submitted!' :
+                                        submissionStatus === 'error' ? 'Try Again' : 'Submit Score'}
+                                </button>
+
                                 <button
                                     onClick={handleContinue}
-                                    className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xl font-black py-4 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
+                                    className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-lg font-black py-3 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3 w-full"
                                     data-testid="button-continue-chapter"
                                 >
                                     Continue to Chapter 3

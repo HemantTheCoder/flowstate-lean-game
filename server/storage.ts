@@ -1,6 +1,6 @@
-// import { db } from "./db"; // DB Disabled for Local Mode
-import { gameStates, type GameState, type InsertGameState, type LeaderboardEntry, type InsertLeaderboardEntry, GAME_CONSTANTS } from "@shared/schema";
-// import { eq } from "drizzle-orm"; // DB Disabled
+import { db } from "./db";
+import { gameStates, type GameState, type InsertGameState, type LeaderboardEntry, type InsertLeaderboardEntry, GAME_CONSTANTS, leaderboardEntries } from "@shared/schema";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   getGameState(sessionId: string): Promise<GameState | undefined>;
@@ -10,6 +10,88 @@ export interface IStorage {
   getLeaderboard(): Promise<LeaderboardEntry[]>;
   getLeaderboardByChapter(chapter: number): Promise<LeaderboardEntry[]>;
   addLeaderboardEntry(entry: InsertLeaderboardEntry): Promise<LeaderboardEntry>;
+  clearLeaderboard(): Promise<void>;
+}
+
+export class DatabaseStorage implements IStorage {
+  async getGameState(sessionId: string): Promise<GameState | undefined> {
+    const [state] = await db
+      .select()
+      .from(gameStates)
+      .where(eq(gameStates.sessionId, sessionId));
+    return state;
+  }
+
+  async createOrUpdateGameState(gameState: InsertGameState): Promise<GameState> {
+    const [existing] = await db
+      .select()
+      .from(gameStates)
+      .where(eq(gameStates.sessionId, gameState.sessionId));
+
+    if (existing) {
+      const [updated] = await db
+        .update(gameStates)
+        .set({ ...gameState, lastPlayed: new Date() })
+        .where(eq(gameStates.sessionId, gameState.sessionId))
+        .returning();
+      return updated;
+    }
+
+    const [created] = await db
+      .insert(gameStates)
+      .values({
+        ...gameState,
+        lastPlayed: new Date(),
+        playerName: gameState.playerName ?? "Architect",
+        chapter: gameState.chapter ?? 1,
+        week: gameState.week ?? 1,
+        resources: (gameState.resources as any) ?? GAME_CONSTANTS.INITIAL_RESOURCES,
+      })
+      .returning();
+    return created;
+  }
+
+  async updateGameState(sessionId: string, updates: Partial<InsertGameState>): Promise<GameState> {
+    const [updated] = await db
+      .update(gameStates)
+      .set({ ...updates, lastPlayed: new Date() })
+      .where(eq(gameStates.sessionId, sessionId))
+      .returning();
+
+    if (!updated) throw new Error("Game state not found");
+    return updated;
+  }
+
+  async deleteGameState(sessionId: string): Promise<void> {
+    await db.delete(gameStates).where(eq(gameStates.sessionId, sessionId));
+  }
+
+  async getLeaderboard(): Promise<LeaderboardEntry[]> {
+    return await db
+      .select()
+      .from(leaderboardEntries)
+      .orderBy(desc(leaderboardEntries.totalScore));
+  }
+
+  async getLeaderboardByChapter(chapter: number): Promise<LeaderboardEntry[]> {
+    return await db
+      .select()
+      .from(leaderboardEntries)
+      .where(eq(leaderboardEntries.chapter, chapter))
+      .orderBy(desc(leaderboardEntries.totalScore));
+  }
+
+  async addLeaderboardEntry(entry: InsertLeaderboardEntry): Promise<LeaderboardEntry> {
+    const [newEntry] = await db
+      .insert(leaderboardEntries)
+      .values(entry)
+      .returning();
+    return newEntry;
+  }
+
+  async clearLeaderboard(): Promise<void> {
+    await db.delete(leaderboardEntries);
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -71,32 +153,33 @@ export class MemStorage implements IStorage {
   }
 
   async getLeaderboard(): Promise<LeaderboardEntry[]> {
-    return [...this.leaderboard]
-      .sort((a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0))
-      .slice(0, 50);
+    return this.leaderboard.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
   }
 
   async getLeaderboardByChapter(chapter: number): Promise<LeaderboardEntry[]> {
     return this.leaderboard
-      .filter((e) => e.chapter === chapter)
-      .sort((a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0))
-      .slice(0, 50);
+      .filter(entry => entry.chapter === chapter)
+      .sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
   }
 
   async addLeaderboardEntry(entry: InsertLeaderboardEntry): Promise<LeaderboardEntry> {
-    const created: LeaderboardEntry = {
-      id: this.leaderboardId++,
-      playerName: entry.playerName,
-      chapter: entry.chapter,
+    const id = this.leaderboardId++;
+    const newEntry: LeaderboardEntry = {
+      ...entry,
+      id,
       efficiency: entry.efficiency ?? 0,
       ppc: entry.ppc ?? 0,
       quizScore: entry.quizScore ?? 0,
       totalScore: entry.totalScore ?? 0,
       completedAt: new Date(),
     };
-    this.leaderboard.push(created);
-    return created;
+    this.leaderboard.push(newEntry);
+    return newEntry;
+  }
+
+  async clearLeaderboard(): Promise<void> {
+    await db.delete(leaderboardEntries);
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

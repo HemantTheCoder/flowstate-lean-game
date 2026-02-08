@@ -4,16 +4,16 @@ import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
 import { apiRequest } from '@/lib/queryClient';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
-import { Play, CheckCircle2, AlertTriangle, TrendingUp, Target, Award, Lightbulb, ChevronRight, Zap, Users, Hammer, CloudRain, Shield, Download } from 'lucide-react';
+import { Play, CheckCircle2, AlertTriangle, TrendingUp, Target, Award, Lightbulb, ChevronRight, Zap, Users, Hammer, CloudRain, Shield, Download, Trophy } from 'lucide-react';
 import { exportChapterReport } from '@/lib/exportPDF';
 
 interface DayBreakdown {
-  day: number;
-  efficiency: number;
-  tasksCompletedToday: number;
-  potentialCapacity: number;
-  cumulativeEfficiency: number;
-  insight: string;
+    day: number;
+    efficiency: number;
+    tasksCompletedToday: number;
+    potentialCapacity: number;
+    cumulativeEfficiency: number;
+    insight: string;
 }
 
 const BeforeAfterComparison: React.FC<{ pushed: boolean }> = ({ pushed }) => {
@@ -160,40 +160,53 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
     const { funds, lpi, dailyMetrics, flags, cumulativeTasksCompleted, cumulativePotentialCapacity, playerName } = useGameStore();
     const [activeDay, setActiveDay] = useState<number | null>(null);
     const [showInsights, setShowInsights] = useState(false);
-    const submittedRef = useRef(false);
+    const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
     useEffect(() => {
         if (isOpen) {
             soundManager.playSFX('success', 0.8);
             const timer = setTimeout(() => setShowInsights(true), 1500);
-            if (!submittedRef.current) {
-                submittedRef.current = true;
-                const eff = cumulativePotentialCapacity > 0
-                    ? Math.min(100, Math.round((cumulativeTasksCompleted / cumulativePotentialCapacity) * 100))
-                    : lpi.flowEfficiency;
-                const totalScore = Math.round(eff * 0.6 + (quizScore || 0) * 8);
-                apiRequest('POST', '/api/leaderboard', {
-                    playerName: playerName || 'Architect',
-                    chapter: 1,
-                    efficiency: eff,
-                    ppc: 0,
-                    quizScore: quizScore || 0,
-                    totalScore,
-                }).catch(() => {});
-            }
             return () => clearTimeout(timer);
         } else {
             setShowInsights(false);
             setActiveDay(null);
+            setSubmissionStatus('idle');
         }
     }, [isOpen]);
+
+    const handleSubmitScore = async () => {
+        if (submissionStatus === 'success' || submissionStatus === 'submitting') return;
+
+        setSubmissionStatus('submitting');
+        const eff = cumulativePotentialCapacity > 0
+            ? Math.min(100, Math.round((cumulativeTasksCompleted / cumulativePotentialCapacity) * 100))
+            : lpi.flowEfficiency;
+        const totalScore = Math.round(eff * 0.6 + (quizScore || 0) * 8);
+
+        try {
+            await apiRequest('POST', '/api/leaderboard', {
+                playerName: playerName || 'Architect',
+                chapter: 1,
+                efficiency: eff,
+                ppc: 0,
+                quizScore: quizScore || 0,
+                totalScore,
+            });
+            setSubmissionStatus('success');
+            soundManager.playSFX('success', 0.5);
+        } catch (error) {
+            console.error(error);
+            setSubmissionStatus('error');
+            soundManager.playSFX('warning', 0.5);
+        }
+    };
 
     const handleContinue = () => {
         onClose();
         onContinue();
     };
 
-    const finalEfficiency = cumulativePotentialCapacity > 0 
+    const finalEfficiency = cumulativePotentialCapacity > 0
         ? Math.min(100, Math.max(0, Math.round((cumulativeTasksCompleted / cumulativePotentialCapacity) * 100)))
         : lpi.flowEfficiency;
 
@@ -209,48 +222,48 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
 
     const getImprovementSuggestions = () => {
         const suggestions: { icon: any; text: string; priority: 'high' | 'medium' | 'low' }[] = [];
-        
+
         const metrics = dailyMetrics as DayBreakdown[];
-        
+
         metrics.forEach((m) => {
             if (m.efficiency < 50) {
                 if (m.day === 1) {
-                    suggestions.push({ 
-                        icon: Target, 
-                        text: 'Day 1: Complete tasks up to WIP limit for maximum throughput', 
-                        priority: 'high' 
+                    suggestions.push({
+                        icon: Target,
+                        text: 'Day 1: Complete tasks up to WIP limit for maximum throughput',
+                        priority: 'high'
                     });
                 }
                 if (m.day === 2) {
-                    suggestions.push({ 
-                        icon: Zap, 
-                        text: 'Day 2: When materials run out, pivot to zero-cost tasks', 
-                        priority: 'high' 
+                    suggestions.push({
+                        icon: Zap,
+                        text: 'Day 2: When materials run out, pivot to zero-cost tasks',
+                        priority: 'high'
                     });
                 }
                 if (m.day === 3) {
-                    suggestions.push({ 
-                        icon: AlertTriangle, 
-                        text: 'Day 3: Rain blocks structural work - adapt with indoor tasks', 
-                        priority: 'medium' 
+                    suggestions.push({
+                        icon: AlertTriangle,
+                        text: 'Day 3: Rain blocks structural work - adapt with indoor tasks',
+                        priority: 'medium'
                     });
                 }
             }
         });
 
         if (pushed) {
-            suggestions.push({ 
-                icon: Lightbulb, 
-                text: 'Day 4: Choosing Pull over Push avoids creating rework waste', 
-                priority: 'high' 
+            suggestions.push({
+                icon: Lightbulb,
+                text: 'Day 4: Choosing Pull over Push avoids creating rework waste',
+                priority: 'high'
             });
         }
 
         if (suggestions.length === 0 && finalEfficiency >= 80) {
-            suggestions.push({ 
-                icon: Award, 
-                text: 'Excellent flow management! You understood WIP limits and adaptation.', 
-                priority: 'low' 
+            suggestions.push({
+                icon: Award,
+                text: 'Excellent flow management! You understood WIP limits and adaptation.',
+                priority: 'low'
             });
         }
 
@@ -258,11 +271,11 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
     };
 
     const suggestions = getImprovementSuggestions();
-    
+
     const getSuccesses = () => {
         const successes: string[] = [];
         const metrics = dailyMetrics as DayBreakdown[];
-        
+
         metrics.forEach((m) => {
             if (m.efficiency >= 80) {
                 if (m.day === 1) successes.push('Mastered WIP limits on Day 1');
@@ -272,7 +285,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                 if (m.day === 5) successes.push('Passed inspection with clean flow');
             }
         });
-        
+
         return successes.length > 0 ? successes : ['Completed the chapter - keep learning!'];
     };
 
@@ -309,8 +322,8 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 CHAPTER 1 COMPLETE
                             </h1>
                             <p className="text-green-100 font-bold tracking-widest uppercase mt-1 text-sm">The Kanban Chronicles</p>
-                            
-                            <motion.div 
+
+                            <motion.div
                                 initial={{ scale: 0, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 transition={{ delay: 0.5 }}
@@ -341,22 +354,22 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         }} onMouseLeave={() => setActiveDay(null)}>
                                             <defs>
                                                 <linearGradient id="efficiencyGradient" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                                                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                                                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                                                 </linearGradient>
                                                 <linearGradient id="cumulativeGradient" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
-                                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.05}/>
+                                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.05} />
                                                 </linearGradient>
                                             </defs>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                            <XAxis 
-                                                dataKey="dayLabel" 
+                                            <XAxis
+                                                dataKey="dayLabel"
                                                 tick={{ fontSize: 11, fontWeight: 500 }}
                                                 tickLine={false}
                                                 axisLine={false}
                                             />
-                                            <YAxis 
+                                            <YAxis
                                                 domain={[0, 100]}
                                                 tick={{ fontSize: 10 }}
                                                 tickLine={false}
@@ -364,11 +377,11 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                                 tickFormatter={(v) => `${v}%`}
                                             />
                                             <ReferenceLine y={100} stroke="#22c55e" strokeDasharray="5 5" strokeOpacity={0.5} />
-                                            <Tooltip 
-                                                contentStyle={{ 
-                                                    borderRadius: '12px', 
-                                                    border: 'none', 
-                                                    boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.2)', 
+                                            <Tooltip
+                                                contentStyle={{
+                                                    borderRadius: '12px',
+                                                    border: 'none',
+                                                    boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.2)',
                                                     fontSize: '12px',
                                                     padding: '12px'
                                                 }}
@@ -377,21 +390,21 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                                     return [`${value}%`, 'Daily'];
                                                 }}
                                             />
-                                            <Area 
-                                                type="monotone" 
+                                            <Area
+                                                type="monotone"
                                                 dataKey="cumulativeEfficiency"
                                                 name="cumulativeEfficiency"
-                                                stroke="#10b981" 
+                                                stroke="#10b981"
                                                 strokeWidth={3}
                                                 fill="url(#cumulativeGradient)"
                                                 dot={{ r: 5, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }}
                                                 activeDot={{ r: 7, stroke: '#10b981', strokeWidth: 2 }}
                                             />
-                                            <Line 
-                                                type="monotone" 
+                                            <Line
+                                                type="monotone"
                                                 dataKey="efficiency"
                                                 name="efficiency"
-                                                stroke="#3b82f6" 
+                                                stroke="#3b82f6"
                                                 strokeWidth={2}
                                                 strokeDasharray="4 4"
                                                 dot={{ r: 3, fill: '#3b82f6' }}
@@ -407,10 +420,10 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         <div className="w-4 h-0.5 bg-blue-500 border-t border-dashed"></div> Daily Rate
                                     </div>
                                 </div>
-                                
+
                                 <AnimatePresence>
                                     {activeDay && chartData.find(d => d.day === activeDay) && (
-                                        <motion.div 
+                                        <motion.div
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0 }}
@@ -430,9 +443,9 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.8 + i * 0.1 }}
                                         className={`p-3 rounded-xl border-2 text-center cursor-pointer transition-all
-                                            ${day.efficiency >= 80 
-                                                ? 'bg-green-50 border-green-200 hover:border-green-400' 
-                                                : day.efficiency >= 50 
+                                            ${day.efficiency >= 80
+                                                ? 'bg-green-50 border-green-200 hover:border-green-400'
+                                                : day.efficiency >= 50
                                                     ? 'bg-blue-50 border-blue-200 hover:border-blue-400'
                                                     : 'bg-orange-50 border-orange-200 hover:border-orange-400'
                                             }`}
@@ -440,10 +453,9 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         data-testid={`card-day-${day.day}`}
                                     >
                                         <div className="text-[10px] font-bold text-slate-500 uppercase">Day {day.day}</div>
-                                        <div className={`text-xl font-black ${
-                                            day.efficiency >= 80 ? 'text-green-600' : 
+                                        <div className={`text-xl font-black ${day.efficiency >= 80 ? 'text-green-600' :
                                             day.efficiency >= 50 ? 'text-blue-600' : 'text-orange-600'
-                                        }`}>
+                                            }`}>
                                             {day.tasksCompletedToday}/{day.potentialCapacity}
                                         </div>
                                         <div className="text-[10px] text-slate-500">tasks</div>
@@ -464,7 +476,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                             </h4>
                                             <ul className="space-y-2">
                                                 {successes.map((s, i) => (
-                                                    <motion.li 
+                                                    <motion.li
                                                         key={i}
                                                         initial={{ opacity: 0, x: -20 }}
                                                         animate={{ opacity: 1, x: 0 }}
@@ -485,17 +497,16 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                                 </h4>
                                                 <ul className="space-y-2">
                                                     {suggestions.map((s, i) => (
-                                                        <motion.li 
+                                                        <motion.li
                                                             key={i}
                                                             initial={{ opacity: 0, x: -20 }}
                                                             animate={{ opacity: 1, x: 0 }}
                                                             transition={{ delay: 2.2 + i * 0.15 }}
                                                             className="flex items-start gap-2 text-amber-700 text-sm"
                                                         >
-                                                            <s.icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
-                                                                s.priority === 'high' ? 'text-red-500' : 
+                                                            <s.icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${s.priority === 'high' ? 'text-red-500' :
                                                                 s.priority === 'medium' ? 'text-amber-500' : 'text-green-500'
-                                                            }`} />
+                                                                }`} />
                                                             {s.text}
                                                         </motion.li>
                                                     ))}
@@ -572,7 +583,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 </p>
                             </div>
 
-                            <div className="flex gap-3">
+                            <div className="grid grid-cols-2 gap-3">
                                 <button
                                     onClick={() => {
                                         const metrics = dailyMetrics as DayBreakdown[];
@@ -600,14 +611,36 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                             badges: [tier.label],
                                         });
                                     }}
-                                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-colors"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-colors w-full"
                                     data-testid="button-export-report-ch1"
                                 >
                                     <Download className="w-4 h-4" /> Export Report
                                 </button>
+
+                                <button
+                                    onClick={() => window.location.href = '/leaderboard'}
+                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-colors w-full"
+                                >
+                                    <Trophy className="w-4 h-4" /> View Leaderboard
+                                </button>
+
+                                <button
+                                    onClick={handleSubmitScore}
+                                    disabled={submissionStatus === 'submitting' || submissionStatus === 'success'}
+                                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-colors font-bold w-full ${submissionStatus === 'success' ? 'bg-green-100 border-green-300 text-green-700' :
+                                        submissionStatus === 'error' ? 'bg-red-50 border-red-200 text-red-700' :
+                                            'border-slate-200 text-slate-700 hover:bg-slate-50'
+                                        }`}
+                                >
+                                    {submissionStatus === 'submitting' && <span className="animate-spin">⏳</span>}
+                                    {submissionStatus === 'success' && <CheckCircle2 className="w-4 h-4" />}
+                                    {submissionStatus === 'success' ? 'Score Submitted!' :
+                                        submissionStatus === 'error' ? 'Try Again' : 'Submit Score'}
+                                </button>
+
                                 <button
                                     onClick={handleContinue}
-                                    className="flex-1 bg-green-500 hover:bg-green-600 text-white text-xl font-black py-4 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
+                                    className="bg-green-500 hover:bg-green-600 text-white text-lg font-black py-3 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3 w-full"
                                     data-testid="button-start-chapter-2"
                                 >
                                     Start Chapter 2 <Play className="w-5 h-5" />

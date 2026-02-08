@@ -23,12 +23,20 @@ export default function Settings() {
                     </div>
                 </div>
 
-                <Link href="/">
-                    <button className="px-8 py-3 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition-colors">
-                        Back to Home
-                    </button>
-                </Link>
-            </motion.div>
-        </div>
+                <div className="space-y-3 w-full">
+                    <Link href="/dev">
+                        <button className="w-full px-8 py-3 border-2 border-slate-300 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors mb-2">
+                            Developer Console
+                        </button>
+                    </Link>
+
+                    <Link href="/">
+                        <button className="w-full px-8 py-3 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition-colors">
+                            Back to Home
+                        </button>
+                    </Link>
+                </div>
+            </motion.div >
+        </div >
     );
 }

@@ -122,5 +122,15 @@ export async function registerRoutes(
     }
   });
 
+  // Clear Leaderboard (Dev Tool)
+  app.delete(api.leaderboard.submit.path, async (_req, res) => {
+    try {
+      await storage.clearLeaderboard();
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to clear leaderboard" });
+    }
+  });
+
   return httpServer;
 }

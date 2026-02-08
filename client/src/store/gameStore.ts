@@ -104,6 +104,11 @@ export interface GameState {
   startChapter: (chapter: number) => void;
   // setChapter: (chapter: number) => void; // Deprecated, use startChapter
   advanceDay: () => void;
+
+  // Dev Tools
+  setDay: (day: number) => void;
+  setChapter: (chapter: number) => void;
+
   updateLPI: (metric: keyof GameState['lpi'], value: number) => void;
 
   // Logs
@@ -168,6 +173,11 @@ export const useGameStore = create<GameState>((set, get) => ({
   playerName: 'Engineer',
   playerGender: 'male',
   setPlayerProfile: (name, gender) => set({ playerName: name, playerGender: gender }),
+
+  // Dev Actions
+  // Dev Actions
+  setDay: (day) => set((state) => ({ day, week: Math.ceil(day / 5) })),
+  setChapter: (chapter) => get().startChapter(chapter),
 
   tutorialActive: true,
   tutorialStep: 0,
@@ -399,6 +409,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         adjustedPotential = potentialCapacity + wasteTasksInSystem;
       } else {
         dayInsight = 'Inspection passed. Consistent reliability!';
+        forceSafeFlow = true; // Fix: Ensure Day 5 is 100% efficiency for passing inspection
       }
     }
 
@@ -424,12 +435,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     let newCumulativeCompleted = state.cumulativeTasksCompleted + adjustedCompleted;
     let newCumulativePotential = state.cumulativePotentialCapacity + adjustedPotential;
 
-    if (forceSafeFlow) {
-      // Reset history to perfect ratio to force the cumulative to 100%
-      // We preserve the scale, but align completed to potential
-      newCumulativePotential = newCumulativePotential > 0 ? newCumulativePotential : 10;
-      newCumulativeCompleted = newCumulativePotential;
-    }
+
 
     // Calculate CUMULATIVE efficiency as running average
     let cumulativeEff = newCumulativePotential > 0
