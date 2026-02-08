@@ -159,8 +159,46 @@ export default function DevDashboard() {
                         </CardContent>
                     </Card>
 
-                    {/* Dangerous Zone */}
+                    {/* Database Tools */}
                     <div className="space-y-6">
+                        <Card className="bg-slate-900 border-indigo-900/30">
+                            <CardHeader>
+                                <CardTitle className="text-indigo-400 flex items-center gap-2">
+                                    <Save className="w-5 h-5" />
+                                    Database Tools
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="space-y-2">
+                                    <h3 className="text-sm font-medium text-slate-300">Test Connectivity</h3>
+                                    <p className="text-xs text-slate-500">Insert a dummy record to verify DB connection.</p>
+                                    <Button
+                                        variant="outline"
+                                        onClick={async () => {
+                                            try {
+                                                await apiRequest('POST', '/api/leaderboard', {
+                                                    playerName: 'Neon Tester',
+                                                    chapter: 1,
+                                                    efficiency: 100,
+                                                    ppc: 100,
+                                                    quizScore: 10,
+                                                    totalScore: 999
+                                                });
+                                                await queryClient.invalidateQueries({ queryKey: ['/api/leaderboard'] });
+                                                alert('✅ Test record added to Neon DB!');
+                                            } catch (e) {
+                                                alert('❌ Failed to add record. Check console.');
+                                                console.error(e);
+                                            }
+                                        }}
+                                        className="w-full border-indigo-800 text-indigo-400 hover:bg-indigo-950/50"
+                                    >
+                                        <Save className="w-4 h-4 mr-2" /> Seed Test Score
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+
                         <Card className="bg-red-950/10 border-red-900/30">
                             <CardHeader>
                                 <CardTitle className="text-red-400 flex items-center gap-2">

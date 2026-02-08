@@ -362,7 +362,12 @@ export class MainScene extends Phaser.Scene {
 
         // 3. Spawn Buildings everywhere to show "Complete"
         for (let i = 0; i < 5; i++) {
-            setTimeout(() => this.spawnBuildingEffect(), i * 300);
+            // Fix: Use arrow function to preserve 'this' context
+            setTimeout(() => {
+                if (this.sys) { // Check if scene is still active
+                    this.spawnBuildingEffect();
+                }
+            }, i * 300);
         }
     }
 
