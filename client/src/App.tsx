@@ -13,6 +13,7 @@ import Dashboard from "@/pages/Dashboard";
 import ChapterSelect from "@/pages/ChapterSelect";
 import Leaderboard from "@/pages/Leaderboard";
 import DevDashboard from "@/pages/DevDashboard";
+import Credits from "@/pages/Credits";
 
 function Router() {
   return (
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/settings" component={Settings} />
       <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/dev" component={DevDashboard} />
+      <Route path="/credits" component={Credits} />
       <Route component={NotFound} />
     </Switch>
   );

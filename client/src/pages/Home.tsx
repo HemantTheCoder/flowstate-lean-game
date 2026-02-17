@@ -84,11 +84,19 @@ export default function Home() {
             CASE LEVELS — Coming Soon
           </button>
 
-          <Link href="/settings">
-            <button className="w-full py-3 text-lg font-medium text-slate-700 bg-white rounded-2xl shadow-sm hover:bg-slate-50 transition-colors">
-              SETTINGS
-            </button>
-          </Link>
+          <div className="grid grid-cols-2 gap-4">
+            <Link href="/settings">
+              <button className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200 flex items-center justify-center gap-3">
+                SETTINGS
+              </button>
+            </Link>
+
+            <Link href="/credits">
+              <button className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200 flex items-center justify-center gap-3">
+                CREDITS
+              </button>
+            </Link>
+          </div>
         </div>
       </motion.div>
 
