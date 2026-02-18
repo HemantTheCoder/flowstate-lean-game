@@ -40,7 +40,7 @@ export function setupAuth(app: Express) {
             console.log("[Auth] Attempting to use PostgresStore for sessions...");
             sessionStore = new PostgresStore({
                 pool: getPool(),
-                createTableIfMissing: false,
+                createTableIfMissing: true,
                 errorLog: (...args) => console.error("[PostgresStore Error]", ...args)
             });
         } catch (err) {

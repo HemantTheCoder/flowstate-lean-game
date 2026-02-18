@@ -137,6 +137,13 @@ export interface UserProfile {
   scores: LeaderboardEntry[];
 }
 
+// Session table for connect-pg-simple
+export const session = pgTable("session", {
+  sid: text("sid").primaryKey(),
+  sess: jsonb("sess").notNull(),
+  expire: timestamp("expire", { precision: 6 }).notNull(),
+});
+
 export const GAME_CONSTANTS = {
   INITIAL_RESOURCES: {
     morale: 50,
