@@ -33,15 +33,36 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
+    let sessionStore: session.Store;
+
+    if (process.env.DATABASE_URL) {
+        try {
+            console.log("[Auth] Attempting to use PostgresStore for sessions...");
+            sessionStore = new PostgresStore({
+                pool: pool,
+                createTableIfMissing: true,
+                errorLog: (...args) => console.error("[PostgresStore Error]", ...args)
+            });
+        } catch (err) {
+            console.error("[Auth] Failed to initialize PostgresStore, falling back to MemoryStore:", err);
+            const MemoryStore = require("memorystore")(session);
+            sessionStore = new MemoryStore({
+                checkPeriod: 86400000 // prune expired entries every 24h
+            });
+        }
+    } else {
+        console.warn("[Auth] No DATABASE_URL found, using MemoryStore for sessions.");
+        const MemoryStore = require("memorystore")(session);
+        sessionStore = new MemoryStore({
+            checkPeriod: 86400000
+        });
+    }
+
     const sessionSettings: session.SessionOptions = {
         secret: process.env.SESSION_SECRET || "flowstate_secret_key",
         resave: false,
         saveUninitialized: false,
-        store: new PostgresStore({
-            pool: pool,
-            createTableIfMissing: true,
-            errorLog: (...args) => console.error("[PostgresStore Error]", ...args)
-        }),
+        store: sessionStore,
         cookie: {
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             secure: process.env.NODE_ENV === "production",
@@ -49,7 +70,7 @@ export function setupAuth(app: Express) {
         }
     };
 
-    console.log("[Auth] Session settings initialized. Database connectivity will be verified on first request.");
+    console.log("[Auth] Session middleware configured with " + (sessionStore instanceof PostgresStore ? "PostgresStore" : "MemoryStore"));
 
     app.set("trust proxy", 1);
     app.use(session(sessionSettings));

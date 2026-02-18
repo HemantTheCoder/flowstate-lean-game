@@ -6,12 +6,12 @@ interface SoundManifest {
 
 const MANIFEST: SoundManifest = {
     bgm: {
-        menu: 'https://cdn.pixabay.com/audio/2022/02/22/audio_d0c0d87f5a.mp3',
-        cozy: 'https://cdn.pixabay.com/audio/2022/02/22/audio_d0c0d87f5a.mp3',
-        tense: 'https://cdn.pixabay.com/audio/2022/03/10/audio_5076413248.mp3',
-        rain: 'https://cdn.pixabay.com/audio/2021/08/09/audio_6a2039c366.mp3',
-        construction: 'https://cdn.pixabay.com/audio/2022/10/30/audio_5914652972.mp3',
-        planning: 'https://cdn.pixabay.com/audio/2022/02/22/audio_d0c0d87f5a.mp3',
+        menu: '',
+        cozy: '',
+        tense: '',
+        rain: '',
+        construction: '',
+        planning: '',
     },
 };
 
@@ -233,7 +233,10 @@ class SoundManager {
 
     playBGM(key: string, volume: number = 0.5) {
         if (this.currentBgmKey === key) return;
-        if (!MANIFEST.bgm[key]) return;
+        if (!MANIFEST.bgm[key] || MANIFEST.bgm[key] === '') {
+            this.stopBGM();
+            return;
+        }
 
         if (this.bgm) {
             this.bgm.fade(this.bgm.volume(), 0, 1000);

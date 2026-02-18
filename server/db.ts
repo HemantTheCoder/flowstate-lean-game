@@ -6,12 +6,24 @@ import ws from "ws";
 // Set the web socket constructor for Neon serverless
 neonConfig.webSocketConstructor = ws;
 
-if (!process.env.DATABASE_URL && process.env.NODE_ENV === "production") {
-  console.warn(
-    "WARNING: DATABASE_URL is not set. Database operations will fail."
-  );
+let cachedPool: Pool | null = null;
+
+export function getPool() {
+  if (cachedPool) return cachedPool;
+
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    if (process.env.NODE_ENV === "production") {
+      console.warn("WARNING: DATABASE_URL is not set. Database operations will fail.");
+    }
+    // Return a dummy pool that will throw only on connection
+    cachedPool = new Pool({ connectionString: "" });
+    return cachedPool;
+  }
+
+  cachedPool = new Pool({ connectionString });
+  return cachedPool;
 }
 
-const connectionString = process.env.DATABASE_URL || "";
-export const pool = new Pool({ connectionString });
+export const pool = getPool();
 export const db = drizzle(pool, { schema });
