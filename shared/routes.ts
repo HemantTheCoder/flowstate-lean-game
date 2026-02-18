@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { insertGameStateSchema, insertLeaderboardEntrySchema, gameStates, type LeaderboardEntry } from './schema';
-export type { UpdateGameRequest } from './schema';
+import { insertGameStateSchema, insertLeaderboardEntrySchema, gameStates, type LeaderboardEntry } from './schema.js';
+export type { UpdateGameRequest } from './schema.js';
 
 // ============================================
 // SHARED ERROR SCHEMAS
