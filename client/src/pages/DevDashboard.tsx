@@ -122,34 +122,34 @@ export default function DevDashboard() {
                             </div>
 
                             <div className="space-y-4">
-                                <label className="text-sm font-medium text-slate-400">Teleport to Chapter</label>
-                                <div className="flex gap-2">
-                                    {[1, 2].map((c) => (
-                                        <Button
-                                            key={c}
-                                            variant={chapter === c ? "default" : "outline"}
-                                            onClick={() => { setChapter(c); alert(`Warped to Chapter ${c}`); }}
-                                            className="border-slate-700 hover:bg-slate-800 hover:text-white"
-                                        >
-                                            Ch {c}
-                                        </Button>
-                                    ))}
-                                </div>
-                            </div>
+                                <label className="text-sm font-medium text-slate-400">Chapters</label>
+                                <div className="space-y-3">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            useGameStore.getState().unlockAllChapters();
+                                            alert('All Chapters Unlocked!');
+                                        }}
+                                        className="w-full border-green-800 text-green-400 hover:bg-green-950/50"
+                                    >
+                                        <ShieldAlert className="w-4 h-4 mr-2" /> Unlock All Chapters
+                                    </Button>
 
-                            <div className="space-y-4">
-                                <label className="text-sm font-medium text-slate-400">Teleport to Day (Current Ch)</label>
-                                <div className="flex gap-2 flex-wrap">
-                                    {[1, 2, 3, 4, 5].map((d) => (
-                                        <Button
-                                            key={d}
-                                            variant={day === d ? "default" : "outline"}
-                                            onClick={() => { setDay(d); alert(`Warped to Day ${d}`); }}
-                                            className="border-slate-700 hover:bg-slate-800 hover:text-white"
-                                        >
-                                            Day {d}
-                                        </Button>
-                                    ))}
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[1, 2, 3].map((c) => (
+                                            <Button
+                                                key={c}
+                                                variant={chapter === c ? "default" : "outline"}
+                                                onClick={() => {
+                                                    setChapter(c);
+                                                    alert(`Warped to Chapter ${c}`);
+                                                }}
+                                                className={`border-slate-700 hover:bg-slate-800 hover:text-white ${chapter === c ? 'bg-indigo-600' : ''}`}
+                                            >
+                                                Ch {c}
+                                            </Button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 

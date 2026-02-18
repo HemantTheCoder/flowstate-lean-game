@@ -33,7 +33,9 @@ export interface GameState {
   week: number;
   phase: GamePhase; // New: Tracks if we are in Planning Room or Site
   unlockedChapters: number[];
+  unlockedBadges: string[];
   completeChapter: (chapter: number) => void;
+  unlockBadge: (badgeId: string) => void;
 
   // Player Profile
   playerName: string;
@@ -108,6 +110,7 @@ export interface GameState {
   // Dev Tools
   setDay: (day: number) => void;
   setChapter: (chapter: number) => void;
+  unlockAllChapters: () => void;
 
   updateLPI: (metric: keyof GameState['lpi'], value: number) => void;
 
@@ -169,15 +172,16 @@ export const useGameStore = create<GameState>((set, get) => ({
   week: 1,
   phase: 'action',
   unlockedChapters: [1],
+  unlockedBadges: [],
 
   playerName: 'Engineer',
   playerGender: 'male',
   setPlayerProfile: (name, gender) => set({ playerName: name, playerGender: gender }),
 
   // Dev Actions
-  // Dev Actions
   setDay: (day) => set((state) => ({ day, week: Math.ceil(day / 5) })),
   setChapter: (chapter) => get().startChapter(chapter),
+  unlockAllChapters: () => set({ unlockedChapters: [1, 2, 3] }),
 
   tutorialActive: true,
   tutorialStep: 0,
@@ -284,12 +288,52 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     }
 
+    if (chapter === 3) {
+      return {
+        ...commonUpdates,
+        day: 12,
+        week: 3,
+        phase: 'planning',
+        columns: [
+          { id: 'backlog', title: 'Master Schedule', tasks: [], wipLimit: 0 },
+          { id: 'ready', title: 'Lookahead', tasks: [], wipLimit: 5 },
+          { id: 'doing', title: 'Doing', tasks: [], wipLimit: 2 },
+          { id: 'done', title: 'Done', tasks: [], wipLimit: 0 },
+        ],
+        funds: 5000,
+        materials: 1000,
+        dailyMetrics: [],
+        previousDoneCount: 0,
+        previousWasteCount: 0,
+        cumulativeTasksCompleted: 0,
+        cumulativePotentialCapacity: 0,
+        weeklyPlan: [],
+        flags: { ...state.flags, chapter_intro_seen: false }
+      };
+    }
+
     return { ...commonUpdates };
   }),
 
-  completeChapter: (chapter) => set((state) => {
-    if (!state.unlockedChapters.includes(chapter + 1)) {
-      return { unlockedChapters: [...state.unlockedChapters, chapter + 1] };
+  completeChapter: (chapterId) => {
+    const nextChapter = chapterId + 1;
+
+    // First reset state to the beginning of the next chapter
+    get().startChapter(nextChapter);
+
+    // Then ensure the next chapter is marked as unlocked
+    set((state) => {
+      if (!state.unlockedChapters.includes(nextChapter)) {
+        return { unlockedChapters: [...state.unlockedChapters, nextChapter] };
+      }
+      return {};
+    });
+  },
+
+  unlockBadge: (badgeId) => set((state) => {
+    if (!state.unlockedBadges.includes(badgeId)) {
+      console.log(`Badge Unlocked: ${badgeId}`);
+      return { unlockedBadges: [...state.unlockedBadges, badgeId] };
     }
     return {};
   }),
@@ -373,6 +417,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     let adjustedPotential = potentialCapacity;
     let adjustedCompleted = tasksCompletedToday;
     let dayInsight = '';
+    let dailyEff = 0;
 
     // Special Override Flag for Pull Decision
     let forceSafeFlow = false;
@@ -408,8 +453,41 @@ export const useGameStore = create<GameState>((set, get) => ({
         dayInsight = 'Inspection failed. Rework destroys efficiency.';
         adjustedPotential = potentialCapacity + wasteTasksInSystem;
       } else {
+
         dayInsight = 'Inspection passed. Consistent reliability!';
         forceSafeFlow = true; // Fix: Ensure Day 5 is 100% efficiency for passing inspection
+      }
+    } else if (state.day === 9) {
+      // Day 9: Commitment Day - Efficiency based on Planning Quality
+      const weeklyPlan = state.weeklyPlan || [];
+      if (weeklyPlan.length > 0) {
+        // Calculate how many committed tasks were Sound (no constraints) vs Risky
+        const committedTasks = state.columns.flatMap(c => c.tasks).filter(t => weeklyPlan.includes(t.id));
+        const riskyCount = committedTasks.filter(t => (t.constraints?.length || 0) > 0 || t.fragile).length;
+        const totalCount = committedTasks.length;
+
+        // Base efficiency is 100%, deduct for risky commitments
+        // If 0 tasks committed (which shouldn't happen due to UI checks), 0%
+        if (totalCount > 0) {
+          const riskPenalty = (riskyCount / totalCount) * 50; // Up to 50% penalty if all are risky
+          dailyEff = Math.round(100 - riskPenalty);
+          adjustedPotential = 100; // Normalized scale for graph
+          adjustedCompleted = dailyEff;
+          dayInsight = riskyCount === 0
+            ? 'Perfect Weekly Work Plan! All promises are sound.'
+            : `Plan committed with ${riskyCount} risky tasks. Execution may be unstable.`;
+        } else {
+          dailyEff = 0;
+          adjustedPotential = 100;
+          adjustedCompleted = 0;
+          dayInsight = 'No tasks committed. Reliability is zero.';
+        }
+      } else {
+        // Fallback if somehow empty
+        dailyEff = 0;
+        adjustedPotential = 100;
+        adjustedCompleted = 0;
+        dayInsight = 'No commitment made.';
       }
     }
 
@@ -417,7 +495,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     adjustedCompleted = Math.min(adjustedCompleted, adjustedPotential);
 
     // Daily efficiency for the graph
-    let dailyEff = 0;
+
 
     if (forceSafeFlow) {
       dailyEff = 100;
@@ -705,8 +783,12 @@ export const useGameStore = create<GameState>((set, get) => ({
       unlockedChapters: data.completedChapters
         ? [1, ...data.completedChapters.map((c: number) => c + 1)]
         : [1],
+      unlockedBadges: data.unlockedBadges ?? [],
       day: restoredDay,
       week: data.week ?? state.week,
+      phase: ks.phase ?? data.phase ?? state.phase,
+      currentDialogue: ks.currentDialogue ?? state.currentDialogue,
+      dialogueIndex: ks.dialogueIndex ?? state.dialogueIndex,
       playerName: data.playerName ?? state.playerName,
       playerGender: ks.playerGender ?? data.playerGender ?? state.playerGender,
       funds: data.resources?.budget ?? state.funds,

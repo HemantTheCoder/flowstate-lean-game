@@ -25,7 +25,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
             if (tutorialStep === 5) targetId = 'col-doing';
             if (tutorialStep === 6) targetId = 'smart-advisor-box';
             if (tutorialStep === 7) targetId = 'stats-box';
-            if (tutorialStep === 8) targetId = 'btn-settings';
+            if (tutorialStep === 8) targetId = 'btn-save';
 
             if (targetId) {
                 const el = document.getElementById(targetId);
@@ -153,40 +153,40 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 {/* Step 5: WIP Slider Explanation - centered on screen */}
                 {tutorialStep === 5 && showKanban && (
                     <div className="absolute inset-0 flex items-center justify-center z-[90] pointer-events-none">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                        className="w-80 pointer-events-auto"
-                    >
-                        <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-cyan-500 relative">
-                            <h3 className="font-black text-cyan-600 text-lg mb-1 flex items-center gap-2">
-                                <Gauge className="w-5 h-5" /> WIP Limit Slider
-                            </h3>
-                            <ul className="text-sm font-medium mb-3 space-y-2 leading-snug">
-                                <li>
-                                    Use the <b>+/-</b> buttons on the Doing column to set your <b>Work-In-Progress limit</b>.
-                                </li>
-                                <li>
-                                    <b>Lower WIP</b> = fewer tasks at once, but faster flow and higher <span className="text-green-600 font-bold">Morale</span>.
-                                </li>
-                                <li>
-                                    <b>Higher WIP</b> = more tasks at once, but risk overloading workers. <span className="text-red-500 font-bold">Morale drops -5</span> if you exceed it!
-                                </li>
-                                <li>
-                                    Your <b>Flow Efficiency</b> is measured against this limit &mdash; it defines how many tasks you <i>could</i> complete each day.
-                                </li>
-                            </ul>
-                            <div className="bg-cyan-50 border border-cyan-200 rounded-lg px-3 py-2 text-xs text-cyan-800 mb-3">
-                                <b>Lean Principle:</b> Limiting WIP prevents congestion and helps work flow smoothly &mdash; just like limiting cars on a highway reduces traffic jams.
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                            className="w-80 pointer-events-auto"
+                        >
+                            <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-cyan-500 relative">
+                                <h3 className="font-black text-cyan-600 text-lg mb-1 flex items-center gap-2">
+                                    <Gauge className="w-5 h-5" /> WIP Limit Slider
+                                </h3>
+                                <ul className="text-sm font-medium mb-3 space-y-2 leading-snug">
+                                    <li>
+                                        Use the <b>+/-</b> buttons on the Doing column to set your <b>Work-In-Progress limit</b>.
+                                    </li>
+                                    <li>
+                                        <b>Lower WIP</b> = fewer tasks at once, but faster flow and higher <span className="text-green-600 font-bold">Morale</span>.
+                                    </li>
+                                    <li>
+                                        <b>Higher WIP</b> = more tasks at once, but risk overloading workers. <span className="text-red-500 font-bold">Morale drops -5</span> if you exceed it!
+                                    </li>
+                                    <li>
+                                        Your <b>Flow Efficiency</b> is measured against this limit &mdash; it defines how many tasks you <i>could</i> complete each day.
+                                    </li>
+                                </ul>
+                                <div className="bg-cyan-50 border border-cyan-200 rounded-lg px-3 py-2 text-xs text-cyan-800 mb-3">
+                                    <b>Lean Principle:</b> Limiting WIP prevents congestion and helps work flow smoothly &mdash; just like limiting cars on a highway reduces traffic jams.
+                                </div>
+                                <button
+                                    onClick={() => setTutorialStep(6)}
+                                    className="bg-cyan-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-cyan-700 transition-colors"
+                                    data-testid="button-tutorial-wip-next"
+                                >
+                                    Next: Smart Advisor
+                                </button>
                             </div>
-                            <button
-                                onClick={() => setTutorialStep(6)}
-                                className="bg-cyan-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-cyan-700 transition-colors"
-                                data-testid="button-tutorial-wip-next"
-                            >
-                                Next: Smart Advisor
-                            </button>
-                        </div>
-                    </motion.div>
+                        </motion.div>
                     </div>
                 )}
 
@@ -246,10 +246,14 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         className="absolute z-[90] w-72 pointer-events-auto"
                     >
                         <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-purple-500 relative">
-                            <div className="absolute -top-3 right-6 w-6 h-6 bg-white border-t-4 border-l-4 border-purple-500 transform rotate-45"></div>
-                            <h3 className="font-black text-purple-600 text-lg mb-1">Save Your Game</h3>
+                            {/* Arrow pointing UP to the button */}
+                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                                <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[15px] border-b-purple-500 animate-bounce"></div>
+                            </div>
+
+                            <h3 className="font-black text-purple-600 text-lg mb-1">Save Your Progress</h3>
                             <p className="text-sm font-medium mb-3 leading-snug">
-                                Click the Gear icon to access <b>Settings</b>. <br /> From there, you can <b>Export</b> your save file to keep it safe!
+                                Click the <b>Save</b> icon to save your game to the cloud! <br /> You'll need to <b>Login</b> or <b>Register</b> to keep your progress safe across devices.
                             </p>
                             <button
                                 onClick={() => setTutorialStep(9)}

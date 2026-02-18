@@ -23,6 +23,9 @@ import soundManager from '@/lib/soundManager';
 import { LayoutDashboard, HardHat, Save, Settings, BookOpen } from 'lucide-react';
 import { GlossaryPanel } from '@/components/game/GlossaryPanel';
 import { ReflectionQuiz } from '@/components/game/ReflectionQuiz';
+import { useAuth } from '@/hooks/use-auth';
+import { AuthModal } from '@/components/ui/AuthModal';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
@@ -72,6 +75,7 @@ export default function Game() {
 
   const { saveGame, gameState, isLoading: isServerLoading } = useGame();
   const [_, navigate] = useLocation();
+  const { toast } = useToast();
 
   // 1. Hydrate Store from Server on Load
   const hydratedRef = React.useRef(false);
@@ -142,11 +146,22 @@ export default function Game() {
     return () => window.removeEventListener('click', handleInteraction);
   }, []);
 
+  // Auth Integration
+  const { user } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
   const handleSave = async (silent = false) => {
+    // If not authenticated, show Auth Modal instead of saving immediately (unless silent auto-save)
+    if (!user && !silent) {
+      setShowAuthModal(true);
+      return;
+    }
+
     try {
       const state = useGameStore.getState();
       await saveGame.mutateAsync({
         sessionId: '', // Handled by hook
+        userId: user?.id, // Attach User ID if logged in
         playerName: state.playerName,
         chapter: state.chapter,
         week: state.week,
@@ -170,18 +185,23 @@ export default function Game() {
           previousWasteCount: state.previousWasteCount,
           cumulativeTasksCompleted: state.cumulativeTasksCompleted,
           cumulativePotentialCapacity: state.cumulativePotentialCapacity,
+          // Narrative & Phase Persistence
+          phase: state.phase,
+          currentDialogue: state.currentDialogue,
+          dialogueIndex: state.dialogueIndex,
         } as any,
         flags: state.flags,
         metrics: { ...state.lpi, ppcHistory: state.ppcHistory },
         weeklyPlan: state.weeklyPlan,
         completedChapters: state.unlockedChapters.filter(c => c !== 1).map(c => c - 1),
-        unlockedBadges: []
+        unlockedBadges: state.unlockedBadges
       });
       if (!silent) {
-        alert("Game Saved Successfully!");
+        toast({ title: "Game Saved!", description: "Progress synced to cloud." });
       }
     } catch (err) {
       console.error("Save failed:", err);
+      if (!silent) toast({ title: "Save Failed", description: "Could not sync progress.", variant: "destructive" });
     }
   };
 
@@ -207,6 +227,10 @@ export default function Game() {
           // Good Outcome -> Don't skip to chapter complete here
           // Let the normal flow handle it: End Day -> Summary -> Quiz -> Chapter Complete
         }
+      }
+
+      if (day === 9 && chapter === 2 && !flags['overcommitment_accepted'] && !flags['overcommitment_declined']) {
+        triggerClientPressureDecision();
       }
     }
     prevDialogueRef.current = currentDialogue;
@@ -245,9 +269,9 @@ export default function Game() {
       }
 
       // Chapter 2 Events
-      if (dayConfig.event === 'client_pressure' && chapter === 2) {
-        setTimeout(() => triggerClientPressureDecision(), 1000);
-      }
+      // if (dayConfig.event === 'client_pressure' && chapter === 2) {
+      //   setTimeout(() => triggerClientPressureDecision(), 1000);
+      // }
 
       // Day 10: Emergency pipe repair injection
       if (day === 10 && chapter === 2) {
@@ -467,7 +491,7 @@ export default function Game() {
     // CHAPTER 2 SPECIFIC GUIDANCE (LPS Teaching)
     if (chapter === 2) {
       const isPlanning = state.phase === 'planning';
-      
+
       if (day === 6) {
         if (isPlanning) {
           const lookaheadCount = ready?.tasks.length || 0;
@@ -623,6 +647,11 @@ export default function Game() {
     return "Flow is stable. Keep moving tasks to 'Done'.";
   };
 
+  const handleSaveAndExit = async () => {
+    await handleSave(false);
+    navigate('/');
+  };
+
   return (
     <div className="w-full h-screen relative overflow-hidden">
       {/* 1. Phaser Layer (Background) */}
@@ -665,6 +694,7 @@ export default function Game() {
               <div className="font-mono font-bold text-green-500 text-sm md:text-base">{lpi.teamMorale}%</div>
             </div>
             <button
+              id="btn-save"
               onClick={() => handleSave()}
               disabled={saveGame.isPending}
               className="bg-white hover:bg-slate-50 border-2 border-slate-200 p-1.5 sm:p-2 rounded-lg shadow-sm transition-all active:scale-95"
@@ -733,7 +763,7 @@ export default function Game() {
 
         {/* Overlays */}
         {/* <CharacterCreationModal /> Moved to ChapterSelect */}
-        <PlanningRoom />
+        <PlanningRoom onSave={() => handleSave()} />
 
         <DialogueBox />
 
@@ -748,7 +778,18 @@ export default function Game() {
         />
 
         <DayBriefingModal />
-        <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
+
+        <SettingsModal
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+          onSaveAndExit={handleSaveAndExit}
+        />
+
+        {/* Auth Modal */}
+        <div className={showAuthModal ? "block" : "hidden"}>
+          <AuthModal triggerOpen={showAuthModal} onOpenChange={setShowAuthModal} />
+        </div>
+
         {/* Modals & Screens */}
         <AnimatePresence>
           {showKanban && <KanbanBoard onClose={() => setShowKanban(false)} />}
@@ -759,8 +800,7 @@ export default function Game() {
           onClose={handleNextDayStart}
           completedTasks={completedToday}
         />
-
-      </div >
+      </div>
 
       <GlossaryPanel isOpen={showGlossary} onClose={() => setShowGlossary(false)} />
       <ReflectionQuiz isOpen={showQuiz} onComplete={handleQuizComplete} chapter={chapter} />
@@ -776,9 +816,9 @@ export default function Game() {
       />
       {/* Root Level Modals (Interactive) */}
       {flags['character_created'] && !flags['character_cast_seen'] && (
-        <CharacterCastModal 
-          chapter={chapter} 
-          onContinue={() => setFlag('character_cast_seen', true)} 
+        <CharacterCastModal
+          chapter={chapter}
+          onContinue={() => setFlag('character_cast_seen', true)}
         />
       )}
       {flags['character_cast_seen'] && !flags['chapter_intro_seen'] && <ChapterIntroModal />}

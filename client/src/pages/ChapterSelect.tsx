@@ -50,6 +50,7 @@ export default function ChapterSelect() {
                 sessionId: '',
                 playerName: state.playerName,
                 chapter: id,
+                day: state.day, // <--- Add DAY
                 week: state.week,
                 resources: {
                     morale: state.lpi.teamMorale,
@@ -60,12 +61,27 @@ export default function ChapterSelect() {
                     budget: state.funds,
                     materials: state.materials
                 },
-                kanbanState: { columns: state.columns } as any,
+                kanbanState: {
+                    columns: state.columns,
+                    day: state.day,
+                    playerGender: state.playerGender,
+                    tutorialActive: state.tutorialActive,
+                    tutorialStep: state.tutorialStep,
+                    dailyMetrics: state.dailyMetrics,
+                    previousDoneCount: state.previousDoneCount,
+                    previousWasteCount: state.previousWasteCount,
+                    cumulativeTasksCompleted: state.cumulativeTasksCompleted,
+                    cumulativePotentialCapacity: state.cumulativePotentialCapacity,
+                    // Narrative & Phase Persistence
+                    phase: state.phase,
+                    currentDialogue: state.currentDialogue,
+                    dialogueIndex: state.dialogueIndex,
+                } as any,
                 flags: state.flags,
                 metrics: { ...state.lpi, ppcHistory: state.ppcHistory },
                 weeklyPlan: state.weeklyPlan,
                 completedChapters: state.unlockedChapters.filter(c => c !== 1).map(c => c - 1),
-                unlockedBadges: []
+                unlockedBadges: state.unlockedBadges
             });
 
             navigate('/game');

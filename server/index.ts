@@ -60,7 +60,11 @@ app.use((req, res, next) => {
   next();
 });
 
+import { setupAuth } from "./auth";
+
 (async () => {
+  // Auth must be set up before routes
+  setupAuth(app);
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {

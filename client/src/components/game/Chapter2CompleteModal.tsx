@@ -70,6 +70,10 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
     useEffect(() => {
         if (isOpen) {
             soundManager.playSFX(ppcLevel === 'excellent' ? 'success' : 'complete', 0.8);
+
+            // Auto-submit score to update Career Stats & Leaderboard
+            handleSubmitScore();
+
             let current = 0;
             const interval = setInterval(() => {
                 current += 2;
@@ -109,6 +113,20 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
             soundManager.playSFX('warning', 0.5);
         }
     };
+
+    const unlockBadge = useGameStore(s => s.unlockBadge);
+
+    useEffect(() => {
+        if (isOpen) {
+            // Basic completion badge
+            unlockBadge('reliable_promise');
+
+            // Perfect Week badge (100% PPC)
+            if (ppc === 100) {
+                unlockBadge('perfect_week');
+            }
+        }
+    }, [isOpen, ppc, unlockBadge]);
 
     const handleContinue = () => {
         onClose();

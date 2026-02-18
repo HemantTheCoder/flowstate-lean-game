@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useGameStore, Task, ConstraintType } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, CheckCircle, Package, Users, FileCheck, Cloud, ArrowRight, Briefcase, Target, Lock, Calendar, ClipboardCheck, Wrench, HandshakeIcon, Play, BarChart3, Sun, ShieldAlert, Eye, Ban } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Package, Users, FileCheck, Cloud, ArrowRight, Briefcase, Target, Lock, Calendar, ClipboardCheck, Wrench, HandshakeIcon, Play, BarChart3, Sun, ShieldAlert, Eye, Ban, Save } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 
 const constraintConfig: Record<ConstraintType, { icon: React.ReactNode, label: string, color: string, action: string, cost: string }> = {
@@ -21,51 +21,55 @@ const colorClassMap: Record<string, { bg: string, border: string }> = {
 };
 
 const DAY_OBJECTIVES: Record<number, { icon: React.ReactNode, title: string, objective: string, action: string, color: string }> = {
-    6: { 
-        icon: <Calendar className="w-5 h-5" />, 
-        title: "The Planning Room", 
+    6: {
+        icon: <Calendar className="w-5 h-5" />,
+        title: "The Planning Room",
         objective: "Learn the Last Planner System layout",
         action: "Pull 4-6 tasks from Master Schedule to Lookahead Window",
         color: "blue"
     },
-    7: { 
-        icon: <Eye className="w-5 h-5" />, 
-        title: "Constraint Discovery", 
+    7: {
+        icon: <Eye className="w-5 h-5" />,
+        title: "Constraint Discovery",
         objective: "Identify all blockers on your tasks",
         action: "Click each RED task to inspect its constraints. You cannot fix them yet!",
         color: "orange"
     },
-    8: { 
-        icon: <Wrench className="w-5 h-5" />, 
-        title: "Making Work Ready", 
+    8: {
+        icon: <Wrench className="w-5 h-5" />,
+        title: "Making Work Ready",
         objective: "Remove constraints to make tasks Sound",
         action: "Click 'Fix' on constraints. New complications may appear!",
         color: "purple"
     },
-    9: { 
-        icon: <HandshakeIcon className="w-5 h-5" />, 
-        title: "The Weekly Promise", 
+    9: {
+        icon: <HandshakeIcon className="w-5 h-5" />,
+        title: "The Weekly Promise",
         objective: "Commit only what you CAN deliver",
         action: "Fix remaining constraints, then click 'Start Week' to commit GREEN tasks",
         color: "green"
     },
-    10: { 
-        icon: <Play className="w-5 h-5" />, 
-        title: "Execution Day", 
+    10: {
+        icon: <Play className="w-5 h-5" />,
+        title: "Execution Day",
         objective: "Deliver on your promises",
         action: "Complete the tasks you committed to in the Weekly Plan",
         color: "blue"
     },
-    11: { 
-        icon: <BarChart3 className="w-5 h-5" />, 
-        title: "PPC Review", 
+    11: {
+        icon: <BarChart3 className="w-5 h-5" />,
+        title: "PPC Review",
         objective: "Measure your reliability",
         action: "Review your Percent Plan Complete - did you keep your promises?",
         color: "slate"
     }
 };
 
-export const PlanningRoom: React.FC = () => {
+interface PlanningRoomProps {
+    onSave: () => void;
+}
+
+export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
     const {
         columns, weeklyPlan, phase, removeConstraint, commitPlan, moveTask,
         week, tutorialActive, tutorialStep, setTutorialStep, flags, setFlag,
@@ -86,7 +90,7 @@ export const PlanningRoom: React.FC = () => {
     const selectedTask = [...backlog, ...ready].find(t => t.id === selectedTaskId);
     const readyTasksCount = lookaheadTasks.filter(t => (t.constraints?.length || 0) === 0).length;
     const constrainedCount = lookaheadTasks.filter(t => (t.constraints?.length || 0) > 0).length;
-    
+
     const dayObjective = DAY_OBJECTIVES[day] || DAY_OBJECTIVES[6];
 
     const canPullTasks = day >= 6;
@@ -170,7 +174,7 @@ export const PlanningRoom: React.FC = () => {
 
     const [showForceWarning, setShowForceWarning] = useState(false);
     const [forceCommitIds, setForceCommitIds] = useState<string[]>([]);
-    
+
     const riskyTasks = lookaheadTasks.filter(t => (t.constraints?.length || 0) === 1);
     const riskyCount = riskyTasks.length;
 
@@ -178,18 +182,18 @@ export const PlanningRoom: React.FC = () => {
         if (!canCommit) return;
         const greenTasks = lookaheadTasks.filter(t => (t.constraints?.length || 0) === 0);
         if (greenTasks.length === 0 && riskyCount === 0) return;
-        
+
         if (riskyCount > 0 && forceCommitIds.length === 0) {
             setShowForceWarning(true);
             soundManager.playSFX('warning', 0.6);
             return;
         }
-        
+
         const allCommitIds = [...greenTasks.map(t => t.id), ...forceCommitIds];
         commitPlan(allCommitIds);
         soundManager.playSFX('success', 0.7);
     };
-    
+
     const handleForceCommitConfirm = (includeRisky: boolean) => {
         setShowForceWarning(false);
         const greenTasks = lookaheadTasks.filter(t => (t.constraints?.length || 0) === 0);
@@ -280,15 +284,25 @@ export const PlanningRoom: React.FC = () => {
                         </div>
                         <div className="relative group">
                             <button
+                                onClick={onSave}
+                                className="flex items-center gap-2 px-4 py-2 bg-indigo-700 hover:bg-indigo-600 text-indigo-100 font-bold rounded-lg shadow-lg transition-colors border border-indigo-500"
+                                title="Save Game"
+                            >
+                                <Save className="w-4 h-4" />
+                                <span className="hidden sm:inline">Save</span>
+                            </button>
+                        </div>
+
+                        <div className="relative group">
+                            <button
                                 onClick={() => {
                                     if (canEndDay()) advanceDay();
                                 }}
                                 disabled={!canEndDay()}
-                                className={`flex items-center gap-2 px-4 py-2 font-bold rounded-lg shadow-lg transition-colors ${
-                                    canEndDay() 
-                                        ? 'bg-amber-500 hover:bg-amber-400 text-white' 
-                                        : 'bg-slate-600 text-slate-400 cursor-not-allowed'
-                                }`}
+                                className={`flex items-center gap-2 px-4 py-2 font-bold rounded-lg shadow-lg transition-colors ${canEndDay()
+                                    ? 'bg-amber-500 hover:bg-amber-400 text-white'
+                                    : 'bg-slate-600 text-slate-400 cursor-not-allowed'
+                                    }`}
                                 data-testid="button-end-planning-day"
                             >
                                 <Sun className="w-4 h-4" />
@@ -302,7 +316,7 @@ export const PlanningRoom: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                
+
                 {/* Day Objective Banner */}
                 <div className="h-12 flex items-center px-6 gap-4 bg-black/20">
                     <div className={`flex items-center gap-2 px-3 py-1 rounded-full border ${colorClassMap[dayObjective.color]?.bg || 'bg-blue-500/30'} ${colorClassMap[dayObjective.color]?.border || 'border-blue-400/50'}`}>
@@ -425,12 +439,11 @@ export const PlanningRoom: React.FC = () => {
                         </div>
                         <div className="flex-1 overflow-y-auto p-3 space-y-2">
                             {masterPlanTasks.map(task => (
-                                <motion.div 
+                                <motion.div
                                     key={task.id}
                                     whileHover={{ scale: 1.02 }}
-                                    className={`p-3 bg-white border-l-4 rounded-lg shadow-sm transition-all cursor-pointer group ${
-                                        day >= 6 ? 'border-slate-300 hover:shadow-md hover:border-blue-400' : 'border-slate-200 opacity-50'
-                                    }`}
+                                    className={`p-3 bg-white border-l-4 rounded-lg shadow-sm transition-all cursor-pointer group ${day >= 6 ? 'border-slate-300 hover:shadow-md hover:border-blue-400' : 'border-slate-200 opacity-50'
+                                        }`}
                                     onClick={() => moveToReady(task.id)}
                                     data-testid={`task-master-${task.id}`}
                                 >
@@ -500,11 +513,10 @@ export const PlanningRoom: React.FC = () => {
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 exit={{ opacity: 0, scale: 0.9 }}
                                                 onClick={() => handleSelectTask(task.id)}
-                                                className={`p-3 rounded-xl border-l-4 cursor-pointer transition-all shadow-sm hover:shadow-md ${
-                                                    isBlocked ? 'border-red-500 bg-red-50 hover:bg-red-100' : 
+                                                className={`p-3 rounded-xl border-l-4 cursor-pointer transition-all shadow-sm hover:shadow-md ${isBlocked ? 'border-red-500 bg-red-50 hover:bg-red-100' :
                                                     isRisky ? 'border-amber-500 bg-amber-50 hover:bg-amber-100' :
-                                                    'border-green-500 bg-green-50 hover:bg-green-100'
-                                                } ${isSelected ? 'ring-2 ring-blue-400 scale-[1.02]' : ''}`}
+                                                        'border-green-500 bg-green-50 hover:bg-green-100'
+                                                    } ${isSelected ? 'ring-2 ring-blue-400 scale-[1.02]' : ''}`}
                                                 data-testid={`task-lookahead-${task.id}`}
                                             >
                                                 <div className="flex justify-between items-start mb-2">
@@ -567,7 +579,7 @@ export const PlanningRoom: React.FC = () => {
                                         Weekly Work Plan
                                     </h3>
                                     <p className="text-[10px] text-indigo-300">
-                                        {canCommit 
+                                        {canCommit
                                             ? `${readyTasksCount} Sound (GREEN)${riskyCount > 0 ? ` + ${riskyCount} Risky (YELLOW)` : ''} - Click Start Week to commit`
                                             : `Commitment unlocks on Day 9 (currently Day ${day})`
                                         }
@@ -576,11 +588,10 @@ export const PlanningRoom: React.FC = () => {
                                 <button
                                     onClick={handleCommitPlan}
                                     disabled={!canCommit || (readyTasksCount === 0 && riskyCount === 0)}
-                                    className={`px-5 py-2 rounded-lg text-sm font-bold shadow-lg transition-all active:scale-95 ${
-                                        canCommit && (readyTasksCount > 0 || riskyCount > 0)
-                                            ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white shadow-green-900/30 ring-2 ring-green-400/50' 
-                                            : 'bg-indigo-800/50 text-indigo-400 cursor-not-allowed'
-                                    }`}
+                                    className={`px-5 py-2 rounded-lg text-sm font-bold shadow-lg transition-all active:scale-95 ${canCommit && (readyTasksCount > 0 || riskyCount > 0)
+                                        ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white shadow-green-900/30 ring-2 ring-green-400/50'
+                                        : 'bg-indigo-800/50 text-indigo-400 cursor-not-allowed'
+                                        }`}
                                     data-testid="button-start-week"
                                 >
                                     {!canCommit ? (
@@ -595,7 +606,7 @@ export const PlanningRoom: React.FC = () => {
                                     <>
                                         {lookaheadTasks.filter(t => (t.constraints?.length || 0) === 0).slice(0, 8).map((t) => (
                                             <motion.div
-                                                initial={{ scale: 0 }} 
+                                                initial={{ scale: 0 }}
                                                 animate={{ scale: 1 }}
                                                 key={t.id}
                                                 className="flex-1 bg-green-500/30 border-2 border-green-400 rounded-lg flex items-center justify-center p-2 text-center shadow-lg shadow-green-500/20"
@@ -605,7 +616,7 @@ export const PlanningRoom: React.FC = () => {
                                         ))}
                                         {riskyTasks.slice(0, Math.max(0, 8 - readyTasksCount)).map((t) => (
                                             <motion.div
-                                                initial={{ scale: 0 }} 
+                                                initial={{ scale: 0 }}
                                                 animate={{ scale: 1 }}
                                                 key={t.id}
                                                 className="flex-1 bg-amber-500/30 border-2 border-amber-400 border-dashed rounded-lg flex items-center justify-center p-2 text-center"
@@ -654,12 +665,11 @@ export const PlanningRoom: React.FC = () => {
                         <div className="flex-1 p-4 overflow-y-auto">
                             {/* Day-specific guidance message */}
                             {getInspectorMessage() && (
-                                <div className={`mb-4 p-3 rounded-lg text-xs font-medium ${
-                                    day === 7 ? 'bg-orange-50 text-orange-700 border border-orange-200' :
+                                <div className={`mb-4 p-3 rounded-lg text-xs font-medium ${day === 7 ? 'bg-orange-50 text-orange-700 border border-orange-200' :
                                     day === 8 ? 'bg-purple-50 text-purple-700 border border-purple-200' :
-                                    day === 9 ? 'bg-green-50 text-green-700 border border-green-200' :
-                                    'bg-blue-50 text-blue-700 border border-blue-200'
-                                }`}>
+                                        day === 9 ? 'bg-green-50 text-green-700 border border-green-200' :
+                                            'bg-blue-50 text-blue-700 border border-blue-200'
+                                    }`}>
                                     {getInspectorMessage()}
                                 </div>
                             )}
@@ -714,22 +724,20 @@ export const PlanningRoom: React.FC = () => {
                                                             key={c}
                                                             onClick={() => canFixConstraints ? handleConstraintRemoval(c) : null}
                                                             disabled={!canFixConstraints}
-                                                            className={`w-full p-3 rounded-lg text-left flex justify-between items-center group transition-all border ${
-                                                                canFixConstraints 
-                                                                    ? `bg-${config.color}-50 hover:bg-${config.color}-100 border-${config.color}-200 cursor-pointer`
-                                                                    : 'bg-slate-50 border-slate-200 cursor-not-allowed'
-                                                            }`}
+                                                            className={`w-full p-3 rounded-lg text-left flex justify-between items-center group transition-all border ${canFixConstraints
+                                                                ? `bg-${config.color}-50 hover:bg-${config.color}-100 border-${config.color}-200 cursor-pointer`
+                                                                : 'bg-slate-50 border-slate-200 cursor-not-allowed'
+                                                                }`}
                                                             data-testid={`button-fix-${c}`}
                                                         >
                                                             <span className={`font-bold text-sm flex items-center gap-2 ${canFixConstraints ? `text-${config.color}-700` : 'text-slate-500'}`}>
                                                                 {config.icon}
                                                                 {config.label}
                                                             </span>
-                                                            <span className={`text-[10px] px-2 py-1 rounded font-bold ${
-                                                                canFixConstraints
-                                                                    ? `bg-${config.color}-200 group-hover:bg-${config.color}-300 text-${config.color}-800`
-                                                                    : 'bg-slate-200 text-slate-500'
-                                                            }`}>
+                                                            <span className={`text-[10px] px-2 py-1 rounded font-bold ${canFixConstraints
+                                                                ? `bg-${config.color}-200 group-hover:bg-${config.color}-300 text-${config.color}-800`
+                                                                : 'bg-slate-200 text-slate-500'
+                                                                }`}>
                                                                 {canFixConstraints ? `${config.action} (${config.cost})` : 'Fix on Day 8'}
                                                             </span>
                                                         </button>
@@ -798,10 +806,10 @@ export const PlanningRoom: React.FC = () => {
                                     <p className="text-sm text-slate-500">You have {riskyCount} task{riskyCount > 1 ? 's' : ''} with unresolved constraints</p>
                                 </div>
                             </div>
-                            
+
                             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
                                 <p className="text-sm text-amber-800 leading-relaxed">
-                                    <strong>YELLOW tasks</strong> have 1 remaining constraint. You CAN force-commit them, but they become <strong>FRAGILE</strong> - 
+                                    <strong>YELLOW tasks</strong> have 1 remaining constraint. You CAN force-commit them, but they become <strong>FRAGILE</strong> -
                                     there's a <strong>30% chance they'll fail</strong> during execution and hurt your PPC.
                                 </p>
                                 <p className="text-xs text-amber-600 mt-2 italic">
@@ -842,13 +850,13 @@ export const PlanningRoom: React.FC = () => {
             {/* Tutorial Overlay */}
             <AnimatePresence>
                 {showTutorial && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="absolute inset-0 z-[100] bg-black/60 flex items-center justify-center"
                     >
-                        <motion.div 
+                        <motion.div
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             className="bg-white rounded-2xl shadow-2xl p-6 max-w-md mx-4"

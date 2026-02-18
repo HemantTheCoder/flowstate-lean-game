@@ -162,17 +162,42 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
     const [showInsights, setShowInsights] = useState(false);
     const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
+    const unlockBadge = useGameStore(s => s.unlockBadge);
+
+    const finalEfficiency = cumulativePotentialCapacity > 0
+        ? Math.min(100, Math.max(0, Math.round((cumulativeTasksCompleted / cumulativePotentialCapacity) * 100)))
+        : lpi.flowEfficiency;
+
+    const pushed = !!flags['decision_push_made'];
+
+    const getPerformanceTier = (eff: number) => {
+        if (eff >= 90) return { label: 'Master Flow Architect', color: 'text-yellow-500', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30' };
+        if (eff >= 70) return { label: 'Skilled Practitioner', color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/30' };
+        if (eff >= 50) return { label: 'Developing Leader', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30' };
+        return { label: 'Learning Journey', color: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/30' };
+    };
+
     useEffect(() => {
         if (isOpen) {
             soundManager.playSFX('success', 0.8);
             const timer = setTimeout(() => setShowInsights(true), 1500);
+
+            // Achievements
+            unlockBadge('flow_master');
+            if (finalEfficiency >= 80) unlockBadge('efficiency_expert');
+            if (!pushed && flags['decision_pull_enforced']) unlockBadge('lean_thinker');
+            unlockBadge('first_day');
+
+            // Auto-submit score to update Career Stats & Leaderboard
+            handleSubmitScore();
+
             return () => clearTimeout(timer);
         } else {
             setShowInsights(false);
             setActiveDay(null);
             setSubmissionStatus('idle');
         }
-    }, [isOpen]);
+    }, [isOpen, finalEfficiency, pushed, flags, unlockBadge]);
 
     const handleSubmitScore = async () => {
         if (submissionStatus === 'success' || submissionStatus === 'submitting') return;
@@ -206,19 +231,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
         onContinue();
     };
 
-    const finalEfficiency = cumulativePotentialCapacity > 0
-        ? Math.min(100, Math.max(0, Math.round((cumulativeTasksCompleted / cumulativePotentialCapacity) * 100)))
-        : lpi.flowEfficiency;
-
-    const getPerformanceTier = (eff: number) => {
-        if (eff >= 90) return { label: 'Master Flow Architect', color: 'text-yellow-500', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30' };
-        if (eff >= 70) return { label: 'Skilled Practitioner', color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/30' };
-        if (eff >= 50) return { label: 'Developing Leader', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30' };
-        return { label: 'Learning Journey', color: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/30' };
-    };
-
     const tier = getPerformanceTier(finalEfficiency);
-    const pushed = !!flags['decision_push_made'];
 
     const getImprovementSuggestions = () => {
         const suggestions: { icon: any; text: string; priority: 'high' | 'medium' | 'low' }[] = [];

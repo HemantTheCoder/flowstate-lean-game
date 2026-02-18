@@ -28,7 +28,7 @@ export const TransitionScreen: React.FC<Props> = ({ isOpen, onComplete, title, s
             icon: <ClipboardCheck className="w-12 h-12" />,
             title: "Planning Phase Complete",
             content: "You've evaluated your Master Schedule, identified constraints, and removed blockers to make tasks Sound.",
-            color: "text-blue-300"
+            color: "text-blue-200"
         },
         {
             icon: <Target className="w-12 h-12" />,
@@ -40,13 +40,13 @@ export const TransitionScreen: React.FC<Props> = ({ isOpen, onComplete, title, s
             icon: <Hammer className="w-12 h-12" />,
             title: "Execution Begins",
             content: "Move your committed tasks through the Kanban board: Ready > Doing > Done. Every task you complete is a KEPT promise.",
-            color: "text-amber-300"
+            color: "text-amber-200"
         }
     ] : [{
         icon: <CheckCircle className="w-12 h-12" />,
         title: title,
         content: description,
-        color: "text-blue-300"
+        color: "text-blue-200"
     }];
 
     const currentStep = steps[step];
@@ -61,9 +61,9 @@ export const TransitionScreen: React.FC<Props> = ({ isOpen, onComplete, title, s
     };
 
     const bgColors: Record<string, string> = {
-        planning: 'from-blue-900 via-indigo-900 to-blue-900',
-        execution: 'from-slate-900 via-indigo-900 to-slate-900',
-        review: 'from-green-900 via-emerald-900 to-green-900'
+        planning: 'from-blue-950 via-indigo-950 to-blue-950',
+        execution: 'from-slate-950 via-gray-950 to-slate-950',
+        review: 'from-green-950 via-emerald-950 to-green-950'
     };
 
     return (
@@ -127,7 +127,7 @@ export const TransitionScreen: React.FC<Props> = ({ isOpen, onComplete, title, s
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.5 }}
-                                className="text-lg md:text-xl text-slate-300 max-w-xl mx-auto leading-relaxed"
+                                className="text-lg md:text-xl text-slate-100 max-w-xl mx-auto leading-relaxed"
                             >
                                 {currentStep.content}
                             </motion.p>

@@ -5,6 +5,7 @@ import { BarChart3, Trophy } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 
 import { ComingSoonModal } from '../components/game/ComingSoonModal';
+import { AuthModal } from '@/components/ui/AuthModal';
 
 export default function Home() {
   const [pendingFeature, setPendingFeature] = useState<'multiplayer' | 'cases' | null>(null);
@@ -24,6 +25,10 @@ export default function Home() {
       {/* Animated Background Placeholder - Could be SVG or Canvas later */}
       <div className="absolute inset-0 -z-10 opacity-30">
         {/* Add moving clouds/cityscape here later */}
+      </div>
+
+      <div className="absolute top-4 right-4 z-50">
+        <AuthModal />
       </div>
 
       <motion.div

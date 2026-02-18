@@ -3,31 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
 import { useGame } from '@/hooks/use-game';
-import { Volume2, VolumeX, Download, Upload } from 'lucide-react';
+import { Volume2, VolumeX, Cloud, LogOut } from 'lucide-react';
 
-export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-    const { audioSettings, setAudioVolume, toggleMute, importState } = useGameStore();
+export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void; onSaveAndExit: () => void }> = ({ isOpen, onClose, onSaveAndExit }) => {
+    // ... existing hooks ...
+    const { audioSettings, setAudioVolume, toggleMute } = useGameStore();
     const [activeTab, setActiveTab] = React.useState<'audio' | 'system'>('audio');
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-    // Save/Load Hooks
-    // We need to re-import useGame hook inside component or pass it down. 
-    // Since useGame is a hook, we can use it here if SettingsModal is inside QueryProvider context (it is).
-    // Note: SettingsModal is imported in Game.tsx, checks out.
-    // However, hooks rules: import at top level.
-    // Let's assume we can import useGame here. 
-    // Wait, useGame is custom hook. I need to add import { useGame } from '@/hooks/use-game' at top level.
-    // For now, I will assume the user has passed necessary props OR I can use the store.
-    // Actually, saving requires server interaction ($saveGame mutation).
-    // The Game.tsx handles save. Ideally SettingsModal should trigger it.
-    // Refactoring: I will use window.location.reload logic for Reset if needed, but for Save I need the mutation.
-    // Let's use the mutation from useGame here.
-
-    // We need to add the import statement at the top of the file separately, but this tool replaces content block.
-    // I will include the hook usage logic assuming I can fix imports in next step or assuming they exist?
-    // No, I must be careful.
-    // Current imports: React, motion, useGameStore, soundManager.
-    // I will use a simple "Save" button that calls a prop or useGame().
 
     return (
         <AnimatePresence>
@@ -59,7 +40,7 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
                                 onClick={() => setActiveTab('system')}
                                 className={`flex-1 py-4 font-bold text-sm uppercase tracking-wide transition-colors ${activeTab === 'system' ? 'bg-white text-blue-600 border-b-2 border-blue-600' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
                             >
-                                <Download className="w-4 h-4 inline mr-1" /> System
+                                <Cloud className="w-4 h-4 inline mr-1" /> System
                             </button>
                         </div>
 
@@ -122,16 +103,23 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
                                     </button>
                                 </>
                             ) : (
-                                <SystemSettings importState={importState} />
+                                <SystemSettings />
                             )}
                         </div>
 
-                        <div className="p-6 border-t border-slate-100 bg-slate-50 shrink-0">
+                        <div className="p-6 border-t border-slate-100 bg-slate-50 shrink-0 grid grid-cols-2 gap-4">
+                            <button
+                                onClick={onSaveAndExit}
+                                className="w-full bg-white border-2 border-slate-200 text-slate-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 py-4 rounded-xl font-bold shadow-sm transition-all flex items-center justify-center gap-2"
+                            >
+                                <LogOut className="w-4 h-4" />
+                                Save & Exit
+                            </button>
                             <button
                                 onClick={onClose}
                                 className="w-full bg-slate-800 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-slate-700 transition-all"
                             >
-                                BACK TO WORK
+                                Resume Game
                             </button>
                         </div>
                     </motion.div>
@@ -143,60 +131,9 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
 
 // Sub-component for System Settings to use hooks cleanly
 
-const SystemSettings: React.FC<{ importState: (data: any) => void }> = ({ importState }) => {
-    const { saveGame, resetGame, gameState } = useGame();
-    const { lpi, funds, day, week, columns, flags, playerName } = useGameStore();
-
-    const handleManualSave = async () => {
-        // Cloud Save disabled for now per user request.
-        // await saveGame.mutateAsync({...});
-        alert("Cloud Save is currently disabled. Please use 'Export Save' to backup your data locally.");
-    };
-
-    const handleExport = () => {
-        const data = {
-            timestamp: Date.now(),
-            chapter: useGameStore.getState().chapter,
-            day,
-            week,
-            playerName,
-            resources: {
-                budget: funds,
-                morale: lpi.teamMorale
-            },
-            kanbanState: { columns },
-            flags,
-            metrics: lpi
-        };
-
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `flowstate_save_day${day}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    };
-
-    const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const json = JSON.parse(event.target?.result as string);
-                importState(json);
-                alert("Save file loaded successfully! 📂");
-                window.location.reload(); // Reload to refresh state fully
-            } catch (err) {
-                alert("Failed to load save file. Invalid format.");
-            }
-        };
-        reader.readAsText(file);
-    };
+const SystemSettings: React.FC = () => {
+    const { resetGame } = useGame();
+    const { playerName } = useGameStore();
 
     const handleReset = () => {
         if (confirm("Are you sure? This will WIPE all progress and start from Day 1.")) {
@@ -208,25 +145,13 @@ const SystemSettings: React.FC<{ importState: (data: any) => void }> = ({ import
         <div className="space-y-6">
             <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                 <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
-                    <span className="text-xl">💾</span> Save & Load
+                    <span className="text-xl">☁️</span> Cloud Save Active
                 </h4>
                 <p className="text-sm text-blue-700 mb-4">
-                    FlowState currently uses <strong>Local JSON Files</strong> for saving.
-                    Export your save daily to keep it safe!
+                    Your progress is saved to your account automatically at the end of each day, or manually via the Save button in the HUD.
                 </p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button
-                        onClick={handleExport}
-                        className="bg-white border-2 border-blue-200 hover:border-blue-400 text-blue-700 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md"
-                    >
-                        <Download className="w-5 h-5" /> Export Save
-                    </button>
-
-                    <label className="bg-white border-2 border-slate-200 hover:border-slate-400 text-slate-700 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md cursor-pointer">
-                        <Upload className="w-5 h-5" /> Import Save
-                        <input type="file" accept=".json" onChange={handleImport} className="hidden" />
-                    </label>
+                <div className="text-xs text-blue-500 font-mono bg-blue-100 p-2 rounded">
+                    Player: {playerName}
                 </div>
             </div>
 
@@ -238,10 +163,6 @@ const SystemSettings: React.FC<{ importState: (data: any) => void }> = ({ import
                 >
                     ⚠️ Reset Progress
                 </button>
-            </div>
-
-            <div className="text-xs text-slate-400 text-center">
-                User ID: {playerName} | Session: Local
             </div>
         </div>
     );

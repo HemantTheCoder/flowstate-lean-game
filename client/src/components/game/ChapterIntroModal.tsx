@@ -44,7 +44,7 @@ export const ChapterIntroModal: React.FC = () => {
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border-4 border-slate-100"
+                className="bg-white w-full max-w-2xl max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden border-4 border-slate-100 flex flex-col"
             >
                 {/* Header Image/Banner Area */}
                 <div className={`${chapter === 2 ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600' : 'bg-blue-600'} h-36 flex flex-col items-center justify-center relative overflow-hidden`}>
@@ -55,7 +55,7 @@ export const ChapterIntroModal: React.FC = () => {
                     <p className="text-white/70 text-sm font-bold z-10 mt-1 uppercase tracking-widest">{content.title}</p>
                 </div>
 
-                <div className="p-8 md:p-12">
+                <div className="p-8 md:p-12 overflow-y-auto">
                     <p className="text-lg text-slate-600 mb-6 leading-relaxed">
                         {content.description}
                     </p>

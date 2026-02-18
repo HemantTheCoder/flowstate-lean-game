@@ -6,11 +6,26 @@ import soundManager from '@/lib/soundManager';
 import { LeanTooltipText } from './LeanTooltip';
 
 export const DialogueBox: React.FC = () => {
-    const { currentDialogue, dialogueIndex, advanceDialogue, playerName, playerGender } = useGameStore();
+    const { currentDialogue, dialogueIndex, advanceDialogue, playerName, playerGender, weeklyPlan, columns, lpi } = useGameStore();
 
     if (!currentDialogue) return null;
 
     const line = currentDialogue[dialogueIndex];
+
+    // Calculate Dynamic Stats for Text Replacement
+    const promised = weeklyPlan.length;
+    const doneTasks = columns.find(c => c.id === 'done')?.tasks || [];
+    const completed = doneTasks.filter(t =>
+        weeklyPlan.includes(t.id) || weeklyPlan.includes(t.originalId || '')
+    ).length;
+    const ppc = lpi.ppc;
+
+    // Replace Placeholders
+    const processedText = line.text
+        .replace(/Engineer/g, playerName)
+        .replace(/{promised}/g, promised.toString())
+        .replace(/{completed}/g, completed.toString())
+        .replace(/{ppc}/g, ppc.toString());
 
     // Logic to determine character side (Left/Right) or Color based on name
     const isPlayer = line.character === 'Engineer' || line.character === 'Architect';
@@ -94,7 +109,7 @@ export const DialogueBox: React.FC = () => {
 
                         {/* Text Content */}
                         <div className="text-xl md:text-2xl text-slate-800 font-medium leading-relaxed font-sans mt-2">
-                            <LeanTooltipText text={line.text.replace(/Engineer/g, playerName)} />
+                            <LeanTooltipText text={processedText} />
                         </div>
 
                         {/* Continue Indicator */}

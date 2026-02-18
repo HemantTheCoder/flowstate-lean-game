@@ -3,11 +3,21 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // === TABLE DEFINITIONS ===
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+  role: text("role").default("user"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const gameStates = pgTable("game_states", {
   id: serial("id").primaryKey(),
   sessionId: text("session_id").notNull(), // Identify player by simple token/session
+  userId: integer("user_id").references(() => users.id), // Link to registered user
   playerName: text("player_name").default("Architect"),
   chapter: integer("chapter").default(1),
+  day: integer("day").default(1),
   week: integer("week").default(1),
 
   // Game Systems State
@@ -30,7 +40,8 @@ export const gameStates = pgTable("game_states", {
   }),
 
   // Kanban System
-  kanbanState: jsonb("kanban_state").$type<any>(), // Allow flexible client state structure
+  // Kanban System & Extended State (Phase, Dialogue, etc.)
+  kanbanState: jsonb("kanban_state").$type<any>(), // Stores columns + UI state + narrative hooks
 
   // Story & Progression
   flags: jsonb("flags").$type<Record<string, boolean>>(), // Story triggers, tutorial flags
@@ -94,6 +105,7 @@ export type GameStateResponse = GameState;
 
 export const leaderboardEntries = pgTable("leaderboard_entries", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id), // Link the score to a user
   playerName: text("player_name").notNull(),
   chapter: integer("chapter").notNull(),
   efficiency: integer("efficiency").default(0),
@@ -110,6 +122,20 @@ export const insertLeaderboardEntrySchema = createInsertSchema(leaderboardEntrie
 
 export type LeaderboardEntry = typeof leaderboardEntries.$inferSelect;
 export type InsertLeaderboardEntry = z.infer<typeof insertLeaderboardEntrySchema>;
+
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true
+});
+
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+
+export interface UserProfile {
+  user: User;
+  gameState: GameState | undefined;
+  scores: LeaderboardEntry[];
+}
 
 export const GAME_CONSTANTS = {
   INITIAL_RESOURCES: {

@@ -83,7 +83,8 @@ export const WEEK_2_SCHEDULE: DayConfig[] = [
             { character: 'Client', text: "Wait. Can you also finish the cafe roofing this week? The investors are visiting Friday. I need to show them something impressive.", emotion: 'neutral' },
             { character: 'Isha', text: "That was scheduled for next week, sir. We haven't checked its constraints yet...", emotion: 'stressed' },
             { character: 'Client', text: "I'm asking if you CAN. It would mean a lot to the project's future funding.", emotion: 'neutral' },
-            { character: 'Advisor', text: "This is the hardest moment in LPS. The pressure to overcommit is real. But remember: a broken promise damages trust more than an honest 'not yet'.", emotion: 'neutral' }
+            { character: 'Advisor', text: "This is the hardest moment in LPS. The pressure to overcommit is real. You must decide whether to accept the risk or protect the plan.", emotion: 'neutral' },
+            { character: 'Advisor', text: "The choice is yours. Ensure your Weekly Work Plan contains only sound tasks, then click 'Start Week' to lock in your promises.", emotion: 'happy' }
         ],
         event: 'client_pressure',
         briefing: {
