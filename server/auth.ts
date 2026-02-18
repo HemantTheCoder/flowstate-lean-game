@@ -6,7 +6,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage.js";
 import { getPool } from "./db.js";
-import { User as SelectUser } from "@shared/schema";
+import { User as SelectUser } from "../shared/schema.js";
 import connectPg from "connect-pg-simple";
 
 const PostgresStore = connectPg(session);

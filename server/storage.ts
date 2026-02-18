@@ -1,5 +1,5 @@
 import { getDb } from "./db.js";
-import { gameStates, users, type GameState, type InsertGameState, type LeaderboardEntry, type InsertLeaderboardEntry, GAME_CONSTANTS, leaderboardEntries, type User, type InsertUser, type UserProfile } from "@shared/schema";
+import { gameStates, users, type GameState, type InsertGameState, type LeaderboardEntry, type InsertLeaderboardEntry, GAME_CONSTANTS, leaderboardEntries, type User, type InsertUser, type UserProfile } from "../shared/schema.js";
 import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
