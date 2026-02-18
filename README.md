@@ -1,44 +1,69 @@
-# Walkthrough - FLOWSTATE Chapter 1
+# 🏗️ FlowState: Mastering Lean Construction
 
-I have implemented the core foundation and the first chapter of Flowstate.
+**FlowState** is a narrative-driven, educational simulation game designed to teach the principles of Lean Construction and high-performance project management. Players step into the shoes of a Project Architect, transforming chaotic construction sites into efficient, flow-centric environments.
 
-## Features Implemented
+> [!NOTE]
+> **Project Status Update**: February 18, 2026
+> The core engine is fully stable, and Chapter 1 & 2 foundations are complete.
 
-### 1. Home Screen
--   Anime-style intro screen with "Start", "Settings", and "Multiplayer (Coming Soon)".
--   Credits to Hemant Kumar as requested.
+---
 
-### 2. Core Game Loop
--   **React + Phaser Integration**: The game runs on a hybrid engine.
-    -   **Phaser**: Renders the isometric construction site and workers in the background. Isometrics workers move faster/slower based on your management!
-    -   **React**: Handles the UI overlays (HUD, Kanban Board, Dialogues).
+## 🎮 The Experience
 
-### 3. Chapter 1: Kanban System
--   **Kanban Board**: A fully interactive board where you can view tasks and tasks flow through columns (Backlog -> Ready -> Doing -> Done).
--   **WIP Limits**: You can set WIP limits on columns.
--   **Visual Feedback**:
-    -   If you respect WIP limits -> Workers move smoothly (Green Flow Status).
-    -   If you overload columns -> Workers slow down/stop (Red Congestion Status).
+FlowState blends a visual novel narrative with deep management simulation. As you navigate through different chapters, you'll work with characters like **Mira** (Project Lead) and **Rao** (Smart Advisor) to implement lean strategies.
 
-### 4. Narrative System
--   **Dialogue Box**: A visual novel style text box with character names and emotions.
--   **Intro Story**: "Mira" and "Architect" introduce the chaos and the need for Kanban.
+### Core Gameplay Mechanics
 
-### 5. Progression
--   **Day/Week Cycle**: You can "End Day" to advance time.
--   **Debrief Screen**: At the end of the week (Day 5), a Debrief screen appears showing your **Lean Performance Index (LPI)**.
+*   **Interactive Construction Site**: Real-time visualization of work trailers and labor movement powered by a custom Phaser engine.
+*   **Dynamic Kanban System**: Manage task flow from Backlog to Done. Set Work-In-Progress (WIP) limits and watch as your field crews respond to your management decisions.
+*   **The Planning Room (Chapter 2)**: A deep dive into the **Last Planner System (LPS)**. Use the 3-panel planning interface to manage:
+    *   **Master Plan**: The long-term project vision.
+    *   **Lookahead Planning**: Identifying and removing constraints before they hit the field.
+    *   **Weekly Work Plan**: Committing to tasks and tracking success.
 
-## How to Verify
-1.  Run the app.
-2.  Click **Start Game**.
-3.  Read the Intro Dialogue.
-4.  Open the **Kanban** menu (Chart Icon).
-5.  Observe the Background Workers.
-6.  Click **End Day** until Week 1 finishes to see the Debrief.
+### Advanced Analytics
+Track your management performance with industry-standard Lean metrics:
+*   **PPC (Percent Plan Complete)**: Measure your planning reliability.
+*   **LPI (Lean Performance Index)**: A composite score based on flow efficiency and waste reduction.
+*   **WIP Compliance**: Monitor how well you respect the system's capacity.
 
-## Next Steps
--   Implement Chapter 2 (Last Planner System).
--   Add more tasks and character interactions.
-### Deployment
-The game is deployed to Vercel
-https://flowstate-lean-game.vercel.app/
+---
+
+## 🚀 Key Features Built So Far
+
+| Feature | Description |
+| :--- | :--- |
+| **Chapter 1: Foundations** | Introduction to Kanban and Work-In-Progress limits. |
+| **Planning Room** | Advanced Chapter 2 module for Last Planner System integration. |
+| **Smart Advisor** | Context-aware guidance from "Rao" to help you solve project bottlenecks. |
+| **User Ecosystem** | Secure registration, login, and persistent player profiles. |
+| **Achievements** | Unlock badges (e.g., "The Lean Champion", "PPC Master") as you progress. |
+| **Global Leaderboard** | Compete with other Architects for the highest LPI and PPC scores. |
+
+---
+
+## 🛠️ Technology Stack
+
+FlowState is built with a modern, scalable full-stack architecture:
+
+-   **Frontend**: React + TypeScript + Tailwind CSS
+-   **Game Engine**: Phaser 3 (Isometric Site Visualization)
+-   **State Management**: Zustand
+-   **Backend**: Node.js + Express
+-   **Database**: PostgreSQL
+-   **ORM**: Drizzle ORM
+-   **Authentication**: Passport.js with persistent session management
+-   **Deployment**: Vercel (Edge-optimized)
+
+---
+
+## 👷 Contributing & Credits
+
+**Main Developer**: [Hemant Kumar](https://github.com/HemantTheCoder)
+**Team**: Jugal Thakkar, Dhvij Shah
+
+*Built for the future of construction management education.*
+
+---
+
+[Launch FlowState](https://flowstate-lean-game.vercel.app/)
