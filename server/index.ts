@@ -83,6 +83,10 @@ app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
 // setting up all the other routes so the catch-all route
 // doesn't interfere with the other routes
 (async () => {
+  if (process.env.VERCEL) {
+    return;
+  }
+
   if (process.env.NODE_ENV === "production") {
     serveStatic(app);
   } else {
