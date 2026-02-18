@@ -7,23 +7,23 @@ import ws from "ws";
 neonConfig.webSocketConstructor = ws;
 
 let cachedPool: Pool | null = null;
+let cachedDb: any = null;
 
-export function getPool() {
+export function getPool(): Pool {
   if (cachedPool) return cachedPool;
 
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
-    if (process.env.NODE_ENV === "production") {
-      console.warn("WARNING: DATABASE_URL is not set. Database operations will fail.");
-    }
-    // Return a dummy pool that will throw only on connection
-    cachedPool = new Pool({ connectionString: "" });
-    return cachedPool;
+    throw new Error("DATABASE_URL is not set. Database operations will fail.");
   }
 
   cachedPool = new Pool({ connectionString });
   return cachedPool;
 }
 
-export const pool = getPool();
-export const db = drizzle(pool, { schema });
+export function getDb() {
+  if (cachedDb) return cachedDb;
+  const p = getPool();
+  cachedDb = drizzle(p, { schema });
+  return cachedDb;
+}

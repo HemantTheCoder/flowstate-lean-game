@@ -4,8 +4,8 @@ import { Express } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
-import { storage } from "./storage";
-import { pool } from "./db";
+import { storage } from "./storage.js";
+import { getPool } from "./db.js";
 import { User as SelectUser } from "@shared/schema";
 import connectPg from "connect-pg-simple";
 
@@ -39,7 +39,7 @@ export function setupAuth(app: Express) {
         try {
             console.log("[Auth] Attempting to use PostgresStore for sessions...");
             sessionStore = new PostgresStore({
-                pool: pool,
+                pool: getPool(),
                 createTableIfMissing: false,
                 errorLog: (...args) => console.error("[PostgresStore Error]", ...args)
             });

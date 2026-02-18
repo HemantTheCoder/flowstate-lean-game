@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { getDb } from "./db.js";
 import { gameStates, users, type GameState, type InsertGameState, type LeaderboardEntry, type InsertLeaderboardEntry, GAME_CONSTANTS, leaderboardEntries, type User, type InsertUser, type UserProfile } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 
@@ -21,22 +21,22 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+    const [user] = await getDb().select().from(users).where(eq(users.id, id));
     return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const [user] = await getDb().select().from(users).where(eq(users.username, username));
     return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+    const [user] = await getDb().insert(users).values(insertUser).returning();
     return user;
   }
 
   async getGameState(sessionId: string): Promise<GameState | undefined> {
-    const [state] = await db
+    const [state] = await getDb()
       .select()
       .from(gameStates)
       .where(eq(gameStates.sessionId, sessionId));
@@ -44,7 +44,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserGameState(userId: number): Promise<GameState | undefined> {
-    const [state] = await db
+    const [state] = await getDb()
       .select()
       .from(gameStates)
       .where(eq(gameStates.userId, userId));
@@ -56,19 +56,19 @@ export class DatabaseStorage implements IStorage {
     let existing: GameState | undefined;
 
     if (gameState.userId) {
-      [existing] = await db
+      [existing] = await getDb()
         .select()
         .from(gameStates)
         .where(eq(gameStates.userId, gameState.userId));
     } else {
-      [existing] = await db
+      [existing] = await getDb()
         .select()
         .from(gameStates)
         .where(eq(gameStates.sessionId, gameState.sessionId));
     }
 
     if (existing) {
-      const [updated] = await db
+      const [updated] = await getDb()
         .update(gameStates)
         .set({ ...gameState, lastPlayed: new Date() })
         .where(eq(gameStates.id, existing.id))
@@ -76,7 +76,7 @@ export class DatabaseStorage implements IStorage {
       return updated;
     }
 
-    const [created] = await db
+    const [created] = await getDb()
       .insert(gameStates)
       .values({
         ...gameState,
@@ -92,10 +92,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateGameState(sessionId: string, updates: Partial<InsertGameState>): Promise<GameState> {
-    // Note: This method specifically updates by SESSION ID. 
-    // If we want to support user updates here, we might need a different method or check if sessionId is null.
-    // For now, logged in users will use createOrUpdateGameState mostly.
-    const [updated] = await db
+    const [updated] = await getDb()
       .update(gameStates)
       .set({ ...updates, lastPlayed: new Date() })
       .where(eq(gameStates.sessionId, sessionId))
@@ -106,18 +103,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteGameState(sessionId: string): Promise<void> {
-    await db.delete(gameStates).where(eq(gameStates.sessionId, sessionId));
+    await getDb().delete(gameStates).where(eq(gameStates.sessionId, sessionId));
   }
 
   async getLeaderboard(): Promise<LeaderboardEntry[]> {
-    return await db
+    return await getDb()
       .select()
       .from(leaderboardEntries)
       .orderBy(desc(leaderboardEntries.totalScore));
   }
 
   async getLeaderboardByChapter(chapter: number): Promise<LeaderboardEntry[]> {
-    return await db
+    return await getDb()
       .select()
       .from(leaderboardEntries)
       .where(eq(leaderboardEntries.chapter, chapter))
@@ -125,7 +122,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async addLeaderboardEntry(entry: InsertLeaderboardEntry, userId?: number): Promise<LeaderboardEntry> {
-    const [newEntry] = await db
+    const [newEntry] = await getDb()
       .insert(leaderboardEntries)
       .values({ ...entry, userId })
       .returning();
@@ -133,16 +130,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async clearLeaderboard(): Promise<void> {
-    await db.delete(leaderboardEntries);
+    await getDb().delete(leaderboardEntries);
   }
 
   async getUserProfile(userId: number): Promise<UserProfile> {
-    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    const [user] = await getDb().select().from(users).where(eq(users.id, userId));
     if (!user) throw new Error("User not found");
 
-    const [gameState] = await db.select().from(gameStates).where(eq(gameStates.userId, userId));
+    const [gameState] = await getDb().select().from(gameStates).where(eq(gameStates.userId, userId));
 
-    const scores = await db
+    const scores = await getDb()
       .select()
       .from(leaderboardEntries)
       .where(eq(leaderboardEntries.userId, userId))
@@ -203,7 +200,7 @@ export class MemStorage implements IStorage {
       const created: GameState = {
         ...gameState,
         id,
-        userId: gameState.userId ?? null, // Fix typings
+        userId: gameState.userId ?? null,
         lastPlayed: new Date(),
         playerName: gameState.playerName ?? "Architect",
         chapter: gameState.chapter ?? 1,
@@ -269,7 +266,6 @@ export class MemStorage implements IStorage {
     const user = this.users.get(userId);
     if (!user) throw new Error("User not found");
     const gameState = await this.getUserGameState(userId);
-    // Filter leaderboard by user (mock implementation needs userId on entries)
     const scores = this.leaderboard.filter(l => l.userId === userId);
     return { user, gameState, scores };
   }
