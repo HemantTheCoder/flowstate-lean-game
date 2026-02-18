@@ -40,7 +40,7 @@ export function setupAuth(app: Express) {
             console.log("[Auth] Attempting to use PostgresStore for sessions...");
             sessionStore = new PostgresStore({
                 pool: pool,
-                createTableIfMissing: true,
+                createTableIfMissing: false,
                 errorLog: (...args) => console.error("[PostgresStore Error]", ...args)
             });
         } catch (err) {
@@ -104,8 +104,9 @@ export function setupAuth(app: Express) {
         }
     });
 
-    app.post("/api/register", async (req, res, next) => {
+    app.post("/api/register", async (req, res) => {
         try {
+            console.log("[API] Register attempt for:", req.body?.username);
             const existingUser = await storage.getUserByUsername(req.body.username);
             if (existingUser) {
                 return res.status(400).json({ message: "Username already exists" });
@@ -118,28 +119,49 @@ export function setupAuth(app: Express) {
             });
 
             req.login(user, (err) => {
-                if (err) return next(err);
+                if (err) {
+                    console.error("[API] Register Login Error:", err);
+                    return res.status(500).json({ message: "Login failed after registration", error: String(err), stack: err instanceof Error ? err.stack : undefined });
+                }
                 return res.status(201).json(user);
             });
         } catch (err) {
-            if (err instanceof Error && 'code' in err && (err as any).code === '23505') {
-                // Duplicate key error handler just in case race condition
-                return res.status(400).json({ message: "Username already exists" });
-            }
-            next(err);
+            console.error("[API] Register Fatal Error:", err);
+            res.status(500).json({
+                message: "Fatal registration error",
+                error: String(err),
+                stack: err instanceof Error ? err.stack : undefined,
+                dbStatus: !!process.env.DATABASE_URL
+            });
         }
     });
 
-    app.post("/api/login", (req, res, next) => {
-        passport.authenticate("local", (err: any, user: Express.User, info: any) => {
-            if (err) return next(err);
-            if (!user) return res.status(401).json({ message: info?.message || "Authentication failed" });
+    app.post("/api/login", (req, res) => {
+        try {
+            console.log("[API] Login attempt for:", req.body?.username);
+            passport.authenticate("local", (err: any, user: Express.User, info: any) => {
+                if (err) {
+                    console.error("[API] Passport Auth Error:", err);
+                    return res.status(500).json({ message: "Auth internal error", error: String(err), stack: err instanceof Error ? err.stack : undefined });
+                }
+                if (!user) return res.status(401).json({ message: info?.message || "Authentication failed" });
 
-            req.login(user, (err) => {
-                if (err) return next(err);
-                return res.json(user);
+                req.login(user, (err) => {
+                    if (err) {
+                        console.error("[API] Login Session Error:", err);
+                        return res.status(500).json({ message: "Session creation failed", error: String(err), stack: err instanceof Error ? err.stack : undefined });
+                    }
+                    return res.json(user);
+                });
+            })(req, res);
+        } catch (err) {
+            console.error("[API] Login Fatal Error:", err);
+            res.status(500).json({
+                message: "Fatal login error",
+                error: String(err),
+                stack: err instanceof Error ? err.stack : undefined
             });
-        })(req, res, next);
+        }
     });
 
     app.post("/api/logout", (req, res, next) => {
