@@ -20,7 +20,7 @@ const teamMembers = [
         name: "Arjav Chaudhari",
         role: "Core Contributor",
         color: "from-blue-400 to-cyan-400",
-        image: null
+        image: "/images/arjavpic.jpeg"
     },
     {
         name: "Jugal Thakkar",
