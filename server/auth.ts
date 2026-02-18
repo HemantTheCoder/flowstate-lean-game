@@ -121,17 +121,14 @@ export function setupAuth(app: Express) {
             req.login(user, (err) => {
                 if (err) {
                     console.error("[API] Register Login Error:", err);
-                    return res.status(500).json({ message: "Login failed after registration", error: String(err), stack: err instanceof Error ? err.stack : undefined });
+                    return res.status(500).json({ message: "Login failed after registration" });
                 }
                 return res.status(201).json(user);
             });
         } catch (err) {
             console.error("[API] Register Fatal Error:", err);
             res.status(500).json({
-                message: "Fatal registration error",
-                error: String(err),
-                stack: err instanceof Error ? err.stack : undefined,
-                dbStatus: !!process.env.DATABASE_URL
+                message: "Fatal registration error"
             });
         }
     });
@@ -142,14 +139,14 @@ export function setupAuth(app: Express) {
             passport.authenticate("local", (err: any, user: Express.User, info: any) => {
                 if (err) {
                     console.error("[API] Passport Auth Error:", err);
-                    return res.status(500).json({ message: "Auth internal error", error: String(err), stack: err instanceof Error ? err.stack : undefined });
+                    return res.status(500).json({ message: "Auth internal error" });
                 }
                 if (!user) return res.status(401).json({ message: info?.message || "Authentication failed" });
 
                 req.login(user, (err) => {
                     if (err) {
                         console.error("[API] Login Session Error:", err);
-                        return res.status(500).json({ message: "Session creation failed", error: String(err), stack: err instanceof Error ? err.stack : undefined });
+                        return res.status(500).json({ message: "Session creation failed" });
                     }
                     return res.json(user);
                 });
