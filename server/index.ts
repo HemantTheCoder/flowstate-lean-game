@@ -4,8 +4,8 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 
-const app = express();
-const httpServer = createServer(app);
+export const app = express();
+export const httpServer = createServer(app);
 
 declare module "http" {
   interface IncomingMessage {
@@ -90,18 +90,17 @@ import { setupAuth } from "./auth";
     await setupVite(httpServer, app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || "5000", 10);
-  httpServer.listen(
-    {
-      port,
-      host: "0.0.0.0",
-    },
-    () => {
-      log(`serving on port ${port}`);
-    },
-  );
+  // Only start the server if we're not in a serverless environment (like Vercel)
+  if (!process.env.VERCEL) {
+    const port = parseInt(process.env.PORT || "5000", 10);
+    httpServer.listen(
+      {
+        port,
+        host: "0.0.0.0",
+      },
+      () => {
+        log(`serving on port ${port}`);
+      },
+    );
+  }
 })();

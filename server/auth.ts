@@ -5,7 +5,11 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
+import { pool } from "./db";
 import { User as SelectUser } from "@shared/schema";
+import connectPg from "connect-pg-simple";
+
+const PostgresStore = connectPg(session);
 
 declare global {
     namespace Express {
@@ -33,7 +37,10 @@ export function setupAuth(app: Express) {
         secret: process.env.SESSION_SECRET || "flowstate_secret_key",
         resave: false,
         saveUninitialized: false,
-        store: undefined, // Will be set in index.ts with connect-pg-simple
+        store: new PostgresStore({
+            pool: pool,
+            createTableIfMissing: true,
+        }),
         cookie: {
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             secure: process.env.NODE_ENV === "production"
