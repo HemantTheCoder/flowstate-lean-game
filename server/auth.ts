@@ -40,12 +40,16 @@ export function setupAuth(app: Express) {
         store: new PostgresStore({
             pool: pool,
             createTableIfMissing: true,
+            errorLog: (...args) => console.error("[PostgresStore Error]", ...args)
         }),
         cookie: {
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-            secure: process.env.NODE_ENV === "production"
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax"
         }
     };
+
+    console.log("[Auth] Session settings initialized. Database connectivity will be verified on first request.");
 
     app.set("trust proxy", 1);
     app.use(session(sessionSettings));

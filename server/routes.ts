@@ -5,6 +5,9 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 
 export function registerRoutes(app: Express) {
+  console.log(`[Server] Environment: ${process.env.NODE_ENV}`);
+  console.log(`[Server] Database URL Status: ${process.env.DATABASE_URL ? "Present (Starts with " + process.env.DATABASE_URL.substring(0, 10) + "...)" : "MISSING"}`);
+  console.log("[Server] Registering routes...");
 
   // Load Game State
   app.get(api.game.load.path, async (req, res) => {
@@ -130,7 +133,8 @@ export function registerRoutes(app: Express) {
           field: err.errors[0].path.join('.'),
         });
       }
-      res.status(500).json({ message: "Failed to submit leaderboard entry" });
+      console.error("[API] Leaderboard Submission Error:", err);
+      res.status(500).json({ message: "Failed to submit leaderboard entry", details: err instanceof Error ? err.message : String(err) });
     }
   });
 
