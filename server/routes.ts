@@ -4,10 +4,7 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 
-export async function registerRoutes(
-  httpServer: Server,
-  app: Express
-): Promise<Server> {
+export function registerRoutes(app: Express) {
 
   // Load Game State
   app.get(api.game.load.path, async (req, res) => {
@@ -164,5 +161,4 @@ export async function registerRoutes(
     }
   });
 
-  return httpServer;
 }
