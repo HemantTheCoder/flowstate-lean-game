@@ -1,11 +1,25 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
-import { motion } from 'framer-motion';
-import { BarChart3, Trophy } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Play, Trophy, User, Users, Settings, ExternalLink, HardHat, Info } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 
 import { ComingSoonModal } from '../components/game/ComingSoonModal';
 import { AuthModal } from '@/components/ui/AuthModal';
+
+const buttonVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { type: "spring", stiffness: 300, damping: 24 }
+  },
+  hover: {
+    scale: 1.03,
+    transition: { type: "spring", stiffness: 400, damping: 10 }
+  },
+  tap: { scale: 0.97 }
+};
 
 export default function Home() {
   const [pendingFeature, setPendingFeature] = useState<'multiplayer' | 'cases' | null>(null);
@@ -21,109 +35,165 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-blue-200 to-purple-100 flex flex-col items-center justify-center p-4">
-      {/* Animated Background Placeholder - Could be SVG or Canvas later */}
-      <div className="absolute inset-0 -z-10 opacity-30">
-        {/* Add moving clouds/cityscape here later */}
+    <div className="relative w-full min-h-screen overflow-hidden bg-[#0A0B1A] flex flex-col items-center justify-center p-6 font-sans">
+
+      {/* Visual Novel Inspired Ambient Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Deep, rich lighting simulating an evening cityscape or anime backdrop */}
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.15, 0.25, 0.15] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-indigo-600/40 blur-[150px] rounded-full"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.15, 0.1] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "linear", delay: 3 }}
+          className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-500/30 blur-[150px] rounded-full"
+        />
+        <motion.div
+          animate={{ opacity: [0.05, 0.1, 0.05] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"
+        />
+        {/* Subtle diagonal slash for anime dynamic feel */}
+        <div className="absolute top-0 right-0 w-[200%] h-[200%] rotate-45 bg-gradient-to-t from-transparent via-white/[0.02] to-transparent transform -translate-x-[50%] -translate-y-[50%]" />
       </div>
 
-      <div className="absolute top-4 right-4 z-50">
+      <div className="absolute top-6 right-6 z-50">
         <AuthModal />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="text-center z-10"
-      >
-        <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4 drop-shadow-sm">
-          FLOWSTATE
-        </h1>
-        <p className="text-xl md:text-2xl text-slate-600 font-light mb-12 tracking-wide">
-          Saga of the Flow Architect
-        </p>
+      {/* Main Content Container - Visual Novel Title Screen Layout */}
+      <div className="z-10 w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 relative h-[80vh]">
 
-        <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
-          <Link href="/chapters">
-            <button
-              onClick={() => soundManager.playSFX('whoosh', 0.6)}
-              className="w-full py-4 text-xl font-bold text-white bg-blue-500 rounded-2xl shadow-lg hover:bg-blue-600 hover:shadow-xl hover:scale-105 transition-all transform active:scale-95"
+        {/* Left Side: Title & Branding */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="flex-1 flex flex-col justify-center text-center md:text-left h-full pt-10"
+        >
+          {/* Tagline pill */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-6 backdrop-blur-md self-center md:self-start shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+            <HardHat className="w-4 h-4 text-blue-400" />
+            <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">A Lean Construction Story</span>
+          </div>
+
+          <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-indigo-100 to-indigo-400 tracking-tight mb-2 drop-shadow-[0_0_40px_rgba(99,102,241,0.3)]">
+            FLOW
+            <span className="block text-4xl md:text-6xl lg:text-7xl mt-[-10px] text-blue-400 opacity-90">STATE</span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-slate-400 font-light mb-12 tracking-widest uppercase mt-4 max-w-lg mx-auto md:mx-0">
+            Master the Flow. Eliminate the Waste.
+          </p>
+        </motion.div>
+
+        {/* Right Side: Clear, User-Friendly Navigation */}
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+          className="w-full max-w-xs md:max-w-sm flex flex-col gap-4 self-center md:self-end mb-10 md:mb-20"
+        >
+          {/* Primary Action */}
+          <Link href="/chapters" className="w-full">
+            <motion.button
+              variants={buttonVariants}
+              initial="hidden"
+              animate="visible"
+              whileHover="hover"
+              whileTap="tap"
+              data-testid="button-play"
+              className="w-full relative px-6 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-between text-white font-black text-xl uppercase tracking-wider shadow-[0_0_30px_rgba(79,70,229,0.4)] overflow-hidden group border border-blue-400/30"
             >
-              START GAME
-            </button>
+              <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-[200%] transition-transform duration-700 ease-out z-0" />
+              <span className="relative z-10 flex items-center gap-3 drop-shadow-md">
+                <Play className="w-6 h-6 fill-current" />
+                Play Game
+              </span>
+            </motion.button>
           </Link>
 
-          <Link href="/dashboard">
-            <button
-              data-testid="button-dashboard"
-              className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200 flex items-center justify-center gap-3"
-            >
-              <BarChart3 className="w-5 h-5" />
-              MY PERFORMANCE
-            </button>
-          </Link>
-
-          <Link href="/leaderboard">
-            <button
-              data-testid="button-leaderboard"
-              className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200 flex items-center justify-center gap-3"
-            >
-              <Trophy className="w-5 h-5" />
-              LEADERBOARD
-            </button>
-          </Link>
-
-
-          <button
-            onClick={() => setPendingFeature('multiplayer')}
-            className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200"
-          >
-            MULTIPLAYER — Coming Soon
-          </button>
-
-          <button
-            onClick={() => setPendingFeature('cases')}
-            className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200"
-          >
-            CASE LEVELS — Coming Soon
-          </button>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Link href="/settings">
-              <button className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200 flex items-center justify-center gap-3">
-                SETTINGS
-              </button>
+          {/* Main Menu Grid */}
+          <div className="grid grid-cols-2 gap-4 mt-2">
+            <Link href="/dashboard" className="w-full">
+              <motion.button
+                variants={buttonVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
+                whileTap="tap"
+                custom={1}
+                className="w-full flex-col items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl text-slate-300 hover:text-white hover:bg-slate-800 hover:border-blue-500/50 transition-all flex shadow-lg"
+              >
+                <User className="w-6 h-6 mb-2 text-blue-400" />
+                <span className="text-[11px] font-bold uppercase tracking-widest text-center">My Profile & Stats</span>
+              </motion.button>
             </Link>
 
-            <Link href="/credits">
-              <button className="w-full py-4 text-xl font-bold text-slate-700 bg-white/80 rounded-2xl shadow-sm hover:bg-white hover:shadow-md transition-all border-2 border-slate-200 flex items-center justify-center gap-3">
-                CREDITS
+            <Link href="/leaderboard" className="w-full">
+              <motion.button
+                variants={buttonVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
+                whileTap="tap"
+                custom={2}
+                className="w-full flex-col items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl text-slate-300 hover:text-white hover:bg-slate-800 hover:border-yellow-500/50 transition-all flex shadow-lg"
+              >
+                <Trophy className="w-6 h-6 mb-2 text-yellow-400" />
+                <span className="text-[11px] font-bold uppercase tracking-widest text-center">Leaderboard</span>
+              </motion.button>
+            </Link>
+          </div>
+
+          {/* Secondary Option Menu */}
+          <div className="flex flex-col gap-3 mt-2">
+            <button
+              onClick={() => setPendingFeature('cases')}
+              className="w-full group relative flex items-center justify-between px-6 py-4 bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-xs hover:text-white hover:bg-slate-800 transition-all"
+            >
+              <span className="flex items-center gap-3">
+                <ExternalLink className="w-4 h-4 opacity-70" />
+                Case Studies
+              </span>
+              <span className="text-[9px] bg-slate-800 px-2 py-0.5 rounded text-slate-500">COMING SOON</span>
+            </button>
+
+            <button
+              onClick={() => setPendingFeature('multiplayer')}
+              className="w-full group relative flex items-center justify-between px-6 py-4 bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-xs hover:text-white hover:bg-slate-800 transition-all"
+            >
+              <span className="flex items-center gap-3">
+                <Users className="w-4 h-4 opacity-70" />
+                Multiplayer
+              </span>
+              <span className="text-[9px] bg-slate-800 px-2 py-0.5 rounded text-slate-500">COMING SOON</span>
+            </button>
+
+            <Link href="/credits" className="w-full">
+              <button className="w-full group relative flex items-center justify-between px-6 py-4 bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-xs hover:text-white hover:bg-slate-800 transition-all">
+                <span className="flex items-center gap-3">
+                  <Info className="w-4 h-4 opacity-70" />
+                  Credits
+                </span>
               </button>
             </Link>
           </div>
-        </div>
-      </motion.div>
 
-      {/* Footer Credits */}
-      <motion.footer
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-        className="absolute bottom-6 right-8 text-right"
-      >
-        <p className="text-slate-500 text-sm font-medium">
-          Made by <a href="https://www.linkedin.com/in/hemantkumar2430/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 hover:underline">Hemant Kumar</a>
-        </p>
-      </motion.footer>
+          <p className="mt-8 text-slate-500/80 hover:text-slate-400 text-[10px] font-bold uppercase tracking-widest text-center transition-colors">
+            Made by <a href="https://www.linkedin.com/in/hemant-kumar-b2b512300" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors">Hemant Kumar</a>
+          </p>
 
-      {/* Feature Preview Modal */}
+        </motion.div>
+      </div>
+
       <ComingSoonModal
-        isOpen={!!pendingFeature}
+        isOpen={pendingFeature !== null}
         onClose={() => setPendingFeature(null)}
         mode={pendingFeature || 'multiplayer'}
       />
-
     </div>
   );
 }

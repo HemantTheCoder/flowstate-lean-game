@@ -1,12 +1,20 @@
 import React from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { WEEK_1_SCHEDULE } from '@/data/chapters/chapter1';
+import { WEEK_2_SCHEDULE } from '@/data/chapters/chapter2';
+import { CHAPTER_3_SCHEDULE } from '@/data/chapters/chapter3';
 import { motion, AnimatePresence } from 'framer-motion';
 import soundManager from '@/lib/soundManager';
 
 export const DayBriefingModal: React.FC = () => {
-    const { day, flags, setFlag } = useGameStore();
-    const dayConfig = WEEK_1_SCHEDULE.find(d => d.day === day);
+    const { day, chapter, flags, setFlag } = useGameStore();
+
+    // Choose the correct schedule based on the chapter
+    const currentSchedule = chapter === 1 ? WEEK_1_SCHEDULE :
+        chapter === 2 ? WEEK_2_SCHEDULE :
+            CHAPTER_3_SCHEDULE;
+
+    const dayConfig = currentSchedule.find(d => d.day === day);
     const dayKey = `day_${day}_briefing_seen`;
     const introKey = `chapter_intro_seen`;
 

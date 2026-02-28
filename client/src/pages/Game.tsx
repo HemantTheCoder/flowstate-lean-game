@@ -10,17 +10,20 @@ import { DailySummary } from '@/components/game/DailySummary';
 import { useGameStore } from '@/store/gameStore';
 import { WEEK_1_SCHEDULE, DAY_5_GOOD, DAY_5_BAD } from '@/data/chapters/chapter1';
 import { WEEK_2_SCHEDULE } from '@/data/chapters/chapter2';
+import { CHAPTER_3_SCHEDULE } from '@/data/chapters/chapter3';
 import { DecisionModal } from '@/components/game/DecisionModal';
 import { TransitionScreen } from '@/components/game/TransitionScreen';
 import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
 import { CharacterCastModal } from '@/components/game/CharacterCastModal';
 import { DayBriefingModal } from '@/components/game/DayBriefingModal';
+import { WorkspaceDepot } from '@/components/game/WorkspaceDepot';
 import { ChapterCompleteModal } from '@/components/game/ChapterCompleteModal';
 import { Chapter2CompleteModal } from '@/components/game/Chapter2CompleteModal';
+import { Chapter3CompleteModal } from '@/components/game/Chapter3CompleteModal';
 import { SettingsModal } from '@/components/game/SettingsModal';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
-import { LayoutDashboard, HardHat, Save, Settings, BookOpen } from 'lucide-react';
+import { LayoutDashboard, HardHat, Save, Settings, BookOpen, Package } from 'lucide-react';
 import { GlossaryPanel } from '@/components/game/GlossaryPanel';
 import { ReflectionQuiz } from '@/components/game/ReflectionQuiz';
 import { useAuth } from '@/hooks/use-auth';
@@ -61,7 +64,8 @@ export default function Game() {
   const columns = useGameStore(s => s.columns);
   const lpi = useGameStore(s => s.lpi);
   const phase = useGameStore(s => s.phase);
-  const unlockedChapters = useGameStore(s => s.unlockedChapters); // Added since used in save
+  const unlockedChapters = useGameStore(s => s.unlockedChapters);
+  const depotScore = useGameStore(s => s.depotScore);
 
   // Phase Change Detection for Transition Screen
   const prevPhaseRef = React.useRef(phase);
@@ -81,21 +85,37 @@ export default function Game() {
   const hydratedRef = React.useRef(false);
   useEffect(() => {
     if (gameState && !hydratedRef.current) {
-      importState(gameState);
-      setFlag('hydrated', true);
-      hydratedRef.current = true;
+      if (useGameStore.getState().bypassHydration) {
+        // User manually selected a chapter, ignore server state, clear flag, and overwrite save with fresh chapter state
+        useGameStore.getState().setBypassHydration(false);
+        setFlag('hydrated', true);
+        hydratedRef.current = true;
+        handleSave(true); // Save the freshly started chapter to cloud
+      } else {
+        // Normal resume from server
+        importState(gameState);
+        setFlag('hydrated', true);
+        hydratedRef.current = true;
+      }
     }
   }, [gameState, importState, setFlag]);
 
   // Redirect to chapters if character not created
-  // Must wait for server load + hydration to complete before checking
+  const [isInitializing, setIsInitializing] = useState(true);
+
   useEffect(() => {
-    if (isServerLoading) return;
+    // 500ms grace period to allow local hydration to safely replace flags before redirect checks fire
+    const timer = setTimeout(() => setIsInitializing(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (isServerLoading || isInitializing) return;
     if (gameState && !hydratedRef.current) return;
     if (!flags['character_created']) {
       navigate('/chapters');
     }
-  }, [flags, navigate, isServerLoading, gameState]);
+  }, [flags, navigate, isServerLoading, gameState, isInitializing]);
 
   const handleChapterContinue = async () => {
     try {
@@ -108,15 +128,16 @@ export default function Game() {
     }
   };
 
-  const handleChapter2Continue = async () => {
-    try {
-      console.log("Completing Chapter 2...");
-      useGameStore.getState().completeChapter(2);
-      await handleSave(true);
-      navigate('/chapters');
-    } catch (e: any) {
-      console.error("Transition Error:", e);
-    }
+  const handleChapter2Continue = () => {
+    useGameStore.getState().completeChapter(2);
+    handleSave(true);
+    navigate('/chapters');
+  };
+
+  const handleChapter3Continue = () => {
+    useGameStore.getState().completeChapter(3);
+    handleSave(true);
+    navigate('/chapters');
   };
 
   // Audio Control Loop
@@ -239,7 +260,9 @@ export default function Game() {
   // Daily Event & Story Loader
   useEffect(() => {
     // Choose Schedule based on Chapter
-    const currentSchedule = chapter === 1 ? WEEK_1_SCHEDULE : WEEK_2_SCHEDULE;
+    const currentSchedule = chapter === 1 ? WEEK_1_SCHEDULE :
+      chapter === 2 ? WEEK_2_SCHEDULE :
+        CHAPTER_3_SCHEDULE;
     // Check if we have config for this day
     const dayConfig = currentSchedule.find(d => d.day === day);
     const dayKey = `day_${day}_started`;
@@ -452,7 +475,16 @@ export default function Game() {
       return;
     }
 
+    if (currentDay > 16 && chapter === 3) {
+      setShowQuiz(true);
+      return;
+    }
+
     if (chapter === 2 && currentDay >= 6 && currentDay <= 9) {
+      return;
+    }
+
+    if (chapter === 3 && currentDay >= 12 && currentDay <= 16) {
       return;
     }
 
@@ -547,6 +579,15 @@ export default function Game() {
         if (readyCount > 0) return `Day 11: Last chance to complete your commitments! ${readyCount} tasks still in Ready.`;
         return "Day 11: PPC Review time! Click 'Finish Chapter' to see how reliable your promises were.";
       }
+    }
+
+    // CHAPTER 3 SPECIFIC GUIDANCE (5S Teaching)
+    if (chapter === 3) {
+      if (day === 12) return "Day 12: Sort (Seiri). Throw away broken tools and unnecessary trash into the Red Tag bin.";
+      if (day === 13) return "Day 13: Set in Order (Seiton). Give every remaining item a home in the correct zone.";
+      if (day === 14) return "Day 14: Shine (Seiso). Click the hazard icons on the floor to clean spills and remove trip risks.";
+      if (day === 15) return "Day 15: Standardize (Seiketsu). Rules are set. Ensure everything is in its designated place.";
+      if (day === 16) return "Day 16: Sustain (Shitsuke). The Inspector is auditing. Ensure no items are out of standard.";
     }
 
     // 0. NARRATIVE SPECIFIC ADVICE & "END DAY" TRIGGERS
@@ -653,7 +694,7 @@ export default function Game() {
   };
 
   return (
-    <div className="w-full h-screen relative overflow-hidden">
+    <div className={`w-full h-screen relative overflow-hidden transition-colors duration-1000 ${chapter === 3 ? 'bg-amber-50/50' : ''}`}>
       {/* 1. Phaser Layer (Background) */}
       <GameCanvas />
 
@@ -678,9 +719,9 @@ export default function Game() {
             <button
               onClick={handleEndDay}
               data-testid="button-end-day"
-              className={`${(day === 5 && chapter === 1) || (day === 11 && chapter === 2) ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-b-4 border-amber-700 ring-2 ring-amber-300' : 'bg-blue-500 hover:bg-blue-600 border-b-4 border-blue-700'} text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') ? 'animate-bounce ring-4 ring-yellow-400' : ''}`}
+              className={`${(day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-b-4 border-amber-700 ring-2 ring-amber-300' : 'bg-blue-500 hover:bg-blue-600 border-b-4 border-blue-700'} text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') ? 'animate-bounce ring-4 ring-yellow-400' : ''}`}
             >
-              {(day === 5 && chapter === 1) || (day === 11 && chapter === 2) ? 'Finish Chapter' : 'End Day'}
+              {((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3)) ? 'Finish Chapter' : 'End Day'}
             </button>
           </div>
 
@@ -689,10 +730,19 @@ export default function Game() {
               <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Funds</div>
               <div className="font-mono font-bold text-blue-600 text-sm md:text-base">${funds}</div>
             </div>
-            <div className="text-center">
-              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Morale</div>
-              <div className="font-mono font-bold text-green-500 text-sm md:text-base">{lpi.teamMorale}%</div>
-            </div>
+
+            {chapter === 3 ? (
+              <div className="text-center px-4 border-l-2 border-slate-100">
+                <div className="text-[10px] md:text-xs font-bold text-amber-500 uppercase">5S Audit</div>
+                <div className="font-mono font-black text-amber-600 text-sm md:text-base">{depotScore}%</div>
+              </div>
+            ) : (
+              <div className="text-center px-4 border-l-2 border-slate-100">
+                <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Morale</div>
+                <div className="font-mono font-bold text-green-500 text-sm md:text-base">{lpi.teamMorale}%</div>
+              </div>
+            )}
+
             <button
               id="btn-save"
               onClick={() => handleSave()}
@@ -733,10 +783,12 @@ export default function Game() {
                 onClick={() => setShowKanban(true)}
                 className="flex flex-col items-center gap-0.5 sm:gap-1 group"
               >
-                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                  <LayoutDashboard className="w-4 h-4 sm:w-6 sm:h-6" />
+                <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center transition-colors
+                  ${chapter === 3 ? 'bg-amber-100 text-amber-600 group-hover:bg-amber-500 group-hover:text-white' : 'bg-blue-100 text-blue-600 group-hover:bg-blue-500 group-hover:text-white'}
+                `}>
+                  {chapter === 3 ? <Package className="w-4 h-4 sm:w-6 sm:h-6" /> : <LayoutDashboard className="w-4 h-4 sm:w-6 sm:h-6" />}
                 </div>
-                <span className="text-[9px] sm:text-xs font-bold text-slate-600">Kanban</span>
+                <span className="text-[9px] sm:text-xs font-bold text-slate-600">{chapter === 3 ? 'Depot' : 'Kanban'}</span>
               </button>
               <button
                 onClick={() => setShowKanban(false)}
@@ -792,7 +844,8 @@ export default function Game() {
 
         {/* Modals & Screens */}
         <AnimatePresence>
-          {showKanban && <KanbanBoard onClose={() => setShowKanban(false)} />}
+          {showKanban && chapter !== 3 && <KanbanBoard onClose={() => setShowKanban(false)} />}
+          {showKanban && chapter === 3 && <WorkspaceDepot onClose={() => setShowKanban(false)} />}
         </AnimatePresence>
 
         <DailySummary
@@ -838,6 +891,14 @@ export default function Game() {
           quizScore={quizScore}
         />
       )}
-    </div >
+      {showChapterComplete && chapter === 3 && (
+        <Chapter3CompleteModal
+          isOpen={true}
+          onClose={() => setShowChapterComplete(false)}
+          onContinue={handleChapter3Continue}
+          quizScore={quizScore}
+        />
+      )}
+    </div>
   );
 }

@@ -1,382 +1,332 @@
 import { useState, useEffect } from 'react';
-import { useGameStore } from '@/store/gameStore';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CharacterCreationModal } from '@/components/game/CharacterCreationModal';
-import { useGame } from '@/hooks/use-game';
-import { Lock, Construction, X, BookOpen, Gamepad2, Target, Lightbulb, ArrowRight, ChevronRight } from 'lucide-react';
+import { Play, Lock, ChevronRight, ArrowLeft, BookOpen, AlertTriangle, Target, HardHat } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
+import { useGameStore } from '@/store/gameStore';
+import { CharacterCreationModal } from '@/components/game/CharacterCreationModal';
 
-const CHAPTERS = [
+export interface ChapterDef {
+    id: number;
+    title: string;
+    description: string;
+    isLocked: boolean;
+    theme: string;
+    isComingSoon?: boolean;
+}
+
+const CHAPTERS: ChapterDef[] = [
+    {
+        id: 0,
+        title: "Episode 1: The Basics of Flow",
+        description: "Learn the fundamentals of Lean Construction by completing simple tasks efficiently.",
+        isLocked: false, // Always unlocked
+        theme: "blue"
+    },
     {
         id: 1,
-        title: "Chapter 1: The Jam",
-        description: "Juniper Pier is in chaos. Learn to see the Flow, limit Work-In-Progress (WIP), and stop the madness.",
-        concept: "Concept: Kanban, WIP Limits & Flow",
-        color: "from-blue-500 to-cyan-400"
+        title: "Episode 2: The Last Planner",
+        description: "Experience the Last Planner System. Manage promises, handle constraints, and track PPC.",
+        isLocked: true, // Will be dynamically checked
+        theme: "emerald"
     },
     {
         id: 2,
-        title: "Chapter 2: The Promise",
-        description: "The Inspector demands reliability. Use the Last Planner System to make commitments you can keep.",
-        concept: "Concept: Last Planner System (LPS) & Reliability",
-        color: "from-purple-500 to-indigo-400"
+        title: "Episode 3: The 5S Principles",
+        description: "Organize the chaotic depot. Sort, Set in order, Shine, Standardize, and Sustain.",
+        isLocked: true,
+        theme: "amber"
+    }
+];
+
+// Enhanced content for Chapter 4 overview
+const CHAPTER_4_PREVIEW = {
+    title: "Episode 4: Pull & JIT Systems",
+    subtitle: "Let Work Be Asked For",
+    overview: "After 5S creates an organized environment and Last Planner systems ensure reliable promises, the next critical step is controlling production flow. Implement Pull Systems and Just-In-Time (JIT) delivery to ensure you produce exactly what is needed, only when it's needed.",
+    learningGoals: [
+        "Differentiate between Push and Pull production systems",
+        "Implement Kanban card signaling across multiple trades",
+        "Design JIT delivery schedules to eliminate bulk storage",
+        "Balance inventory buffers against lead time variability",
+        "Respond to supply chain shocks without overproducing"
+    ],
+    gameplay: [
+        "Design pull-based workflows for finishing trades",
+        "Manage dynamic Kanban limits based on demand",
+        "Schedule JIT material deliveries to precise zones",
+        "Mitigate the 'Bullwhip Effect' during disruptions"
+    ],
+    scenario: "The mall's finishing phase requires intense coordination between drywallers, painters, and electricians. Upstream teams are pushing work, creating massive bottlenecks. You must design a pull system where work is only requested when the downstream trade is ready."
+};
+
+const DUMMY_CHAPTERS: ChapterDef[] = [
+    ...CHAPTERS,
+    {
+        id: 3,
+        title: "Episode 4: Coming Soon",
+        description: "Master Pull Systems and JIT (Just-in-Time) delivery to eliminate overproduction waste.",
+        isLocked: true,
+        isComingSoon: true,
+        theme: "purple"
     }
 ];
 
 export default function ChapterSelect() {
-    const unlockedChapters = useGameStore(s => s.unlockedChapters);
-    const startChapter = useGameStore(s => s.startChapter);
-    const flags = useGameStore(s => s.flags);
-    const [showCh3Modal, setShowCh3Modal] = useState(false);
+    const [, setLocation] = useLocation();
+    const [hoveredChapter, setHoveredChapter] = useState<number | null>(null);
+    const [showChapter4Modal, setShowChapter4Modal] = useState(false);
+
+    // Get unlocked chapters from state
+    const { unlockedChapters, setChapter } = useGameStore();
 
     useEffect(() => {
         soundManager.playBGM('menu', 0.3);
     }, []);
 
-    const [_, navigate] = useLocation();
-    const { saveGame } = useGame();
+    const handleBack = () => {
+        soundManager.playSFX('click');
+        setLocation('/');
+    };
 
-    const handleSelect = async (id: number) => {
-        if (!flags['character_created']) return;
-
-        console.log(`Starting Chapter ${id}...`);
-
-        startChapter(id);
-
-        try {
-            const state = useGameStore.getState();
-            await saveGame.mutateAsync({
-                sessionId: '',
-                playerName: state.playerName,
-                chapter: id,
-                day: state.day, // <--- Add DAY
-                week: state.week,
-                resources: {
-                    morale: state.lpi.teamMorale,
-                    stress: 0,
-                    trust: 50,
-                    productivity: 40,
-                    quality: 80,
-                    budget: state.funds,
-                    materials: state.materials
-                },
-                kanbanState: {
-                    columns: state.columns,
-                    day: state.day,
-                    playerGender: state.playerGender,
-                    tutorialActive: state.tutorialActive,
-                    tutorialStep: state.tutorialStep,
-                    dailyMetrics: state.dailyMetrics,
-                    previousDoneCount: state.previousDoneCount,
-                    previousWasteCount: state.previousWasteCount,
-                    cumulativeTasksCompleted: state.cumulativeTasksCompleted,
-                    cumulativePotentialCapacity: state.cumulativePotentialCapacity,
-                    // Narrative & Phase Persistence
-                    phase: state.phase,
-                    currentDialogue: state.currentDialogue,
-                    dialogueIndex: state.dialogueIndex,
-                } as any,
-                flags: state.flags,
-                metrics: { ...state.lpi, ppcHistory: state.ppcHistory },
-                weeklyPlan: state.weeklyPlan,
-                completedChapters: state.unlockedChapters.filter(c => c !== 1).map(c => c - 1),
-                unlockedBadges: state.unlockedBadges
-            });
-
-            navigate('/game');
-
-        } catch (error) {
-            console.error("Failed to start chapter:", error);
-            alert("Failed to save game state. Please check connection.");
+    const handleSelectChapter = (chapterId: number, isLocked?: boolean, isComingSoon?: boolean) => {
+        soundManager.playSFX('click');
+        if (isComingSoon) {
+            setShowChapter4Modal(true);
+            return;
+        }
+        if (!isLocked) {
+            // chapterId is 0-indexed in DUMMY_CHAPTERS, so add 1 to get the store's chapter number
+            setChapter(chapterId + 1);
+            soundManager.playSFX('success');
+            setLocation('/game');
+        } else {
+            soundManager.playSFX('alert');
         }
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-8 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black pointer-events-none" />
-
+        <div className="min-h-screen bg-[#0A0B1A] text-slate-200 p-6 md:p-10 relative overflow-hidden font-sans">
+            {/* Character Creation for New Players */}
             <CharacterCreationModal />
 
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="z-10 text-center mb-12"
-            >
-                <h1 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">
-                    Select Chapter
-                </h1>
-                <p className="text-slate-400 text-lg">Choose your simulation scenario</p>
-            </motion.div>
-
-            <div className="z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full">
-                {CHAPTERS.map((chapter) => {
-                    const isUnlocked = unlockedChapters.includes(chapter.id);
-
-                    return (
-                        <motion.button
-                            key={chapter.id}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            whileHover={isUnlocked ? { scale: 1.02, y: -5 } : {}}
-                            whileTap={isUnlocked ? { scale: 0.98 } : {}}
-                            onClick={() => isUnlocked && handleSelect(chapter.id)}
-                            disabled={!isUnlocked}
-                            className={`relative group text-left overflow-hidden rounded-3xl border-2 transition-all duration-300 w-full
-                                ${isUnlocked
-                                    ? 'bg-slate-800 border-slate-700 hover:border-slate-500 hover:shadow-2xl hover:shadow-blue-900/20 cursor-pointer'
-                                    : 'bg-slate-900/50 border-slate-800 opacity-60 cursor-not-allowed grayscale'
-                                }
-                            `}
-                            data-testid={`card-chapter-${chapter.id}`}
-                        >
-                            <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-br ${chapter.color}`} />
-
-                            <div className="p-8 relative z-10 flex flex-col h-full">
-                                <div className="flex justify-between items-start mb-6">
-                                    <span className={`px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${isUnlocked ? 'bg-white/10 text-white border-white/20' : 'bg-slate-800 text-slate-500 border-slate-700'}`}>
-                                        Episode {chapter.id}
-                                    </span>
-                                    {!isUnlocked && <span className="text-sm font-bold text-slate-500 uppercase">[LOCKED]</span>}
-                                </div>
-
-                                <h2 className={`text-2xl font-black mb-2 ${isUnlocked ? 'text-white' : 'text-slate-600'}`}>
-                                    {chapter.title}
-                                </h2>
-                                <p className={`text-sm font-bold mb-4 ${isUnlocked ? 'text-blue-400' : 'text-slate-700'}`}>
-                                    {chapter.concept}
-                                </p>
-                                <p className={`text-sm leading-relaxed flex-1 ${isUnlocked ? 'text-slate-300' : 'text-slate-600'}`}>
-                                    {chapter.description}
-                                </p>
-
-                                <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
-                                    <span className={`text-sm font-bold ${isUnlocked ? 'text-white group-hover:underline' : 'text-slate-700'}`}>
-                                        {isUnlocked ? 'Play Scenario' : 'Locked'}
-                                    </span>
-                                    {isUnlocked && <ArrowRight className="w-4 h-4 text-white" />}
-                                </div>
-                            </div>
-                        </motion.button>
-                    );
-                })}
-
-                {/* Chapter 3 - Coming Soon */}
-                <motion.button
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2 }}
-                    whileHover={{ scale: 1.02, y: -5 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setShowCh3Modal(true)}
-                    className="relative group text-left overflow-hidden rounded-3xl border-2 border-amber-800/40 bg-slate-800/60 cursor-pointer transition-all duration-300 w-full"
-                    data-testid="card-chapter-3"
-                >
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-br from-amber-500 to-orange-400" />
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-amber-500/10 to-transparent rounded-bl-full" />
-
-                    <div className="p-8 relative z-10 flex flex-col h-full">
-                        <div className="flex justify-between items-start mb-6">
-                            <span className="px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider border bg-amber-900/30 text-amber-400 border-amber-700/40">
-                                Episode 3
-                            </span>
-                            <span className="flex items-center gap-1.5 text-xs font-bold text-amber-500 uppercase bg-amber-900/30 px-3 py-1 rounded-full border border-amber-700/40">
-                                <Construction className="w-3 h-3" />
-                                Coming Soon
-                            </span>
-                        </div>
-
-                        <h2 className="text-2xl font-black text-white/80 mb-1">
-                            Chapter 3: The Tangled Depot
-                        </h2>
-                        <p className="text-sm font-bold mb-4 text-amber-400/80">
-                            Concept: 5S &mdash; Order Creates Energy
-                        </p>
-                        <p className="text-sm leading-relaxed text-slate-400 flex-1">
-                            Organize the site. Reduce wasted motion. Build stability.
-                        </p>
-
-                        <div className="mt-6 pt-4 border-t border-amber-800/30 flex items-center justify-between">
-                            <span className="text-sm font-bold text-amber-400/70 group-hover:text-amber-300 transition-colors">
-                                View Overview
-                            </span>
-                            <ChevronRight className="w-4 h-4 text-amber-500/60 group-hover:text-amber-400 transition-colors" />
-                        </div>
-                    </div>
-                </motion.button>
+            {/* Visual Novel Ambient Background */}
+            <div className="absolute inset-0 pointer-events-none z-0">
+                <motion.div
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                    className="absolute top-[-20%] right-[-20%] w-[70%] h-[70%] bg-blue-600/30 blur-[150px] rounded-full"
+                />
+                <motion.div
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.15, 0.1] }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear", delay: 5 }}
+                    className="absolute bottom-[-20%] left-[-20%] w-[70%] h-[70%] bg-indigo-600/20 blur-[150px] rounded-full"
+                />
+                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.05] [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
             </div>
 
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="z-10 mt-12"
-            >
-                <p className="text-slate-600 text-xs text-center mb-4 italic">Build flow. Keep promises. Create order.</p>
-                <button
-                    onClick={() => navigate('/')}
-                    className="text-slate-500 hover:text-white transition-colors font-bold text-sm uppercase tracking-widest"
-                    data-testid="button-back-title"
+            <div className="max-w-7xl mx-auto relative z-10 h-full flex flex-col">
+                {/* Header - User Friendly Navigation */}
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6"
                 >
-                    &larr; Back to Title
-                </button>
-            </motion.div>
-
-            {/* Chapter 3 Overview Modal */}
-            <AnimatePresence>
-                {showCh3Modal && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-                        onClick={() => setShowCh3Modal(false)}
-                        data-testid="overlay-chapter-3-modal"
-                    >
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="bg-slate-900 border-2 border-amber-700/40 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl shadow-amber-900/20"
-                            data-testid="modal-chapter-3-overview"
+                    <div className="flex items-center gap-6">
+                        <button
+                            onClick={handleBack}
+                            data-testid="button-back"
+                            className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2 font-bold uppercase tracking-widest text-xs shadow-lg backdrop-blur-md"
                         >
-                            {/* Header */}
-                            <div className="bg-gradient-to-r from-amber-700 via-orange-600 to-amber-700 p-8 relative overflow-hidden rounded-t-3xl">
-                                <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(255,255,255,0.05)_10px,rgba(255,255,255,0.05)_20px)]" />
-                                <button
-                                    onClick={() => setShowCh3Modal(false)}
-                                    className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
-                                    data-testid="button-close-ch3-modal"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
+                            <ArrowLeft className="w-4 h-4" /> Go Back
+                        </button>
+                        <div>
+                            <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-200 tracking-tight drop-shadow-sm">Select Episode</h1>
+                            <p className="text-blue-400 font-bold text-xs uppercase tracking-widest mt-1">Lean Construction Story</p>
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* Chapters Grid - 2x2 Layout Anime/VN Style */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 content-start">
+                    {DUMMY_CHAPTERS.map((chapter, index) => {
+                        // The store uses 1-indexed chapters (1, 2, 3), but the DUMMY_CHAPTERS array uses 0-indexed IDs (0, 1, 2)
+                        const storeChapterId = chapter.id + 1;
+                        const isEffectivelyLocked = chapter.isComingSoon ? true : !unlockedChapters.includes(storeChapterId);
+                        const isHovered = hoveredChapter === chapter.id;
+
+                        let theme = {
+                            color: 'text-slate-400',
+                            border: 'border-white/5',
+                            bg: 'bg-slate-900/60',
+                            glow: 'rgba(255,255,255,0)',
+                            button: 'bg-slate-800'
+                        };
+
+                        if (!isEffectivelyLocked) {
+                            if (chapter.id === 0) theme = { color: 'text-blue-400', border: 'border-blue-500/30', bg: 'bg-[#0f172a]/80', glow: 'rgba(59,130,246,0.3)', button: 'bg-blue-600' };
+                            else if (chapter.id === 1) theme = { color: 'text-emerald-400', border: 'border-emerald-500/30', bg: 'bg-[#064e3b]/40', glow: 'rgba(16,185,129,0.3)', button: 'bg-emerald-600' };
+                            else if (chapter.id === 2) theme = { color: 'text-amber-400', border: 'border-amber-500/30', bg: 'bg-[#451a03]/40', glow: 'rgba(245,158,11,0.3)', button: 'bg-amber-600' };
+                        } else if (chapter.isComingSoon) {
+                            theme = { color: 'text-purple-400', border: 'border-purple-500/20', bg: 'bg-[#2e1065]/30', glow: 'rgba(168,85,247,0.1)', button: 'bg-purple-900/50' };
+                        }
+
+                        return (
+                            <motion.div
+                                key={chapter.id}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
+                                onMouseEnter={() => setHoveredChapter(chapter.id)}
+                                onMouseLeave={() => setHoveredChapter(null)}
+                                onClick={() => handleSelectChapter(chapter.id, isEffectivelyLocked, chapter.isComingSoon)}
+                                data-testid={`chapter-card-${chapter.id}`}
+                                className={`group relative p-8 backdrop-blur-xl border-2 rounded-3xl flex flex-col justify-between transition-all duration-500 cursor-pointer overflow-hidden ${theme.bg} ${theme.border} ${isEffectivelyLocked && !chapter.isComingSoon ? 'opacity-60 hover:opacity-100' : ''}`}
+                                style={{
+                                    boxShadow: isHovered && (!isEffectivelyLocked || chapter.isComingSoon) ? `0 20px 40px -10px ${theme.glow}` : '0 10px 30px -10px rgba(0,0,0,0.5)'
+                                }}
+                            >
+                                {/* Internal Animated Gradient Glow */}
+                                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+                                    style={{ background: `radial-gradient(circle at 50% 120%, ${theme.glow} 0%, transparent 70%)` }} />
+
+                                <div className="relative z-10 flex flex-col h-full">
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div>
+                                            <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 bg-black/40 border ${theme.border} ${theme.color}`}>
+                                                Episode 0{index + 1}
+                                            </span>
+                                            <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight drop-shadow-md">
+                                                {chapter.title}
+                                            </h2>
+                                        </div>
+
+                                        {isEffectivelyLocked && !chapter.isComingSoon ? (
+                                            <div className="w-12 h-12 rounded-full bg-black/40 flex items-center justify-center border border-white/10 shadow-inner">
+                                                <Lock className="w-5 h-5 text-slate-500" />
+                                            </div>
+                                        ) : (
+                                            <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 ${isHovered ? 'scale-110 shadow-[0_0_20px_rgba(255,255,255,0.2)]' : 'shadow-lg'} ${theme.button}`}>
+                                                {chapter.isComingSoon ? <AlertTriangle className="w-6 h-6 text-white" /> : <Play className="w-6 h-6 fill-white text-white ml-1" />}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <p className="text-slate-300 font-light text-base md:text-lg leading-relaxed mb-8 flex-1 opacity-90">
+                                        {chapter.description}
+                                    </p>
+
+                                    <div className="pt-6 border-t border-white/10 flex justify-between items-center relative">
+                                        {chapter.isComingSoon ? (
+                                            <span className={`flex items-center gap-2 font-bold uppercase tracking-wider text-xs transition-colors ${theme.color}`}>
+                                                View Briefing <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                                            </span>
+                                        ) : isEffectivelyLocked ? (
+                                            <span className="flex items-center gap-2 text-slate-500 font-bold uppercase tracking-wider text-xs">
+                                                <Lock className="w-4 h-4" /> Locked Episode
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-2 text-white font-bold uppercase tracking-wider text-xs bg-white/10 px-4 py-2 rounded-full border border-white/20 group-hover:bg-white/20 transition-all">
+                                                Play Episode <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Chapter 4 Preview Modal - Visual Novel Readability */}
+            <AnimatePresence>
+                {showChapter4Modal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-[#0A0B1A]/90 backdrop-blur-md"
+                            onClick={() => setShowChapter4Modal(false)}
+                        />
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="relative w-full max-w-4xl bg-slate-900/80 backdrop-blur-2xl border border-white/10 rounded-3xl flex flex-col max-h-[90vh] overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.15)]"
+                        >
+                            {/* Premium Header */}
+                            <div className="bg-gradient-to-r from-purple-900/50 to-slate-900/50 p-6 md:p-8 border-b border-white/5 flex justify-between items-start shrink-0 relative overflow-hidden">
+                                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
                                 <div className="relative z-10">
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-white/20 text-white mb-3 border border-white/20">
-                                        <Construction className="w-3 h-3" />
-                                        Coming Soon
-                                    </span>
-                                    <h2 className="text-3xl font-black text-white mb-1">The Tangled Depot</h2>
-                                    <p className="text-amber-200/80 font-bold text-sm">Chapter 3 &mdash; 5S: Order Creates Energy</p>
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">
+                                        Upcoming Episode
+                                    </div>
+                                    <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight mb-2 drop-shadow-md">{CHAPTER_4_PREVIEW.title}</h2>
+                                    <p className="text-lg text-slate-300 font-light">{CHAPTER_4_PREVIEW.subtitle}</p>
+                                </div>
+                                <button
+                                    onClick={() => setShowChapter4Modal(false)}
+                                    className="relative z-10 p-2 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-colors"
+                                >
+                                    <AlertTriangle className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <div className="p-6 md:p-8 overflow-y-auto flex-1 font-sans custom-scrollbar">
+                                <p className="text-lg text-slate-300 leading-relaxed mb-8 max-w-3xl">
+                                    {CHAPTER_4_PREVIEW.overview}
+                                </p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                    <div className="bg-black/20 p-6 rounded-2xl border border-white/5 relative">
+                                        <h3 className="text-sm font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2 mb-4">
+                                            <BookOpen className="w-4 h-4" /> Learning Goals
+                                        </h3>
+                                        <ul className="space-y-3">
+                                            {CHAPTER_4_PREVIEW.learningGoals.map((goal, i) => (
+                                                <li key={i} className="flex gap-3 text-slate-300 text-sm leading-relaxed">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                                                    {goal}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="bg-black/20 p-6 rounded-2xl border border-white/5 relative">
+                                        <h3 className="text-sm font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2 mb-4">
+                                            <Target className="w-4 h-4" /> Planned Gameplay
+                                        </h3>
+                                        <ul className="space-y-3">
+                                            {CHAPTER_4_PREVIEW.gameplay.map((item, i) => (
+                                                <li key={i} className="flex gap-3 text-slate-300 text-sm leading-relaxed">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                                                    {item}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div className="bg-gradient-to-br from-purple-900/30 to-slate-900/30 border border-purple-500/20 p-6 rounded-2xl relative overflow-hidden">
+                                    <h3 className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3">Narrative Scenario</h3>
+                                    <p className="text-slate-300 leading-relaxed text-sm italic">
+                                        "{CHAPTER_4_PREVIEW.scenario}"
+                                    </p>
                                 </div>
                             </div>
 
-                            <div className="p-8 space-y-6">
-                                {/* Story Preview */}
-                                <div>
-                                    <h3 className="text-xs font-bold text-amber-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                        <BookOpen className="w-3.5 h-3.5" />
-                                        Story Preview
-                                    </h3>
-                                    <div className="space-y-3 text-sm text-slate-300 leading-relaxed">
-                                        <p>
-                                            After improving flow (Kanban) and making reliable promises (Last Planner), you arrive at the mall's material depot.
-                                        </p>
-                                        <p>
-                                            Tools are scattered. Walk paths are blocked. Materials are stacked randomly. Workers spend more time searching than building.
-                                        </p>
-                                        <p className="text-slate-400 italic border-l-2 border-amber-600/40 pl-4">
-                                            Old Foreman looks around and sighs: "We fixed promises. Now fix the chaos."
-                                        </p>
-                                        <p>
-                                            Your next challenge is to transform a cluttered depot into an organized, efficient work environment.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* What You'll Learn */}
-                                <div className="bg-amber-950/30 border border-amber-800/30 rounded-2xl p-5">
-                                    <h3 className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                        <Lightbulb className="w-3.5 h-3.5" />
-                                        What You'll Learn
-                                    </h3>
-                                    <p className="text-sm text-slate-400 mb-3">
-                                        This chapter introduces <strong className="text-amber-300">5S</strong>, the Lean method for workplace organization.
-                                    </p>
-                                    <ul className="space-y-2">
-                                        {[
-                                            "Reduce wasted motion and searching",
-                                            "Improve productivity through layout",
-                                            "Create visual order on site",
-                                            "Support reliable execution with organized workspaces"
-                                        ].map((item, i) => (
-                                            <li key={i} className="flex items-center gap-2 text-sm text-slate-300">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
-                                                {item}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    <div className="mt-4 pt-3 border-t border-amber-800/30">
-                                        <p className="text-xs font-bold text-amber-500/80 uppercase tracking-wide mb-2">You'll Practice:</p>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            {[
-                                                "Sorting unnecessary materials",
-                                                "Setting fixed locations for tools",
-                                                "Cleaning work zones",
-                                                "Standardizing layouts",
-                                                "Sustaining improvements"
-                                            ].map((item, i) => (
-                                                <span key={i} className="text-xs text-slate-400 flex items-center gap-1.5">
-                                                    <span className="text-amber-600">&#x25B8;</span> {item}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Planned Gameplay */}
-                                <div>
-                                    <h3 className="text-xs font-bold text-amber-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                        <Gamepad2 className="w-3.5 h-3.5" />
-                                        Planned Gameplay
-                                    </h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                        {[
-                                            "Drag-and-drop organization of tools and materials",
-                                            "Creating storage zones and walk paths",
-                                            "Before/after site transformation",
-                                            "Daily mini-challenges for each S",
-                                            "Visual feedback on speed, safety, and morale"
-                                        ].map((item, i) => (
-                                            <div key={i} className="flex items-start gap-2 text-sm text-slate-400 bg-slate-800/50 rounded-xl p-3">
-                                                <span className="text-amber-500 font-bold text-xs mt-0.5">{i + 1}</span>
-                                                <span>{item}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <p className="text-xs text-slate-500 mt-3 italic">
-                                        This chapter focuses on physical workspace optimization, not planning boards.
-                                    </p>
-                                </div>
-
-                                {/* Learning Outcome */}
-                                <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5">
-                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                        <Target className="w-3.5 h-3.5" />
-                                        Learning Outcome
-                                    </h3>
-                                    <p className="text-sm text-white font-medium">
-                                        By the end of Chapter 3, you will understand how site organization directly affects productivity, safety, and flow.
-                                    </p>
-                                </div>
-
-                                {/* Status */}
-                                <div className="flex items-center justify-between pt-2">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                                        <span className="text-xs font-bold text-amber-400/70 uppercase tracking-widest">Under Development</span>
-                                    </div>
-                                    <button
-                                        onClick={() => setShowCh3Modal(false)}
-                                        className="px-5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 text-sm font-bold transition-all"
-                                        data-testid="button-close-ch3-overview"
-                                    >
-                                        Close
-                                    </button>
-                                </div>
+                            <div className="p-6 bg-black/40 border-t border-white/5 shrink-0 flex justify-end">
+                                <button
+                                    onClick={() => setShowChapter4Modal(false)}
+                                    className="w-full md:w-auto px-8 py-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl uppercase tracking-widest text-xs transition-colors shadow-lg shadow-purple-900/20"
+                                >
+                                    Close Briefing
+                                </button>
                             </div>
                         </motion.div>
-                    </motion.div>
+                    </div>
                 )}
             </AnimatePresence>
         </div>

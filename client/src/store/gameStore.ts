@@ -8,6 +8,22 @@ export interface DialogueLine {
   emotion?: 'neutral' | 'happy' | 'stressed' | 'angry' | 'worried';
 }
 
+export interface DepotItem {
+  id: string;
+  type: 'tool' | 'material' | 'trash' | 'hazard';
+  name: string;
+  isBroken?: boolean;
+  idealZoneId?: string;
+  currentZoneId?: string; // 'unassigned', 'trash', 'zone-x'
+}
+
+export interface DepotZone {
+  id: string;
+  name: string;
+  acceptsType: 'tool' | 'material' | 'trash' | 'hazard';
+  capacity: number;
+}
+
 export type ConstraintType = 'material' | 'crew' | 'approval' | 'weather'; // red icon if present
 export type GamePhase = 'planning' | 'action' | 'review';
 
@@ -141,7 +157,17 @@ export interface GameState {
   addDailyTasks: (count: number, currentDay?: number) => void;
 
   // Persistence
+  bypassHydration: boolean;
+  setBypassHydration: (val: boolean) => void;
   importState: (data: any) => void;
+
+  // Chapter 3: 5S Actions
+  depotItems: DepotItem[];
+  depotZones: DepotZone[];
+  depotScore: number;
+  moveDepotItem: (itemId: string, zoneId: string) => void;
+  cleanDepotHazard: (itemId: string) => void;
+  evaluate5S: () => void;
 
   // Chapter 2: LPS Actions
   removeConstraint: (taskId: string, constraint: ConstraintType) => void;
@@ -211,7 +237,13 @@ export const useGameStore = create<GameState>((set, get) => ({
   funds: 2500,
   materials: 300,
 
+  // Chapter 3 State Defaults
+  depotItems: [],
+  depotZones: [],
+  depotScore: 0,
+
   flags: {},
+  bypassHydration: false,
 
   audioSettings: {
     bgmVolume: 0.5,
@@ -219,6 +251,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     isMuted: false,
   },
 
+  setBypassHydration: (val) => set({ bypassHydration: val }),
   setAudioVolume: (type, volume) => set((state) => ({
     audioSettings: { ...state.audioSettings, [`${type}Volume`]: volume }
   })),
@@ -232,6 +265,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       chapter,
       currentDialogue: null,
       dialogueIndex: 0,
+      bypassHydration: true, // Manual chapter start should ignore server state on next mount
     };
 
     if (chapter === 1) {
@@ -302,6 +336,21 @@ export const useGameStore = create<GameState>((set, get) => ({
         ],
         funds: 5000,
         materials: 1000,
+        depotItems: [
+          // Sample cluttered depot items
+          { id: 'd-1', type: 'tool', name: 'Hammer', idealZoneId: 'zone-tools', currentZoneId: 'unassigned' },
+          { id: 'd-2', type: 'material', name: 'Wiring', idealZoneId: 'zone-mats', currentZoneId: 'unassigned' },
+          { id: 'd-3', type: 'trash', name: 'Broken Drill', isBroken: true, currentZoneId: 'unassigned' },
+          { id: 'd-4', type: 'trash', name: 'Empty Pallet', currentZoneId: 'unassigned' },
+          { id: 'd-5', type: 'tool', name: 'Wrench', idealZoneId: 'zone-tools', currentZoneId: 'unassigned' },
+          { id: 'd-6', type: 'hazard', name: 'Oil Spill', currentZoneId: 'unassigned' },
+        ],
+        depotZones: [
+          { id: 'zone-tools', name: 'Tool Shadow Board', acceptsType: 'tool', capacity: 3 },
+          { id: 'zone-mats', name: 'Material Storage', acceptsType: 'material', capacity: 3 },
+          { id: 'zone-trash', name: 'Red Tag Area', acceptsType: 'trash', capacity: 5 },
+        ],
+        depotScore: 0,
         dailyMetrics: [],
         previousDoneCount: 0,
         previousWasteCount: 0,
@@ -805,6 +854,39 @@ export const useGameStore = create<GameState>((set, get) => ({
       dailyMetrics: ks.dailyMetrics ?? data.dailyMetrics ?? state.dailyMetrics,
       tutorialActive: ks.tutorialActive ?? (restoredDay > 1 ? false : true),
       tutorialStep: ks.tutorialStep ?? (restoredDay > 1 ? 99 : 0),
+      depotItems: data.depotItems ?? state.depotItems,
+      depotZones: data.depotZones ?? state.depotZones,
+      depotScore: data.depotScore ?? state.depotScore,
+    };
+  }),
+
+  // Chapter 3 Actions
+  moveDepotItem: (itemId, zoneId) => set((state) => ({
+    depotItems: state.depotItems.map(item =>
+      item.id === itemId ? { ...item, currentZoneId: zoneId } : item
+    )
+  })),
+  cleanDepotHazard: (itemId) => set((state) => ({
+    depotItems: state.depotItems.filter(item => item.id !== itemId),
+    lpi: { ...state.lpi, teamMorale: Math.min(100, state.lpi.teamMorale + 2) }
+  })),
+  evaluate5S: () => set((state) => {
+    let score = 0;
+    let totalItems = state.depotItems.filter(i => i.type !== 'hazard').length;
+
+    state.depotItems.forEach(item => {
+      if (item.type === 'trash' && item.currentZoneId === 'zone-trash') score++;
+      if (item.type === 'tool' && item.currentZoneId === 'zone-tools') score++;
+      if (item.type === 'material' && item.currentZoneId === 'zone-mats') score++;
+    });
+
+    const hazardsScore = state.depotItems.filter(i => i.type === 'hazard').length === 0 ? 5 : 0;
+
+    const finalScore = Math.round((score / totalItems) * 100) + hazardsScore;
+
+    return {
+      depotScore: finalScore,
+      lpi: { ...state.lpi, teamMorale: Math.min(100, state.lpi.teamMorale + Math.floor(finalScore / 10)) }
     };
   }),
 

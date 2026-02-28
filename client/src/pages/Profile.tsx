@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { useGameStore } from '@/store/gameStore';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Loader2, Trophy, Play, Calendar, User as UserIcon, LogOut, Award, BarChart3, Clock, ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Loader2, Trophy, Play, Calendar, LogOut, Award, BarChart3, Clock, ArrowLeft, Target, ShieldCheck, HardHat, Info, BookOpen } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { UserProfile } from '@shared/schema';
 import { format } from 'date-fns';
@@ -21,8 +20,14 @@ export default function Profile() {
 
     if (isAuthLoading || isProfileLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-slate-50">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+            <div className="min-h-screen bg-[#0A0B1A] flex items-center justify-center p-6 relative overflow-hidden font-sans">
+                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+                <div className="flex flex-col items-center gap-6 z-10">
+                    <div className="relative">
+                        <Loader2 className="w-16 h-16 text-blue-500 animate-spin" />
+                    </div>
+                    <p className="text-blue-400 text-xs font-bold uppercase tracking-widest">Accessing Profile...</p>
+                </div>
             </div>
         );
     }
@@ -32,13 +37,12 @@ export default function Profile() {
         return null;
     }
 
-    if (!profile) return null; // Should handle error state better ideally
+    if (!profile) return null;
 
     const { gameState, scores } = profile;
 
     const handleResume = async () => {
         if (gameState) {
-            // Load state into store
             importState(gameState);
             setLocation('/game');
         }
@@ -49,207 +53,263 @@ export default function Profile() {
         setLocation('/');
     };
 
-    // Calculate aggregate stats
     const totalScore = scores.reduce((acc, curr) => acc + (curr.totalScore || 0), 0);
     const bestPpc = Math.max(...scores.map(s => s.ppc || 0), 0);
     const completedChapters = scores.length;
-
-    // get user join date
     const joinDate = user.createdAt ? new Date(user.createdAt) : new Date();
 
     return (
-        <div className="min-h-screen bg-slate-50 p-8 font-sans">
-            <div className="max-w-5xl mx-auto space-y-8">
+        <div className="min-h-screen bg-[#0A0B1A] p-4 md:p-8 font-sans relative overflow-x-hidden text-slate-200">
+
+            {/* Visual Novel Ambient Background */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <motion.div
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15] }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                    className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/30 blur-[150px] rounded-full"
+                />
+                <motion.div
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.15, 0.1] }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear", delay: 5 }}
+                    className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-indigo-600/30 blur-[150px] rounded-full"
+                />
+                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.03] [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+            </div>
+
+            <div className="max-w-6xl mx-auto space-y-8 relative z-10">
 
                 {/* Header Section */}
-                <div className="flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col md:flex-row items-start md:items-center justify-between bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-6 md:p-8 rounded-3xl shadow-[0_0_50px_rgba(59,130,246,0.1)] gap-6 relative overflow-hidden"
+                >
                     <div className="flex items-center gap-6">
-                        <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-3xl font-black border-4 border-indigo-50">
+                        <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex flex-col items-center justify-center text-blue-400 text-4xl font-black border border-blue-500/30 rounded-full shrink-0 shadow-inner">
                             {user.username.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-800">{user.username}</h1>
-                            <p className="text-slate-500 flex items-center gap-2 mt-1">
-                                <Calendar className="w-4 h-4" />
-                                Member since {format(joinDate, 'MMMM yyyy')}
-                            </p>
-                            <div className="flex gap-2 mt-3">
-                                <span className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold border border-indigo-100">
-                                    {user.role === 'admin' ? 'Administrator' : 'Architect'}
-                                </span>
+                            <div className="flex items-center gap-3 mb-1">
+                                <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">{user.username}</h1>
+                                {user.role === 'admin' && (
+                                    <span className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-yellow-500/30 flex items-center gap-1">
+                                        <ShieldCheck className="w-3 h-3" /> Root Admin
+                                    </span>
+                                )}
                             </div>
+                            <p className="text-slate-400 flex items-center gap-2 mt-2 text-xs md:text-sm font-light">
+                                <Calendar className="w-4 h-4 text-slate-500" />
+                                Lean Architect since {format(joinDate, 'MMMM yyyy')}
+                            </p>
                         </div>
                     </div>
-                    <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => setLocation('/')} className="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 border-slate-200">
-                            <ArrowLeft className="w-4 h-4 mr-2" />
-                            Back to Menu
-                        </Button>
-                        <Button variant="outline" onClick={handleLogout} className="text-slate-600 hover:text-red-600 hover:bg-red-50 border-slate-200">
-                            <LogOut className="w-4 h-4 mr-2" />
-                            Logout
-                        </Button>
+                    <div className="flex gap-3 w-full md:w-auto">
+                        <button
+                            onClick={() => setLocation('/')}
+                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-xs font-bold uppercase tracking-widest text-slate-300"
+                        >
+                            <ArrowLeft className="w-4 h-4" />
+                            Return Home
+                        </button>
+                        <button
+                            onClick={handleLogout}
+                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl transition-colors text-xs font-bold uppercase tracking-widest text-red-400"
+                        >
+                            <LogOut className="w-4 h-4" />
+                            Log Out
+                        </button>
                     </div>
-                </div>
+                </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
 
                     {/* Left Column: Stats & Resume */}
-                    <div className="space-y-8">
+                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="md:col-span-5 space-y-8">
+
                         {/* Current Game Card */}
-                        <Card className="border-slate-200 shadow-sm overflow-hidden">
-                            <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white pb-6">
-                                <CardTitle className="flex items-center gap-2">
-                                    <Play className="w-5 h-5 fill-current" />
-                                    Active Game
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="pt-6">
+                        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-3xl overflow-hidden relative">
+                            {/* Glowing orb behind active project section */}
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 blur-3xl rounded-full" />
+
+                            <div className="bg-white/5 p-5 border-b border-white/5 relative flex justify-between items-center">
+                                <h3 className="relative z-10 flex items-center gap-2 text-white font-bold uppercase tracking-widest text-xs">
+                                    <Play className="w-4 h-4 fill-current text-blue-400" />
+                                    Active Project
+                                </h3>
+                                {gameState && <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />}
+                            </div>
+                            <div className="p-8">
                                 {gameState ? (
-                                    <div className="space-y-4">
+                                    <div className="space-y-6">
                                         <div>
-                                            <p className="text-sm text-slate-500 font-bold uppercase tracking-wider">Current Progress</p>
-                                            <p className="text-2xl font-black text-slate-800">Chapter {gameState.chapter}</p>
-                                            <p className="text-sm text-slate-600">Day {gameState.day}</p>
+                                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Current Sector</p>
+                                            <p className="text-3xl font-black text-white uppercase drop-shadow-md">Episode {gameState.chapter}</p>
+                                            <p className="text-sm text-blue-400 mt-1 font-bold">Sim Day {gameState.day}</p>
                                         </div>
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-slate-500">Funds</span>
-                                                <span className="font-mono font-bold">${gameState.resources?.budget?.toLocaleString()}</span>
+                                        <div className="space-y-4 p-5 bg-black/20 rounded-2xl border border-white/5">
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-slate-400 tracking-wide font-bold">Budget</span>
+                                                <span className="font-bold text-emerald-400">${gameState.resources?.budget?.toLocaleString()}</span>
                                             </div>
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-slate-500">Player Name</span>
-                                                <span className="font-medium">{gameState.playerName}</span>
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-slate-400 tracking-wide font-bold">Engineer</span>
+                                                <span className="font-bold text-slate-200">{gameState.playerName}</span>
                                             </div>
                                         </div>
-                                        <Button onClick={handleResume} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold">
-                                            Resume Game
-                                        </Button>
+                                        <button
+                                            onClick={handleResume}
+                                            className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl text-white font-bold text-sm uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)]"
+                                        >
+                                            Resume Project
+                                        </button>
                                     </div>
                                 ) : (
-                                    <div className="text-center py-6">
-                                        <p className="text-slate-500 mb-4">No active save found.</p>
-                                        <Button onClick={() => setLocation('/game')} variant="outline">Start New Game</Button>
+                                    <div className="text-center py-10">
+                                        <div className="w-16 h-16 mx-auto bg-white/5 rounded-full flex flex-col items-center justify-center border border-white/10 mb-4">
+                                            <Info className="w-6 h-6 text-slate-500" />
+                                        </div>
+                                        <p className="text-slate-400 mb-8 text-sm">No active project detected.</p>
+                                        <button
+                                            onClick={() => setLocation('/chapters')}
+                                            className="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-white font-bold text-xs uppercase tracking-widest transition-colors w-full"
+                                        >
+                                            Start New Project
+                                        </button>
                                     </div>
                                 )}
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
 
                         {/* Aggregate Stats */}
-                        <Card className="border-slate-200 shadow-sm">
-                            <CardHeader>
-                                <CardTitle className="text-lg">Career Statistics</CardTitle>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-2 gap-4">
-                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
-                                    <Trophy className="w-6 h-6 text-amber-500 mx-auto mb-1" />
-                                    <div className="text-2xl font-black text-slate-800">{totalScore.toLocaleString()}</div>
-                                    <div className="text-xs text-slate-500 font-bold uppercase">Total Score</div>
+                        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 shadow-xl rounded-3xl overflow-hidden">
+                            <div className="p-5 border-b border-white/5 bg-white/5">
+                                <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                                    <Target className="w-4 h-4 text-emerald-400" /> Career Analytics
+                                </h3>
+                            </div>
+                            <div className="p-6 grid grid-cols-2 gap-4">
+                                <div className="bg-black/20 p-5 rounded-2xl border border-white/5 text-center flex flex-col items-center justify-center shadow-inner hover:bg-white/5 transition-colors">
+                                    <Trophy className="w-6 h-6 text-yellow-500 mb-3 drop-shadow-md" />
+                                    <div className="text-2xl font-black text-white">{totalScore.toLocaleString()}</div>
+                                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Total Score</div>
                                 </div>
-                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
-                                    <BarChart3 className="w-6 h-6 text-blue-500 mx-auto mb-1" />
-                                    <div className="text-2xl font-black text-slate-800">{bestPpc}%</div>
-                                    <div className="text-xs text-slate-500 font-bold uppercase">Best PPC</div>
+                                <div className="bg-black/20 p-5 rounded-2xl border border-white/5 text-center flex flex-col items-center justify-center shadow-inner hover:bg-white/5 transition-colors">
+                                    <BarChart3 className="w-6 h-6 text-blue-500 mb-3 drop-shadow-md" />
+                                    <div className="text-2xl font-black text-white">{bestPpc}%</div>
+                                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Best PPC</div>
                                 </div>
-                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
-                                    <Award className="w-6 h-6 text-purple-500 mx-auto mb-1" />
-                                    <div className="text-2xl font-black text-slate-800">{completedChapters}</div>
-                                    <div className="text-xs text-slate-500 font-bold uppercase">Chapters Done</div>
+                                <div className="bg-black/20 p-5 rounded-2xl border border-white/5 text-center flex flex-col items-center justify-center shadow-inner hover:bg-white/5 transition-colors">
+                                    <Award className="w-6 h-6 text-purple-500 mb-3 drop-shadow-md" />
+                                    <div className="text-2xl font-black text-white">{completedChapters}</div>
+                                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Episodes Done</div>
                                 </div>
-                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
-                                    <Clock className="w-6 h-6 text-green-500 mx-auto mb-1" />
-                                    <div className="text-2xl font-black text-slate-800">{gameState ? Math.floor((Date.now() - new Date(gameState.lastPlayed || 0).getTime()) / (1000 * 60 * 60 * 24)) : 0}d</div>
-                                    <div className="text-xs text-slate-500 font-bold uppercase">Since Last Play</div>
+                                <div className="bg-black/20 p-5 rounded-2xl border border-white/5 text-center flex flex-col items-center justify-center shadow-inner hover:bg-white/5 transition-colors">
+                                    <Clock className="w-6 h-6 text-emerald-500 mb-3 drop-shadow-md" />
+                                    <div className="text-2xl font-black text-white">{gameState ? Math.floor((Date.now() - new Date(gameState.lastPlayed || 0).getTime()) / (1000 * 60 * 60 * 24)) : 0}<span className="text-sm text-slate-500 mx-1">days</span></div>
+                                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Since Last Play</div>
                                 </div>
-                            </CardContent>
-                        </Card>
-                    </div>
+                            </div>
+                        </div>
+                    </motion.div>
 
                     {/* Right Column: Badges & History */}
-                    <div className="col-span-1 md:col-span-2 space-y-8">
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="md:col-span-7 space-y-8">
 
                         {/* Achievements Section */}
-                        <div className="space-y-4">
-                            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                                <Award className="w-5 h-5 text-indigo-600" />
-                                Achievements
+                        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-6 md:p-8 rounded-3xl shadow-xl">
+                            <h2 className="text-sm font-bold text-slate-300 uppercase tracking-widest flex items-center gap-3 mb-6">
+                                <Award className="w-5 h-5 text-yellow-400 drop-shadow-md" />
+                                Credentials & Certifications
                             </h2>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                {BADGES.map((badge) => {
+                            <div className="grid grid-cols-2 xl:grid-cols-3 gap-5">
+                                {BADGES.map((badge, i) => {
                                     const isUnlocked = gameState?.unlockedBadges?.includes(badge.id);
                                     const Icon = badge.icon;
 
                                     return (
-                                        <Card key={badge.id} className={`border-2 transition-all ${isUnlocked ? 'border-indigo-100 bg-white shadow-sm' : 'border-slate-100 bg-slate-50 opacity-60 grayscale'}`}>
-                                            <CardContent className="p-4 flex flex-col items-center text-center gap-2 h-full justify-center">
-                                                <div className={`p-3 rounded-full ${isUnlocked ? 'bg-indigo-50' : 'bg-slate-200'}`}>
-                                                    <Icon className={`w-6 h-6 ${isUnlocked ? badge.color : 'text-slate-400'}`} />
-                                                </div>
-                                                <div>
-                                                    <h3 className={`font-bold text-sm ${isUnlocked ? 'text-slate-800' : 'text-slate-500'}`}>{badge.name}</h3>
-                                                    <p className="text-xs text-slate-500 mt-1 line-clamp-2">{badge.description}</p>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.3 + (i * 0.05) }}
+                                            key={badge.id}
+                                            className={`p-6 rounded-2xl flex flex-col items-center text-center justify-center gap-3 transition-colors backdrop-blur-md ${isUnlocked ? 'bg-white/10 border-t border-white/20 shadow-lg' : 'bg-black/20 border border-white/5 opacity-50 grayscale hover:grayscale-0 hover:opacity-100'}`}
+                                        >
+                                            <div className={`p-4 rounded-full ${isUnlocked ? 'bg-white/5 shadow-inner' : 'bg-black/40'}`}>
+                                                <Icon className={`w-8 h-8 ${isUnlocked ? badge.color : 'text-slate-600'}`} />
+                                            </div>
+                                            <div>
+                                                <h3 className={`font-bold text-xs uppercase tracking-wider mb-2 ${isUnlocked ? 'text-white' : 'text-slate-400'}`}>{badge.name}</h3>
+                                                <p className="text-[11px] text-slate-400 leading-relaxed font-light">{badge.description}</p>
+                                            </div>
+                                        </motion.div>
                                     );
                                 })}
                             </div>
                         </div>
 
                         {/* Completion History */}
-                        <div className="space-y-4">
-                            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                                <Trophy className="w-5 h-5 text-indigo-600" />
-                                Completion History
+                        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-6 md:p-8 shadow-xl rounded-3xl">
+                            <h2 className="text-sm font-bold text-slate-300 uppercase tracking-widest flex items-center gap-3 mb-6">
+                                <HardHat className="w-5 h-5 text-blue-400" />
+                                Project History Log
                             </h2>
 
                             {scores.length > 0 ? (
                                 <div className="grid gap-4">
-                                    {scores.map((score) => (
-                                        <Card key={score.id} className="border-slate-200 hover:shadow-md transition-shadow">
-                                            <CardContent className="p-5 flex items-center justify-between">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 font-black text-xl border border-indigo-100">
-                                                        {score.chapter}
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="font-bold text-slate-800">Chapter {score.chapter} Complete</h3>
-                                                        <p className="text-xs text-slate-500 mt-1 flex items-center gap-2">
-                                                            <Clock className="w-3 h-3" />
-                                                            {score.completedAt ? new Date(score.completedAt).toLocaleDateString() : 'Unknown Date'}
-                                                        </p>
-                                                    </div>
+                                    {scores.map((score, idx) => (
+                                        <motion.div
+                                            key={score.id}
+                                            initial={{ opacity: 0, scale: 0.98 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: 0.4 + (idx * 0.1) }}
+                                            className="bg-black/20 rounded-2xl border border-white/5 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:bg-white/5 transition-colors shadow-inner"
+                                        >
+                                            <div className="flex items-center gap-5">
+                                                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center text-blue-300 font-black text-2xl border border-blue-500/30">
+                                                    {score.chapter}
                                                 </div>
-                                                <div className="flex items-center gap-8">
-                                                    <div className="text-right">
-                                                        <p className="text-[10px] text-slate-400 font-bold uppercase">Efficiency</p>
-                                                        <p className="font-mono font-bold text-slate-700">{score.efficiency}%</p>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p className="text-[10px] text-slate-400 font-bold uppercase">PPC</p>
-                                                        <p className="font-mono font-bold text-slate-700">{score.ppc}%</p>
-                                                    </div>
-                                                    <div className="text-right pl-4 border-l border-slate-100">
-                                                        <p className="text-[10px] text-slate-400 font-bold uppercase">Score</p>
-                                                        <p className="font-mono font-black text-indigo-600 text-xl">{score.totalScore?.toLocaleString()}</p>
-                                                    </div>
+                                                <div>
+                                                    <h3 className="font-bold text-white uppercase tracking-widest text-sm">Episode {score.chapter}</h3>
+                                                    <p className="text-xs text-slate-400 mt-1 flex items-center gap-2">
+                                                        <Clock className="w-3 h-3 text-slate-500" />
+                                                        {score.completedAt ? new Date(score.completedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'Unknown Date'}
+                                                    </p>
                                                 </div>
-                                            </CardContent>
-                                        </Card>
+                                            </div>
+                                            <div className="flex items-center gap-6 sm:gap-8 bg-black/40 p-4 rounded-xl border border-white/5">
+                                                <div className="text-center">
+                                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Efficiency</p>
+                                                    <p className="text-sm font-bold text-emerald-400">{score.efficiency}%</p>
+                                                </div>
+                                                <div className="text-center">
+                                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">PPC</p>
+                                                    <p className="text-sm font-bold text-blue-400">{score.ppc}%</p>
+                                                </div>
+                                                <div className="text-center pl-6 sm:pl-8 border-l border-white/10">
+                                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Final Score</p>
+                                                    <p className="font-black text-yellow-400 text-xl drop-shadow-[0_0_10px_rgba(250,204,21,0.3)]">{score.totalScore?.toLocaleString()}</p>
+                                                </div>
+                                            </div>
+                                        </motion.div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="bg-white p-8 rounded-2xl border border-dashed border-slate-300 text-center">
-                                    <Trophy className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                                    <h3 className="text-lg font-bold text-slate-700">No History Yet</h3>
-                                    <p className="text-slate-500 mb-6 max-w-md mx-auto">Complete chapters to earn badges, set high scores, and track your construction management career!</p>
-                                    <Button onClick={() => setLocation('/game')} variant="secondary">
-                                        Play Now
-                                    </Button>
+                                <div className="bg-black/20 p-10 rounded-2xl border border-white/5 border-dashed text-center flex flex-col items-center">
+                                    <div className="w-16 h-16 bg-white/5 rounded-full flex flex-col items-center justify-center border border-white/10 mb-6">
+                                        <BookOpen className="w-8 h-8 text-slate-500" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-white mb-2 tracking-tight">No History Found</h3>
+                                    <p className="text-slate-400 mb-8 max-w-md text-sm leading-relaxed">Complete simulation episodes to earn Lean credentials and establish a permanent track record of your projects.</p>
+                                    <button
+                                        onClick={() => setLocation('/chapters')}
+                                        className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-500 hover:to-indigo-500 font-bold uppercase tracking-widest text-sm rounded-xl transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)]"
+                                    >
+                                        Execute Project
+                                    </button>
                                 </div>
                             )}
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
         </div>

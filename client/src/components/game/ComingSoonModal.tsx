@@ -71,46 +71,53 @@ export const ComingSoonModal: React.FC<ComingSoonModalProps> = ({ isOpen, onClos
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4 pointer-events-auto overflow-hidden">
+                <div className="absolute inset-0 z-[100] flex items-center justify-center bg-[#0A0B1A]/80 backdrop-blur-md p-4 pointer-events-auto overflow-hidden">
                     <motion.div
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.9, opacity: 0 }}
-                        className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl border-4 border-slate-100 flex flex-col max-h-[90vh]"
+                        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                        className="relative w-full max-w-4xl bg-slate-900/80 backdrop-blur-2xl rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col max-h-[90vh] overflow-hidden"
                     >
                         {/* Header */}
-                        <div className={`p-6 text-white flex justify-between items-center shrink-0 ${mode === 'multiplayer' ? 'bg-indigo-600' : 'bg-orange-600'}`}>
-                            <div>
-                                <h2 className="text-2xl font-black uppercase tracking-wider">{content.title}</h2>
-                                <p className="text-white/80 font-medium">{content.subtitle}</p>
+                        <div className={`p-6 md:p-8 flex justify-between items-center shrink-0 relative overflow-hidden border-b border-white/5`}>
+                            <div className={`absolute inset-0 opacity-20 bg-gradient-to-r ${mode === 'multiplayer' ? 'from-indigo-600 to-blue-600' : 'from-orange-600 to-amber-600'}`} />
+                            <div className="relative z-10">
+                                <div className={`inline-flex items-center gap-2 px-3 py-1 bg-white/10 border border-white/20 text-white rounded-full text-[10px] font-bold uppercase tracking-widest mb-3`}>
+                                    Upcoming Feature
+                                </div>
+                                <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight drop-shadow-md">{content.title}</h2>
+                                <p className="text-slate-300 font-medium mt-1">{content.subtitle}</p>
                             </div>
-                            <button onClick={onClose} className="text-white/60 hover:text-white transition-colors">
-                                <span className="text-4xl">×</span>
+                            <button onClick={onClose} className="relative z-10 p-2 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-colors">
+                                <span className="text-2xl leading-none">&times;</span>
                             </button>
                         </div>
 
                         {/* Scrollable Content */}
-                        <div className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-10 custom-scrollbar text-slate-200">
 
                             {/* Intro */}
-                            <div className="text-lg text-slate-600 leading-relaxed font-medium">
+                            <div className="text-lg text-slate-300 leading-relaxed font-light">
                                 {content.intro}
                             </div>
 
                             {/* Main Sections */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {content.sections.map((section, idx) => (
-                                    <div key={idx} className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                                        <h3 className="text-xl font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">
+                                    <div key={idx} className="bg-black/20 p-6 rounded-2xl border border-white/5 relative overflow-hidden">
+                                        <div className={`absolute top-0 right-0 w-32 h-32 blur-[50px] rounded-full opacity-10 ${mode === 'multiplayer' ? 'bg-indigo-500' : 'bg-orange-500'}`} />
+                                        <h3 className={`text-sm font-bold uppercase tracking-widest mb-6 flex items-center gap-2 ${mode === 'multiplayer' ? 'text-indigo-400' : 'text-orange-400'}`}>
                                             {section.title}
                                         </h3>
-                                        <div className="space-y-4">
+                                        <div className="space-y-4 relative z-10">
                                             {section.items.map((item, i) => (
-                                                <div key={i} className="flex gap-3">
-                                                    <span className="text-2xl">{item.icon}</span>
+                                                <div key={i} className="flex gap-4 items-start">
+                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg shrink-0 ${mode === 'multiplayer' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-orange-500/20 text-orange-300 border border-orange-500/30'}`}>
+                                                        {item.icon}
+                                                    </div>
                                                     <div>
-                                                        <h4 className="font-bold text-slate-700">{item.title}</h4>
-                                                        <p className="text-sm text-slate-500">{item.desc}</p>
+                                                        <h4 className="font-bold text-white mb-1">{item.title}</h4>
+                                                        <p className="text-sm text-slate-400 leading-relaxed">{item.desc}</p>
                                                     </div>
                                                 </div>
                                             ))}
@@ -120,20 +127,28 @@ export const ComingSoonModal: React.FC<ComingSoonModalProps> = ({ isOpen, onClos
                             </div>
 
                             {/* Special Section */}
-                            <div className={`p-6 rounded-2xl border-l-8 ${mode === 'multiplayer' ? 'bg-indigo-50 border-indigo-500' : 'bg-orange-50 border-orange-500'}`}>
-                                <h3 className={`text-xl font-black mb-2 ${mode === 'multiplayer' ? 'text-indigo-800' : 'text-orange-800'}`}>
-                                    {content.roleThinking.title}
-                                </h3>
-                                <p className={`${mode === 'multiplayer' ? 'text-indigo-700' : 'text-orange-700'}`}>
-                                    {content.roleThinking.desc}
-                                </p>
+                            <div className={`p-6 rounded-2xl border relative overflow-hidden ${mode === 'multiplayer' ? 'bg-indigo-900/20 border-indigo-500/30' : 'bg-orange-900/20 border-orange-500/30'}`}>
+                                <div className={`absolute inset-0 opacity-10 bg-[url('/grid.svg')] [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]`} />
+                                <div className="relative z-10">
+                                    <h3 className={`text-xs font-bold uppercase tracking-widest mb-3 ${mode === 'multiplayer' ? 'text-indigo-400' : 'text-orange-400'}`}>
+                                        {content.roleThinking.title}
+                                    </h3>
+                                    <p className={`text-sm leading-relaxed ${mode === 'multiplayer' ? 'text-indigo-200/80' : 'text-orange-200/80'}`}>
+                                        {content.roleThinking.desc}
+                                    </p>
+                                </div>
                             </div>
 
                         </div>
 
                         {/* Footer */}
-                        <div className="p-4 bg-slate-50 border-t border-slate-100 text-center text-xs text-slate-400 uppercase tracking-widest font-bold shrink-0">
-                            {content.footer}
+                        <div className="p-6 bg-black/40 border-t border-white/5 text-center shrink-0">
+                            <button
+                                onClick={onClose}
+                                className={`w-full md:w-auto px-8 py-4 text-white font-bold rounded-xl uppercase tracking-widest text-xs transition-colors shadow-lg ${mode === 'multiplayer' ? 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-900/20' : 'bg-orange-600 hover:bg-orange-500 shadow-orange-900/20'}`}
+                            >
+                                Close Briefing
+                            </button>
                         </div>
                     </motion.div>
                 </div>
