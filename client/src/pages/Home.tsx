@@ -38,7 +38,15 @@ export default function Home() {
     <div className="relative w-full min-h-screen overflow-hidden bg-slate-900 flex flex-col items-center justify-center p-6 font-sans">
 
       {/* Premium Twilight Industrial Ambient Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      <div
+        className="absolute inset-0 overflow-hidden pointer-events-none z-0"
+        style={{
+          backgroundImage: `url('/assets/bg_title_screen.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        <div className="absolute inset-0 bg-slate-950/70" /> {/* Darkening overlay so UI pops */}
         <motion.div
           animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
           transition={{ duration: 12, repeat: Infinity, ease: "linear" }}

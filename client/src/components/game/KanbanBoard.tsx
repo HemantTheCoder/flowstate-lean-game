@@ -331,8 +331,6 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                 <Droppable key={col.id} droppableId={col.id} isDropDisabled={isBlurred}>
                                     {(provided, snapshot) => (
                                         <div
-                                            {...provided.droppableProps}
-                                            ref={provided.innerRef}
                                             id={`col-${col.id}`}
                                             className={`min-w-[280px] md:w-[320px] flex flex-col h-full bg-slate-800/60 rounded-3xl border transition-all relative ${highlightClass} ${snapshot.isDraggingOver ? 'bg-cyan-900/20 border-cyan-500/50' : ''} overflow-visible shrink-0 ${isBlurred ? 'opacity-50 grayscale pointer-events-none' : ''}`}
                                         >
@@ -369,7 +367,11 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                 )}
                                             </div>
 
-                                            <div className="flex-1 bg-slate-900/40 p-3 space-y-3 overflow-y-auto rounded-b-3xl">
+                                            <div
+                                                {...provided.droppableProps}
+                                                ref={provided.innerRef}
+                                                className="flex-1 bg-slate-900/40 p-3 flex flex-col gap-3 overflow-y-auto rounded-b-3xl min-h-[150px]"
+                                            >
                                                 {col.tasks.map((task, index) => {
                                                     const hasRedConstraints = chapter > 1 && (task.constraints?.length || 0) > 0;
                                                     const isWasteTask = task.id.includes('waste') || task.title === 'REWORK';

@@ -16,8 +16,13 @@ export class MainScene extends Phaser.Scene {
         const { width, height } = this.scale;
 
         // 1. Background Image - Full screen cover
-        if (this.textures.exists('construction_bg')) {
-            const bg = this.add.image(width / 2, height / 2, 'construction_bg');
+        const currentChapter = useGameStore.getState().chapter;
+        let bgKey = 'construction_bg';
+        if (currentChapter === 2) bgKey = 'bg_mall_site';
+        if (currentChapter === 3) bgKey = 'bg_depot';
+
+        if (this.textures.exists(bgKey)) {
+            const bg = this.add.image(width / 2, height / 2, bgKey);
             const scaleX = width / bg.width;
             const scaleY = height / bg.height;
             const scale = Math.max(scaleX, scaleY);
@@ -164,16 +169,33 @@ export class MainScene extends Phaser.Scene {
             }
 
             // Watch for Chapter Change
-            // Watch for Chapter Change
             if (state.chapter !== prevState.chapter) {
                 // Safety check: specific to Phaser scene lifecycle
                 if (!this.sys || !this.scene || !this.ground) return;
 
+                let newBgKey = 'construction_bg';
+
                 if (state.chapter === 2) {
                     this.ground.setTexture('ground_mall');
+                    newBgKey = 'bg_mall_site';
                     this.spawnBuildingEffect(); // Celebrate chapter change
+                } else if (state.chapter === 3) {
+                    this.ground.setTexture('ground');
+                    newBgKey = 'bg_depot';
                 } else {
                     this.ground.setTexture('ground');
+                }
+
+                const bgImage = (this as any).bgImage;
+                if (bgImage && this.textures.exists(newBgKey)) {
+                    bgImage.setTexture(newBgKey);
+                    const sourceImg = this.textures.get(newBgKey).getSourceImage();
+                    if (sourceImg) {
+                        const { width, height } = this.scale;
+                        const scaleX = width / sourceImg.width;
+                        const scaleY = height / sourceImg.height;
+                        bgImage.setScale(Math.max(scaleX, scaleY));
+                    }
                 }
             }
         });

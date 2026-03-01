@@ -22,6 +22,8 @@ export class BootScene extends Phaser.Scene {
         // Environment
         this.load.image('ground', '/assets/ground.png');
         this.load.image('construction_bg', '/assets/construction_bg.png');
+        this.load.image('bg_mall_site', '/assets/bg_mall_site.png');
+        this.load.image('bg_depot', '/assets/bg_depot.png');
 
         // Workers (SVGs for perfect transparency)
         this.load.svg('worker_blue', '/assets/worker_blue.svg', { width: 64, height: 64 });

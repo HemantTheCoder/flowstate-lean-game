@@ -692,9 +692,8 @@ export default function Game() {
     await handleSave(false);
     navigate('/');
   };
-
   return (
-    <div className={`w-full h-screen relative overflow-hidden transition-colors duration-1000 bg-slate-900`}>
+    <div className={`w-full h-screen relative overflow-hidden transition-colors duration-1000 bg-slate-950/60`}>
       {/* 1. Phaser Layer (Background) */}
       <GameCanvas />
 

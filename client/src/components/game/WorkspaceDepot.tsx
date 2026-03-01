@@ -69,12 +69,12 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
         return { label: 'C (Cluttered)', color: 'text-slate-400' };
     };
 
-    const currentScore = day === 16 ? evaluate5S() : (depotScore || 0);
+    const currentScore = depotScore || 0;
     const grade = get5SGrade(currentScore);
     const unassignedItems = depotItems.filter(i => i.currentZoneId === 'unassigned');
 
     return (
-        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm z-40 flex items-center justify-center p-4 pointer-events-auto">
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -146,8 +146,8 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
                                                 {(provided, snapshot) => (
                                                     <motion.div
                                                         ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
+                                                        {...(provided.draggableProps as any)}
+                                                        {...(provided.dragHandleProps as any)}
                                                         whileHover={{ scale: 1.05 }}
                                                         whileTap={{ scale: 0.95 }}
                                                         onClick={() => item.type === 'hazard' ? handleHazardClick(item.id) : null}
