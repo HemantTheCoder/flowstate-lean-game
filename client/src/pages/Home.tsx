@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Trophy, User, Users, Settings, ExternalLink, HardHat, Info } from 'lucide-react';
+import { Play, Trophy, User, Users, Settings, ExternalLink, HardHat, Info, MessageSquare, Terminal } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 
 import { ComingSoonModal } from '../components/game/ComingSoonModal';
@@ -82,7 +82,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="flex-1 flex flex-col justify-center text-center md:text-left h-full pt-10"
+          className="flex-1 flex flex-col justify-center text-center md:text-left"
         >
           <div className="bg-slate-900/40 backdrop-blur-md p-8 md:p-12 rounded-3xl border border-slate-700/50 shadow-2xl inline-block w-fit mx-auto md:mx-0">
             {/* Tagline pill */}
@@ -107,7 +107,7 @@ export default function Home() {
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-          className="w-full max-w-xs md:max-w-sm flex flex-col gap-4 self-center md:self-end mb-10 md:mb-20"
+          className="w-full max-w-xs md:max-w-sm flex flex-col gap-4 self-center pt-8 md:pt-0"
         >
           {/* Primary Action */}
           <Link href="/chapters" className="w-full">
@@ -185,6 +185,15 @@ export default function Home() {
               <span className="text-[9px] bg-slate-900 px-2 py-0.5 rounded text-slate-500 font-bold border border-slate-800">COMING SOON</span>
             </button>
 
+            <Link href="/feedback" className="w-full">
+              <button className="w-full group relative flex items-center justify-between px-6 py-4 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-300 font-bold uppercase tracking-widest text-xs hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all shadow-md">
+                <span className="flex items-center gap-3">
+                  <MessageSquare className="w-4 h-4 text-cyan-500 group-hover:text-cyan-400 transition-colors" />
+                  Feedback & Report
+                </span>
+              </button>
+            </Link>
+
             <Link href="/credits" className="w-full">
               <button className="w-full group relative flex items-center justify-between px-6 py-4 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-xs hover:text-slate-200 hover:bg-slate-800 hover:border-slate-600 transition-all shadow-md">
                 <span className="flex items-center gap-3">
@@ -195,9 +204,15 @@ export default function Home() {
             </Link>
           </div>
 
-          <p className="mt-8 text-slate-500 hover:text-slate-400 text-[10px] font-bold uppercase tracking-widest text-center transition-colors">
-            Made by <a href="https://www.linkedin.com/in/hemant-kumar-b2b512300" target="_blank" rel="noopener noreferrer" className="text-cyan-500 hover:text-cyan-400 transition-colors drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">Hemant Kumar</a>
-          </p>
+          <div className="mt-8 flex flex-col items-center gap-2">
+            <p className="text-slate-500 hover:text-slate-400 text-[10px] font-bold uppercase tracking-widest text-center transition-colors">
+              Made by <a href="https://www.linkedin.com/in/hemant-kumar-b2b512300" target="_blank" rel="noopener noreferrer" className="text-cyan-500 hover:text-cyan-400 transition-colors drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">Hemant Kumar</a>
+            </p>
+            <Link href="/dev" className="group flex items-center gap-1 opacity-20 hover:opacity-100 transition-opacity">
+              <Terminal className="w-3 h-3 text-slate-500 group-hover:text-cyan-400" />
+              <span className="text-[8px] uppercase tracking-widest text-slate-500 group-hover:text-cyan-400 font-bold">Dev Console</span>
+            </Link>
+          </div>
 
         </motion.div>
       </div>

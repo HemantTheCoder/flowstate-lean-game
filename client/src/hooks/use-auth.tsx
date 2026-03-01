@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { InsertUser, User } from "@shared/schema";
 
@@ -72,6 +72,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             queryClient.setQueryData(["/api/user"], null);
         },
     });
+
+    useEffect(() => {
+        if (!user) return;
+
+        // Ping presence immediately and then every 3 minutes
+        fetch("/api/user/ping", { method: "POST" }).catch(console.error);
+        const interval = setInterval(() => {
+            fetch("/api/user/ping", { method: "POST" }).catch(console.error);
+        }, 180000);
+
+        return () => clearInterval(interval);
+    }, [user]);
 
     return (
         <AuthContext.Provider

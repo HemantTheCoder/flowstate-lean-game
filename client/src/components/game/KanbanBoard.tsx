@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useGameStore, Column, Task } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
@@ -257,9 +258,9 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-2 md:p-8"
             onClick={(e) => {
                 if (e.target === e.currentTarget) onClose();
@@ -332,7 +333,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                     {(provided, snapshot) => (
                                         <div
                                             id={`col-${col.id}`}
-                                            className={`min-w-[280px] md:w-[320px] flex flex-col h-full bg-slate-800/60 rounded-3xl border transition-all relative ${highlightClass} ${snapshot.isDraggingOver ? 'bg-cyan-900/20 border-cyan-500/50' : ''} overflow-visible shrink-0 ${isBlurred ? 'opacity-50 grayscale pointer-events-none' : ''}`}
+                                            className={`min-w-[280px] md:w-[320px] flex flex-col h-full bg-slate-800/60 rounded-3xl border transition-all relative ${highlightClass} ${snapshot.isDraggingOver ? 'bg-cyan-900/20 border-cyan-500/50' : ''} overflow-visible shrink-0 ${isBlurred ? 'opacity-50 grayscale' : ''}`}
                                         >
                                             <BottleneckPulse isBottleneck={isBottleneck} />
                                             {col.id === 'doing' && <CongestionCloud intensity={congestion} />}
@@ -379,57 +380,67 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
                                                     return (
                                                         <Draggable key={task.id} draggableId={task.id} index={index}>
-                                                            {(provided, snapshot) => (
-                                                                <div
-                                                                    ref={provided.innerRef}
-                                                                    {...provided.draggableProps}
-                                                                    {...provided.dragHandleProps}
-                                                                    className={`relative bg-slate-800 p-3 rounded-2xl shadow-sm border border-slate-700/50 cursor-grab active:cursor-grabbing hover:shadow-lg transition-all group ${isWasteTask
-                                                                        ? 'border-red-500/50 bg-red-900/20'
-                                                                        : hasRedConstraints
+                                                            {(provided, snapshot) => {
+                                                                const child = (
+                                                                    <div
+                                                                        ref={provided.innerRef}
+                                                                        {...provided.draggableProps}
+                                                                        {...provided.dragHandleProps}
+                                                                        style={provided.draggableProps.style}
+                                                                        className={`relative bg-slate-800 p-3 rounded-2xl shadow-sm border border-slate-700/50 cursor-grab active:cursor-grabbing group ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-cyan-500/50 !bg-slate-700 z-50' : 'hover:shadow-lg transition-transform duration-200'} ${isWasteTask
                                                                             ? 'border-red-500/50 bg-red-900/20'
-                                                                            : task.type === 'Structural' ? 'border-l-4 border-l-cyan-500'
-                                                                                : task.type === 'Systems' ? 'border-l-4 border-l-emerald-500'
-                                                                                    : task.type === 'Interior' ? 'border-l-4 border-l-amber-500'
-                                                                                        : task.type === 'Management' ? 'border-l-4 border-l-purple-500'
-                                                                                            : 'border-l-4 border-l-cyan-400'
-                                                                        } ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-cyan-500/50 !bg-slate-700 rotate-2 z-50' : ''} ${isOverWip && col.id === 'doing' ? 'opacity-80' : ''
-                                                                        }`}
-                                                                >
-                                                                    <WasteTaskOverlay isWaste={isWasteTask} isInDone={isInDoneCol} />
+                                                                            : hasRedConstraints
+                                                                                ? 'border-red-500/50 bg-red-900/20'
+                                                                                : task.type === 'Structural' ? 'border-l-4 border-l-cyan-500'
+                                                                                    : task.type === 'Systems' ? 'border-l-4 border-l-emerald-500'
+                                                                                        : task.type === 'Interior' ? 'border-l-4 border-l-amber-500'
+                                                                                            : task.type === 'Management' ? 'border-l-4 border-l-purple-500'
+                                                                                                : 'border-l-4 border-l-cyan-400'
+                                                                            } ${isOverWip && col.id === 'doing' && !snapshot.isDragging ? 'opacity-80' : ''
+                                                                            }`}
+                                                                    >
+                                                                        <WasteTaskOverlay isWaste={isWasteTask} isInDone={isInDoneCol} />
 
-                                                                    <div className="flex justify-between items-start">
-                                                                        <h4 className={`font-bold group-hover:text-cyan-400 transition-colors text-sm md:text-base flex-1 ${isWasteTask ? 'text-red-400' : 'text-slate-200'}`}>
-                                                                            {task.title}
-                                                                        </h4>
-                                                                        {hasRedConstraints && <span className="text-[10px] font-black text-red-400 bg-red-500/20 px-1.5 py-0.5 rounded animate-pulse" title="Blocked by Constraints">BLOCKED</span>}
-                                                                        {isWasteTask && !isInDoneCol && (
-                                                                            <span className="text-[9px] font-black text-red-400 bg-red-500/20 px-1.5 py-0.5 rounded animate-pulse">WASTE</span>
-                                                                        )}
+                                                                        <div className="flex justify-between items-start">
+                                                                            <h4 className={`font-bold group-hover:text-cyan-400 transition-colors text-sm md:text-base flex-1 ${isWasteTask ? 'text-red-400' : 'text-slate-200'}`}>
+                                                                                {task.title}
+                                                                            </h4>
+                                                                            {hasRedConstraints && <span className="text-[10px] font-black text-red-400 bg-red-500/20 px-1.5 py-0.5 rounded animate-pulse" title="Blocked by Constraints">BLOCKED</span>}
+                                                                            {isWasteTask && !isInDoneCol && (
+                                                                                <span className="text-[9px] font-black text-red-400 bg-red-500/20 px-1.5 py-0.5 rounded animate-pulse">WASTE</span>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <p className="text-[10px] md:text-xs text-slate-400 line-clamp-2 mt-1">{task.description}</p>
+
+                                                                        {chapter > 1 && task.constraints?.map(c => (
+                                                                            <span key={c} className="inline-block bg-red-500/20 text-red-300 text-[9px] px-1 py-0.5 rounded mr-1 mt-1 font-bold border border-red-500/30 uppercase">
+                                                                                Blocked: {c}
+                                                                            </span>
+                                                                        ))}
+
+                                                                        <div className="mt-2 flex flex-wrap gap-1 md:gap-2 text-[10px] font-mono font-bold">
+                                                                            <span className={`px-1.5 py-0.5 rounded-full border ${task.type === 'Structural' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' :
+                                                                                task.type === 'Systems' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                                                                                    task.type === 'Interior' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
+                                                                                        task.type === 'Management' ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' :
+                                                                                            'bg-sky-500/20 text-sky-400 border-sky-500/30'
+                                                                                }`}>
+                                                                                {task.type}
+                                                                            </span>
+                                                                            <span className="text-slate-400 bg-slate-700/50 border border-slate-600/50 px-1.5 py-0.5 rounded-full">-{task.cost}</span>
+                                                                            <span className="text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 px-1.5 py-0.5 rounded-full">+${task.reward}</span>
+                                                                        </div>
                                                                     </div>
+                                                                );
 
-                                                                    <p className="text-[10px] md:text-xs text-slate-400 line-clamp-2 mt-1">{task.description}</p>
+                                                                const usePortal = snapshot.isDragging || snapshot.isDropAnimating;
 
-                                                                    {chapter > 1 && task.constraints?.map(c => (
-                                                                        <span key={c} className="inline-block bg-red-500/20 text-red-300 text-[9px] px-1 py-0.5 rounded mr-1 mt-1 font-bold border border-red-500/30 uppercase">
-                                                                            Blocked: {c}
-                                                                        </span>
-                                                                    ))}
-
-                                                                    <div className="mt-2 flex flex-wrap gap-1 md:gap-2 text-[10px] font-mono font-bold">
-                                                                        <span className={`px-1.5 py-0.5 rounded-full border ${task.type === 'Structural' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' :
-                                                                            task.type === 'Systems' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
-                                                                                task.type === 'Interior' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
-                                                                                    task.type === 'Management' ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' :
-                                                                                        'bg-sky-500/20 text-sky-400 border-sky-500/30'
-                                                                            }`}>
-                                                                            {task.type}
-                                                                        </span>
-                                                                        <span className="text-slate-400 bg-slate-700/50 border border-slate-600/50 px-1.5 py-0.5 rounded-full">-{task.cost}</span>
-                                                                        <span className="text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 px-1.5 py-0.5 rounded-full">+${task.reward}</span>
-                                                                    </div>
-                                                                </div>
-                                                            )}
+                                                                if (usePortal) {
+                                                                    return createPortal(child, document.body);
+                                                                }
+                                                                return child;
+                                                            }}
                                                         </Draggable>
                                                     );
                                                 })}

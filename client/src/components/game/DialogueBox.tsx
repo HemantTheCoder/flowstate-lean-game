@@ -18,7 +18,7 @@ export const DialogueBox: React.FC = () => {
     const completed = doneTasks.filter(t =>
         weeklyPlan.includes(t.id) || weeklyPlan.includes(t.originalId || '')
     ).length;
-    const ppc = lpi.ppc;
+    const ppc = promised > 0 ? Math.round((completed / promised) * 100) : 0;
 
     // Replace Placeholders
     const processedText = line.text

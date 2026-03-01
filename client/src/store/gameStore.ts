@@ -337,18 +337,34 @@ export const useGameStore = create<GameState>((set, get) => ({
         funds: 5000,
         materials: 1000,
         depotItems: [
-          // Sample cluttered depot items
-          { id: 'd-1', type: 'tool', name: 'Hammer', idealZoneId: 'zone-tools', currentZoneId: 'unassigned' },
-          { id: 'd-2', type: 'material', name: 'Wiring', idealZoneId: 'zone-mats', currentZoneId: 'unassigned' },
-          { id: 'd-3', type: 'trash', name: 'Broken Drill', isBroken: true, currentZoneId: 'unassigned' },
-          { id: 'd-4', type: 'trash', name: 'Empty Pallet', currentZoneId: 'unassigned' },
-          { id: 'd-5', type: 'tool', name: 'Wrench', idealZoneId: 'zone-tools', currentZoneId: 'unassigned' },
+          // Row 1
+          { id: 'd-1', type: 'tool', name: 'Power Drill', idealZoneId: 'zone-tools', currentZoneId: 'unassigned' },
+          { id: 'd-2', type: 'material', name: 'Copper Wiring', idealZoneId: 'zone-mats', currentZoneId: 'unassigned' },
+          { id: 'd-3', type: 'trash', name: 'Broken Saw Blade', isBroken: true, currentZoneId: 'unassigned' },
+          { id: 'd-4', type: 'trash', name: 'Shattered Tile', currentZoneId: 'unassigned' },
+
+          // Row 2
+          { id: 'd-5', type: 'tool', name: 'Socket Wrench', idealZoneId: 'zone-tools', currentZoneId: 'unassigned' },
           { id: 'd-6', type: 'hazard', name: 'Oil Spill', currentZoneId: 'unassigned' },
+          { id: 'd-7', type: 'material', name: 'PVC Pipes', idealZoneId: 'zone-mats', currentZoneId: 'unassigned' },
+          { id: 'd-8', type: 'tool', name: 'Measuring Tape', idealZoneId: 'zone-tools', currentZoneId: 'unassigned' },
+
+          // Row 3
+          { id: 'd-9', type: 'trash', name: 'Rusted Screws', currentZoneId: 'unassigned' },
+          { id: 'd-10', type: 'hazard', name: 'Frayed Cable', currentZoneId: 'unassigned' },
+          { id: 'd-11', type: 'material', name: 'Cement Bag', idealZoneId: 'zone-mats', currentZoneId: 'unassigned' },
+          { id: 'd-12', type: 'tool', name: 'Spirit Level', idealZoneId: 'zone-tools', currentZoneId: 'unassigned' },
+
+          // Row 4
+          { id: 'd-13', type: 'trash', name: 'Empty Paint Can', currentZoneId: 'unassigned' },
+          { id: 'd-14', type: 'material', name: 'Lumber', idealZoneId: 'zone-mats', currentZoneId: 'unassigned' },
+          { id: 'd-15', type: 'hazard', name: 'Tripping Wire', currentZoneId: 'unassigned' },
+          { id: 'd-16', type: 'tool', name: 'Screwdriver Set', idealZoneId: 'zone-tools', currentZoneId: 'unassigned' },
         ],
         depotZones: [
-          { id: 'zone-tools', name: 'Tool Shadow Board', acceptsType: 'tool', capacity: 3 },
-          { id: 'zone-mats', name: 'Material Storage', acceptsType: 'material', capacity: 3 },
-          { id: 'zone-trash', name: 'Red Tag Area', acceptsType: 'trash', capacity: 5 },
+          { id: 'zone-tools', name: 'Tool Shadow Board', acceptsType: 'tool', capacity: 6 },
+          { id: 'zone-mats', name: 'Material Storage', acceptsType: 'material', capacity: 6 },
+          { id: 'zone-trash', name: 'Red Tag Area', acceptsType: 'trash', capacity: 6 },
         ],
         depotScore: 0,
         dailyMetrics: [],
@@ -470,6 +486,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     // Special Override Flag for Pull Decision
     let forceSafeFlow = false;
+    let nextColumns = state.columns;
 
     // Day-specific insights and adjustments
     // Only subtract NEW waste created today (not total waste in system)
@@ -538,6 +555,35 @@ export const useGameStore = create<GameState>((set, get) => ({
         adjustedCompleted = 0;
         dayInsight = 'No commitment made.';
       }
+    } else if (state.day === 10) {
+      dayInsight = 'All commitments met! Emergency repair completed. Perfect flow.';
+      forceSafeFlow = true;
+
+      // Auto-move committed tasks and emergency tasks to DONE
+      const tasksToMove: Task[] = [];
+      const updatedCols = state.columns.map(col => {
+        if (col.id === 'done') return col;
+
+        const remainingTasks: Task[] = [];
+        col.tasks.forEach(t => {
+          if (state.weeklyPlan.includes(t.id) || state.weeklyPlan.includes(t.originalId || '') || t.id.startsWith('emergency-')) {
+            tasksToMove.push({ ...t, status: 'done', constraints: [] });
+          } else {
+            remainingTasks.push(t);
+          }
+        });
+        return { ...col, tasks: remainingTasks };
+      });
+
+      nextColumns = updatedCols.map(col => {
+        if (col.id === 'done') {
+          return { ...col, tasks: [...col.tasks, ...tasksToMove] };
+        }
+        return col;
+      });
+    } else if (state.day === 11) {
+      dayInsight = 'PPC Review passed. Exceptional reliability confirmed.';
+      forceSafeFlow = true;
     }
 
     // Clamp adjustedCompleted to not exceed adjustedPotential
@@ -602,6 +648,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       week: Math.ceil(nextDay / 5),
       materials: state.materials + 150,
       funds: state.funds - dailyCost,
+      columns: nextColumns,
       dailyMetrics: [...state.dailyMetrics, newDailyMetric],
       previousDoneCount: currentDoneCount,
       previousWasteCount: wasteTasksInDone,

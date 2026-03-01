@@ -1,11 +1,14 @@
 import { getDb } from "./db.js";
-import { gameStates, users, type GameState, type InsertGameState, type LeaderboardEntry, type InsertLeaderboardEntry, GAME_CONSTANTS, leaderboardEntries, type User, type InsertUser, type UserProfile } from "../shared/schema.js";
+import { gameStates, users, type GameState, type InsertGameState, type LeaderboardEntry, type InsertLeaderboardEntry, GAME_CONSTANTS, leaderboardEntries, type User, type InsertUser, type UserProfile, type Feedback, type InsertFeedback, feedbacks } from "../shared/schema.js";
 import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getAllUsers(): Promise<(User & { lastPlayed?: Date | null })[]>;
+  deleteUser(id: number): Promise<void>;
   createUser(user: InsertUser): Promise<User>;
+  pingUser(id: number): Promise<void>;
 
   getGameState(sessionId: string): Promise<GameState | undefined>;
   getUserGameState(userId: number): Promise<GameState | undefined>;
@@ -17,6 +20,12 @@ export interface IStorage {
   addLeaderboardEntry(entry: InsertLeaderboardEntry, userId?: number): Promise<LeaderboardEntry>;
   clearLeaderboard(): Promise<void>;
   getUserProfile(userId: number): Promise<UserProfile>;
+
+  // Feedback
+  addFeedback(feedback: InsertFeedback): Promise<Feedback>;
+  getFeedbacks(): Promise<(Feedback & { user?: User })[]>;
+  resolveFeedback(id: number): Promise<void>;
+  deleteFeedback(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -33,6 +42,34 @@ export class DatabaseStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await getDb().insert(users).values(insertUser).returning();
     return user;
+  }
+
+  async getAllUsers(): Promise<(User & { lastPlayed?: Date | null })[]> {
+    const results = await getDb()
+      .select({
+        user: users,
+        gameState: gameStates,
+      })
+      .from(users)
+      .leftJoin(gameStates, eq(users.id, gameStates.userId))
+      .orderBy(desc(users.createdAt));
+
+    return results.map((r: any) => ({
+      ...r.user,
+      lastPlayed: r.gameState?.lastPlayed || null
+    }));
+  }
+
+  async pingUser(id: number): Promise<void> {
+    await getDb().update(users).set({ lastActiveAt: new Date() }).where(eq(users.id, id));
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    // Delete associated game states and feedbacks first due to foreign keys
+    await getDb().delete(gameStates).where(eq(gameStates.userId, id));
+    await getDb().delete(feedbacks).where(eq(feedbacks.userId, id));
+    await getDb().delete(leaderboardEntries).where(eq(leaderboardEntries.userId, id));
+    await getDb().delete(users).where(eq(users.id, id));
   }
 
   async getGameState(sessionId: string): Promise<GameState | undefined> {
@@ -147,6 +184,39 @@ export class DatabaseStorage implements IStorage {
 
     return { user, gameState, scores };
   }
+
+  async addFeedback(feedback: InsertFeedback): Promise<Feedback> {
+    const [newFeedback] = await getDb()
+      .insert(feedbacks)
+      .values(feedback)
+      .returning();
+    return newFeedback;
+  }
+
+  async getFeedbacks(): Promise<(Feedback & { user?: User })[]> {
+    const results = await getDb()
+      .select({
+        feedback: feedbacks,
+        user: users,
+      })
+      .from(feedbacks)
+      .leftJoin(users, eq(feedbacks.userId, users.id))
+      .orderBy(desc(feedbacks.createdAt));
+
+    return results.map((row: any) => ({
+      ...row.feedback,
+      email: row.feedback.email ?? null,
+      user: row.user || undefined,
+    }));
+  }
+
+  async resolveFeedback(id: number): Promise<void> {
+    await getDb().update(feedbacks).set({ status: 'resolved', resolvedAt: new Date() }).where(eq(feedbacks.id, id));
+  }
+
+  async deleteFeedback(id: number): Promise<void> {
+    await getDb().delete(feedbacks).where(eq(feedbacks.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -156,6 +226,8 @@ export class MemStorage implements IStorage {
   private currentUserId: number;
   private leaderboard: LeaderboardEntry[];
   private leaderboardId: number;
+  private feedbacksList: Feedback[];
+  private feedbackId: number;
 
   constructor() {
     this.states = new Map();
@@ -164,6 +236,8 @@ export class MemStorage implements IStorage {
     this.currentUserId = 1;
     this.leaderboard = [];
     this.leaderboardId = 1;
+    this.feedbacksList = [];
+    this.feedbackId = 1;
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -176,9 +250,41 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { ...insertUser, id, role: insertUser.role ?? "user", createdAt: new Date() };
+    const user: User = { ...insertUser, id, role: insertUser.role ?? "user", createdAt: new Date(), lastActiveAt: new Date() };
     this.users.set(id, user);
     return user;
+  }
+
+  async pingUser(id: number): Promise<void> {
+    const user = this.users.get(id);
+    if (user) {
+      user.lastActiveAt = new Date();
+    }
+  }
+
+  async getAllUsers(): Promise<(User & { lastPlayed?: Date | null })[]> {
+    const allUsers = Array.from(this.users.values());
+    const states = Array.from(this.states.values());
+
+    return allUsers.map(u => {
+      const state = states.find(s => s.userId === u.id);
+      return {
+        ...u,
+        lastPlayed: state?.lastPlayed || null
+      };
+    }).sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    this.users.delete(id);
+    // Find and delete game states
+    const entries = Array.from(this.states.entries());
+    for (const [key, state] of entries) {
+      if (state.userId === id) this.states.delete(key);
+    }
+    // Filter out feedbacks and leaderboard
+    this.feedbacksList = this.feedbacksList.filter(f => f.userId !== id);
+    this.leaderboard = this.leaderboard.filter(l => l.userId !== id);
   }
 
   async getGameState(sessionId: string): Promise<GameState | undefined> {
@@ -268,6 +374,42 @@ export class MemStorage implements IStorage {
     const gameState = await this.getUserGameState(userId);
     const scores = this.leaderboard.filter(l => l.userId === userId);
     return { user, gameState, scores };
+  }
+
+  async addFeedback(feedback: InsertFeedback): Promise<Feedback> {
+    const id = this.feedbackId++;
+    const newFeedback: Feedback = {
+      ...feedback,
+      id,
+      userId: feedback.userId ?? null,
+      email: feedback.email ?? null,
+      status: 'open',
+      createdAt: new Date(),
+      resolvedAt: null,
+    };
+    this.feedbacksList.push(newFeedback);
+    return newFeedback;
+  }
+
+  async getFeedbacks(): Promise<(Feedback & { user?: User })[]> {
+    const sorted = [...this.feedbacksList].sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+    return sorted.map(f => ({
+      ...f,
+      email: f.email ?? null,
+      user: f.userId ? this.users.get(f.userId) : undefined
+    })) as (Feedback & { user?: User })[];
+  }
+
+  async resolveFeedback(id: number): Promise<void> {
+    const f = this.feedbacksList.find(f => f.id === id);
+    if (f) {
+      f.status = 'resolved';
+      f.resolvedAt = new Date();
+    }
+  }
+
+  async deleteFeedback(id: number): Promise<void> {
+    this.feedbacksList = this.feedbacksList.filter(f => f.id !== id);
   }
 }
 

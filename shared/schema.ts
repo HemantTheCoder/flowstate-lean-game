@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   role: text("role").default("user"),
   createdAt: timestamp("created_at").defaultNow(),
+  lastActiveAt: timestamp("last_active_at").defaultNow(),
 });
 
 export const gameStates = pgTable("game_states", {
@@ -161,3 +162,23 @@ export const GAME_CONSTANTS = {
     { id: 5, title: "Grand Transit", focus: "Integrated Systems" }
   ]
 };
+
+export const feedbacks = pgTable("feedbacks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  playerName: text("player_name").notNull(),
+  email: text("email"), // Optional contact email
+  type: text("type").notNull(), // 'bug', 'suggestion', 'other'
+  message: text("message").notNull(),
+  status: text("status").notNull().default("open"), // 'open', 'resolved'
+  createdAt: timestamp("created_at").defaultNow(),
+  resolvedAt: timestamp("resolved_at"),
+});
+
+export const insertFeedbackSchema = createInsertSchema(feedbacks).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type Feedback = typeof feedbacks.$inferSelect;
+export type InsertFeedback = z.infer<typeof insertFeedbackSchema>;

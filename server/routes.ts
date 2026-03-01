@@ -165,4 +165,109 @@ export function registerRoutes(app: Express) {
     }
   });
 
+  // Ping user presence
+  app.post("/api/user/ping", async (req, res) => {
+    if (req.isAuthenticated() && req.user) {
+      try {
+        await storage.pingUser(req.user.id);
+        res.status(200).send();
+      } catch (error) {
+        res.status(500).send();
+      }
+    } else {
+      res.status(401).send();
+    }
+  });
+
+  // Submit Feedback
+  app.post("/api/feedback", async (req, res) => {
+    try {
+      const { type, message, playerName, email } = req.body;
+      if (!type || !message) {
+        return res.status(400).json({ message: "Type and message are required" });
+      }
+      const userId = (req.isAuthenticated() && req.user) ? req.user.id : undefined;
+      const feedback = await storage.addFeedback({
+        type,
+        message,
+        playerName: playerName || "Anonymous Architect",
+        email: email || null,
+        userId
+      });
+      res.status(201).json(feedback);
+    } catch (error) {
+      console.error("[API] Feedback Submission Error:", error);
+      res.status(500).json({ message: "Failed to submit feedback" });
+    }
+  });
+
+  // Get All Feedback (For Dev Console)
+  app.get("/api/feedback", async (req, res) => {
+    // In a real app we would restrict this to req.user.role === 'admin'
+    // But for this project scope, we'll allow access (or could add simple protection)
+    try {
+      const feedbacksList = await storage.getFeedbacks();
+      res.json(feedbacksList);
+    } catch (error) {
+      console.error("[API] Fetch Feedback Error:", error);
+      res.status(500).json({ message: "Failed to fetch feedback" });
+    }
+  });
+
+  // Resolve Feedback
+  app.patch("/api/feedback/:id/resolve", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) return res.status(400).json({ message: "Invalid feedback ID" });
+      await storage.resolveFeedback(id);
+      res.status(200).send();
+    } catch (error) {
+      console.error("[API] Resolve Feedback Error:", error);
+      res.status(500).json({ message: "Failed to resolve feedback" });
+    }
+  });
+
+  // Delete Feedback
+  app.delete("/api/feedback/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid feedback ID" });
+      }
+      await storage.deleteFeedback(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("[API] Delete Feedback Error:", error);
+      res.status(500).json({ message: "Failed to delete feedback" });
+    }
+  });
+
+  // --- ADMIN ROUTES ---
+
+  // Get all registered users
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      const usersList = await storage.getAllUsers();
+      res.json(usersList);
+    } catch (error) {
+      console.error("[API] Fetch Users Error:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Delete a user
+  app.delete("/api/admin/users/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      await storage.deleteUser(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("[API] Delete User Error:", error);
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
 }

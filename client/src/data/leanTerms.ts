@@ -23,4 +23,12 @@ export const LEAN_TERMS: LeanTerm[] = [
   { term: 'Should/Can/Will', keywords: ['Should/Can/Will', 'SHOULD/CAN/WILL'], definition: 'Three planning levels: what SHOULD happen, what CAN happen, what WILL happen.' },
   { term: 'Reliable Promise', keywords: ['Reliable Promise', 'reliable promise'], definition: 'A commitment made only after verifying all prerequisites are met.' },
   { term: 'Starvation', keywords: ['Starvation', 'starvation'], definition: 'When workers have no tasks because upstream has not delivered.' },
+  { term: '5S', keywords: ['5S', '5s'], definition: 'A workplace organization method consisting of Sort, Set in Order, Shine, Standardize, and Sustain.' },
+  { term: 'Sort (Seiri)', keywords: ['Sort', 'Seiri', 'sort', 'seiri'], definition: 'Separating needed tools, parts, and instructions from unneeded materials and removing the latter.' },
+  { term: 'Set in Order (Seiton)', keywords: ['Set in Order', 'Seiton', 'set in order', 'seiton'], definition: 'Arranging and labeling items so they are easy to use and find by anyone (e.g., Shadow Boards).' },
+  { term: 'Shine (Seiso)', keywords: ['Shine', 'Seiso', 'shine', 'seiso'], definition: 'Cleaning the workspace and equipment as a form of inspection to find abnormalities early.' },
+  { term: 'Standardize (Seiketsu)', keywords: ['Standardize', 'Seiketsu', 'standardize', 'seiketsu'], definition: 'Creating strict guidelines, schedules, and visual controls to maintain the first 3S phases.' },
+  { term: 'Sustain (Shitsuke)', keywords: ['Sustain', 'Shitsuke', 'sustain', 'shitsuke'], definition: 'Building the discipline and culture to uphold the rules of 5S over the long term without backsliding.' },
+  { term: 'Red Tag', keywords: ['Red Tag', 'red tag', 'Red tag'], definition: 'A visual method to identify unneeded items during the "Sort" phase for removal from the workspace.' },
+  { term: 'Shadow Board', keywords: ['Shadow Board', 'shadow board', 'Shadow board'], definition: 'A visual management tool where outlines of tools are drawn to indicate exactly where they belong.' },
 ];

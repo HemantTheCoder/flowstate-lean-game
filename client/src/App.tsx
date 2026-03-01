@@ -16,6 +16,7 @@ import Leaderboard from "@/pages/Leaderboard";
 import Profile from "@/pages/Profile";
 import DevDashboard from "@/pages/DevDashboard";
 import Credits from "@/pages/Credits";
+import Feedback from "@/pages/Feedback";
 
 function Router() {
   return (
@@ -30,6 +31,7 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/dev" component={DevDashboard} />
       <Route path="/credits" component={Credits} />
+      <Route path="/feedback" component={Feedback} />
       <Route component={NotFound} />
     </Switch>
   );

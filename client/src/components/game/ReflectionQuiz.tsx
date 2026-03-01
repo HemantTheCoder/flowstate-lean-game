@@ -138,8 +138,68 @@ const CHAPTER_2_QUESTIONS: Question[] = [
   },
 ];
 
+const CHAPTER_3_QUESTIONS: Question[] = [
+  {
+    id: '5s-seiri',
+    text: 'What is the primary goal of the "Sort" (Seiri) step?',
+    options: [
+      { id: 'a', text: 'To clean all the floors and machines', isCorrect: false },
+      { id: 'b', text: 'To separate necessary items from unnecessary ones and discard the waste', isCorrect: true },
+      { id: 'c', text: 'To organize tools in alphabetical order', isCorrect: false },
+      { id: 'd', text: 'To buy new equipment for the workspace', isCorrect: false },
+    ],
+    explanation: 'Sort (Seiri) is about separating the value from the waste. If an item is not needed for current production, it should be red-tagged and removed to free up space and reduce confusion.',
+  },
+  {
+    id: '5s-seiton',
+    text: 'Why do we use Shadow Boards in the "Set in Order" (Seiton) phase?',
+    options: [
+      { id: 'a', text: 'To make the workspace look more colorful', isCorrect: false },
+      { id: 'b', text: 'Because they are cheaper than toolboxes', isCorrect: false },
+      { id: 'c', text: 'To provide visual management so anyone can find or return an item in seconds', isCorrect: true },
+      { id: 'd', text: 'To hide broken tools from management', isCorrect: false },
+    ],
+    explanation: 'Visual management like Shadow Boards ensures "A place for everything, and everything in its place." It eliminates the waste of searching, making abnormalities immediately obvious.',
+  },
+  {
+    id: '5s-seiso',
+    text: 'In Lean, "Shine" (Seiso) is not just about cleaning. What is its true purpose?',
+    options: [
+      { id: 'a', text: 'To pass health and safety audits only', isCorrect: false },
+      { id: 'b', text: 'To act as an inspection process to find leaks, wear, and abnormalities before they cause failures', isCorrect: true },
+      { id: 'c', text: 'To keep workers busy when there is no production', isCorrect: false },
+      { id: 'd', text: 'To make the factory look good for visitors', isCorrect: false },
+    ],
+    explanation: 'Cleaning is Inspection. By routinely cleaning equipment, operators notice minor issues (like an oil leak or a loose bolt) before they turn into major breakdowns.',
+  },
+  {
+    id: '5s-seiketsu',
+    text: 'If a workspace gets messy again within a week, which 5S pillar was likely ignored?',
+    options: [
+      { id: 'a', text: 'Sort', isCorrect: false },
+      { id: 'b', text: 'Shine', isCorrect: false },
+      { id: 'c', text: 'Standardize (Seiketsu) - creating rules to maintain the first 3S', isCorrect: true },
+      { id: 'd', text: 'Sustain', isCorrect: false },
+    ],
+    explanation: ' Standardize (Seiketsu) ensures the first three pillars become habits rather than one-time events. Without checklists, schedules, and standard operating procedures, chaos quickly returns.',
+  },
+  {
+    id: '5s-shitsuke',
+    text: 'What makes "Sustain" (Shitsuke) the most difficult part of 5S?',
+    options: [
+      { id: 'a', text: 'It requires buying expensive software', isCorrect: false },
+      { id: 'b', text: 'It requires hiring full-time cleaners', isCorrect: false },
+      { id: 'c', text: 'It requires a fundamental shift in company culture to maintain discipline over the long term', isCorrect: true },
+      { id: 'd', text: 'It takes up too much time during the workday', isCorrect: false },
+    ],
+    explanation: 'Sustain is about discipline. It means following the standards every day, even when rushing or when no one is watching. It transforms 5S from a "project" into a daily culture.',
+  },
+];
+
 export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComplete, chapter = 1 }) => {
-  const QUESTIONS = chapter === 2 ? CHAPTER_2_QUESTIONS : CHAPTER_1_QUESTIONS;
+  let QUESTIONS = CHAPTER_1_QUESTIONS;
+  if (chapter === 2) QUESTIONS = CHAPTER_2_QUESTIONS;
+  if (chapter === 3) QUESTIONS = CHAPTER_3_QUESTIONS;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -400,7 +460,30 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
                 <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-xl p-4 w-full space-y-2">
                   <div className="font-semibold text-cyan-400 text-sm">Key Takeaways</div>
                   <ul className="text-sm text-cyan-100 space-y-1">
-                    {chapter === 2 ? (
+                    {chapter === 3 ? (
+                      <>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Sort (Seiri) - Separate value from waste. Red Tag the rest.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Set in Order (Seiton) - Visual management. A place for everything.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Shine (Seiso) - Cleaning is inspection. Find failures early.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Standardize (Seiketsu) - Create checklists and rules to maintain order.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>Sustain (Shitsuke) - The long-term discipline to uphold the culture.</span>
+                        </li>
+                      </>
+                    ) : chapter === 2 ? (
                       <>
                         <li className="flex items-start gap-2">
                           <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
