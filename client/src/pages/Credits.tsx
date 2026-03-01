@@ -8,25 +8,29 @@ const teamMembers = [
         name: "Hemant Kumar",
         role: "Flow Architect & Lead Developer", // Assuming based on context, can be generic if needed
         color: "from-pink-400 to-rose-400",
-        image: "/images/hemantpic.jpeg"
+        image: "/images/hemantpic.jpeg",
+        linkedin: "https://www.linkedin.com/in/hemant-kumar-b2b512300"
     },
     {
         name: "Dhvij Shah",
         role: "Core Contributor",
         color: "from-purple-400 to-indigo-400",
-        image: "/images/dhvijpic.jpeg"
+        image: "/images/dhvijpic.jpeg",
+        linkedin: "https://www.linkedin.com/in/dhvij-shah-511927339/"
     },
     {
         name: "Arjav Chaudhari",
         role: "Core Contributor",
         color: "from-blue-400 to-cyan-400",
-        image: "/images/arjavpic.jpeg"
+        image: "/images/arjavpic.jpeg",
+        linkedin: "https://www.linkedin.com/in/arjav-chaudhari-256b28338/"
     },
     {
         name: "Jugal Thakkar",
         role: "Core Contributor",
         color: "from-emerald-400 to-teal-400",
-        image: "/images/jugalpic.jpeg"
+        image: "/images/jugalpic.jpeg",
+        linkedin: "https://www.linkedin.com/in/jugal-thakkar-32aa85217/"
     }
 ];
 
@@ -119,8 +123,15 @@ export default function Credits() {
                                     </div>
                                 </div>
 
-                                <div className="flex-1 text-center sm:text-left">
-                                    <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight drop-shadow-md mb-1">{member.name}</h3>
+                                <div className="flex-1 text-center sm:text-left flex flex-col justify-center">
+                                    <div className="flex items-center justify-center sm:justify-start gap-3 mb-1">
+                                        <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight drop-shadow-md">{member.name}</h3>
+                                        {member.linkedin && (
+                                            <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#0A66C2] transition-colors">
+                                                <Linkedin className="w-5 h-5 flex-shrink-0" />
+                                            </a>
+                                        )}
+                                    </div>
                                     <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] sm:text-xs">
                                         {member.role}
                                     </p>
