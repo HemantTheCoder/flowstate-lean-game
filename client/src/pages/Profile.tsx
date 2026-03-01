@@ -20,7 +20,7 @@ export default function Profile() {
 
     if (isAuthLoading || (user && isProfileLoading)) {
         return (
-            <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 relative overflow-hidden font-sans">
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 relative overflow-x-hidden font-sans">
                 <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
                 <div className="flex flex-col items-center gap-6 z-10">
                     <div className="relative">

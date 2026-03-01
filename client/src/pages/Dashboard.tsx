@@ -6,7 +6,7 @@ import { useGameStore } from '@/store/gameStore';
 import {
   LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
-import { ArrowLeft, Target, GitBranch, Activity, Clock, Layers, HardHat } from 'lucide-react';
+import { ArrowLeft, Target, GitBranch, Activity, Clock, Layers, HardHat, Loader2 } from 'lucide-react';
 
 interface RunEntry {
   id: number;
@@ -68,9 +68,18 @@ export default function Dashboard() {
     return 'bg-red-500';
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-slate-200 font-sans relative overflow-x-hidden">
+        <Loader2 className="w-12 h-12 text-cyan-500 animate-spin mb-4" />
+        <p className="text-xl font-medium tracking-wide">Loading your operation parameters...</p>
+      </div>
+    );
+  }
+
   if ((!gameState || dailyMetrics.length === 0) && runs.length === 0 && !isLoading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-slate-200 font-sans relative overflow-hidden">
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-slate-200 font-sans relative overflow-x-hidden">
         {/* Premium Twilight Industrial Ambient Background */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           <div className="absolute top-[20%] right-[20%] w-[50%] h-[50%] bg-indigo-500/20 blur-[150px] rounded-full" />
@@ -101,8 +110,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-200 font-sans p-4 md:p-8 relative overflow-hidden">
-      {/* Premium Twilight Industrial Ambient Background */}
+    <div className="min-h-screen bg-slate-900 text-slate-200 font-sans p-4 md:p-8 relative overflow-x-hidden">
+
+      {/* Premium Background Ambience */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15] }}

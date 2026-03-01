@@ -51,7 +51,7 @@ const item = {
 
 export default function Credits() {
     return (
-        <div className="relative w-full min-h-screen overflow-hidden bg-slate-900 flex flex-col items-center p-4 md:p-8 font-sans">
+        <div className="relative w-full min-h-screen overflow-x-hidden bg-slate-900 flex flex-col items-center p-4 md:p-8 font-sans">
 
             {/* Premium Twilight Industrial Ambient Background */}
             <div className="fixed inset-0 pointer-events-none z-0">

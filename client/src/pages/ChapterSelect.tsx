@@ -106,7 +106,7 @@ export default function ChapterSelect() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-200 p-6 md:p-10 relative overflow-hidden font-sans">
+        <div className="min-h-screen bg-slate-900 text-slate-200 p-6 md:p-10 relative overflow-x-hidden font-sans">
             {/* Character Creation for New Players */}
             <CharacterCreationModal />
 

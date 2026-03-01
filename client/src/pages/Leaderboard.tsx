@@ -59,7 +59,7 @@ export default function Leaderboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-200 p-4 md:p-8 font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-slate-900 text-slate-200 p-4 md:p-8 font-sans relative overflow-x-hidden">
 
       {/* Premium Twilight Industrial Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0">

@@ -35,7 +35,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative w-full min-h-screen overflow-hidden bg-slate-900 flex flex-col items-center justify-center p-6 font-sans">
+    <div className="relative w-full min-h-screen overflow-x-hidden bg-slate-900 flex flex-col items-center justify-center p-6 font-sans">
 
       {/* Premium Twilight Industrial Ambient Background */}
       <div
