@@ -32,36 +32,33 @@ export default function Dashboard() {
     queryKey: ['/api/runs/recent'],
   });
 
-  const generateMockDailyMetrics = () => {
-    return Array.from({ length: 14 }).map((_, i) => {
-      const day = i + 1;
-      const baseEff = Math.min(45 + (day * 3.5) + (Math.random() * 10 - 5), 98);
-      return {
-        day,
-        efficiency: Math.round(baseEff),
-        tasksCompletedToday: Math.floor(baseEff / 2),
-        potentialCapacity: 50,
-        cumulativeEfficiency: Math.round(baseEff * 0.9 + 5),
-        insight: baseEff > 80 ? 'Optimal Flow. Waste eliminated.' : baseEff > 60 ? 'Bottlenecks forming at trade handoffs.' : 'Critical Mura (unevenness) detected.',
-      };
-    });
-  };
+  // If the user has completed a run that saved to the server, use that, 
+  // otherwise fallback to the active local game state.
+  const sourceMetrics = runs.length > 0 && runs[0].stats?.dailyMetrics
+    ? runs[0].stats.dailyMetrics as any[]
+    : gameState.dailyMetrics;
 
-  const dailyMetrics = useMemo(() => generateMockDailyMetrics(), []);
+  const dailyMetrics = useMemo(() => {
+    if (sourceMetrics && sourceMetrics.length > 0) return sourceMetrics;
+    return []; // Return empty if no plays yet
+  }, [sourceMetrics]);
+
+  const sourcePpc = runs.length > 0 && runs[0].stats?.ppcHistory
+    ? runs[0].stats.ppcHistory as any[]
+    : gameState.ppcHistory;
 
   const ppcData = useMemo(() => {
-    return Array.from({ length: 6 }).map((_, i) => ({
-      name: `Week ${i + 1}`,
-      ppc: Math.round(50 + (i * 8) + (Math.random() * 10 - 5))
-    }));
-  }, []);
+    if (sourcePpc && sourcePpc.length > 0) return sourcePpc;
+    return [];
+  }, [sourcePpc]);
 
+  // Derive decisions from game flags if playing locally, otherwise from run logs
   const decisions = [
-    { label: 'Implemented 5S in Storage Area', positive: true },
-    { label: 'Ignored Daily Huddle', positive: false },
-    { label: 'Used Last Planner System for Lookahead', positive: true },
-    { label: 'Batched sheetrock delivery (Overproduction)', positive: false },
-  ];
+    { label: 'Completed Lean Introduction (Chapter 1)', positive: gameState.unlockedChapters.includes(2) },
+    { label: 'Mastered Last Planner System (Chapter 2)', positive: gameState.unlockedChapters.includes(3) },
+    { label: 'Eliminated Wait Waste (Just-in-Time)', positive: (gameState.lpi?.wasteRemoved || 0) > 0 },
+    { label: 'Pushed Work vs Pulled Work', positive: !gameState.flags['decision_push_made'] },
+  ].filter(d => Boolean(d.positive)); // Only show things they actually did
 
   const recentLogs = runs.flatMap(r => r.logs).slice(0, 15).filter(Boolean);
 
@@ -71,7 +68,7 @@ export default function Dashboard() {
     return 'bg-red-500';
   };
 
-  if (!gameState && runs.length === 0 && !isLoading) {
+  if ((!gameState || dailyMetrics.length === 0) && runs.length === 0 && !isLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-slate-200 font-sans relative overflow-hidden">
         {/* Premium Twilight Industrial Ambient Background */}

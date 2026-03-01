@@ -11,14 +11,14 @@ import { BADGES } from '@/data/badges';
 export default function Profile() {
     const { user, logoutMutation, isLoading: isAuthLoading } = useAuth();
     const [, setLocation] = useLocation();
-    const { importState } = useGameStore();
+    const { importState, ...localGameState } = useGameStore();
 
     const { data: profile, isLoading: isProfileLoading } = useQuery<UserProfile>({
         queryKey: ['/api/user/profile'],
         enabled: !!user,
     });
 
-    if (isAuthLoading || isProfileLoading) {
+    if (isAuthLoading || (user && isProfileLoading)) {
         return (
             <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 relative overflow-hidden font-sans">
                 <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
@@ -32,18 +32,18 @@ export default function Profile() {
         );
     }
 
-    if (!user) {
-        setLocation('/');
-        return null;
-    }
+    // What to display: If logged in with a DB save, use that. Otherwise, use local.
+    const savedGameState = profile?.gameState;
+    const scores = profile?.scores || [];
 
-    if (!profile) return null;
-
-    const { gameState, scores } = profile;
+    // Choose which state to display in the UI cards: Server or Local
+    const displayState = savedGameState || localGameState;
 
     const handleResume = async () => {
-        if (gameState) {
-            importState(gameState);
+        if (savedGameState) {
+            importState(savedGameState);
+            setLocation('/game');
+        } else if (localGameState) {
             setLocation('/game');
         }
     };
@@ -53,10 +53,27 @@ export default function Profile() {
         setLocation('/');
     };
 
-    const totalScore = scores.reduce((acc, curr) => acc + (curr.totalScore || 0), 0);
-    const bestPpc = Math.max(...scores.map(s => s.ppc || 0), 0);
-    const completedChapters = scores.length;
-    const joinDate = user.createdAt ? new Date(user.createdAt) : new Date();
+    // Calculate stats based on DB profile FIRST, fallback to local gameStore if not logged in
+    let totalScore = 0;
+    let bestPpc = 0;
+    let completedChapters = 0;
+
+    if (user && profile) {
+        totalScore = scores.reduce((acc, curr) => acc + (curr.totalScore || 0), 0);
+        bestPpc = Math.max(...scores.map(s => s.ppc || 0), 0);
+        completedChapters = scores.length;
+    } else {
+        // Local fallback calculations from GameStore
+        completedChapters = Math.max(0, localGameState.unlockedChapters.length - 1); // If 2 unlocked, 1 is completed
+        totalScore = localGameState.funds; // proxy for score locally
+        // PPC history available locally now
+        if (localGameState.ppcHistory && localGameState.ppcHistory.length > 0) {
+            bestPpc = Math.max(...localGameState.ppcHistory.map(p => p.ppc));
+        }
+    }
+
+    const joinDate = user?.createdAt ? new Date(user.createdAt) : new Date();
+    const displayUsername = user?.username || localGameState.playerName || 'Guest Engineer';
 
     return (
         <div className="min-h-screen bg-slate-900 p-4 md:p-8 font-sans relative overflow-x-hidden text-slate-200">
@@ -86,14 +103,19 @@ export default function Profile() {
                 >
                     <div className="flex items-center gap-6">
                         <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 flex flex-col items-center justify-center text-cyan-400 text-4xl font-black border border-cyan-500/30 rounded-full shrink-0 shadow-inner">
-                            {user.username.charAt(0).toUpperCase()}
+                            {displayUsername.charAt(0).toUpperCase()}
                         </div>
                         <div>
                             <div className="flex items-center gap-3 mb-1">
-                                <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">{user.username}</h1>
-                                {user.role === 'admin' && (
+                                <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">{displayUsername}</h1>
+                                {user?.role === 'admin' && (
                                     <span className="bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-amber-500/30 flex items-center gap-1">
                                         <ShieldCheck className="w-3 h-3" /> Root Admin
+                                    </span>
+                                )}
+                                {!user && (
+                                    <span className="bg-slate-500/20 text-slate-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-slate-500/30">
+                                        Local Profile
                                     </span>
                                 )}
                             </div>
@@ -111,13 +133,22 @@ export default function Profile() {
                             <ArrowLeft className="w-4 h-4" />
                             Return Home
                         </button>
-                        <button
-                            onClick={handleLogout}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl transition-colors text-xs font-bold uppercase tracking-widest text-red-400"
-                        >
-                            <LogOut className="w-4 h-4" />
-                            Log Out
-                        </button>
+                        {user ? (
+                            <button
+                                onClick={handleLogout}
+                                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl transition-colors text-xs font-bold uppercase tracking-widest text-red-400"
+                            >
+                                <LogOut className="w-4 h-4" />
+                                Log Out
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => setLocation('/auth')}
+                                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-xl transition-colors text-xs font-bold uppercase tracking-widest text-cyan-400"
+                            >
+                                Create Account to Auto-Save
+                            </button>
+                        )}
                     </div>
                 </motion.div>
 
@@ -136,24 +167,24 @@ export default function Profile() {
                                     <Play className="w-4 h-4 fill-current text-cyan-400" />
                                     Active Project
                                 </h3>
-                                {gameState && <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />}
+                                {displayState && <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />}
                             </div>
                             <div className="p-8">
-                                {gameState ? (
+                                {displayState ? (
                                     <div className="space-y-6">
                                         <div>
                                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Current Sector</p>
-                                            <p className="text-3xl font-black text-white uppercase drop-shadow-md">Episode {gameState.chapter}</p>
-                                            <p className="text-sm text-cyan-400 mt-1 font-bold">Sim Day {gameState.day}</p>
+                                            <p className="text-3xl font-black text-white uppercase drop-shadow-md">Episode {displayState.chapter}</p>
+                                            <p className="text-sm text-cyan-400 mt-1 font-bold">Sim Day {displayState.day}</p>
                                         </div>
                                         <div className="space-y-4 p-5 bg-slate-900/50 rounded-2xl border border-slate-700/50">
                                             <div className="flex justify-between items-center text-sm">
-                                                <span className="text-slate-400 tracking-wide font-bold">Budget</span>
-                                                <span className="font-bold text-emerald-400">${gameState.resources?.budget?.toLocaleString()}</span>
+                                                <span className="text-slate-400 tracking-wide font-bold">Funds</span>
+                                                <span className="font-bold text-emerald-400">${((displayState as any).funds || (displayState as any).resources?.budget || 0).toLocaleString()}</span>
                                             </div>
                                             <div className="flex justify-between items-center text-sm">
                                                 <span className="text-slate-400 tracking-wide font-bold">Engineer</span>
-                                                <span className="font-bold text-slate-200">{gameState.playerName}</span>
+                                                <span className="font-bold text-slate-200">{displayState.playerName}</span>
                                             </div>
                                         </div>
                                         <button
@@ -205,7 +236,7 @@ export default function Profile() {
                                 </div>
                                 <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-700/50 text-center flex flex-col items-center justify-center shadow-inner hover:bg-slate-800 transition-colors">
                                     <Clock className="w-6 h-6 text-emerald-500 mb-3 drop-shadow-md" />
-                                    <div className="text-2xl font-black text-white">{gameState ? Math.floor((Date.now() - new Date(gameState.lastPlayed || 0).getTime()) / (1000 * 60 * 60 * 24)) : 0}<span className="text-sm text-slate-500 mx-1">days</span></div>
+                                    <div className="text-2xl font-black text-white">{displayState ? Math.floor((Date.now() - new Date((displayState as any).lastPlayed || Date.now()).getTime()) / (1000 * 60 * 60 * 24)) : 0}<span className="text-sm text-slate-500 mx-1">days</span></div>
                                     <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Since Last Play</div>
                                 </div>
                             </div>
@@ -223,7 +254,7 @@ export default function Profile() {
                             </h2>
                             <div className="grid grid-cols-2 xl:grid-cols-3 gap-5">
                                 {BADGES.map((badge, i) => {
-                                    const isUnlocked = gameState?.unlockedBadges?.includes(badge.id);
+                                    const isUnlocked = displayState?.unlockedBadges?.includes(badge.id);
                                     const Icon = badge.icon;
 
                                     return (
