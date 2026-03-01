@@ -144,34 +144,33 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
                                         {unassignedItems.map((item, idx) => (
                                             <Draggable key={item.id} draggableId={item.id} index={idx} isDragDisabled={item.type === 'hazard'}>
                                                 {(provided, snapshot) => (
-                                                    <motion.div
+                                                    <div
                                                         ref={provided.innerRef}
                                                         {...(provided.draggableProps as any)}
                                                         {...(provided.dragHandleProps as any)}
-                                                        whileHover={{ scale: 1.05 }}
-                                                        whileTap={{ scale: 0.95 }}
                                                         onClick={() => item.type === 'hazard' ? handleHazardClick(item.id) : null}
                                                         className={`
-                                                                bg-slate-800/80 backdrop-blur border rounded-xl p-4 shadow-md w-36 flex flex-col items-center gap-3 cursor-grab active:cursor-grabbing relative
-                                                                ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-cyan-500/50 z-50 !rotate-6 !bg-slate-700' : 'hover:shadow-lg transition-transform'}
-                                                                ${item.type === 'hazard' ? 'border-red-500/50 bg-red-900/20 cursor-pointer' : 'border-slate-700/50'}
+                                                                bg-slate-800/90 backdrop-blur border rounded-xl p-3 shadow-md w-[200px] flex items-center gap-3 relative
+                                                                ${item.type !== 'hazard' ? 'cursor-grab active:cursor-grabbing hover:bg-slate-700/80 transition-colors' : 'cursor-pointer'}
+                                                                ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-cyan-500/50 z-50 !rotate-2 !bg-slate-700' : ''}
+                                                                ${item.type === 'hazard' ? 'border-red-500/50 bg-red-900/30' : 'border-slate-600/50'}
                                                             `}
                                                     >
                                                         {item.type === 'hazard' && (
-                                                            <div className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full animate-pulse">
+                                                            <div className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full animate-pulse shadow-md">
                                                                 <Flame className="w-4 h-4" />
                                                             </div>
                                                         )}
-                                                        <div className={`p-3 rounded-full ${item.type === 'hazard' ? 'bg-red-500/20' : 'bg-slate-700/50'}`}>
+                                                        <div className={`p-2 rounded-lg flex-shrink-0 ${item.type === 'hazard' ? 'bg-red-500/20' : 'bg-slate-700/50'}`}>
                                                             {renderItemIcon(item)}
                                                         </div>
-                                                        <span className="text-sm font-bold text-slate-200 text-center leading-tight">{item.name}</span>
+                                                        <span className="text-xs font-bold text-slate-200 leading-tight truncate flex-1">{item.name}</span>
                                                         {item.isBroken && (
-                                                            <div className="absolute -bottom-2 px-2 py-0.5 bg-red-500 text-white text-[10px] font-black rounded-full shadow-sm">
+                                                            <div className="absolute -bottom-2 right-2 px-2 py-0.5 bg-red-500 text-white text-[9px] font-black rounded-full shadow-sm">
                                                                 RE TAG
                                                             </div>
                                                         )}
-                                                    </motion.div>
+                                                    </div>
                                                 )}
                                             </Draggable>
                                         ))}
@@ -217,8 +216,6 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
                                     <Droppable key={zone.id} droppableId={zone.id}>
                                         {(provided, snapshot) => (
                                             <div
-                                                ref={provided.innerRef}
-                                                {...provided.droppableProps}
                                                 className={`
                                                         rounded-2xl p-4 border flex flex-col min-h-[150px] transition-colors
                                                         ${bgClass} ${borderClass}
@@ -232,25 +229,37 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
                                                     </span>
                                                 </div>
 
-                                                <div className="flex-1 flex flex-col gap-2">
+                                                <div
+                                                    ref={provided.innerRef}
+                                                    {...provided.droppableProps}
+                                                    className="flex-1 flex flex-col gap-2 min-h-[100px]"
+                                                >
                                                     {zoneItems.map((item, idx) => (
                                                         <Draggable key={item.id} draggableId={item.id} index={idx}>
                                                             {(provided, snapshot) => (
                                                                 <div
                                                                     ref={provided.innerRef}
-                                                                    {...provided.draggableProps}
-                                                                    {...provided.dragHandleProps}
+                                                                    {...(provided.draggableProps as any)}
+                                                                    {...(provided.dragHandleProps as any)}
                                                                     className={`
-                                                                            bg-slate-800 border border-slate-700/50 rounded-lg p-2 flex items-center gap-2 shadow-sm
-                                                                            ${snapshot.isDragging ? 'shadow-md ring-1 ring-cyan-400' : ''}
+                                                                            bg-slate-800/90 backdrop-blur border rounded-xl p-3 shadow-md w-[200px] flex items-center gap-3 relative cursor-grab active:cursor-grabbing hover:bg-slate-700/80 transition-colors
+                                                                            ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-cyan-500/50 z-50 !rotate-2 !bg-slate-700' : ''}
+                                                                            border-slate-600/50
                                                                         `}
                                                                 >
-                                                                    <div className="scale-75 origin-left">
+                                                                    <div className={`p-2 rounded-lg flex-shrink-0 bg-slate-700/50`}>
                                                                         {renderItemIcon(item)}
                                                                     </div>
-                                                                    <span className="text-xs font-semibold text-slate-200 truncate">{item.name}</span>
+                                                                    <span className="text-xs font-bold text-slate-200 leading-tight truncate flex-1">{item.name}</span>
+                                                                    {item.isBroken && (
+                                                                        <div className="absolute -bottom-2 right-2 px-2 py-0.5 bg-red-500 text-white text-[9px] font-black rounded-full shadow-sm">
+                                                                            RE TAG
+                                                                        </div>
+                                                                    )}
                                                                     {item.type !== zone.acceptsType && day >= 13 && (
-                                                                        <AlertTriangle className="w-4 h-4 text-red-500 ml-auto" />
+                                                                        <span title="Wrong Zone!" className="absolute -top-2 -right-2 bg-slate-900 rounded-full border border-amber-500/50">
+                                                                            <AlertTriangle className="w-5 h-5 text-amber-500" />
+                                                                        </span>
                                                                     )}
                                                                 </div>
                                                             )}
