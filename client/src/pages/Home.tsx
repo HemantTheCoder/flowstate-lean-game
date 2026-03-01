@@ -43,20 +43,25 @@ export default function Home() {
         style={{
           backgroundImage: `url('/assets/bg_title_screen.png')`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center'
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          imageRendering: 'crisp-edges'
         }}
       >
-        <div className="absolute inset-0 bg-slate-950/70" /> {/* Darkening overlay so UI pops */}
+        <div className="absolute inset-0 bg-slate-950/40" /> {/* Darkening overlay so UI pops */}
+
+        {/* Restored ambient blurs to keep options nicely visible and add atmosphere */}
         <motion.div
-          animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
+          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
           className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-indigo-500/20 blur-[150px] rounded-full"
         />
         <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
           transition={{ duration: 18, repeat: Infinity, ease: "linear", delay: 3 }}
           className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-cyan-500/20 blur-[150px] rounded-full"
         />
+
         <motion.div
           animate={{ opacity: [0.05, 0.1, 0.05] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
@@ -79,20 +84,22 @@ export default function Home() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="flex-1 flex flex-col justify-center text-center md:text-left h-full pt-10"
         >
-          {/* Tagline pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/50 mb-6 backdrop-blur-md self-center md:self-start shadow-md shadow-slate-900/50">
-            <HardHat className="w-4 h-4 text-cyan-400" />
-            <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">A Lean Construction Story</span>
+          <div className="bg-slate-900/40 backdrop-blur-md p-8 md:p-12 rounded-3xl border border-slate-700/50 shadow-2xl inline-block w-fit mx-auto md:mx-0">
+            {/* Tagline pill */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/90 border border-slate-700/50 mb-6 shadow-md shadow-slate-900/50">
+              <HardHat className="w-4 h-4 text-cyan-400" />
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">A Lean Construction Story</span>
+            </div>
+
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-indigo-100 to-indigo-400 tracking-tight mb-2 drop-shadow-[0_0_30px_rgba(99,102,241,0.4)]">
+              FLOW
+              <span className="block text-4xl md:text-6xl lg:text-7xl mt-[-10px] text-cyan-400 opacity-100 drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]">STATE</span>
+            </h1>
+
+            <p className="text-lg md:text-xl text-slate-300 font-bold mb-4 tracking-widest uppercase mt-4 max-w-lg mx-auto md:mx-0 drop-shadow-md">
+              Master the Flow. Eliminate the Waste.
+            </p>
           </div>
-
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-indigo-100 to-indigo-400 tracking-tight mb-2 drop-shadow-[0_0_30px_rgba(99,102,241,0.2)]">
-            FLOW
-            <span className="block text-4xl md:text-6xl lg:text-7xl mt-[-10px] text-cyan-400 opacity-90 drop-shadow-[0_0_20px_rgba(34,211,238,0.3)]">STATE</span>
-          </h1>
-
-          <p className="text-lg md:text-xl text-slate-400 font-medium mb-12 tracking-widest uppercase mt-4 max-w-lg mx-auto md:mx-0">
-            Master the Flow. Eliminate the Waste.
-          </p>
         </motion.div>
 
         {/* Right Side: Clear, User-Friendly Navigation */}
