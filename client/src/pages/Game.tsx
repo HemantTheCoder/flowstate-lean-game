@@ -694,7 +694,7 @@ export default function Game() {
   };
 
   return (
-    <div className={`w-full h-screen relative overflow-hidden transition-colors duration-1000 ${chapter === 3 ? 'bg-amber-50/50' : ''}`}>
+    <div className={`w-full h-screen relative overflow-hidden transition-colors duration-1000 bg-slate-900`}>
       {/* 1. Phaser Layer (Background) */}
       <GameCanvas />
 
@@ -708,10 +708,10 @@ export default function Game() {
           className="flex flex-col md:flex-row justify-between items-start pointer-events-auto gap-4 w-full md:w-auto"
         >
           <div className="flex gap-4 w-full md:w-auto">
-            <div id="smart-advisor-box" className="bg-white/90 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border-2 border-slate-100 w-full md:min-w-[300px] md:w-auto flex-1">
-              <h3 className="font-bold text-slate-700 text-sm md:text-base">Week {week} | Day {day}</h3>
-              <div className="text-xs md:text-sm text-slate-500 font-medium">Current Focus:</div>
-              <div className="text-xs md:text-sm text-blue-600 animate-pulse font-bold mt-1 leading-tight">
+            <div id="smart-advisor-box" className="bg-slate-800/80 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border border-slate-700/50 w-full md:min-w-[300px] md:w-auto flex-1">
+              <h3 className="font-bold text-slate-300 text-sm md:text-base">Week {week} | Day {day}</h3>
+              <div className="text-xs md:text-sm text-slate-400 font-medium">Current Focus:</div>
+              <div className="text-xs md:text-sm text-cyan-400 animate-pulse font-bold mt-1 leading-tight">
                 {getSmartObjective()}
               </div>
             </div>
@@ -719,27 +719,27 @@ export default function Game() {
             <button
               onClick={handleEndDay}
               data-testid="button-end-day"
-              className={`${(day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-b-4 border-amber-700 ring-2 ring-amber-300' : 'bg-blue-500 hover:bg-blue-600 border-b-4 border-blue-700'} text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') ? 'animate-bounce ring-4 ring-yellow-400' : ''}`}
+              className={`${(day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-b-4 border-amber-700 ring-2 ring-amber-300/50' : 'bg-cyan-600 hover:bg-cyan-500 border-b-4 border-cyan-800'} text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') ? 'animate-bounce ring-4 ring-amber-400/50' : ''}`}
             >
               {((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3)) ? 'Finish Chapter' : 'End Day'}
             </button>
           </div>
 
-          <div id="stats-box" className="bg-white/90 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border-2 border-slate-100 flex gap-4 md:gap-6 w-full md:w-auto justify-around">
+          <div id="stats-box" className="bg-slate-800/80 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border border-slate-700/50 flex gap-4 md:gap-6 w-full md:w-auto justify-around">
             <div className="text-center">
               <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Funds</div>
-              <div className="font-mono font-bold text-blue-600 text-sm md:text-base">${funds}</div>
+              <div className="font-mono font-bold text-emerald-400 text-sm md:text-base">${funds}</div>
             </div>
 
             {chapter === 3 ? (
-              <div className="text-center px-4 border-l-2 border-slate-100">
+              <div className="text-center px-4 border-l border-slate-700/50">
                 <div className="text-[10px] md:text-xs font-bold text-amber-500 uppercase">5S Audit</div>
-                <div className="font-mono font-black text-amber-600 text-sm md:text-base">{depotScore}%</div>
+                <div className="font-mono font-black text-amber-400 text-sm md:text-base">{depotScore}%</div>
               </div>
             ) : (
-              <div className="text-center px-4 border-l-2 border-slate-100">
+              <div className="text-center px-4 border-l border-slate-700/50">
                 <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Morale</div>
-                <div className="font-mono font-bold text-green-500 text-sm md:text-base">{lpi.teamMorale}%</div>
+                <div className="font-mono font-bold text-emerald-400 text-sm md:text-base">{lpi.teamMorale}%</div>
               </div>
             )}
 
@@ -747,13 +747,13 @@ export default function Game() {
               id="btn-save"
               onClick={() => handleSave()}
               disabled={saveGame.isPending}
-              className="bg-white hover:bg-slate-50 border-2 border-slate-200 p-1.5 sm:p-2 rounded-lg shadow-sm transition-all active:scale-95"
+              className="bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 p-1.5 sm:p-2 rounded-lg shadow-sm transition-all active:scale-95"
               title="Save Game"
             >
               {saveGame.isPending ? (
-                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
               ) : (
-                <Save className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
+                <Save className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
               )}
             </button>
             <button
@@ -762,10 +762,10 @@ export default function Game() {
                 soundManager.playSFX('click', audioSettings.sfxVolume);
                 setShowSettings(true);
               }}
-              className="bg-white hover:bg-slate-50 border-2 border-slate-200 p-1.5 sm:p-2 rounded-lg shadow-sm transition-all active:scale-95 pointer-events-auto"
+              className="bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 p-1.5 sm:p-2 rounded-lg shadow-sm transition-all active:scale-95 pointer-events-auto"
               title="Settings"
             >
-              <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
+              <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
             </button>
           </div>
         </motion.div>
@@ -776,7 +776,7 @@ export default function Game() {
           animate={{ y: 0, opacity: 1 }}
           className="flex justify-center pointer-events-auto pb-2 sm:pb-4"
         >
-          <div className="bg-white/90 backdrop-blur-md px-2 sm:px-6 py-1.5 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg border-2 border-slate-100">
+          <div className="bg-slate-800/80 backdrop-blur-md px-2 sm:px-6 py-1.5 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg border border-slate-700/50">
             <div className="flex gap-1.5 sm:gap-4 items-center">
               <button
                 id="btn-kanban"
@@ -784,20 +784,20 @@ export default function Game() {
                 className="flex flex-col items-center gap-0.5 sm:gap-1 group"
               >
                 <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center transition-colors
-                  ${chapter === 3 ? 'bg-amber-100 text-amber-600 group-hover:bg-amber-500 group-hover:text-white' : 'bg-blue-100 text-blue-600 group-hover:bg-blue-500 group-hover:text-white'}
+                  ${chapter === 3 ? 'bg-amber-500/20 text-amber-400 group-hover:bg-amber-500 group-hover:text-white border border-amber-500/30' : 'bg-cyan-500/20 text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white border border-cyan-500/30'}
                 `}>
                   {chapter === 3 ? <Package className="w-4 h-4 sm:w-6 sm:h-6" /> : <LayoutDashboard className="w-4 h-4 sm:w-6 sm:h-6" />}
                 </div>
-                <span className="text-[9px] sm:text-xs font-bold text-slate-600">{chapter === 3 ? 'Depot' : 'Kanban'}</span>
+                <span className="text-[9px] sm:text-xs font-bold text-slate-400">{chapter === 3 ? 'Depot' : 'Kanban'}</span>
               </button>
               <button
                 onClick={() => setShowKanban(false)}
                 className="flex flex-col items-center gap-0.5 sm:gap-1 group"
               >
-                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors border border-purple-500/30">
                   <HardHat className="w-4 h-4 sm:w-6 sm:h-6" />
                 </div>
-                <span className="text-[9px] sm:text-xs font-bold text-slate-600">Site</span>
+                <span className="text-[9px] sm:text-xs font-bold text-slate-400">Site</span>
               </button>
               <button
                 onClick={() => setShowGlossary(true)}

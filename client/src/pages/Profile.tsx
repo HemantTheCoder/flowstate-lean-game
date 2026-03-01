@@ -20,13 +20,13 @@ export default function Profile() {
 
     if (isAuthLoading || isProfileLoading) {
         return (
-            <div className="min-h-screen bg-[#0A0B1A] flex items-center justify-center p-6 relative overflow-hidden font-sans">
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 relative overflow-hidden font-sans">
                 <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
                 <div className="flex flex-col items-center gap-6 z-10">
                     <div className="relative">
-                        <Loader2 className="w-16 h-16 text-blue-500 animate-spin" />
+                        <Loader2 className="w-16 h-16 text-cyan-500 animate-spin" />
                     </div>
-                    <p className="text-blue-400 text-xs font-bold uppercase tracking-widest">Accessing Profile...</p>
+                    <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest">Accessing Profile...</p>
                 </div>
             </div>
         );
@@ -59,21 +59,21 @@ export default function Profile() {
     const joinDate = user.createdAt ? new Date(user.createdAt) : new Date();
 
     return (
-        <div className="min-h-screen bg-[#0A0B1A] p-4 md:p-8 font-sans relative overflow-x-hidden text-slate-200">
+        <div className="min-h-screen bg-slate-900 p-4 md:p-8 font-sans relative overflow-x-hidden text-slate-200">
 
-            {/* Visual Novel Ambient Background */}
+            {/* Premium Twilight Industrial Ambient Background */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <motion.div
                     animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15] }}
                     transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                    className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/30 blur-[150px] rounded-full"
+                    className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-500/20 blur-[150px] rounded-full"
                 />
                 <motion.div
-                    animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.15, 0.1] }}
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.2, 0.1] }}
                     transition={{ duration: 20, repeat: Infinity, ease: "linear", delay: 5 }}
-                    className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-indigo-600/30 blur-[150px] rounded-full"
+                    className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-cyan-500/20 blur-[150px] rounded-full"
                 />
-                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.03] [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-15 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
             </div>
 
             <div className="max-w-6xl mx-auto space-y-8 relative z-10">
@@ -82,17 +82,17 @@ export default function Profile() {
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col md:flex-row items-start md:items-center justify-between bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-6 md:p-8 rounded-3xl shadow-[0_0_50px_rgba(59,130,246,0.1)] gap-6 relative overflow-hidden"
+                    className="flex flex-col md:flex-row items-start md:items-center justify-between bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-6 md:p-8 rounded-3xl shadow-[0_0_50px_rgba(34,211,238,0.1)] gap-6 relative overflow-hidden"
                 >
                     <div className="flex items-center gap-6">
-                        <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex flex-col items-center justify-center text-blue-400 text-4xl font-black border border-blue-500/30 rounded-full shrink-0 shadow-inner">
+                        <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 flex flex-col items-center justify-center text-cyan-400 text-4xl font-black border border-cyan-500/30 rounded-full shrink-0 shadow-inner">
                             {user.username.charAt(0).toUpperCase()}
                         </div>
                         <div>
                             <div className="flex items-center gap-3 mb-1">
                                 <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">{user.username}</h1>
                                 {user.role === 'admin' && (
-                                    <span className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-yellow-500/30 flex items-center gap-1">
+                                    <span className="bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-amber-500/30 flex items-center gap-1">
                                         <ShieldCheck className="w-3 h-3" /> Root Admin
                                     </span>
                                 )}
@@ -127,13 +127,13 @@ export default function Profile() {
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="md:col-span-5 space-y-8">
 
                         {/* Current Game Card */}
-                        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-3xl overflow-hidden relative">
+                        <div className="bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 shadow-2xl rounded-3xl overflow-hidden relative">
                             {/* Glowing orb behind active project section */}
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 blur-3xl rounded-full" />
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/20 blur-3xl rounded-full" />
 
-                            <div className="bg-white/5 p-5 border-b border-white/5 relative flex justify-between items-center">
+                            <div className="bg-slate-900/50 p-5 border-b border-slate-700/50 relative flex justify-between items-center">
                                 <h3 className="relative z-10 flex items-center gap-2 text-white font-bold uppercase tracking-widest text-xs">
-                                    <Play className="w-4 h-4 fill-current text-blue-400" />
+                                    <Play className="w-4 h-4 fill-current text-cyan-400" />
                                     Active Project
                                 </h3>
                                 {gameState && <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />}
@@ -144,9 +144,9 @@ export default function Profile() {
                                         <div>
                                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Current Sector</p>
                                             <p className="text-3xl font-black text-white uppercase drop-shadow-md">Episode {gameState.chapter}</p>
-                                            <p className="text-sm text-blue-400 mt-1 font-bold">Sim Day {gameState.day}</p>
+                                            <p className="text-sm text-cyan-400 mt-1 font-bold">Sim Day {gameState.day}</p>
                                         </div>
-                                        <div className="space-y-4 p-5 bg-black/20 rounded-2xl border border-white/5">
+                                        <div className="space-y-4 p-5 bg-slate-900/50 rounded-2xl border border-slate-700/50">
                                             <div className="flex justify-between items-center text-sm">
                                                 <span className="text-slate-400 tracking-wide font-bold">Budget</span>
                                                 <span className="font-bold text-emerald-400">${gameState.resources?.budget?.toLocaleString()}</span>
@@ -158,20 +158,20 @@ export default function Profile() {
                                         </div>
                                         <button
                                             onClick={handleResume}
-                                            className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl text-white font-bold text-sm uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)]"
+                                            className="w-full py-4 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 rounded-xl text-white font-bold text-sm uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]"
                                         >
                                             Resume Project
                                         </button>
                                     </div>
                                 ) : (
                                     <div className="text-center py-10">
-                                        <div className="w-16 h-16 mx-auto bg-white/5 rounded-full flex flex-col items-center justify-center border border-white/10 mb-4">
+                                        <div className="w-16 h-16 mx-auto bg-slate-900/50 rounded-full flex flex-col items-center justify-center border border-slate-700/50 mb-4">
                                             <Info className="w-6 h-6 text-slate-500" />
                                         </div>
                                         <p className="text-slate-400 mb-8 text-sm">No active project detected.</p>
                                         <button
                                             onClick={() => setLocation('/chapters')}
-                                            className="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-white font-bold text-xs uppercase tracking-widest transition-colors w-full"
+                                            className="px-8 py-4 bg-slate-800 hover:bg-slate-700 border border-slate-700/50 rounded-xl text-white font-bold text-xs uppercase tracking-widest transition-colors w-full"
                                         >
                                             Start New Project
                                         </button>
@@ -181,29 +181,29 @@ export default function Profile() {
                         </div>
 
                         {/* Aggregate Stats */}
-                        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 shadow-xl rounded-3xl overflow-hidden">
-                            <div className="p-5 border-b border-white/5 bg-white/5">
+                        <div className="bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 shadow-xl rounded-3xl overflow-hidden">
+                            <div className="p-5 border-b border-slate-700/50 bg-slate-900/50">
                                 <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2">
                                     <Target className="w-4 h-4 text-emerald-400" /> Career Analytics
                                 </h3>
                             </div>
                             <div className="p-6 grid grid-cols-2 gap-4">
-                                <div className="bg-black/20 p-5 rounded-2xl border border-white/5 text-center flex flex-col items-center justify-center shadow-inner hover:bg-white/5 transition-colors">
-                                    <Trophy className="w-6 h-6 text-yellow-500 mb-3 drop-shadow-md" />
+                                <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-700/50 text-center flex flex-col items-center justify-center shadow-inner hover:bg-slate-800 transition-colors">
+                                    <Trophy className="w-6 h-6 text-amber-500 mb-3 drop-shadow-md" />
                                     <div className="text-2xl font-black text-white">{totalScore.toLocaleString()}</div>
                                     <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Total Score</div>
                                 </div>
-                                <div className="bg-black/20 p-5 rounded-2xl border border-white/5 text-center flex flex-col items-center justify-center shadow-inner hover:bg-white/5 transition-colors">
-                                    <BarChart3 className="w-6 h-6 text-blue-500 mb-3 drop-shadow-md" />
+                                <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-700/50 text-center flex flex-col items-center justify-center shadow-inner hover:bg-slate-800 transition-colors">
+                                    <BarChart3 className="w-6 h-6 text-cyan-500 mb-3 drop-shadow-md" />
                                     <div className="text-2xl font-black text-white">{bestPpc}%</div>
                                     <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Best PPC</div>
                                 </div>
-                                <div className="bg-black/20 p-5 rounded-2xl border border-white/5 text-center flex flex-col items-center justify-center shadow-inner hover:bg-white/5 transition-colors">
+                                <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-700/50 text-center flex flex-col items-center justify-center shadow-inner hover:bg-slate-800 transition-colors">
                                     <Award className="w-6 h-6 text-purple-500 mb-3 drop-shadow-md" />
                                     <div className="text-2xl font-black text-white">{completedChapters}</div>
                                     <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Episodes Done</div>
                                 </div>
-                                <div className="bg-black/20 p-5 rounded-2xl border border-white/5 text-center flex flex-col items-center justify-center shadow-inner hover:bg-white/5 transition-colors">
+                                <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-700/50 text-center flex flex-col items-center justify-center shadow-inner hover:bg-slate-800 transition-colors">
                                     <Clock className="w-6 h-6 text-emerald-500 mb-3 drop-shadow-md" />
                                     <div className="text-2xl font-black text-white">{gameState ? Math.floor((Date.now() - new Date(gameState.lastPlayed || 0).getTime()) / (1000 * 60 * 60 * 24)) : 0}<span className="text-sm text-slate-500 mx-1">days</span></div>
                                     <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Since Last Play</div>
@@ -216,9 +216,9 @@ export default function Profile() {
                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="md:col-span-7 space-y-8">
 
                         {/* Achievements Section */}
-                        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-6 md:p-8 rounded-3xl shadow-xl">
+                        <div className="bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-6 md:p-8 rounded-3xl shadow-xl">
                             <h2 className="text-sm font-bold text-slate-300 uppercase tracking-widest flex items-center gap-3 mb-6">
-                                <Award className="w-5 h-5 text-yellow-400 drop-shadow-md" />
+                                <Award className="w-5 h-5 text-amber-400 drop-shadow-md" />
                                 Credentials & Certifications
                             </h2>
                             <div className="grid grid-cols-2 xl:grid-cols-3 gap-5">
@@ -232,9 +232,9 @@ export default function Profile() {
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: 0.3 + (i * 0.05) }}
                                             key={badge.id}
-                                            className={`p-6 rounded-2xl flex flex-col items-center text-center justify-center gap-3 transition-colors backdrop-blur-md ${isUnlocked ? 'bg-white/10 border-t border-white/20 shadow-lg' : 'bg-black/20 border border-white/5 opacity-50 grayscale hover:grayscale-0 hover:opacity-100'}`}
+                                            className={`p-6 rounded-2xl flex flex-col items-center text-center justify-center gap-3 transition-colors backdrop-blur-md border ${isUnlocked ? 'bg-slate-800/80 border border-slate-600 shadow-[0_0_15px_rgba(255,255,255,0.05)]' : 'bg-slate-900/40 border-slate-800/50 opacity-50 hover:opacity-80'}`}
                                         >
-                                            <div className={`p-4 rounded-full ${isUnlocked ? 'bg-white/5 shadow-inner' : 'bg-black/40'}`}>
+                                            <div className={`p-4 rounded-full border ${isUnlocked ? 'bg-slate-900/50 border-slate-700 shadow-inner' : 'bg-slate-900/80 border-slate-800'}`}>
                                                 <Icon className={`w-8 h-8 ${isUnlocked ? badge.color : 'text-slate-600'}`} />
                                             </div>
                                             <div>
@@ -248,7 +248,7 @@ export default function Profile() {
                         </div>
 
                         {/* Completion History */}
-                        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-6 md:p-8 shadow-xl rounded-3xl">
+                        <div className="bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-6 md:p-8 shadow-xl rounded-3xl">
                             <h2 className="text-sm font-bold text-slate-300 uppercase tracking-widest flex items-center gap-3 mb-6">
                                 <HardHat className="w-5 h-5 text-blue-400" />
                                 Project History Log
@@ -262,7 +262,7 @@ export default function Profile() {
                                             initial={{ opacity: 0, scale: 0.98 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             transition={{ delay: 0.4 + (idx * 0.1) }}
-                                            className="bg-black/20 rounded-2xl border border-white/5 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:bg-white/5 transition-colors shadow-inner"
+                                            className="bg-slate-900/50 rounded-2xl border border-slate-700/50 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:bg-slate-800 transition-colors shadow-inner"
                                         >
                                             <div className="flex items-center gap-5">
                                                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center text-blue-300 font-black text-2xl border border-blue-500/30">
@@ -276,7 +276,7 @@ export default function Profile() {
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-6 sm:gap-8 bg-black/40 p-4 rounded-xl border border-white/5">
+                                            <div className="flex items-center gap-6 sm:gap-8 bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
                                                 <div className="text-center">
                                                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Efficiency</p>
                                                     <p className="text-sm font-bold text-emerald-400">{score.efficiency}%</p>
@@ -285,24 +285,24 @@ export default function Profile() {
                                                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">PPC</p>
                                                     <p className="text-sm font-bold text-blue-400">{score.ppc}%</p>
                                                 </div>
-                                                <div className="text-center pl-6 sm:pl-8 border-l border-white/10">
+                                                <div className="text-center pl-6 sm:pl-8 border-l border-slate-700/50">
                                                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Final Score</p>
-                                                    <p className="font-black text-yellow-400 text-xl drop-shadow-[0_0_10px_rgba(250,204,21,0.3)]">{score.totalScore?.toLocaleString()}</p>
+                                                    <p className="font-black text-emerald-400 text-xl drop-shadow-[0_0_10px_rgba(16,185,129,0.3)]">{score.totalScore?.toLocaleString()}</p>
                                                 </div>
                                             </div>
                                         </motion.div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="bg-black/20 p-10 rounded-2xl border border-white/5 border-dashed text-center flex flex-col items-center">
-                                    <div className="w-16 h-16 bg-white/5 rounded-full flex flex-col items-center justify-center border border-white/10 mb-6">
+                                <div className="bg-slate-900/50 p-10 rounded-2xl border border-slate-700/50 border-dashed text-center flex flex-col items-center">
+                                    <div className="w-16 h-16 bg-slate-800/50 rounded-full flex flex-col items-center justify-center border border-slate-700/50 mb-6">
                                         <BookOpen className="w-8 h-8 text-slate-500" />
                                     </div>
                                     <h3 className="text-lg font-bold text-white mb-2 tracking-tight">No History Found</h3>
                                     <p className="text-slate-400 mb-8 max-w-md text-sm leading-relaxed">Complete simulation episodes to earn Lean credentials and establish a permanent track record of your projects.</p>
                                     <button
                                         onClick={() => setLocation('/chapters')}
-                                        className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-500 hover:to-indigo-500 font-bold uppercase tracking-widest text-sm rounded-xl transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)]"
+                                        className="px-8 py-4 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white hover:from-cyan-500 hover:to-indigo-500 font-bold uppercase tracking-widest text-sm rounded-xl transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)]"
                                     >
                                         Execute Project
                                     </button>

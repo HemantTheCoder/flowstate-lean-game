@@ -19,7 +19,7 @@ interface DayBreakdown {
 const BeforeAfterComparison: React.FC<{ pushed: boolean }> = ({ pushed }) => {
     return (
         <div className="grid grid-cols-2 gap-3">
-            <div className="bg-slate-100 rounded-xl p-4 border border-slate-200 relative overflow-hidden">
+            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 bg-red-500/80 text-white text-[10px] font-bold text-center py-0.5 uppercase tracking-wider">
                     Before Kanban
                 </div>
@@ -28,7 +28,7 @@ const BeforeAfterComparison: React.FC<{ pushed: boolean }> = ({ pushed }) => {
                         {[1, 2, 3, 4, 5].map(i => (
                             <motion.div
                                 key={i}
-                                className="h-6 w-full bg-red-200 rounded border border-red-300"
+                                className="h-6 w-full bg-red-900/40 rounded border border-red-500/50"
                                 animate={{ opacity: [0.5, 0.8, 0.5] }}
                                 transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
                             />
@@ -38,19 +38,19 @@ const BeforeAfterComparison: React.FC<{ pushed: boolean }> = ({ pushed }) => {
                         {[1, 2, 3].map(i => (
                             <motion.div
                                 key={i}
-                                className="h-4 w-full bg-orange-200 rounded border border-orange-300"
+                                className="h-4 w-full bg-orange-900/40 rounded border border-orange-500/50"
                                 animate={{ opacity: [0.4, 0.7, 0.4] }}
                                 transition={{ duration: 2, delay: i * 0.3, repeat: Infinity }}
                             />
                         ))}
                     </div>
-                    <div className="text-[10px] text-slate-500 font-medium mt-1 text-center">
+                    <div className="text-[10px] text-slate-400 font-medium mt-1 text-center">
                         Congested queues, idle workers
                     </div>
                 </div>
             </div>
 
-            <div className="bg-green-50 rounded-xl p-4 border border-green-200 relative overflow-hidden">
+            <div className="bg-green-900/20 rounded-xl p-4 border border-green-500/30 relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 bg-green-500/80 text-white text-[10px] font-bold text-center py-0.5 uppercase tracking-wider">
                     After Kanban
                 </div>
@@ -59,7 +59,7 @@ const BeforeAfterComparison: React.FC<{ pushed: boolean }> = ({ pushed }) => {
                         {[1, 2].map(i => (
                             <motion.div
                                 key={i}
-                                className="h-6 w-full bg-green-300 rounded border border-green-400"
+                                className="h-6 w-full bg-green-500/40 rounded border border-green-400/50"
                                 initial={{ x: -20, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
                                 transition={{ delay: 0.5 + i * 0.3 }}
@@ -67,12 +67,12 @@ const BeforeAfterComparison: React.FC<{ pushed: boolean }> = ({ pushed }) => {
                         ))}
                     </div>
                     <motion.div
-                        className="h-4 w-1/2 bg-blue-200 rounded border border-blue-300"
+                        className="h-4 w-1/2 bg-blue-900/40 rounded border border-blue-500/50"
                         initial={{ width: 0 }}
                         animate={{ width: '50%' }}
                         transition={{ delay: 1.2, duration: 0.5 }}
                     />
-                    <div className="text-[10px] text-green-700 font-medium mt-1 text-center">
+                    <div className="text-[10px] text-green-400 font-medium mt-1 text-center">
                         {pushed ? 'Flow improved, but waste created' : 'Smooth flow, focused teams'}
                     </div>
                 </div>
@@ -88,26 +88,26 @@ const CharacterReactions: React.FC<{ pushed: boolean; efficiency: number }> = ({
             text: efficiency >= 80
                 ? "See how limiting work helped everything move?"
                 : "We have room to improve, but the system works.",
-            color: 'bg-blue-50 border-blue-200 text-blue-800'
+            color: 'bg-blue-900/20 border-blue-500/30 text-blue-300'
         },
         {
             name: 'Old Foreman',
             text: "Finish beats busy. Always has, always will.",
-            color: 'bg-amber-50 border-amber-200 text-amber-800'
+            color: 'bg-amber-900/20 border-amber-500/30 text-amber-300'
         },
         {
             name: 'Rao',
             text: pushed
                 ? "Fine. Maybe pushing wasn't the answer. But I still want results!"
                 : "I hate to admit it... the site IS calmer. And the Inspector was impressed.",
-            color: pushed ? 'bg-red-50 border-red-200 text-red-800' : 'bg-green-50 border-green-200 text-green-800'
+            color: pushed ? 'bg-red-900/20 border-red-500/30 text-red-300' : 'bg-green-900/20 border-green-500/30 text-green-300'
         }
     ];
 
     return (
         <div className="space-y-2">
-            <h4 className="font-bold text-slate-700 text-sm uppercase flex items-center gap-2">
-                <Users className="w-4 h-4 text-slate-500" /> Team Reactions
+            <h4 className="font-bold text-slate-300 text-sm uppercase flex items-center gap-2">
+                <Users className="w-4 h-4 text-slate-400" /> Team Reactions
             </h4>
             {reactions.map((r, i) => (
                 <motion.div
@@ -313,13 +313,13 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="absolute inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md px-4 perspective-[1000px] pointer-events-auto">
+                <div className="absolute inset-0 z-[200] flex items-center justify-center bg-slate-950/90 backdrop-blur-md px-4 perspective-[1000px] pointer-events-auto">
                     <motion.div
                         initial={{ scale: 0.5, rotateX: 45, opacity: 0 }}
                         animate={{ scale: 1, rotateX: 0, opacity: 1 }}
                         exit={{ scale: 0.5, opacity: 0, rotateX: -45 }}
                         transition={{ type: "spring", bounce: 0.5 }}
-                        className="bg-white w-full max-w-3xl max-h-[95vh] rounded-3xl shadow-[0_0_50px_rgba(34,197,94,0.3)] overflow-hidden border-4 border-green-400 relative flex flex-col"
+                        className="bg-slate-900 w-full max-w-3xl max-h-[95vh] rounded-3xl shadow-[0_0_50px_rgba(34,197,94,0.15)] overflow-hidden border border-green-500/30 relative flex flex-col"
                     >
                         <div className="bg-gradient-to-r from-green-400 to-emerald-600 px-6 py-8 flex flex-col items-center justify-center relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-30"></div>
@@ -353,9 +353,9 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
 
                             <BeforeAfterComparison pushed={pushed} />
 
-                            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 shadow-inner">
-                                <h3 className="text-slate-800 font-bold text-sm uppercase mb-3 flex items-center gap-2">
-                                    <TrendingUp className="w-4 h-4 text-blue-500" />
+                            <div className="bg-slate-800/40 rounded-2xl border border-slate-700/50 p-4 shadow-inner">
+                                <h3 className="text-slate-200 font-bold text-sm uppercase mb-3 flex items-center gap-2">
+                                    <TrendingUp className="w-4 h-4 text-blue-400" />
                                     Your Flow Journey
                                 </h3>
                                 <div className="h-48 w-full">
@@ -440,7 +440,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0 }}
-                                            className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800"
+                                            className="mt-3 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg text-sm text-blue-300"
                                         >
                                             <strong>Day {activeDay}:</strong> {chartData.find(d => d.day === activeDay)?.insight}
                                         </motion.div>
@@ -455,23 +455,23 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.8 + i * 0.1 }}
-                                        className={`p-3 rounded-xl border-2 text-center cursor-pointer transition-all
+                                        className={`p-3 rounded-xl border text-center cursor-pointer transition-all
                                             ${day.efficiency >= 80
-                                                ? 'bg-green-50 border-green-200 hover:border-green-400'
+                                                ? 'bg-green-900/20 border-green-500/30 hover:border-green-400/50'
                                                 : day.efficiency >= 50
-                                                    ? 'bg-blue-50 border-blue-200 hover:border-blue-400'
-                                                    : 'bg-orange-50 border-orange-200 hover:border-orange-400'
+                                                    ? 'bg-blue-900/20 border-blue-500/30 hover:border-blue-400/50'
+                                                    : 'bg-orange-900/20 border-orange-500/30 hover:border-orange-400/50'
                                             }`}
                                         onClick={() => setActiveDay(activeDay === day.day ? null : day.day)}
                                         data-testid={`card-day-${day.day}`}
                                     >
-                                        <div className="text-[10px] font-bold text-slate-500 uppercase">Day {day.day}</div>
-                                        <div className={`text-xl font-black ${day.efficiency >= 80 ? 'text-green-600' :
-                                            day.efficiency >= 50 ? 'text-blue-600' : 'text-orange-600'
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase">Day {day.day}</div>
+                                        <div className={`text-xl font-black ${day.efficiency >= 80 ? 'text-green-400' :
+                                            day.efficiency >= 50 ? 'text-blue-400' : 'text-orange-400'
                                             }`}>
                                             {day.tasksCompletedToday}/{day.potentialCapacity}
                                         </div>
-                                        <div className="text-[10px] text-slate-500">tasks</div>
+                                        <div className="text-[10px] text-slate-400">tasks</div>
                                     </motion.div>
                                 ))}
                             </div>
@@ -483,8 +483,8 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         animate={{ opacity: 1, height: 'auto' }}
                                         className="space-y-4"
                                     >
-                                        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                                            <h4 className="font-bold text-green-800 text-sm uppercase mb-3 flex items-center gap-2">
+                                        <div className="bg-green-900/20 border border-green-500/30 rounded-xl p-4">
+                                            <h4 className="font-bold text-green-400 text-sm uppercase mb-3 flex items-center gap-2">
                                                 <CheckCircle2 className="w-4 h-4" /> What Went Well
                                             </h4>
                                             <ul className="space-y-2">
@@ -494,9 +494,9 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                                         initial={{ opacity: 0, x: -20 }}
                                                         animate={{ opacity: 1, x: 0 }}
                                                         transition={{ delay: 1.8 + i * 0.15 }}
-                                                        className="flex items-center gap-2 text-green-700 text-sm"
+                                                        className="flex items-center gap-2 text-green-300 text-sm"
                                                     >
-                                                        <ChevronRight className="w-3 h-3 text-green-500" />
+                                                        <ChevronRight className="w-3 h-3 text-green-400" />
                                                         {s}
                                                     </motion.li>
                                                 ))}
@@ -504,8 +504,8 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         </div>
 
                                         {finalEfficiency < 100 && suggestions.length > 0 && (
-                                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                                                <h4 className="font-bold text-amber-800 text-sm uppercase mb-3 flex items-center gap-2">
+                                            <div className="bg-amber-900/20 border border-amber-500/30 rounded-xl p-4">
+                                                <h4 className="font-bold text-amber-400 text-sm uppercase mb-3 flex items-center gap-2">
                                                     <Lightbulb className="w-4 h-4" /> How to Improve
                                                 </h4>
                                                 <ul className="space-y-2">
@@ -515,10 +515,10 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                                             initial={{ opacity: 0, x: -20 }}
                                                             animate={{ opacity: 1, x: 0 }}
                                                             transition={{ delay: 2.2 + i * 0.15 }}
-                                                            className="flex items-start gap-2 text-amber-700 text-sm"
+                                                            className="flex items-start gap-2 text-amber-300 text-sm"
                                                         >
-                                                            <s.icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${s.priority === 'high' ? 'text-red-500' :
-                                                                s.priority === 'medium' ? 'text-amber-500' : 'text-green-500'
+                                                            <s.icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${s.priority === 'high' ? 'text-red-400' :
+                                                                s.priority === 'medium' ? 'text-amber-400' : 'text-green-400'
                                                                 }`} />
                                                             {s.text}
                                                         </motion.li>
@@ -530,40 +530,40 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         <CharacterReactions pushed={pushed} efficiency={finalEfficiency} />
 
                                         {quizScore !== undefined && (
-                                            <div className={`rounded-xl p-4 border ${quizScore >= 5 ? 'bg-green-50 border-green-200' : quizScore >= 3 ? 'bg-blue-50 border-blue-200' : 'bg-amber-50 border-amber-200'}`}>
-                                                <h4 className={`font-bold text-sm uppercase mb-2 flex items-center gap-2 ${quizScore >= 5 ? 'text-green-800' : quizScore >= 3 ? 'text-blue-800' : 'text-amber-800'}`}>
+                                            <div className={`rounded-xl p-4 border ${quizScore >= 5 ? 'bg-green-900/20 border-green-500/30' : quizScore >= 3 ? 'bg-blue-900/20 border-blue-500/30' : 'bg-amber-900/20 border-amber-500/30'}`}>
+                                                <h4 className={`font-bold text-sm uppercase mb-2 flex items-center gap-2 ${quizScore >= 5 ? 'text-green-400' : quizScore >= 3 ? 'text-blue-400' : 'text-amber-400'}`}>
                                                     <Award className="w-4 h-4" /> Reflection Quiz: {quizScore}/5
                                                 </h4>
-                                                <p className={`text-sm ${quizScore >= 5 ? 'text-green-700' : quizScore >= 3 ? 'text-blue-700' : 'text-amber-700'}`}>
+                                                <p className={`text-sm ${quizScore >= 5 ? 'text-green-300' : quizScore >= 3 ? 'text-blue-300' : 'text-amber-300'}`}>
                                                     {quizScore >= 5 ? 'Perfect understanding of Lean concepts!' : quizScore >= 3 ? 'Good grasp of core principles. Review the missed concepts.' : 'Consider replaying to strengthen your understanding.'}
                                                 </p>
                                             </div>
                                         )}
 
-                                        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-                                            <h4 className="font-bold text-purple-800 text-sm uppercase mb-3 flex items-center gap-2">
+                                        <div className="bg-purple-900/20 border border-purple-500/30 rounded-xl p-4">
+                                            <h4 className="font-bold text-purple-400 text-sm uppercase mb-3 flex items-center gap-2">
                                                 <Lightbulb className="w-4 h-4" /> Key Learnings
                                             </h4>
-                                            <div className="space-y-3 text-sm text-purple-700">
+                                            <div className="space-y-3 text-sm text-purple-300">
                                                 <div className="flex items-start gap-2">
-                                                    <CheckCircle2 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                                                    <CheckCircle2 className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
                                                     <div>
                                                         <strong>WIP Limits prevent congestion.</strong>
-                                                        <p className="text-xs text-purple-600 mt-0.5 italic">In construction: limiting active work fronts to 2-3 zones keeps crews focused and prevents spreading resources too thin across the site.</p>
+                                                        <p className="text-xs text-purple-400 mt-0.5 italic">In construction: limiting active work fronts to 2-3 zones keeps crews focused and prevents spreading resources too thin across the site.</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-start gap-2">
-                                                    <CheckCircle2 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                                                    <CheckCircle2 className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
                                                     <div>
                                                         <strong>Pull systems eliminate waste from rushing.</strong>
-                                                        <p className="text-xs text-purple-600 mt-0.5 italic">In construction: excavating before pipes arrive creates mud pits needing re-work. Pull-based scheduling waits until materials and prerequisites are ready.</p>
+                                                        <p className="text-xs text-purple-400 mt-0.5 italic">In construction: excavating before pipes arrive creates mud pits needing re-work. Pull-based scheduling waits until materials and prerequisites are ready.</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-start gap-2">
-                                                    <CheckCircle2 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                                                    <CheckCircle2 className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
                                                     <div>
                                                         <strong>Adaptation keeps flow alive under constraints.</strong>
-                                                        <p className="text-xs text-purple-600 mt-0.5 italic">In construction: experienced contractors keep indoor work (MEP, drywall) ready for rainy days instead of idling crews.</p>
+                                                        <p className="text-xs text-purple-400 mt-0.5 italic">In construction: experienced contractors keep indoor work (MEP, drywall) ready for rainy days instead of idling crews.</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -575,23 +575,23 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                             </AnimatePresence>
 
                             <div className="grid grid-cols-3 gap-3">
-                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                                <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700/50 text-center">
                                     <div className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Funds</div>
-                                    <div className="text-xl font-mono font-bold text-slate-800">${funds}</div>
+                                    <div className="text-xl font-mono font-bold text-slate-200">${funds}</div>
                                 </div>
-                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                                <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700/50 text-center">
                                     <div className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Morale</div>
-                                    <div className="text-xl font-mono font-bold text-green-500">{lpi.teamMorale}%</div>
+                                    <div className="text-xl font-mono font-bold text-green-400">{lpi.teamMorale}%</div>
                                 </div>
-                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                                <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700/50 text-center">
                                     <div className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Tasks Done</div>
-                                    <div className="text-xl font-mono font-bold text-blue-500">{cumulativeTasksCompleted}/{cumulativePotentialCapacity}</div>
+                                    <div className="text-xl font-mono font-bold text-blue-400">{cumulativeTasksCompleted}/{cumulativePotentialCapacity}</div>
                                 </div>
                             </div>
 
-                            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-400 p-4 rounded-r-lg">
-                                <h4 className="font-bold text-indigo-800 text-sm uppercase mb-1">Coming Up: Chapter 2</h4>
-                                <p className="text-indigo-700 text-sm italic">
+                            <div className="bg-gradient-to-r from-indigo-900/30 to-purple-900/30 border-l-4 border-indigo-500/50 p-4 rounded-r-lg">
+                                <h4 className="font-bold text-indigo-300 text-sm uppercase mb-1">Coming Up: Chapter 2</h4>
+                                <p className="text-indigo-200 text-sm italic">
                                     "The Promise System". Master the Last Planner System with <strong>Should/Can/Will</strong> planning and constraint management.
                                 </p>
                             </div>
@@ -624,7 +624,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                             badges: [tier.label],
                                         });
                                     }}
-                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-colors w-full"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/50 text-slate-300 font-bold hover:bg-slate-700/50 transition-colors w-full shadow-md"
                                     data-testid="button-export-report-ch1"
                                 >
                                     <Download className="w-4 h-4" /> Export Report
@@ -632,7 +632,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
 
                                 <button
                                     onClick={() => window.location.href = '/leaderboard'}
-                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-colors w-full"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/50 text-slate-300 font-bold hover:bg-slate-700/50 transition-colors w-full shadow-md"
                                 >
                                     <Trophy className="w-4 h-4" /> View Leaderboard
                                 </button>
@@ -640,9 +640,9 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 <button
                                     onClick={handleSubmitScore}
                                     disabled={submissionStatus === 'submitting' || submissionStatus === 'success'}
-                                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-colors font-bold w-full ${submissionStatus === 'success' ? 'bg-green-100 border-green-300 text-green-700' :
-                                        submissionStatus === 'error' ? 'bg-red-50 border-red-200 text-red-700' :
-                                            'border-slate-200 text-slate-700 hover:bg-slate-50'
+                                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-colors font-bold w-full shadow-md ${submissionStatus === 'success' ? 'bg-green-900/30 border-green-500/50 text-green-400' :
+                                        submissionStatus === 'error' ? 'bg-red-900/30 border-red-500/50 text-red-400' :
+                                            'border-slate-700 text-slate-300 hover:bg-slate-800'
                                         }`}
                                 >
                                     {submissionStatus === 'submitting' && <span className="animate-spin">⏳</span>}

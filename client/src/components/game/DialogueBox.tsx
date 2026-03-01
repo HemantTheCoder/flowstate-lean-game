@@ -96,7 +96,7 @@ export const DialogueBox: React.FC = () => {
 
                     {/* Text Box Container */}
                     <div
-                        className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border-4 border-slate-100 p-6 md:p-8 cursor-pointer z-10 min-h-[160px] flex flex-col justify-center"
+                        className="relative bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-[0_0_30px_rgba(30,58,138,0.3)] border border-slate-700/50 p-6 md:p-8 cursor-pointer z-10 min-h-[160px] flex flex-col justify-center"
                         onClick={() => {
                             soundManager.playSFX('typing', 0.6);
                             advanceDialogue();
@@ -108,7 +108,7 @@ export const DialogueBox: React.FC = () => {
                         </div>
 
                         {/* Text Content */}
-                        <div className="text-xl md:text-2xl text-slate-800 font-medium leading-relaxed font-sans mt-2">
+                        <div className="text-xl md:text-2xl text-slate-200 font-medium leading-relaxed font-sans mt-2">
                             <LeanTooltipText text={processedText} />
                         </div>
 

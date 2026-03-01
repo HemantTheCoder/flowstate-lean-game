@@ -63,7 +63,7 @@ export const ChapterIntroModal: React.FC = () => {
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white w-full max-w-2xl max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden border-4 border-slate-100 flex flex-col"
+                className="bg-slate-800 w-full max-w-2xl max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden border border-slate-700/50 flex flex-col"
             >
                 {/* Header Image/Banner Area */}
                 <div className={`${getThemeColors()} h-36 flex flex-col items-center justify-center relative overflow-hidden shrink-0`}>
@@ -75,14 +75,14 @@ export const ChapterIntroModal: React.FC = () => {
                 </div>
 
                 <div className="p-8 md:p-12 overflow-y-auto">
-                    <p className="text-lg text-slate-600 mb-6 leading-relaxed">
+                    <p className="text-lg text-slate-300 mb-6 leading-relaxed">
                         {content.description}
                     </p>
 
                     {chapter === 2 && (
-                        <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-200 mb-6 shadow-inner">
-                            <h3 className="text-sm font-bold text-emerald-600 uppercase tracking-widest mb-3">You Will Learn</h3>
-                            <ul className="space-y-2 text-sm text-emerald-800 font-medium">
+                        <div className="bg-emerald-500/10 p-5 rounded-2xl border border-emerald-500/20 mb-6 shadow-inner">
+                            <h3 className="text-sm font-bold text-emerald-400 uppercase tracking-widest mb-3">You Will Learn</h3>
+                            <ul className="space-y-2 text-sm text-emerald-100 font-medium">
                                 <li className="flex items-center gap-2"><span className="text-emerald-500 font-bold">{'>'}</span> How to make reliable commitments</li>
                                 <li className="flex items-center gap-2"><span className="text-emerald-500 font-bold">{'>'}</span> How to remove constraints before promising</li>
                                 <li className="flex items-center gap-2"><span className="text-emerald-500 font-bold">{'>'}</span> Why overcommitment fails</li>
@@ -92,9 +92,9 @@ export const ChapterIntroModal: React.FC = () => {
                     )}
 
                     {chapter === 3 && (
-                        <div className="bg-amber-50 p-5 rounded-2xl border border-amber-200 mb-6 shadow-inner">
-                            <h3 className="text-sm font-bold text-amber-600 uppercase tracking-widest mb-3">You Will Learn</h3>
-                            <ul className="space-y-2 text-sm text-amber-800 font-medium">
+                        <div className="bg-amber-500/10 p-5 rounded-2xl border border-amber-500/20 mb-6 shadow-inner">
+                            <h3 className="text-sm font-bold text-amber-400 uppercase tracking-widest mb-3">You Will Learn</h3>
+                            <ul className="space-y-2 text-sm text-amber-100 font-medium">
                                 <li className="flex items-center gap-2"><span className="text-amber-500 font-bold">{'>'}</span> Sort: Keep only what is needed</li>
                                 <li className="flex items-center gap-2"><span className="text-amber-500 font-bold">{'>'}</span> Set in Order: A place for everything</li>
                                 <li className="flex items-center gap-2"><span className="text-amber-500 font-bold">{'>'}</span> Shine: Clean means to inspect</li>
@@ -103,14 +103,14 @@ export const ChapterIntroModal: React.FC = () => {
                         </div>
                     )}
 
-                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 mb-8">
+                    <div className="bg-slate-900/50 p-6 rounded-2xl border border-slate-700/50 mb-8 mt-2">
                         <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Core Objectives</h3>
                         <ul className="space-y-3">
                             {content.objectives.map((obj, i) => (
-                                <li key={i} className="flex items-center gap-3 text-slate-700 font-medium">
-                                    <div className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-xs font-bold ${chapter === 3 ? 'bg-amber-100 text-amber-600' :
-                                        chapter === 2 ? 'bg-emerald-100 text-emerald-600' :
-                                            'bg-blue-100 text-blue-600'}
+                                <li key={i} className="flex items-center gap-3 text-slate-300 font-medium">
+                                    <div className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-xs font-bold ${chapter === 3 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                                        chapter === 2 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                                            'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'}
                                     `}>
                                         {i + 1}
                                     </div>

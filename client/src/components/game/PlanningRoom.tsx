@@ -241,7 +241,7 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
     if (phase !== 'planning' || chapter !== 2) return null;
 
     return (
-        <div className="absolute inset-0 z-[50] flex flex-col font-sans text-slate-800 pointer-events-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="absolute inset-0 z-[50] flex flex-col font-sans text-slate-200 pointer-events-auto bg-slate-900">
             {/* Event Banner */}
             <AnimatePresence>
                 {showEventBanner && (
@@ -249,43 +249,43 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                         initial={{ y: -80, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: -80, opacity: 0 }}
-                        className="absolute top-0 left-0 right-0 z-[200] bg-gradient-to-r from-amber-600 via-orange-600 to-amber-600 text-white px-6 py-4 shadow-2xl flex items-center gap-3"
+                        className="absolute top-0 left-0 right-0 z-[200] bg-gradient-to-r from-amber-900 via-orange-900 to-amber-900 border-b border-amber-500/50 text-white px-6 py-4 shadow-2xl flex items-center gap-3"
                     >
-                        <ShieldAlert className="w-6 h-6 flex-shrink-0" />
+                        <ShieldAlert className="w-6 h-6 flex-shrink-0 text-amber-400" />
                         <div className="flex-1">
-                            <span className="font-bold text-sm">NEW EVENT: </span>
-                            <span className="text-sm">{eventMessage}</span>
+                            <span className="font-bold text-sm text-amber-400">NEW EVENT: </span>
+                            <span className="text-sm text-slate-200">{eventMessage}</span>
                         </div>
-                        <button onClick={() => setShowEventBanner(false)} className="text-white/70 hover:text-white text-xs font-bold" data-testid="button-dismiss-event">Dismiss</button>
+                        <button onClick={() => setShowEventBanner(false)} className="text-slate-400 hover:text-white text-xs font-bold bg-black/20 px-3 py-1.5 rounded-lg border border-slate-700/50 transition-colors" data-testid="button-dismiss-event">Dismiss</button>
                     </motion.div>
                 )}
             </AnimatePresence>
 
             {/* Header with Day Objective */}
-            <div className="relative z-10 bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-900 border-b border-indigo-700 shadow-lg">
-                <div className="h-14 flex items-center justify-between px-6 border-b border-white/10">
+            <div className="relative z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-700/50 shadow-lg">
+                <div className="h-14 flex items-center justify-between px-6 border-b border-slate-800">
                     <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                            <Briefcase className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 bg-slate-800/80 border border-slate-700/50 rounded-xl flex items-center justify-center">
+                            <Briefcase className="w-5 h-5 text-cyan-400" />
                         </div>
                         <div>
                             <h1 className="text-lg font-black text-white">The Planning Room</h1>
-                            <p className="text-xs text-indigo-200">Week {week} - Last Planner System</p>
+                            <p className="text-xs text-slate-400">Week {week} - Last Planner System</p>
                         </div>
                     </div>
                     <div className="flex gap-4 text-sm items-center">
-                        <div className="flex flex-col items-center px-4 py-1 bg-white/10 backdrop-blur rounded-lg">
-                            <span className="text-[10px] uppercase text-indigo-200 font-bold">Budget</span>
+                        <div className="flex flex-col items-center px-4 py-1 bg-slate-800/50 border border-slate-700/50 rounded-xl">
+                            <span className="text-[10px] uppercase text-cyan-500 font-bold">Budget</span>
                             <span className="text-white font-mono font-bold">${funds}</span>
                         </div>
-                        <div className="flex flex-col items-center px-4 py-1 bg-white/10 backdrop-blur rounded-lg">
-                            <span className="text-[10px] uppercase text-indigo-200 font-bold">Morale</span>
-                            <span className="text-green-300 font-mono font-bold">{lpi.teamMorale}%</span>
+                        <div className="flex flex-col items-center px-4 py-1 bg-slate-800/50 border border-slate-700/50 rounded-xl">
+                            <span className="text-[10px] uppercase text-emerald-500 font-bold">Morale</span>
+                            <span className="text-emerald-400 font-mono font-bold">{lpi.teamMorale}%</span>
                         </div>
                         <div className="relative group">
                             <button
                                 onClick={onSave}
-                                className="flex items-center gap-2 px-4 py-2 bg-indigo-700 hover:bg-indigo-600 text-indigo-100 font-bold rounded-lg shadow-lg transition-colors border border-indigo-500"
+                                className="flex items-center gap-2 px-4 py-2 bg-slate-800/80 hover:bg-slate-700 text-cyan-400 font-bold rounded-xl shadow-lg transition-colors border border-slate-600/50"
                                 title="Save Game"
                             >
                                 <Save className="w-4 h-4" />
@@ -299,9 +299,9 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                     if (canEndDay()) advanceDay();
                                 }}
                                 disabled={!canEndDay()}
-                                className={`flex items-center gap-2 px-4 py-2 font-bold rounded-lg shadow-lg transition-colors ${canEndDay()
-                                    ? 'bg-amber-500 hover:bg-amber-400 text-white'
-                                    : 'bg-slate-600 text-slate-400 cursor-not-allowed'
+                                className={`flex items-center gap-2 px-4 py-2 font-bold rounded-xl shadow-lg transition-colors border ${canEndDay()
+                                    ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border-amber-500/50'
+                                    : 'bg-slate-800 text-slate-500 border-slate-700/50 cursor-not-allowed'
                                     }`}
                                 data-testid="button-end-planning-day"
                             >
@@ -309,7 +309,7 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                 End Day
                             </button>
                             {getEndDayTooltip() && !canEndDay() && (
-                                <div className="invisible group-hover:visible absolute top-full right-0 mt-2 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl z-50 border border-slate-600">
+                                <div className="invisible group-hover:visible absolute top-full right-0 mt-2 w-64 p-3 bg-slate-900 text-slate-300 text-xs rounded-xl shadow-2xl z-50 border border-slate-700/50">
                                     {getEndDayTooltip()}
                                 </div>
                             )}
@@ -318,20 +318,20 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                 </div>
 
                 {/* Day Objective Banner */}
-                <div className="h-12 flex items-center px-6 gap-4 bg-black/20">
-                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full border ${colorClassMap[dayObjective.color]?.bg || 'bg-blue-500/30'} ${colorClassMap[dayObjective.color]?.border || 'border-blue-400/50'}`}>
-                        <span className="text-white">{dayObjective.icon}</span>
+                <div className="h-12 flex items-center px-6 gap-4 bg-slate-900/50 border-b border-slate-700/50">
+                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full border bg-slate-800/50 ${colorClassMap[dayObjective.color]?.border || 'border-cyan-500/50'}`}>
+                        <span className={`${dayObjective.color === 'orange' ? 'text-orange-400' : dayObjective.color === 'purple' ? 'text-purple-400' : dayObjective.color === 'green' ? 'text-emerald-400' : dayObjective.color === 'amber' ? 'text-amber-400' : 'text-cyan-400'}`}>{dayObjective.icon}</span>
                         <span className="text-white font-bold text-sm">Day {day}</span>
                     </div>
                     <div className="flex-1">
                         <div className="flex items-center gap-2">
-                            <span className="text-white font-bold">{dayObjective.title}:</span>
-                            <span className="text-indigo-200 text-sm">{dayObjective.objective}</span>
+                            <span className="text-slate-200 font-bold">{dayObjective.title}:</span>
+                            <span className="text-slate-400 text-sm">{dayObjective.objective}</span>
                         </div>
                     </div>
-                    <div className="bg-white/10 backdrop-blur px-4 py-1.5 rounded-lg">
-                        <span className="text-xs text-indigo-100 font-medium">Action: </span>
-                        <span className="text-xs text-yellow-300 font-bold">{dayObjective.action}</span>
+                    <div className="bg-slate-800/50 border border-slate-700/50 px-4 py-1.5 rounded-xl">
+                        <span className="text-xs text-slate-400 font-medium">Action: </span>
+                        <span className="text-xs text-amber-400 font-bold">{dayObjective.action}</span>
                     </div>
                 </div>
             </div>
@@ -339,122 +339,127 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
             {/* Main Content */}
             <div className="relative z-10 flex-1 flex overflow-hidden">
                 {/* LPS Workflow Sidebar */}
-                <div className="w-56 bg-gradient-to-b from-indigo-900/95 to-purple-900/95 backdrop-blur text-slate-200 border-r border-indigo-600/50 flex flex-col p-4">
-                    <h3 className="text-indigo-300 font-black uppercase tracking-wider text-xs mb-4 flex items-center gap-2">
-                        <Target className="w-4 h-4" />
+                <div className="w-56 bg-slate-900/60 backdrop-blur-md text-slate-300 border-r border-slate-700/50 flex flex-col p-4">
+                    <h3 className="text-slate-400 font-black uppercase tracking-wider text-[10px] mb-4 flex items-center gap-2">
+                        <Target className="w-4 h-4 text-cyan-500" />
                         LPS Workflow
                     </h3>
 
                     <div className="space-y-3 flex-1">
                         {/* SHOULD Phase */}
-                        <div className={`p-3 rounded-xl border transition-all ${day === 6 ? 'bg-blue-600/40 border-blue-400 shadow-lg shadow-blue-500/30 ring-2 ring-blue-400/50' : day > 6 ? 'border-green-600/40 bg-green-800/20' : 'border-indigo-600/40 bg-indigo-800/30'}`}>
+                        <div className={`p-3 rounded-xl border transition-all ${day === 6 ? 'bg-cyan-900/40 border-cyan-500/50 shadow-lg shadow-cyan-900/30 ring-1 ring-cyan-500/30' : day > 6 ? 'border-emerald-500/30 bg-emerald-900/20' : 'border-slate-700/50 bg-slate-800/30 opacity-50'}`}>
                             <div className="text-base font-bold mb-1 flex items-center gap-2">
-                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-black ${day === 6 ? 'bg-blue-500 text-white' : day > 6 ? 'bg-green-600 text-white' : 'bg-indigo-700 text-indigo-300'}`}>
+                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-black border ${day === 6 ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : day > 6 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-slate-700/50 text-slate-400 border-slate-600/50'}`}>
                                     {day > 6 ? <CheckCircle className="w-4 h-4" /> : '1'}
                                 </span>
-                                <span className={day === 6 ? 'text-white' : day > 6 ? 'text-green-300' : 'text-indigo-300'}>SHOULD</span>
+                                <span className={day === 6 ? 'text-white' : day > 6 ? 'text-emerald-400' : 'text-slate-400'}>SHOULD</span>
                             </div>
-                            <p className="text-[11px] leading-snug text-indigo-200/70 ml-8">
+                            <p className="text-[11px] leading-snug text-slate-400 ml-8">
                                 {day === 6 ? 'Pull tasks now!' : day > 6 ? `${lookaheadTasks.length} tasks pulled` : 'Pull tasks to Lookahead'}
                             </p>
                         </div>
 
                         {/* CAN Phase */}
-                        <div className={`p-3 rounded-xl border transition-all ${day === 7 ? 'bg-orange-600/40 border-orange-400 shadow-lg shadow-orange-500/30 ring-2 ring-orange-400/50' : day === 8 ? 'bg-purple-600/40 border-purple-400 shadow-lg shadow-purple-500/30 ring-2 ring-purple-400/50' : day > 8 ? 'border-green-600/40 bg-green-800/20' : 'border-indigo-600/40 bg-indigo-800/30'}`}>
+                        <div className={`p-3 rounded-xl border transition-all ${day === 7 ? 'bg-orange-900/40 border-orange-500/50 shadow-lg shadow-orange-900/30 ring-1 ring-orange-500/30' : day === 8 ? 'bg-purple-900/40 border-purple-500/50 shadow-lg shadow-purple-900/30 ring-1 ring-purple-500/30' : day > 8 ? 'border-emerald-500/30 bg-emerald-900/20' : 'border-slate-700/50 bg-slate-800/30 opacity-50'}`}>
                             <div className="text-base font-bold mb-1 flex items-center gap-2">
-                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-black ${day === 7 ? 'bg-orange-500 text-white' : day === 8 ? 'bg-purple-500 text-white' : day > 8 ? 'bg-green-600 text-white' : 'bg-indigo-700 text-indigo-300'}`}>
+                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-black border ${day === 7 ? 'bg-orange-500/20 text-orange-400 border-orange-500/50' : day === 8 ? 'bg-purple-500/20 text-purple-400 border-purple-500/50' : day > 8 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-slate-700/50 text-slate-400 border-slate-600/50'}`}>
                                     {day > 8 ? <CheckCircle className="w-4 h-4" /> : '2'}
                                 </span>
-                                <span className={day === 7 || day === 8 ? 'text-white' : day > 8 ? 'text-green-300' : 'text-indigo-300'}>CAN</span>
+                                <span className={day === 7 || day === 8 ? 'text-white' : day > 8 ? 'text-emerald-400' : 'text-slate-400'}>CAN</span>
                             </div>
-                            <p className="text-[11px] leading-snug text-indigo-200/70 ml-8">
+                            <p className="text-[11px] leading-snug text-slate-400 ml-8">
                                 {day === 7 ? 'Discover constraints!' : day === 8 ? 'Fix constraints now!' : day > 8 ? `${readyTasksCount} tasks sound` : 'Check & fix constraints'}
                             </p>
                         </div>
 
                         {/* WILL Phase */}
-                        <div className={`p-3 rounded-xl border transition-all ${day === 9 ? 'bg-green-600/40 border-green-400 shadow-lg shadow-green-500/30 ring-2 ring-green-400/50' : day > 9 ? 'border-green-600/40 bg-green-800/20' : 'border-indigo-600/40 bg-indigo-800/30'}`}>
+                        <div className={`p-3 rounded-xl border transition-all ${day === 9 ? 'bg-emerald-900/40 border-emerald-500/50 shadow-lg shadow-emerald-900/30 ring-1 ring-emerald-500/30' : day > 9 ? 'border-emerald-500/30 bg-emerald-900/20' : 'border-slate-700/50 bg-slate-800/30 opacity-50'}`}>
                             <div className="text-base font-bold mb-1 flex items-center gap-2">
-                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-black ${day === 9 ? 'bg-green-500 text-white' : day > 9 ? 'bg-green-600 text-white' : 'bg-indigo-700 text-indigo-300'}`}>
+                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-black border ${day === 9 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : day > 9 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-slate-700/50 text-slate-400 border-slate-600/50'}`}>
                                     {day > 9 ? <CheckCircle className="w-4 h-4" /> : '3'}
                                 </span>
-                                <span className={day === 9 ? 'text-white' : day > 9 ? 'text-green-300' : 'text-indigo-300'}>WILL</span>
+                                <span className={day === 9 ? 'text-white' : day > 9 ? 'text-emerald-400' : 'text-slate-400'}>WILL</span>
                             </div>
-                            <p className="text-[11px] leading-snug text-indigo-200/70 ml-8">
+                            <p className="text-[11px] leading-snug text-slate-400 ml-8">
                                 {day === 9 ? 'Commit your promises!' : day > 9 ? 'Plan committed!' : 'Commit to your promise'}
                             </p>
                         </div>
                     </div>
 
                     {/* Progress Summary */}
-                    <div className="pt-4 border-t border-indigo-600/50 space-y-2">
+                    <div className="pt-4 border-t border-slate-700/50 space-y-2">
                         <div className="flex justify-between text-xs">
-                            <span className="text-indigo-300">In Lookahead:</span>
-                            <span className="text-white font-mono font-bold">{lookaheadTasks.length}</span>
+                            <span className="text-slate-400">In Lookahead:</span>
+                            <span className="text-cyan-400 font-mono font-bold">{lookaheadTasks.length}</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                            <span className="text-red-300">Blocked:</span>
-                            <span className="text-red-400 font-mono font-bold">{lookaheadTasks.filter(t => (t.constraints?.length || 0) > 1).length}</span>
+                            <span className="text-red-400">Blocked:</span>
+                            <span className="text-red-300 font-mono font-bold">{lookaheadTasks.filter(t => (t.constraints?.length || 0) > 1).length}</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                            <span className="text-amber-300">Risky:</span>
-                            <span className="text-amber-400 font-mono font-bold">{riskyCount}</span>
+                            <span className="text-amber-400">Risky:</span>
+                            <span className="text-amber-300 font-mono font-bold">{riskyCount}</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                            <span className="text-green-300">Sound:</span>
-                            <span className="text-green-400 font-mono font-bold">{readyTasksCount}</span>
+                            <span className="text-emerald-400">Sound:</span>
+                            <span className="text-emerald-300 font-mono font-bold">{readyTasksCount}</span>
                         </div>
 
                         {/* Day Progress Indicator */}
-                        <div className="pt-3 border-t border-indigo-600/30">
-                            <div className="text-[10px] text-indigo-300 uppercase font-bold mb-2">Planning Progress</div>
+                        <div className="pt-3 border-t border-slate-700/50">
+                            <div className="text-[10px] text-slate-500 uppercase font-bold mb-2">Planning Progress</div>
                             <div className="flex gap-1">
                                 {[6, 7, 8, 9].map(d => (
-                                    <div key={d} className={`flex-1 h-2 rounded-full ${d < day ? 'bg-green-500' : d === day ? 'bg-yellow-400 animate-pulse' : 'bg-indigo-700'}`} />
+                                    <div key={d} className={`flex-1 h-2 rounded-full ${d < day ? 'bg-emerald-500/50' : d === day ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)]' : 'bg-slate-700/50'}`} />
                                 ))}
                             </div>
                             <div className="flex justify-between mt-1">
-                                <span className="text-[8px] text-indigo-400">Pull</span>
-                                <span className="text-[8px] text-indigo-400">Find</span>
-                                <span className="text-[8px] text-indigo-400">Fix</span>
-                                <span className="text-[8px] text-indigo-400">Commit</span>
+                                <span className="text-[8px] text-slate-500">Pull</span>
+                                <span className="text-[8px] text-slate-500">Find</span>
+                                <span className="text-[8px] text-slate-500">Fix</span>
+                                <span className="text-[8px] text-slate-500">Commit</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Main 3-Column Grid */}
-                <div className="flex-1 p-4 grid grid-cols-12 gap-4 overflow-hidden">
+                <div className="flex-1 p-4 grid grid-cols-12 gap-4 overflow-hidden bg-slate-900/40">
 
                     {/* LEFT: Master Plan */}
-                    <div className={`col-span-3 bg-white/95 backdrop-blur rounded-2xl shadow-xl border-2 ${showTutorial && tutorialSteps[tutorialIndex].highlight === 'master' ? 'border-blue-500 ring-4 ring-blue-500/30' : 'border-slate-200'} flex flex-col overflow-hidden transition-all`}>
-                        <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+                    <div className={`col-span-3 bg-slate-800/60 backdrop-blur-md rounded-3xl shadow-xl border ${showTutorial && tutorialSteps[tutorialIndex].highlight === 'master' ? 'border-cyan-500 ring-2 ring-cyan-500/30' : 'border-slate-700/50'} flex flex-col overflow-hidden transition-all`}>
+                        <div className="p-4 border-b border-slate-700/50 bg-slate-800/80 rounded-t-3xl">
                             <div className="flex items-center gap-2 mb-1">
-                                <div className="w-8 h-8 bg-slate-200 rounded-lg flex items-center justify-center">
-                                    <Briefcase className="w-4 h-4 text-slate-600" />
+                                <div className="w-8 h-8 bg-slate-700/50 rounded-xl flex items-center justify-center border border-slate-600/50">
+                                    <Briefcase className="w-4 h-4 text-cyan-400" />
                                 </div>
-                                <h3 className="font-bold text-slate-700">Master Schedule</h3>
+                                <h3 className="font-bold text-slate-200">Master Schedule</h3>
                             </div>
-                            <p className="text-xs text-slate-500 bg-slate-100 py-1 px-2 rounded text-center mt-2">What we SHOULD do</p>
+                            <p className="text-[10px] text-cyan-400/70 bg-cyan-900/20 py-1.5 px-2 rounded-lg text-center mt-2 border border-cyan-500/20 uppercase font-bold tracking-wider">What we SHOULD do</p>
                         </div>
                         <div className="flex-1 overflow-y-auto p-3 space-y-2">
                             {masterPlanTasks.map(task => (
                                 <motion.div
                                     key={task.id}
                                     whileHover={{ scale: 1.02 }}
-                                    className={`p-3 bg-white border-l-4 rounded-lg shadow-sm transition-all cursor-pointer group ${day >= 6 ? 'border-slate-300 hover:shadow-md hover:border-blue-400' : 'border-slate-200 opacity-50'
-                                        }`}
+                                    className={`p-3 bg-slate-800/80 rounded-xl shadow-sm transition-all cursor-pointer group border ${day >= 6 ? 'border-slate-600/50 hover:shadow-lg hover:bg-slate-700 hover:border-cyan-500/50' : 'border-slate-700/50 opacity-50'
+                                        } 
+                                        ${task.type === 'Structural' ? 'border-l-4 border-l-cyan-500/50'
+                                            : task.type === 'Systems' ? 'border-l-4 border-l-emerald-500/50'
+                                                : task.type === 'Interior' ? 'border-l-4 border-l-amber-500/50'
+                                                    : task.type === 'Management' ? 'border-l-4 border-l-purple-500/50'
+                                                        : 'border-l-4 border-l-cyan-400/50'}`}
                                     onClick={() => moveToReady(task.id)}
                                     data-testid={`task-master-${task.id}`}
                                 >
                                     <div className="flex justify-between items-start mb-1">
-                                        <span className="font-bold text-sm text-slate-700 leading-tight">{task.title}</span>
-                                        <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 transition-colors" />
+                                        <span className="font-bold text-sm text-slate-200 leading-tight">{task.title}</span>
+                                        <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
                                     </div>
                                     <div className="flex justify-between items-center mt-2">
-                                        <span className="text-[10px] text-slate-400">{task.type}</span>
+                                        <span className="text-[10px] text-slate-400 font-mono">{task.type}</span>
                                         {(task.constraints?.length || 0) > 0 && (
-                                            <span className="text-[9px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-bold">
+                                            <span className="text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded font-bold">
                                                 {task.constraints?.length} BLOCK
                                             </span>
                                         )}
@@ -462,7 +467,7 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                 </motion.div>
                             ))}
                             {masterPlanTasks.length === 0 && (
-                                <div className="text-center text-slate-400 italic py-10 text-sm">
+                                <div className="text-center text-slate-500 italic py-10 text-sm">
                                     All tasks moved to Lookahead
                                 </div>
                             )}
@@ -472,25 +477,25 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                     {/* CENTER: Lookahead + Weekly Plan */}
                     <div className="col-span-6 flex flex-col gap-4">
                         {/* Lookahead Board */}
-                        <div className={`flex-1 bg-white/95 backdrop-blur rounded-2xl shadow-xl border-2 ${showTutorial && tutorialSteps[tutorialIndex].highlight === 'lookahead' ? 'border-orange-500 ring-4 ring-orange-500/30' : 'border-slate-200'} flex flex-col overflow-hidden transition-all`}>
-                            <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-blue-50 to-white flex justify-between items-center">
+                        <div className={`flex-1 bg-slate-800/60 backdrop-blur-md rounded-3xl shadow-xl border ${showTutorial && tutorialSteps[tutorialIndex].highlight === 'lookahead' ? 'border-orange-500 ring-2 ring-orange-500/30' : 'border-slate-700/50'} flex flex-col overflow-hidden transition-all`}>
+                            <div className="p-4 border-b border-slate-700/50 bg-slate-800/80 flex justify-between items-center rounded-t-3xl">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                        <Target className="w-4 h-4 text-blue-600" />
+                                    <div className="w-8 h-8 bg-cyan-900/50 rounded-xl flex items-center justify-center border border-cyan-500/30">
+                                        <Target className="w-4 h-4 text-cyan-400" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-blue-900">Lookahead Window</h3>
-                                        <p className="text-xs text-blue-600">What we CAN do (Check Constraints)</p>
+                                        <h3 className="font-bold text-slate-200">Lookahead Window</h3>
+                                        <p className="text-xs text-slate-400">What we CAN do (Check Constraints)</p>
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">
+                                    <span className="bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-1 rounded-lg text-xs font-bold">
                                         {lookaheadTasks.filter(t => (t.constraints?.length || 0) > 1).length} Blocked
                                     </span>
-                                    <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded text-xs font-bold">
+                                    <span className="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-1 rounded-lg text-xs font-bold">
                                         {riskyCount} Risky
                                     </span>
-                                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">
+                                    <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded-lg text-xs font-bold">
                                         {readyTasksCount} Sound
                                     </span>
                                 </div>
@@ -513,14 +518,14 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 exit={{ opacity: 0, scale: 0.9 }}
                                                 onClick={() => handleSelectTask(task.id)}
-                                                className={`p-3 rounded-xl border-l-4 cursor-pointer transition-all shadow-sm hover:shadow-md ${isBlocked ? 'border-red-500 bg-red-50 hover:bg-red-100' :
-                                                    isRisky ? 'border-amber-500 bg-amber-50 hover:bg-amber-100' :
-                                                        'border-green-500 bg-green-50 hover:bg-green-100'
-                                                    } ${isSelected ? 'ring-2 ring-blue-400 scale-[1.02]' : ''}`}
+                                                className={`p-3 rounded-xl border-l-4 cursor-pointer transition-all shadow-sm hover:shadow-md ${isBlocked ? 'border-red-500/50 bg-red-900/20 hover:bg-red-900/30' :
+                                                    isRisky ? 'border-amber-500/50 bg-amber-900/20 hover:bg-amber-900/30' :
+                                                        'border-emerald-500/50 bg-emerald-900/20 hover:bg-emerald-900/30'
+                                                    } ${isSelected ? 'ring-2 ring-cyan-500/50 scale-[1.02] bg-slate-800' : ''}`}
                                                 data-testid={`task-lookahead-${task.id}`}
                                             >
                                                 <div className="flex justify-between items-start mb-2">
-                                                    <span className="font-bold text-sm text-slate-800 leading-tight">{task.title}</span>
+                                                    <span className="font-bold text-sm text-slate-200 leading-tight">{task.title}</span>
                                                     {isBlocked ? (
                                                         <AlertTriangle className="w-4 h-4 text-red-500" />
                                                     ) : isRisky ? (
@@ -533,28 +538,28 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                                     {day >= 7 ? (
                                                         <>
                                                             {task.constraints?.map(c => (
-                                                                <span key={c} className={`px-1.5 py-0.5 bg-${constraintConfig[c].color}-200 text-${constraintConfig[c].color}-800 text-[9px] font-bold rounded uppercase flex items-center gap-1`}>
+                                                                <span key={c} className={`px-1.5 py-0.5 bg-${constraintConfig[c].color}-900/40 border border-${constraintConfig[c].color}-500/30 text-${constraintConfig[c].color}-400 text-[9px] font-bold rounded uppercase flex items-center gap-1`}>
                                                                     {constraintConfig[c].icon}
                                                                     {constraintConfig[c].label}
                                                                 </span>
                                                             ))}
-                                                            {isSound && <span className="text-[10px] text-green-600 font-bold">SOUND - Ready to Commit</span>}
-                                                            {isRisky && <span className="text-[10px] text-amber-600 font-bold ml-1">RISKY - Can force commit</span>}
+                                                            {isSound && <span className="text-[10px] text-emerald-400 font-bold">SOUND - Ready to Commit</span>}
+                                                            {isRisky && <span className="text-[10px] text-amber-400 font-bold ml-1">RISKY - Can force commit</span>}
                                                         </>
                                                     ) : (
                                                         constraintCount > 0 ? (
-                                                            <span className="text-[10px] text-red-500 font-bold flex items-center gap-1">
+                                                            <span className="text-[10px] text-red-400 font-bold flex items-center gap-1">
                                                                 <Ban className="w-3 h-3" />
                                                                 {constraintCount} hidden constraint{constraintCount > 1 ? 's' : ''} - discover tomorrow
                                                             </span>
                                                         ) : (
-                                                            <span className="text-[10px] text-green-600 font-bold">No constraints detected</span>
+                                                            <span className="text-[10px] text-emerald-400 font-bold">No constraints detected</span>
                                                         )
                                                     )}
                                                 </div>
                                                 {day === 7 && constraintCount > 0 && isInspected && (
                                                     <div className="mt-1">
-                                                        <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold">INSPECTED</span>
+                                                        <span className="text-[9px] bg-cyan-900/30 text-cyan-400 border border-cyan-500/30 px-1.5 py-0.5 rounded-lg font-bold">INSPECTED</span>
                                                     </div>
                                                 )}
                                             </motion.div>
@@ -571,14 +576,14 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                         </div>
 
                         {/* Weekly Commitment Bar */}
-                        <div className={`h-36 bg-gradient-to-r from-indigo-900/95 to-purple-900/95 backdrop-blur rounded-2xl border-2 ${showTutorial && (tutorialSteps[tutorialIndex].highlight === 'weekly' || tutorialSteps[tutorialIndex].highlight === 'commit') ? 'border-green-500 ring-4 ring-green-500/30' : 'border-indigo-600/50'} p-4 flex flex-col transition-all`}>
+                        <div className={`h-36 bg-slate-800/60 backdrop-blur-md rounded-3xl shadow-xl border ${showTutorial && (tutorialSteps[tutorialIndex].highlight === 'weekly' || tutorialSteps[tutorialIndex].highlight === 'commit') ? 'border-emerald-500 ring-2 ring-emerald-500/30' : 'border-slate-700/50'} p-4 flex flex-col transition-all`}>
                             <div className="flex justify-between items-center mb-3">
                                 <div>
-                                    <h3 className="text-white font-bold text-sm uppercase tracking-wide flex items-center gap-2">
-                                        <Lock className="w-4 h-4 text-indigo-300" />
+                                    <h3 className="text-slate-200 font-bold text-sm uppercase tracking-wide flex items-center gap-2">
+                                        <Lock className="w-4 h-4 text-cyan-400" />
                                         Weekly Work Plan
                                     </h3>
-                                    <p className="text-[10px] text-indigo-300">
+                                    <p className="text-[10px] text-slate-400">
                                         {canCommit
                                             ? `${readyTasksCount} Sound (GREEN)${riskyCount > 0 ? ` + ${riskyCount} Risky (YELLOW)` : ''} - Click Start Week to commit`
                                             : `Commitment unlocks on Day 9 (currently Day ${day})`
@@ -588,9 +593,9 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                 <button
                                     onClick={handleCommitPlan}
                                     disabled={!canCommit || (readyTasksCount === 0 && riskyCount === 0)}
-                                    className={`px-5 py-2 rounded-lg text-sm font-bold shadow-lg transition-all active:scale-95 ${canCommit && (readyTasksCount > 0 || riskyCount > 0)
-                                        ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white shadow-green-900/30 ring-2 ring-green-400/50'
-                                        : 'bg-indigo-800/50 text-indigo-400 cursor-not-allowed'
+                                    className={`px-5 py-2 rounded-xl text-sm font-bold shadow-lg transition-all active:scale-95 border ${canCommit && (readyTasksCount > 0 || riskyCount > 0)
+                                        ? 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                                        : 'bg-slate-800 text-slate-500 border-slate-700/50 cursor-not-allowed'
                                         }`}
                                     data-testid="button-start-week"
                                 >
@@ -609,9 +614,9 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                                 initial={{ scale: 0 }}
                                                 animate={{ scale: 1 }}
                                                 key={t.id}
-                                                className="flex-1 bg-green-500/30 border-2 border-green-400 rounded-lg flex items-center justify-center p-2 text-center shadow-lg shadow-green-500/20"
+                                                className="flex-1 bg-emerald-900/40 border border-emerald-500/50 rounded-xl flex items-center justify-center p-2 text-center shadow-lg shadow-emerald-900/30"
                                             >
-                                                <span className="text-[10px] font-bold text-green-100 leading-tight">{t.title}</span>
+                                                <span className="text-[10px] font-bold text-emerald-400 leading-tight">{t.title}</span>
                                             </motion.div>
                                         ))}
                                         {riskyTasks.slice(0, Math.max(0, 8 - readyTasksCount)).map((t) => (
@@ -619,22 +624,22 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                                 initial={{ scale: 0 }}
                                                 animate={{ scale: 1 }}
                                                 key={t.id}
-                                                className="flex-1 bg-amber-500/30 border-2 border-amber-400 border-dashed rounded-lg flex items-center justify-center p-2 text-center"
+                                                className="flex-1 bg-amber-900/40 border border-amber-500/50 border-dashed rounded-xl flex items-center justify-center p-2 text-center shadow-lg shadow-amber-900/30"
                                             >
-                                                <span className="text-[10px] font-bold text-amber-100 leading-tight">{t.title}</span>
+                                                <span className="text-[10px] font-bold text-amber-400 leading-tight">{t.title}</span>
                                             </motion.div>
                                         ))}
                                         {Array.from({ length: Math.max(0, 8 - readyTasksCount - riskyCount) }).map((_, i) => (
-                                            <div key={`empty-${i}`} className="flex-1 border-2 border-dashed border-indigo-600/50 rounded-lg flex items-center justify-center bg-indigo-800/20">
-                                                <span className="text-indigo-500 text-xs">Empty</span>
+                                            <div key={`empty-${i}`} className="flex-1 border border-dashed border-slate-700/50 rounded-xl flex items-center justify-center bg-slate-800/30">
+                                                <span className="text-slate-600 text-xs">Empty</span>
                                             </div>
                                         ))}
                                     </>
                                 ) : (
-                                    <div className="flex-1 flex items-center justify-center border-2 border-dashed border-indigo-600/30 rounded-lg">
+                                    <div className="flex-1 flex items-center justify-center border border-dashed border-slate-700/50 rounded-xl bg-slate-800/20">
                                         <div className="text-center">
-                                            <Lock className="w-6 h-6 text-indigo-500 mx-auto mb-1" />
-                                            <p className="text-indigo-400 text-xs">
+                                            <Lock className="w-6 h-6 text-slate-600 mx-auto mb-1" />
+                                            <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">
                                                 {day === 6 && "Step 1: Pull tasks to Lookahead first"}
                                                 {day === 7 && "Step 2: Discover constraints on your tasks"}
                                                 {day === 8 && "Step 3: Fix constraints to make tasks Sound"}
@@ -647,14 +652,14 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                     </div>
 
                     {/* RIGHT: Task Inspector */}
-                    <div className={`col-span-3 bg-white/95 backdrop-blur rounded-2xl shadow-xl border-2 ${showTutorial && tutorialSteps[tutorialIndex].highlight === 'inspector' ? 'border-purple-500 ring-4 ring-purple-500/30' : 'border-slate-200'} flex flex-col overflow-hidden transition-all`}>
-                        <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+                    <div className={`col-span-3 bg-slate-800/60 backdrop-blur-md rounded-3xl shadow-xl border ${showTutorial && tutorialSteps[tutorialIndex].highlight === 'inspector' ? 'border-purple-500 ring-2 ring-purple-500/30' : 'border-slate-700/50'} flex flex-col overflow-hidden transition-all`}>
+                        <div className="p-4 border-b border-slate-700/50 bg-slate-800/80 rounded-t-3xl">
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                                    <FileCheck className="w-4 h-4 text-purple-600" />
+                                <div className="w-8 h-8 bg-purple-900/50 rounded-xl flex items-center justify-center border border-purple-500/30">
+                                    <FileCheck className="w-4 h-4 text-purple-400" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-slate-700">Task Inspector</h3>
+                                    <h3 className="font-bold text-slate-200">Task Inspector</h3>
                                     <p className="text-xs text-slate-400">
                                         {day < 7 ? 'Task Details' : day < 8 ? 'Discover Constraints' : 'Fix Constraints'}
                                     </p>
@@ -665,10 +670,10 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                         <div className="flex-1 p-4 overflow-y-auto">
                             {/* Day-specific guidance message */}
                             {getInspectorMessage() && (
-                                <div className={`mb-4 p-3 rounded-lg text-xs font-medium ${day === 7 ? 'bg-orange-50 text-orange-700 border border-orange-200' :
-                                    day === 8 ? 'bg-purple-50 text-purple-700 border border-purple-200' :
-                                        day === 9 ? 'bg-green-50 text-green-700 border border-green-200' :
-                                            'bg-blue-50 text-blue-700 border border-blue-200'
+                                <div className={`mb-4 p-3 rounded-xl text-xs font-bold border ${day === 7 ? 'bg-orange-900/30 text-orange-400 border-orange-500/30' :
+                                    day === 8 ? 'bg-purple-900/30 text-purple-400 border-purple-500/30' :
+                                        day === 9 ? 'bg-emerald-900/30 text-emerald-400 border-emerald-500/30' :
+                                            'bg-cyan-900/30 text-cyan-400 border-cyan-500/30'
                                     }`}>
                                     {getInspectorMessage()}
                                 </div>
@@ -677,43 +682,43 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                             {selectedTask ? (
                                 <div className="space-y-5">
                                     <div>
-                                        <h2 className="text-lg font-black text-slate-800 leading-tight">{selectedTask.title}</h2>
-                                        <p className="text-xs text-slate-500 mt-2 leading-relaxed">{selectedTask.description}</p>
+                                        <h2 className="text-lg font-black text-slate-200 leading-tight">{selectedTask.title}</h2>
+                                        <p className="text-xs text-slate-400 mt-2 leading-relaxed">{selectedTask.description}</p>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-2 text-sm">
-                                        <div className="bg-slate-50 p-2 rounded-lg">
-                                            <span className="text-[10px] text-slate-400 uppercase block">Cost</span>
-                                            <span className="font-mono font-bold text-slate-700">${selectedTask.cost}</span>
+                                        <div className="bg-slate-800/80 p-2 rounded-xl border border-slate-700/50">
+                                            <span className="text-[10px] text-slate-500 uppercase block font-bold">Cost</span>
+                                            <span className="font-mono font-bold text-slate-300">${selectedTask.cost}</span>
                                         </div>
-                                        <div className="bg-green-50 p-2 rounded-lg">
-                                            <span className="text-[10px] text-green-600 uppercase block">Revenue</span>
-                                            <span className="font-mono font-bold text-green-700">+${selectedTask.reward}</span>
+                                        <div className="bg-emerald-900/20 p-2 rounded-xl border border-emerald-500/30">
+                                            <span className="text-[10px] text-emerald-500 uppercase block font-bold">Revenue</span>
+                                            <span className="font-mono font-bold text-emerald-400">+${selectedTask.reward}</span>
                                         </div>
                                     </div>
 
                                     {selectedTask.leanTip && (
-                                        <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
-                                            <span className="text-[10px] text-indigo-500 uppercase font-bold block mb-1">Lean Insight</span>
-                                            <p className="text-xs text-indigo-700">{selectedTask.leanTip}</p>
+                                        <div className="p-3 bg-cyan-900/20 border border-cyan-500/30 rounded-xl">
+                                            <span className="text-[10px] text-cyan-500 uppercase font-bold block mb-1">Lean Insight</span>
+                                            <p className="text-xs text-cyan-300/80">{selectedTask.leanTip}</p>
                                         </div>
                                     )}
 
-                                    <div className="border-t border-slate-200 pt-4">
-                                        <h4 className="font-bold text-slate-700 mb-3 flex items-center gap-2">
+                                    <div className="border-t border-slate-700/50 pt-4">
+                                        <h4 className="font-bold text-slate-300 mb-3 flex items-center gap-2">
                                             Constraints
                                             {(selectedTask.constraints?.length || 0) === 0 && (
-                                                <span className="text-green-500 text-xs flex items-center gap-1">
+                                                <span className="text-emerald-400 text-xs flex items-center gap-1">
                                                     <CheckCircle className="w-3 h-3" /> CLEAR
                                                 </span>
                                             )}
                                         </h4>
 
                                         {day < 7 ? (
-                                            <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-center">
-                                                <Eye className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                                                <p className="text-slate-500 text-sm font-medium">Constraints Hidden</p>
-                                                <p className="text-slate-400 text-xs mt-1">Come back tomorrow to discover what's blocking your tasks</p>
+                                            <div className="p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl text-center">
+                                                <Eye className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+                                                <p className="text-slate-400 text-sm font-bold uppercase tracking-wider">Constraints Hidden</p>
+                                                <p className="text-slate-500 text-xs mt-1">Come back tomorrow to discover what's blocking your tasks</p>
                                             </div>
                                         ) : (
                                             <div className="space-y-2">
@@ -724,19 +729,19 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                                             key={c}
                                                             onClick={() => canFixConstraints ? handleConstraintRemoval(c) : null}
                                                             disabled={!canFixConstraints}
-                                                            className={`w-full p-3 rounded-lg text-left flex justify-between items-center group transition-all border ${canFixConstraints
-                                                                ? `bg-${config.color}-50 hover:bg-${config.color}-100 border-${config.color}-200 cursor-pointer`
-                                                                : 'bg-slate-50 border-slate-200 cursor-not-allowed'
+                                                            className={`w-full p-3 rounded-xl text-left flex justify-between items-center group transition-all border ${canFixConstraints
+                                                                ? `bg-${config.color}-900/20 hover:bg-${config.color}-900/40 border-${config.color}-500/50 cursor-pointer`
+                                                                : 'bg-slate-800/50 border-slate-700/50 cursor-not-allowed'
                                                                 }`}
                                                             data-testid={`button-fix-${c}`}
                                                         >
-                                                            <span className={`font-bold text-sm flex items-center gap-2 ${canFixConstraints ? `text-${config.color}-700` : 'text-slate-500'}`}>
+                                                            <span className={`font-bold text-sm flex items-center gap-2 ${canFixConstraints ? `text-${config.color}-400` : 'text-slate-500'}`}>
                                                                 {config.icon}
                                                                 {config.label}
                                                             </span>
                                                             <span className={`text-[10px] px-2 py-1 rounded font-bold ${canFixConstraints
-                                                                ? `bg-${config.color}-200 group-hover:bg-${config.color}-300 text-${config.color}-800`
-                                                                : 'bg-slate-200 text-slate-500'
+                                                                ? `bg-${config.color}-500/20 group-hover:bg-${config.color}-500/30 text-${config.color}-300`
+                                                                : 'bg-slate-700/50 text-slate-500'
                                                                 }`}>
                                                                 {canFixConstraints ? `${config.action} (${config.cost})` : 'Fix on Day 8'}
                                                             </span>
@@ -795,24 +800,24 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                         <motion.div
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
-                            className="bg-white rounded-2xl shadow-2xl p-6 max-w-lg mx-4"
+                            className="bg-slate-800 rounded-3xl shadow-2xl p-6 max-w-lg mx-4 border border-amber-500/50"
                         >
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
-                                    <AlertTriangle className="w-6 h-6 text-amber-600" />
+                                <div className="w-12 h-12 bg-amber-900/50 rounded-full flex items-center justify-center border border-amber-500/30">
+                                    <AlertTriangle className="w-6 h-6 text-amber-400" />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold text-slate-800">Risky Tasks Detected</h3>
-                                    <p className="text-sm text-slate-500">You have {riskyCount} task{riskyCount > 1 ? 's' : ''} with unresolved constraints</p>
+                                    <h3 className="text-xl font-bold text-slate-200">Risky Tasks Detected</h3>
+                                    <p className="text-sm text-slate-400">You have {riskyCount} task{riskyCount > 1 ? 's' : ''} with unresolved constraints</p>
                                 </div>
                             </div>
 
-                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
-                                <p className="text-sm text-amber-800 leading-relaxed">
+                            <div className="bg-amber-900/20 border border-amber-500/30 rounded-xl p-4 mb-4">
+                                <p className="text-sm text-amber-300 leading-relaxed">
                                     <strong>YELLOW tasks</strong> have 1 remaining constraint. You CAN force-commit them, but they become <strong>FRAGILE</strong> -
                                     there's a <strong>30% chance they'll fail</strong> during execution and hurt your PPC.
                                 </p>
-                                <p className="text-xs text-amber-600 mt-2 italic">
+                                <p className="text-xs text-amber-400/80 mt-2 italic">
                                     "A smaller plan that's 100% complete is better than a big plan that's 40% complete." - Lean Principle
                                 </p>
                             </div>
@@ -820,23 +825,23 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                             <div className="space-y-3">
                                 <button
                                     onClick={() => handleForceCommitConfirm(true)}
-                                    className="w-full p-3 rounded-xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 text-left transition-colors"
+                                    className="w-full p-3 rounded-xl border border-amber-500/50 bg-amber-900/20 hover:bg-amber-900/40 text-left transition-colors"
                                     data-testid="button-force-commit-risky"
                                 >
-                                    <span className="font-bold text-amber-800 text-sm">Include Risky Tasks (Overcommit)</span>
-                                    <p className="text-xs text-amber-600 mt-1">Commit {readyTasksCount + riskyCount} tasks total. {riskyCount} may fail. Higher risk, higher reward.</p>
+                                    <span className="font-bold text-amber-400 text-sm">Include Risky Tasks (Overcommit)</span>
+                                    <p className="text-xs text-amber-500 mt-1">Commit {readyTasksCount + riskyCount} tasks total. {riskyCount} may fail. Higher risk, higher reward.</p>
                                 </button>
                                 <button
                                     onClick={() => handleForceCommitConfirm(false)}
-                                    className="w-full p-3 rounded-xl border-2 border-green-300 bg-green-50 hover:bg-green-100 text-left transition-colors"
+                                    className="w-full p-3 rounded-xl border border-emerald-500/50 bg-emerald-900/20 hover:bg-emerald-900/40 text-left transition-colors"
                                     data-testid="button-commit-safe"
                                 >
-                                    <span className="font-bold text-green-800 text-sm">Only Sound Tasks (Safe)</span>
-                                    <p className="text-xs text-green-600 mt-1">Commit {readyTasksCount} reliable tasks. Safer PPC. More reliable promises.</p>
+                                    <span className="font-bold text-emerald-400 text-sm">Only Sound Tasks (Safe)</span>
+                                    <p className="text-xs text-emerald-500 mt-1">Commit {readyTasksCount} reliable tasks. Safer PPC. More reliable promises.</p>
                                 </button>
                                 <button
                                     onClick={() => setShowForceWarning(false)}
-                                    className="w-full text-center text-xs text-slate-400 hover:text-slate-600 py-2"
+                                    className="w-full text-center text-xs text-slate-400 hover:text-slate-200 py-2"
                                     data-testid="button-cancel-commit"
                                 >
                                     Go back and fix more constraints
@@ -859,24 +864,24 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                         <motion.div
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
-                            className="bg-white rounded-2xl shadow-2xl p-6 max-w-md mx-4"
+                            className="bg-slate-800 rounded-3xl shadow-2xl p-6 max-w-md mx-4 border border-cyan-500/50"
                         >
                             <div className="flex items-center gap-2 mb-4">
-                                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                                <div className="w-10 h-10 bg-cyan-500/20 border border-cyan-500/50 rounded-full flex items-center justify-center text-cyan-400 font-bold">
                                     {tutorialIndex + 1}
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-800">{tutorialSteps[tutorialIndex].title}</h3>
+                                <h3 className="text-xl font-bold text-slate-200">{tutorialSteps[tutorialIndex].title}</h3>
                             </div>
-                            <p className="text-slate-600 mb-6 leading-relaxed">{tutorialSteps[tutorialIndex].content}</p>
+                            <p className="text-slate-400 mb-6 leading-relaxed">{tutorialSteps[tutorialIndex].content}</p>
                             <div className="flex justify-between items-center">
                                 <div className="flex gap-1">
                                     {tutorialSteps.map((_, i) => (
-                                        <div key={i} className={`w-2 h-2 rounded-full ${i === tutorialIndex ? 'bg-blue-500' : 'bg-slate-200'}`} />
+                                        <div key={i} className={`w-2 h-2 rounded-full ${i === tutorialIndex ? 'bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)]' : 'bg-slate-600'}`} />
                                     ))}
                                 </div>
                                 <button
                                     onClick={handleTutorialNext}
-                                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-bold transition-colors"
+                                    className="bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/50 px-6 py-2 rounded-xl font-bold transition-colors"
                                     data-testid="button-tutorial-next"
                                 >
                                     {tutorialIndex < tutorialSteps.length - 1 ? 'Next' : 'Got It!'}

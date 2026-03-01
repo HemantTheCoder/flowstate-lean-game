@@ -26,17 +26,17 @@ export const DecisionModal: React.FC<Props> = ({ isOpen, title, prompt, options,
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.9, opacity: 0 }}
-                    className="bg-slate-50 w-full max-w-2xl rounded-3xl shadow-2xl border-4 border-slate-200 overflow-hidden"
+                    className="bg-slate-900/95 backdrop-blur-md w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden flex flex-col"
                 >
                     {/* Header */}
-                    <div className="bg-slate-800 p-6 text-white">
-                        <h2 className="text-2xl font-black uppercase tracking-wider text-yellow-400 mb-2">⚡ Critical Decision</h2>
+                    <div className="bg-slate-900/50 p-6 text-white border-b border-slate-700/50">
+                        <h2 className="text-2xl font-black uppercase tracking-wider text-amber-500 mb-2">⚡ Critical Decision</h2>
                         <h3 className="text-xl font-bold">{title}</h3>
                     </div>
 
                     {/* Content */}
                     <div className="p-8">
-                        <p className="text-xl text-slate-700 font-medium mb-8 leading-relaxed">
+                        <p className="text-xl text-slate-200 font-medium mb-8 leading-relaxed">
                             {prompt}
                         </p>
 
@@ -46,22 +46,22 @@ export const DecisionModal: React.FC<Props> = ({ isOpen, title, prompt, options,
                                     key={opt.id}
                                     onClick={() => onSelect(opt.id)}
                                     className={`
-                                        group relative p-6 rounded-2xl border-l-8 text-left transition-all hover:-translate-y-1 hover:shadow-lg
-                                        ${opt.type === 'risky' ? 'bg-red-50 border-red-500 hover:bg-red-100' : ''}
-                                        ${opt.type === 'safe' ? 'bg-blue-50 border-blue-500 hover:bg-blue-100' : ''}
-                                        ${opt.type === 'neutral' ? 'bg-slate-50 border-slate-400 hover:bg-slate-100' : ''}
+                                        group relative p-6 rounded-2xl border-l-8 text-left transition-all hover:-translate-y-1 shadow-md hover:shadow-lg
+                                        ${opt.type === 'risky' ? 'bg-red-900/20 border-red-500 hover:bg-red-900/40 text-red-200' : ''}
+                                        ${opt.type === 'safe' ? 'bg-cyan-900/20 border-cyan-500 hover:bg-cyan-900/40 text-cyan-200' : ''}
+                                        ${opt.type === 'neutral' ? 'bg-slate-800/50 border-slate-500 hover:bg-slate-800 text-slate-200' : ''}
                                     `}
                                 >
                                     <div className="flex justify-between items-center">
-                                        <span className={`text-lg font-bold ${opt.type === 'risky' ? 'text-red-700' : opt.type === 'safe' ? 'text-blue-700' : 'text-slate-700'}`}>
+                                        <span className={`text-lg font-bold ${opt.type === 'risky' ? 'text-red-400' : opt.type === 'safe' ? 'text-cyan-400' : 'text-slate-300'}`}>
                                             {opt.text}
                                         </span>
-                                        <span className="opacity-0 group-hover:opacity-100 transition-opacity text-sm font-bold uppercase">
+                                        <span className={`opacity-0 group-hover:opacity-100 transition-opacity text-sm font-black uppercase tracking-widest ${opt.type === 'risky' ? 'text-red-500' : opt.type === 'safe' ? 'text-cyan-500' : 'text-slate-400'}`}>
                                             {opt.type === 'risky' ? 'RISK' : opt.type === 'safe' ? 'SAFE' : 'GO'}
                                         </span>
                                     </div>
                                     {opt.description && (
-                                        <p className="text-sm text-slate-500 mt-1 font-medium">
+                                        <p className="text-sm text-slate-400 mt-2 font-medium">
                                             {opt.description}
                                         </p>
                                     )}

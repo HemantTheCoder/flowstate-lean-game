@@ -106,23 +106,23 @@ export default function ChapterSelect() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0A0B1A] text-slate-200 p-6 md:p-10 relative overflow-hidden font-sans">
+        <div className="min-h-screen bg-slate-900 text-slate-200 p-6 md:p-10 relative overflow-hidden font-sans">
             {/* Character Creation for New Players */}
             <CharacterCreationModal />
 
-            {/* Visual Novel Ambient Background */}
+            {/* Premium Twilight Industrial Ambient Background */}
             <div className="absolute inset-0 pointer-events-none z-0">
                 <motion.div
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15] }}
                     transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                    className="absolute top-[-20%] right-[-20%] w-[70%] h-[70%] bg-blue-600/30 blur-[150px] rounded-full"
+                    className="absolute top-[-20%] right-[-20%] w-[70%] h-[70%] bg-indigo-500/20 blur-[150px] rounded-full"
                 />
                 <motion.div
-                    animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.15, 0.1] }}
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.2, 0.1] }}
                     transition={{ duration: 20, repeat: Infinity, ease: "linear", delay: 5 }}
-                    className="absolute bottom-[-20%] left-[-20%] w-[70%] h-[70%] bg-indigo-600/20 blur-[150px] rounded-full"
+                    className="absolute bottom-[-20%] left-[-20%] w-[70%] h-[70%] bg-cyan-500/20 blur-[150px] rounded-full"
                 />
-                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.05] [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-15 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
             </div>
 
             <div className="max-w-7xl mx-auto relative z-10 h-full flex flex-col">
@@ -157,18 +157,18 @@ export default function ChapterSelect() {
 
                         let theme = {
                             color: 'text-slate-400',
-                            border: 'border-white/5',
-                            bg: 'bg-slate-900/60',
+                            border: 'border-slate-700/50',
+                            bg: 'bg-slate-800/60',
                             glow: 'rgba(255,255,255,0)',
-                            button: 'bg-slate-800'
+                            button: 'bg-slate-700'
                         };
 
                         if (!isEffectivelyLocked) {
-                            if (chapter.id === 0) theme = { color: 'text-blue-400', border: 'border-blue-500/30', bg: 'bg-[#0f172a]/80', glow: 'rgba(59,130,246,0.3)', button: 'bg-blue-600' };
-                            else if (chapter.id === 1) theme = { color: 'text-emerald-400', border: 'border-emerald-500/30', bg: 'bg-[#064e3b]/40', glow: 'rgba(16,185,129,0.3)', button: 'bg-emerald-600' };
-                            else if (chapter.id === 2) theme = { color: 'text-amber-400', border: 'border-amber-500/30', bg: 'bg-[#451a03]/40', glow: 'rgba(245,158,11,0.3)', button: 'bg-amber-600' };
+                            if (chapter.id === 0) theme = { color: 'text-cyan-400', border: 'border-cyan-500/40', bg: 'bg-slate-800/80', glow: 'rgba(34,211,238,0.25)', button: 'bg-cyan-600' };
+                            else if (chapter.id === 1) theme = { color: 'text-emerald-400', border: 'border-emerald-500/40', bg: 'bg-slate-800/80', glow: 'rgba(16,185,129,0.25)', button: 'bg-emerald-600' };
+                            else if (chapter.id === 2) theme = { color: 'text-amber-400', border: 'border-amber-500/40', bg: 'bg-slate-800/80', glow: 'rgba(245,158,11,0.25)', button: 'bg-amber-600' };
                         } else if (chapter.isComingSoon) {
-                            theme = { color: 'text-purple-400', border: 'border-purple-500/20', bg: 'bg-[#2e1065]/30', glow: 'rgba(168,85,247,0.1)', button: 'bg-purple-900/50' };
+                            theme = { color: 'text-purple-400', border: 'border-purple-500/40', bg: 'bg-slate-800/60', glow: 'rgba(168,85,247,0.15)', button: 'bg-purple-900/60' };
                         }
 
                         return (
@@ -246,7 +246,7 @@ export default function ChapterSelect() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-[#0A0B1A]/90 backdrop-blur-md"
+                            className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
                             onClick={() => setShowChapter4Modal(false)}
                         />
 
@@ -254,7 +254,7 @@ export default function ChapterSelect() {
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="relative w-full max-w-4xl bg-slate-900/80 backdrop-blur-2xl border border-white/10 rounded-3xl flex flex-col max-h-[90vh] overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.15)]"
+                            className="relative w-full max-w-4xl bg-slate-800/95 backdrop-blur-2xl border border-slate-600/50 rounded-3xl flex flex-col max-h-[90vh] overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.15)]"
                         >
                             {/* Premium Header */}
                             <div className="bg-gradient-to-r from-purple-900/50 to-slate-900/50 p-6 md:p-8 border-b border-white/5 flex justify-between items-start shrink-0 relative overflow-hidden">

@@ -92,68 +92,68 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
     const lesson = LEAN_LESSONS[displayDay];
 
     return (
-        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 pointer-events-auto">
+        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 pointer-events-auto">
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="bg-white w-full max-w-md max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden border-4 border-slate-200 flex flex-col"
+                className="bg-slate-900 w-full max-w-md max-h-[90vh] rounded-3xl shadow-[0_0_40px_rgba(59,130,246,0.15)] overflow-hidden border border-slate-700/50 flex flex-col"
             >
-                <div className="bg-blue-600 p-6 text-center shrink-0">
+                <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-900 p-6 text-center shrink-0 border-b border-blue-500/30">
                     <h2 className="text-3xl font-black text-white uppercase tracking-wider">Day {displayDay} Complete</h2>
-                    <p className="text-blue-100 font-medium mt-1">Site Report</p>
+                    <p className="text-blue-200 font-medium mt-1">Site Report</p>
                 </div>
 
                 <div className="p-6 space-y-4 overflow-y-auto flex-1">
-                    <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-                        <div className="text-slate-500 font-bold">Tasks Finished</div>
-                        <div className="text-3xl font-black text-slate-800">{completedTasks}</div>
+                    <div className="flex justify-between items-center border-b border-slate-700/50 pb-3">
+                        <div className="text-slate-400 font-bold">Tasks Finished</div>
+                        <div className="text-3xl font-black text-slate-200">{completedTasks}</div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-blue-50 rounded-xl p-3 border border-blue-100 text-center">
+                        <div className="bg-blue-900/20 rounded-xl p-3 border border-blue-500/30 text-center">
                             <div className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Daily Efficiency</div>
-                            <div className={`text-2xl font-black ${dailyEfficiency >= 80 ? 'text-green-500' : dailyEfficiency >= 50 ? 'text-blue-500' : 'text-orange-500'}`}>
+                            <div className={`text-2xl font-black ${dailyEfficiency >= 80 ? 'text-green-400' : dailyEfficiency >= 50 ? 'text-blue-400' : 'text-orange-400'}`}>
                                 {dailyEfficiency}%
                             </div>
                         </div>
-                        <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100 text-center">
+                        <div className="bg-emerald-900/20 rounded-xl p-3 border border-emerald-500/30 text-center">
                             <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider flex items-center justify-center gap-1">
                                 <TrendingUp className="w-3 h-3" /> Cumulative
                             </div>
-                            <div className={`text-2xl font-black ${cumulativeEfficiency >= 80 ? 'text-green-500' : cumulativeEfficiency >= 50 ? 'text-blue-500' : 'text-orange-500'}`}>
+                            <div className={`text-2xl font-black ${cumulativeEfficiency >= 80 ? 'text-green-400' : cumulativeEfficiency >= 50 ? 'text-blue-400' : 'text-orange-400'}`}>
                                 {cumulativeEfficiency}%
                             </div>
                         </div>
                     </div>
 
                     {insight && (
-                        <div className={`p-3 rounded-xl text-sm font-bold border ${dailyEfficiency >= 80 ? 'bg-green-50 border-green-200 text-green-700' : dailyEfficiency >= 50 ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-orange-50 border-orange-200 text-orange-700'}`}>
+                        <div className={`p-3 rounded-xl text-sm font-bold border ${dailyEfficiency >= 80 ? 'bg-green-900/20 border-green-500/30 text-green-300' : dailyEfficiency >= 50 ? 'bg-blue-900/20 border-blue-500/30 text-blue-300' : 'bg-orange-900/20 border-orange-500/30 text-orange-300'}`}>
                             {insight}
                         </div>
                     )}
 
-                    <div className="bg-red-50 p-3 rounded-xl border border-red-100">
+                    <div className="bg-red-900/20 p-3 rounded-xl border border-red-500/30">
                         <div className="flex justify-between items-center mb-1">
-                            <span className="text-red-800 font-bold text-sm">Daily Overhead</span>
-                            <span className="text-red-600 font-mono font-bold">-$250</span>
+                            <span className="text-red-400 font-bold text-sm">Daily Overhead</span>
+                            <span className="text-red-400 font-mono font-bold">-$250</span>
                         </div>
-                        <p className="text-xs text-red-600">Salaries, Equipment, Rent.</p>
+                        <p className="text-xs text-red-500">Salaries, Equipment, Rent.</p>
                     </div>
 
-                    <div className={`text-center font-bold text-sm ${funds < 0 ? 'text-red-600' : 'text-slate-600'}`}>
-                        Current Funds: <span className="font-mono">${funds}</span>
+                    <div className={`text-center font-bold text-sm ${funds < 0 ? 'text-red-400' : 'text-slate-400'}`}>
+                        Current Funds: <span className="font-mono text-slate-200">${funds}</span>
                     </div>
 
                     {lesson && (
-                        <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-200">
-                            <h4 className="font-bold text-indigo-800 text-sm uppercase mb-2 flex items-center gap-2">
+                        <div className="bg-indigo-900/20 p-4 rounded-xl border border-indigo-500/30">
+                            <h4 className="font-bold text-indigo-400 text-sm uppercase mb-2 flex items-center gap-2">
                                 <BookOpen className="w-4 h-4" /> Today's Lesson: {lesson.concept}
                             </h4>
-                            <p className="text-sm text-indigo-700 leading-relaxed mb-2">
+                            <p className="text-sm text-indigo-300 leading-relaxed mb-2">
                                 {lesson.explanation}
                             </p>
-                            <div className="flex items-start gap-2 text-xs text-indigo-600 bg-indigo-100/50 rounded-lg p-2 border border-indigo-200/50">
-                                <Lightbulb className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                            <div className="flex items-start gap-2 text-xs text-indigo-300 bg-indigo-950/50 rounded-lg p-2 border border-indigo-500/20">
+                                <Lightbulb className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-amber-400" />
                                 <span className="italic">{lesson.example}</span>
                             </div>
                         </div>
@@ -162,7 +162,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                     <button
                         onClick={onClose}
                         data-testid="button-next-day"
-                        className="w-full bg-black text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-transform"
+                        className="w-full bg-blue-600 border border-blue-500/50 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-500 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_4px_20px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2"
                     >
                         {(displayDay >= 5 && chapter === 1) || (displayDay >= 11 && chapter === 2) ? 'View Results' : `Start Day ${displayDay + 1}`}
                     </button>

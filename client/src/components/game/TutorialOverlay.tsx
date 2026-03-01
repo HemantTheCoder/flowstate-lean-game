@@ -157,11 +157,11 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                             className="w-80 pointer-events-auto"
                         >
-                            <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-cyan-500 relative">
-                                <h3 className="font-black text-cyan-600 text-lg mb-1 flex items-center gap-2">
+                            <div className="bg-slate-900 text-slate-200 px-5 py-4 rounded-xl shadow-2xl border-4 border-cyan-500 relative">
+                                <h3 className="font-black text-cyan-400 text-lg mb-1 flex items-center gap-2">
                                     <Gauge className="w-5 h-5" /> WIP Limit Slider
                                 </h3>
-                                <ul className="text-sm font-medium mb-3 space-y-2 leading-snug">
+                                <ul className="text-sm font-medium mb-3 space-y-2 leading-snug text-slate-300">
                                     <li>
                                         Use the <b>+/-</b> buttons on the Doing column to set your <b>Work-In-Progress limit</b>.
                                     </li>
@@ -175,7 +175,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                         Your <b>Flow Efficiency</b> is measured against this limit &mdash; it defines how many tasks you <i>could</i> complete each day.
                                     </li>
                                 </ul>
-                                <div className="bg-cyan-50 border border-cyan-200 rounded-lg px-3 py-2 text-xs text-cyan-800 mb-3">
+                                <div className="bg-cyan-900/30 border border-cyan-500/30 rounded-lg px-3 py-2 text-xs text-cyan-300 mb-3">
                                     <b>Lean Principle:</b> Limiting WIP prevents congestion and helps work flow smoothly &mdash; just like limiting cars on a highway reduces traffic jams.
                                 </div>
                                 <button
@@ -197,15 +197,15 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x }}
                         className="absolute z-[90] w-72 pointer-events-auto"
                     >
-                        <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-blue-500 relative">
-                            <div className="absolute -top-3 left-6 w-6 h-6 bg-white border-t-4 border-l-4 border-blue-500 transform rotate-45"></div>
-                            <h3 className="font-black text-blue-600 text-lg mb-1">Smart Advisor</h3>
-                            <p className="text-sm font-medium mb-3 leading-snug">
+                        <div className="bg-slate-900 text-slate-200 px-5 py-4 rounded-xl shadow-2xl border-4 border-blue-500 relative">
+                            <div className="absolute -top-3 left-6 w-6 h-6 bg-slate-900 border-t-4 border-l-4 border-blue-500 transform rotate-45"></div>
+                            <h3 className="font-black text-blue-400 text-lg mb-1">Smart Advisor</h3>
+                            <p className="text-sm font-medium mb-3 leading-snug text-slate-300">
                                 Always check here! I will warn you about <b>Bottlenecks</b> (Too much WIP) and <b>Starvation</b> (Idle workers).
                             </p>
                             <button
                                 onClick={() => setTutorialStep(7)}
-                                className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-blue-700 transition-colors"
+                                className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-blue-500 transition-colors"
                             >
                                 Next: Stats
                             </button>
@@ -220,17 +220,17 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x }}
                         className="absolute z-[90] w-72 pointer-events-auto"
                     >
-                        <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-green-500 relative">
-                            <div className="absolute -top-3 left-6 w-6 h-6 bg-white border-t-4 border-l-4 border-green-500 transform rotate-45"></div>
-                            <h3 className="font-black text-green-600 text-lg mb-1">Project Health</h3>
-                            <ul className="text-sm font-medium mb-3 space-y-2">
+                        <div className="bg-slate-900 text-slate-200 px-5 py-4 rounded-xl shadow-2xl border-4 border-green-500 relative">
+                            <div className="absolute -top-3 left-6 w-6 h-6 bg-slate-900 border-t-4 border-l-4 border-green-500 transform rotate-45"></div>
+                            <h3 className="font-black text-green-400 text-lg mb-1">Project Health</h3>
+                            <ul className="text-sm font-medium mb-3 space-y-2 text-slate-300">
                                 <li><b>Funds</b>: You earn money when tasks reach <b>Done</b>. Each day costs $250 overhead. Don't run out!</li>
-                                <li><b>Morale</b>: Stays high with steady flow. <span className="text-red-500">Drops</span> if you exceed WIP limits or push workers. <span className="text-green-600">Rises</span> when you complete tasks within limits.</li>
+                                <li><b>Morale</b>: Stays high with steady flow. <span className="text-red-400">Drops</span> if you exceed WIP limits or push workers. <span className="text-green-400">Rises</span> when you complete tasks within limits.</li>
                                 <li><b>Efficiency</b>: Tasks completed vs. what was possible (set by your WIP limit). Higher WIP limit = higher bar to reach!</li>
                             </ul>
                             <button
                                 onClick={() => setTutorialStep(8)}
-                                className="bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-green-700 transition-colors"
+                                className="bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-green-500 transition-colors"
                             >
                                 Next: Saving
                             </button>
@@ -245,19 +245,19 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x - 150 }}
                         className="absolute z-[90] w-72 pointer-events-auto"
                     >
-                        <div className="bg-white text-slate-800 px-5 py-4 rounded-xl shadow-2xl border-4 border-purple-500 relative">
+                        <div className="bg-slate-900 text-slate-200 px-5 py-4 rounded-xl shadow-2xl border-4 border-purple-500 relative">
                             {/* Arrow pointing UP to the button */}
                             <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
                                 <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[15px] border-b-purple-500 animate-bounce"></div>
                             </div>
 
-                            <h3 className="font-black text-purple-600 text-lg mb-1">Save Your Progress</h3>
-                            <p className="text-sm font-medium mb-3 leading-snug">
+                            <h3 className="font-black text-purple-400 text-lg mb-1">Save Your Progress</h3>
+                            <p className="text-sm font-medium mb-3 leading-snug text-slate-300">
                                 Click the <b>Save</b> icon to save your game to the cloud! <br /> You'll need to <b>Login</b> or <b>Register</b> to keep your progress safe across devices.
                             </p>
                             <button
                                 onClick={() => setTutorialStep(9)}
-                                className="bg-purple-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-purple-700 transition-colors"
+                                className="bg-purple-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-purple-500 transition-colors"
                             >
                                 Finish Tutorial
                             </button>
@@ -271,12 +271,12 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-auto z-[90]"
                     >
-                        <div className="bg-yellow-400 text-black px-8 py-6 rounded-3xl shadow-2xl text-center border-4 border-white max-w-md">
-                            <h2 className="text-3xl font-black mb-2">Great Job!</h2>
-                            <p className="mb-4 font-medium">You've learned the flow of work! <br /> Respect WIP limits to keep the workers happy and efficiency high.</p>
+                        <div className="bg-slate-900 text-slate-200 px-8 py-6 rounded-3xl shadow-[0_0_50px_rgba(250,204,21,0.2)] text-center border border-yellow-500/50 max-w-md">
+                            <h2 className="text-3xl font-black mb-2 text-yellow-400">Great Job!</h2>
+                            <p className="mb-4 font-medium text-slate-300">You've learned the flow of work! <br /> Respect WIP limits to keep the workers happy and efficiency high.</p>
                             <button
                                 onClick={() => completeTutorial()}
-                                className="bg-black text-white px-6 py-2 rounded-full font-bold hover:scale-105 transition-transform"
+                                className="bg-yellow-500 text-slate-900 px-6 py-2 rounded-full font-bold hover:bg-yellow-400 transition-colors shadow-lg"
                                 data-testid="button-tutorial-complete"
                             >
                                 Close Tutorial

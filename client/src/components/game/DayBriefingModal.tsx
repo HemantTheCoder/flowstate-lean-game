@@ -30,13 +30,13 @@ export const DayBriefingModal: React.FC = () => {
     };
 
     return (
-        <div className="absolute inset-0 z-[80] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 pointer-events-auto">
+        <div className="absolute inset-0 z-[80] flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-4 pointer-events-auto">
             <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-slate-900 border-2 border-slate-700 w-full max-w-lg max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col text-white"
+                className="bg-slate-900 border border-slate-700/50 w-full max-w-lg max-h-[90vh] rounded-2xl shadow-[0_0_30px_rgba(59,130,246,0.15)] overflow-hidden flex flex-col text-white"
             >
-                <div className="flex justify-between items-center border-b border-slate-800 p-4 md:p-6 shrink-0">
+                <div className="flex justify-between items-center border-b border-slate-800 p-4 md:p-6 shrink-0 bg-slate-900/50">
                     <div>
                         <h2 className="text-xs md:text-sm font-bold text-blue-400 uppercase tracking-wider">Day {day} Briefing</h2>
                         <h1 className="text-xl md:text-2xl font-black text-white">{dayConfig.title}</h1>

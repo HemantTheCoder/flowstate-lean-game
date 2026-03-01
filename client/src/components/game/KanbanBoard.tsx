@@ -20,28 +20,27 @@ const WipSlider: React.FC<{ column: Column; onChangeWip: (id: string, limit: num
                 <div className="flex items-center gap-1">
                     <button
                         onClick={() => onChangeWip(column.id, Math.max(1, column.wipLimit - 1))}
-                        className="w-5 h-5 rounded bg-slate-200 hover:bg-slate-300 flex items-center justify-center transition-colors"
+                        className="w-5 h-5 rounded bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors"
                         data-testid={`button-wip-decrease-${column.id}`}
                     >
-                        <Minus className="w-3 h-3 text-slate-600" />
+                        <Minus className="w-3 h-3 text-slate-300" />
                     </button>
-                    <span className={`text-sm font-black min-w-[20px] text-center ${isOverLimit ? 'text-red-600' : isAtLimit ? 'text-amber-600' : 'text-blue-600'}`}>
+                    <span className={`text-sm font-black min-w-[20px] text-center ${isOverLimit ? 'text-red-500' : isAtLimit ? 'text-amber-500' : 'text-blue-400'}`}>
                         {column.wipLimit}
                     </span>
                     <button
                         onClick={() => onChangeWip(column.id, Math.min(6, column.wipLimit + 1))}
-                        className="w-5 h-5 rounded bg-slate-200 hover:bg-slate-300 flex items-center justify-center transition-colors"
+                        className="w-5 h-5 rounded bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors"
                         data-testid={`button-wip-increase-${column.id}`}
                     >
-                        <Plus className="w-3 h-3 text-slate-600" />
+                        <Plus className="w-3 h-3 text-slate-300" />
                     </button>
                 </div>
             </div>
-            <div className="relative h-2 bg-slate-200 rounded-full overflow-hidden">
+            <div className="relative h-2 bg-slate-700/50 rounded-full overflow-hidden border border-slate-600/30">
                 <motion.div
-                    className={`h-full rounded-full transition-colors ${
-                        isOverLimit ? 'bg-red-500' : isAtLimit ? 'bg-amber-400' : 'bg-blue-400'
-                    }`}
+                    className={`h-full rounded-full transition-colors ${isOverLimit ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : isAtLimit ? 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.5)]' : 'bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.5)]'
+                        }`}
                     initial={{ width: 0 }}
                     animate={{ width: `${fillPercent}%` }}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -266,28 +265,28 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 if (e.target === e.currentTarget) onClose();
             }}
         >
-            <div className={`w-full h-full max-w-6xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto ${chapter > 1 ? 'bg-gradient-to-br from-slate-800 to-slate-900' : 'bg-slate-100'}`}>
+            <div className={`w-full h-full max-w-6xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto bg-slate-800/95 backdrop-blur-md border border-slate-700/50`}>
 
-                <div className={`p-4 md:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center z-10 gap-2 md:gap-4 ${chapter > 1 ? 'bg-gradient-to-r from-indigo-900 to-purple-900 border-b border-indigo-600/50' : 'bg-white'}`}>
+                <div className={`p-4 md:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center z-10 gap-2 md:gap-4 bg-slate-900/50 border-b border-slate-700/50`}>
                     <div>
-                        <h2 className={`text-xl md:text-3xl font-black flex items-center gap-2 ${chapter > 1 ? 'text-white' : 'text-slate-800'}`}>
+                        <h2 className={`text-xl md:text-3xl font-black flex items-center gap-2 text-white`}>
                             {chapter > 1 ? 'Week 2 Execution Board' : 'Project Kanban Board'}
                         </h2>
-                        <p className={`text-xs mt-1 ${chapter > 1 ? 'text-indigo-200' : 'text-slate-500'}`}>
+                        <p className={`text-xs mt-1 text-slate-400`}>
                             {chapter > 1 ? 'Execute your committed Weekly Work Plan' : 'Drag tasks through the flow. Keep WIP under control.'}
                         </p>
                         <div className="flex gap-2 md:gap-4 mt-1 md:mt-2">
-                            <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-lg font-mono font-bold border text-[10px] md:text-sm ${chapter > 1 ? 'bg-white/10 text-white border-white/20' : 'bg-blue-50 text-blue-700 border-blue-100'}`}>
+                            <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-lg font-mono font-bold border text-[10px] md:text-sm bg-slate-800/50 text-cyan-400 border-cyan-500/30`}>
                                 Funds: ${funds}
                             </div>
-                            <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-lg font-mono font-bold border text-[10px] md:text-sm ${chapter > 1 ? 'bg-white/10 text-white border-white/20' : 'bg-amber-50 text-amber-700 border-amber-100'}`}>
+                            <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-lg font-mono font-bold border text-[10px] md:text-sm bg-slate-800/50 text-amber-400 border-amber-500/30`}>
                                 Materials: {materials}
                             </div>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className={`px-4 md:px-6 py-1.5 md:py-2 rounded-xl font-bold transition-colors w-full md:w-auto text-sm md:text-base ${chapter > 1 ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20' : 'bg-slate-200 hover:bg-slate-300 text-slate-700'}`}
+                        className={`px-4 md:px-6 py-1.5 md:py-2 rounded-xl font-bold transition-colors w-full md:w-auto text-sm md:text-base bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 border border-slate-600/50`}
                         data-testid="button-close-kanban"
                     >
                         Close View
@@ -297,9 +296,9 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 <ConstraintBanner day={day} materials={materials} />
 
                 <DragDropContext onDragEnd={onDragEnd}>
-                    <div className={`flex-1 flex flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-hidden ${chapter > 1 ? 'bg-slate-800/50' : 'bg-slate-200/50'}`}>
+                    <div className={`flex-1 flex flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-hidden bg-slate-900/60`}>
                         {columns.map(col => {
-                            let highlightClass = "border-slate-200";
+                            let highlightClass = "border-slate-700/50";
                             let adviceText: string | null = null;
 
                             let displayTitle = col.title;
@@ -313,15 +312,15 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                             const isBottleneck = isOverWip || isAtWip;
 
                             if (isOverWip) {
-                                highlightClass = "border-red-400 ring-4 ring-red-100";
+                                highlightClass = "border-red-500/50 ring-2 ring-red-500/20";
                                 adviceText = "Bottleneck! Workers are overloaded.";
                             } else if (isAtWip) {
-                                highlightClass = "border-amber-300 ring-2 ring-amber-100";
+                                highlightClass = "border-amber-500/50 ring-2 ring-amber-500/20";
                                 adviceText = "At WIP limit. Finish before pulling more.";
                             }
 
                             if (col.id === 'ready' && col.tasks.length === 0) {
-                                highlightClass = "border-orange-300 ring-4 ring-orange-100";
+                                highlightClass = "border-orange-500/50 ring-2 ring-orange-500/20";
                                 adviceText = "Starved! No tasks ready.";
                             }
 
@@ -335,17 +334,17 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                             {...provided.droppableProps}
                                             ref={provided.innerRef}
                                             id={`col-${col.id}`}
-                                            className={`min-w-[280px] md:w-[320px] flex flex-col h-full bg-slate-50 rounded-2xl border-2 transition-all relative ${highlightClass} ${snapshot.isDraggingOver ? 'bg-blue-50/50 border-blue-300' : ''} overflow-visible shrink-0 ${isBlurred ? 'opacity-50 grayscale pointer-events-none' : ''}`}
+                                            className={`min-w-[280px] md:w-[320px] flex flex-col h-full bg-slate-800/60 rounded-3xl border transition-all relative ${highlightClass} ${snapshot.isDraggingOver ? 'bg-cyan-900/20 border-cyan-500/50' : ''} overflow-visible shrink-0 ${isBlurred ? 'opacity-50 grayscale pointer-events-none' : ''}`}
                                         >
                                             <BottleneckPulse isBottleneck={isBottleneck} />
                                             {col.id === 'doing' && <CongestionCloud intensity={congestion} />}
 
-                                            <div className={`${col.id === 'done' ? 'bg-green-100' : 'bg-white'} p-4 border-b border-slate-100 rounded-t-2xl`}>
+                                            <div className={`${col.id === 'done' ? 'bg-emerald-900/20' : 'bg-slate-800/80'} p-4 border-b border-slate-700/50 rounded-t-3xl backdrop-blur-sm`}>
                                                 <div className="flex justify-between items-center mb-1">
-                                                    <h3 className="font-bold text-slate-700">{displayTitle}</h3>
+                                                    <h3 className="font-bold text-slate-200">{displayTitle}</h3>
                                                     {col.wipLimit > 0 && (
                                                         <div className="flex items-center gap-2">
-                                                            <span className={`text-xs font-bold px-2 py-1 rounded ${isOverWip ? 'bg-red-100 text-red-600 animate-pulse' : isAtWip ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500'}`}>
+                                                            <span className={`text-xs font-bold px-2 py-1 rounded-full ${isOverWip ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30' : isAtWip ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-slate-700/50 text-slate-300 border border-slate-600/50'}`}>
                                                                 {col.tasks.length} / {col.wipLimit}
                                                             </span>
                                                         </div>
@@ -370,7 +369,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                 )}
                                             </div>
 
-                                            <div className="flex-1 bg-slate-100 p-3 space-y-3 overflow-y-auto rounded-b-2xl">
+                                            <div className="flex-1 bg-slate-900/40 p-3 space-y-3 overflow-y-auto rounded-b-3xl">
                                                 {col.tasks.map((task, index) => {
                                                     const hasRedConstraints = chapter > 1 && (task.constraints?.length || 0) > 0;
                                                     const isWasteTask = task.id.includes('waste') || task.title === 'REWORK';
@@ -383,52 +382,49 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                     ref={provided.innerRef}
                                                                     {...provided.draggableProps}
                                                                     {...provided.dragHandleProps}
-                                                                    className={`relative bg-white p-3 rounded-xl shadow-sm border-l-4 cursor-grab active:cursor-grabbing hover:shadow-md transition-all group ${
-                                                                        isWasteTask
-                                                                            ? 'border-red-500 bg-red-50/80'
-                                                                            : hasRedConstraints
-                                                                                ? 'border-red-500 bg-red-50'
-                                                                                : task.type === 'Structural' ? 'border-blue-500'
-                                                                                : task.type === 'Systems' ? 'border-emerald-500'
-                                                                                : task.type === 'Interior' ? 'border-amber-500'
-                                                                                : task.type === 'Management' ? 'border-purple-500'
-                                                                                : 'border-blue-400'
-                                                                    } ${snapshot.isDragging ? 'shadow-2xl ring-2 rotate-2' : ''} ${
-                                                                        isOverWip && col.id === 'doing' ? 'opacity-80' : ''
-                                                                    }`}
+                                                                    className={`relative bg-slate-800 p-3 rounded-2xl shadow-sm border border-slate-700/50 cursor-grab active:cursor-grabbing hover:shadow-lg transition-all group ${isWasteTask
+                                                                        ? 'border-red-500/50 bg-red-900/20'
+                                                                        : hasRedConstraints
+                                                                            ? 'border-red-500/50 bg-red-900/20'
+                                                                            : task.type === 'Structural' ? 'border-l-4 border-l-cyan-500'
+                                                                                : task.type === 'Systems' ? 'border-l-4 border-l-emerald-500'
+                                                                                    : task.type === 'Interior' ? 'border-l-4 border-l-amber-500'
+                                                                                        : task.type === 'Management' ? 'border-l-4 border-l-purple-500'
+                                                                                            : 'border-l-4 border-l-cyan-400'
+                                                                        } ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-cyan-500/50 !bg-slate-700 rotate-2 z-50' : ''} ${isOverWip && col.id === 'doing' ? 'opacity-80' : ''
+                                                                        }`}
                                                                 >
                                                                     <WasteTaskOverlay isWaste={isWasteTask} isInDone={isInDoneCol} />
 
                                                                     <div className="flex justify-between items-start">
-                                                                        <h4 className={`font-bold group-hover:text-blue-600 transition-colors text-sm md:text-base flex-1 ${isWasteTask ? 'text-red-700' : 'text-slate-700'}`}>
+                                                                        <h4 className={`font-bold group-hover:text-cyan-400 transition-colors text-sm md:text-base flex-1 ${isWasteTask ? 'text-red-400' : 'text-slate-200'}`}>
                                                                             {task.title}
                                                                         </h4>
-                                                                        {hasRedConstraints && <span className="text-xs font-black text-red-600 animate-pulse" title="Blocked by Constraints">BLOCKED</span>}
+                                                                        {hasRedConstraints && <span className="text-[10px] font-black text-red-400 bg-red-500/20 px-1.5 py-0.5 rounded animate-pulse" title="Blocked by Constraints">BLOCKED</span>}
                                                                         {isWasteTask && !isInDoneCol && (
-                                                                            <span className="text-[9px] font-black text-red-600 bg-red-100 px-1.5 py-0.5 rounded animate-pulse">WASTE</span>
+                                                                            <span className="text-[9px] font-black text-red-400 bg-red-500/20 px-1.5 py-0.5 rounded animate-pulse">WASTE</span>
                                                                         )}
                                                                     </div>
 
                                                                     <p className="text-[10px] md:text-xs text-slate-400 line-clamp-2 mt-1">{task.description}</p>
 
                                                                     {chapter > 1 && task.constraints?.map(c => (
-                                                                        <span key={c} className="inline-block bg-red-100 text-red-700 text-[9px] px-1 py-0.5 rounded mr-1 mt-1 font-bold border border-red-200 uppercase">
+                                                                        <span key={c} className="inline-block bg-red-500/20 text-red-300 text-[9px] px-1 py-0.5 rounded mr-1 mt-1 font-bold border border-red-500/30 uppercase">
                                                                             Blocked: {c}
                                                                         </span>
                                                                     ))}
 
                                                                     <div className="mt-2 flex flex-wrap gap-1 md:gap-2 text-[10px] font-mono font-bold">
-                                                                        <span className={`px-1 rounded border ${
-                                                                            task.type === 'Structural' ? 'bg-blue-100 text-blue-800 border-blue-200' :
-                                                                            task.type === 'Systems' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
-                                                                            task.type === 'Interior' ? 'bg-amber-100 text-amber-800 border-amber-200' :
-                                                                            task.type === 'Management' ? 'bg-purple-100 text-purple-800 border-purple-200' :
-                                                                                'bg-sky-100 text-sky-800 border-sky-200'
+                                                                        <span className={`px-1.5 py-0.5 rounded-full border ${task.type === 'Structural' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' :
+                                                                            task.type === 'Systems' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                                                                                task.type === 'Interior' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
+                                                                                    task.type === 'Management' ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' :
+                                                                                        'bg-sky-500/20 text-sky-400 border-sky-500/30'
                                                                             }`}>
                                                                             {task.type}
                                                                         </span>
-                                                                        <span className="text-slate-600 bg-slate-50 border border-slate-200 px-1 rounded">-{task.cost}</span>
-                                                                        <span className="text-green-600 bg-green-50 border border-green-200 px-1 rounded">+${task.reward}</span>
+                                                                        <span className="text-slate-400 bg-slate-700/50 border border-slate-600/50 px-1.5 py-0.5 rounded-full">-{task.cost}</span>
+                                                                        <span className="text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 px-1.5 py-0.5 rounded-full">+${task.reward}</span>
                                                                     </div>
                                                                 </div>
                                                             )}

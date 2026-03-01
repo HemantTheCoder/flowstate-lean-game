@@ -22,7 +22,7 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
     if (!isOpen) return null;
 
     // Ensure final score is calculated if not yet done
-    const finalScore = depotScore > 0 ? depotScore : evaluate5S();
+    const finalScore = depotScore > 0 ? depotScore : (evaluate5S() ?? 0);
 
     const getGrade = (score: number) => {
         if (score >= 90) return { letter: 'S', color: 'text-amber-500', phrase: 'Master Organizer' };
@@ -34,21 +34,21 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
     const gradeInfo = getGrade(finalScore);
 
     return (
-        <div className="absolute inset-0 z-[200] flex items-center justify-center bg-slate-900/95 backdrop-blur-md px-4 font-sans pointer-events-auto">
+        <div className="absolute inset-0 z-[200] flex items-center justify-center bg-slate-950/90 backdrop-blur-md px-4 font-sans pointer-events-auto">
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="bg-white w-full max-w-2xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden border-4 border-slate-100 flex flex-col"
+                className="bg-slate-900 w-full max-w-2xl max-h-[90vh] rounded-3xl shadow-[0_0_50px_rgba(245,158,11,0.2)] overflow-hidden border border-amber-500/30 flex flex-col"
             >
                 {/* Header Banner - Amber Theme for 5S */}
-                <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 h-40 flex flex-col items-center justify-center relative shadow-inner overflow-hidden shrink-0">
+                <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-600 h-40 flex flex-col items-center justify-center relative shadow-inner overflow-hidden shrink-0">
                     <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/blueprint.png')]"></div>
 
                     <motion.div
                         initial={{ scale: 0, rotate: -180 }}
                         animate={{ scale: 1, rotate: 0 }}
                         transition={{ type: "spring", delay: 0.2 }}
-                        className="bg-white p-3 rounded-2xl shadow-xl z-10 mb-2 border-4 border-amber-200"
+                        className="bg-slate-900 p-3 rounded-2xl shadow-xl z-10 mb-2 border border-amber-500/50"
                     >
                         <ShieldCheck className="w-10 h-10 text-amber-500" />
                     </motion.div>
@@ -59,31 +59,31 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
 
                 <div className="p-8 md:p-10 overflow-y-auto">
                     <div className="text-center mb-8">
-                        <p className="text-lg text-slate-600 font-medium">
+                        <p className="text-lg text-slate-300 font-medium">
                             You brought order to chaos. By applying the 5S principles, you transformed a cluttered depot into a visual, high-performance workspace.
                         </p>
                     </div>
 
                     <div className="flex flex-col md:flex-row gap-6 mb-8">
                         {/* 5S Score Card */}
-                        <div className="flex-1 bg-amber-50 rounded-2xl p-6 border-2 border-amber-200 flex flex-col items-center justify-center shadow-inner relative overflow-hidden">
-                            <h3 className="text-sm font-bold text-amber-600 uppercase tracking-widest mb-2 z-10">5S Audit Score</h3>
+                        <div className="flex-1 bg-slate-800/80 rounded-2xl p-6 border border-amber-500/30 flex flex-col items-center justify-center shadow-inner relative overflow-hidden">
+                            <h3 className="text-sm font-bold text-amber-500 uppercase tracking-widest mb-2 z-10">5S Audit Score</h3>
                             <div className="flex items-end justify-center gap-2 z-10 mb-1">
-                                <span className={`text-6xl font-black ${gradeInfo.color} drop-shadow-sm`}>{finalScore}%</span>
+                                <span className={`text-6xl font-black ${gradeInfo.color} drop-shadow-[0_0_15px_rgba(245,158,11,0.3)]`}>{finalScore}%</span>
                             </div>
-                            <span className={`text-sm font-black uppercase tracking-widest ${gradeInfo.color} px-3 py-1 bg-white rounded-full z-10 shadow-sm border border-slate-100`}>
+                            <span className={`text-sm font-black uppercase tracking-widest ${gradeInfo.color} px-3 py-1 bg-amber-950/50 rounded-full z-10 shadow-md border border-amber-500/20`}>
                                 {gradeInfo.phrase}
                             </span>
                         </div>
 
                         {/* Quiz Score Card */}
-                        <div className="flex-1 bg-blue-50 rounded-2xl p-6 border-2 border-blue-200 flex flex-col items-center justify-center shadow-inner">
-                            <h3 className="text-sm font-bold text-blue-600 uppercase tracking-widest mb-2">Knowledge Check</h3>
+                        <div className="flex-1 bg-slate-800/80 rounded-2xl p-6 border border-blue-500/30 flex flex-col items-center justify-center shadow-inner">
+                            <h3 className="text-sm font-bold text-blue-400 uppercase tracking-widest mb-2">Knowledge Check</h3>
                             <div className="flex items-center gap-2 mb-2">
                                 <Brain className="w-8 h-8 text-blue-500" />
-                                <span className="text-4xl font-black text-blue-700">{quizScore}%</span>
+                                <span className="text-4xl font-black text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">{quizScore}%</span>
                             </div>
-                            <p className="text-xs text-blue-500 font-medium text-center px-4">Principles Understood</p>
+                            <p className="text-xs text-blue-500 font-bold text-center px-4 uppercase tracking-widest">Principles Understood</p>
                         </div>
                     </div>
 

@@ -73,19 +73,19 @@ export default function Dashboard() {
 
   if (!gameState && runs.length === 0 && !isLoading) {
     return (
-      <div className="min-h-screen bg-[#0A0B1A] flex flex-col items-center justify-center p-6 text-slate-200 font-sans relative overflow-hidden">
-        {/* Visual Novel Background */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-[20%] right-[20%] w-[50%] h-[50%] bg-blue-600/20 blur-[150px] rounded-full" />
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-slate-200 font-sans relative overflow-hidden">
+        {/* Premium Twilight Industrial Ambient Background */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute top-[20%] right-[20%] w-[50%] h-[50%] bg-indigo-500/20 blur-[150px] rounded-full" />
         </div>
 
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center max-w-lg z-10 bg-slate-900/60 backdrop-blur-2xl border border-white/10 p-10 rounded-3xl shadow-[0_0_50px_rgba(59,130,246,0.15)] relative overflow-hidden"
+          className="text-center max-w-lg z-10 bg-slate-800/80 backdrop-blur-2xl border border-slate-700/50 p-10 rounded-3xl shadow-[0_0_50px_rgba(34,211,238,0.15)] relative overflow-hidden"
         >
-          <div className="w-20 h-20 mx-auto bg-blue-500/10 rounded-full flex items-center justify-center border border-blue-500/30 mb-8 shadow-inner">
-            <Activity className="w-10 h-10 text-blue-400" />
+          <div className="w-20 h-20 mx-auto bg-cyan-500/10 rounded-full flex items-center justify-center border border-cyan-500/30 mb-8 shadow-inner">
+            <Activity className="w-10 h-10 text-cyan-400" />
           </div>
           <h2 className="text-3xl font-black text-white mb-4 tracking-tight">No Site Data Recorded</h2>
           <p className="text-slate-400 mb-10 text-base leading-relaxed">
@@ -94,7 +94,7 @@ export default function Dashboard() {
           <button
             data-testid="button-go-chapters"
             onClick={() => setLocation('/chapters')}
-            className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)]"
+            className="w-full py-4 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold text-sm uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]"
           >
             Go to Episodes
           </button>
@@ -104,64 +104,65 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0B1A] text-slate-200 font-sans p-4 md:p-8 relative overflow-hidden">
-      {/* Visual Novel Ambient Background */}
+    <div className="min-h-screen bg-slate-900 text-slate-200 font-sans p-4 md:p-8 relative overflow-hidden">
+      {/* Premium Twilight Industrial Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15] }}
           transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/30 blur-[150px] rounded-full"
+          className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-500/20 blur-[150px] rounded-full"
         />
         <motion.div
-          animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.15, 0.1] }}
+          animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.2, 0.1] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear", delay: 5 }}
-          className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-blue-600/20 blur-[150px] rounded-full"
+          className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-cyan-500/20 blur-[150px] rounded-full"
         />
+        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-15 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
       </div>
 
       <main className="max-w-7xl mx-auto space-y-8 relative z-10">
 
         {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-6 border-b border-white/10">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-6 border-b border-slate-700/50">
           <div className="flex items-center gap-6">
             <button
               onClick={() => setLocation('/')}
               data-testid="button-back"
-              className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2 font-bold uppercase tracking-widest text-xs shadow-lg backdrop-blur-md"
+              className="px-5 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all flex items-center gap-2 font-bold uppercase tracking-widest text-xs shadow-lg backdrop-blur-md"
             >
               <ArrowLeft className="w-4 h-4" /> Go Back
             </button>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-200 tracking-tight">Performance Metrics</h1>
+                <h1 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-200 tracking-tight">Performance Metrics</h1>
               </div>
-              <p className="text-blue-400 text-xs font-bold uppercase tracking-widest mt-1">Flowstate Analytics</p>
+              <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mt-1">Flowstate Analytics</p>
             </div>
           </div>
 
           <div className="flex gap-4">
-            <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 px-6 py-3 rounded-2xl flex flex-col items-end shadow-lg">
+            <div className="bg-slate-800/60 backdrop-blur-md border border-slate-700/50 px-6 py-3 rounded-2xl flex flex-col items-end shadow-lg">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Current Episode</span>
               <span className="font-black text-white text-lg leading-none mt-1">Ep {gameState?.chapter || 1}</span>
             </div>
-            <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 px-6 py-3 rounded-2xl flex flex-col items-end shadow-lg">
+            <div className="bg-slate-800/60 backdrop-blur-md border border-slate-700/50 px-6 py-3 rounded-2xl flex flex-col items-end shadow-lg">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sim Day</span>
-              <span className="font-black text-blue-400 text-lg leading-none mt-1">{gameState?.day || 0}</span>
+              <span className="font-black text-cyan-400 text-lg leading-none mt-1">{gameState?.day || 0}</span>
             </div>
           </div>
         </header>
 
         {/* Top KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <motion.div variants={sectionVariants} initial="hidden" animate="visible" className="bg-slate-900/40 backdrop-blur-xl border border-white/10 p-6 flex flex-col relative overflow-hidden rounded-3xl shadow-lg group">
-            <div className="absolute right-[-10px] top-[-10px] text-blue-500/10 group-hover:text-blue-500/20 transition-colors duration-500">
+          <motion.div variants={sectionVariants} initial="hidden" animate="visible" className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 p-6 flex flex-col relative overflow-hidden rounded-3xl shadow-lg group">
+            <div className="absolute right-[-10px] top-[-10px] text-cyan-500/10 group-hover:text-cyan-500/20 transition-colors duration-500">
               <Activity className="w-32 h-32" />
             </div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 z-10">Overall Score</p>
             <p className="text-4xl font-black text-white z-10 drop-shadow-md">{runs.reduce((acc, curr) => acc + (curr.totalScore || 0), 0)}</p>
           </motion.div>
 
-          <motion.div variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }} className="bg-slate-900/40 backdrop-blur-xl border border-white/10 p-6 flex flex-col relative overflow-hidden rounded-3xl shadow-lg group">
+          <motion.div variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }} className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 p-6 flex flex-col relative overflow-hidden rounded-3xl shadow-lg group">
             <div className="absolute right-[-10px] top-[-10px] text-emerald-500/10 group-hover:text-emerald-500/20 transition-colors duration-500">
               <Layers className="w-32 h-32" />
             </div>
@@ -172,7 +173,7 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
-          <motion.div variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.2 }} className="bg-slate-900/40 backdrop-blur-xl border border-white/10 p-6 flex flex-col relative overflow-hidden rounded-3xl shadow-lg group">
+          <motion.div variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.2 }} className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 p-6 flex flex-col relative overflow-hidden rounded-3xl shadow-lg group">
             <div className="absolute right-[-10px] top-[-10px] text-amber-500/10 group-hover:text-amber-500/20 transition-colors duration-500">
               <Target className="w-32 h-32" />
             </div>
@@ -183,12 +184,12 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
-          <motion.div variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.3 }} className="bg-slate-900/40 backdrop-blur-xl border border-white/10 p-6 flex flex-col relative overflow-hidden rounded-3xl shadow-lg group">
+          <motion.div variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.3 }} className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 p-6 flex flex-col relative overflow-hidden rounded-3xl shadow-lg group">
             <div className="absolute right-[-10px] top-[-10px] text-purple-500/10 group-hover:text-purple-500/20 transition-colors duration-500">
               <Clock className="w-32 h-32" />
             </div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 z-10">Days Completed</p>
-            <p className="text-4xl font-black text-purple-400 drop-shadow-[0_0_15px_rgba(192,132,252,0.3)] z-10">{runs.length || 0}</p>
+            <p className="text-4xl font-black text-purple-400 drop-shadow-[0_0_15px_rgba(168,85,247,0.3)] z-10">{runs.length || 0}</p>
           </motion.div>
         </div>
 
@@ -199,10 +200,10 @@ export default function Dashboard() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
-            className="lg:col-span-2 bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-6 md:p-8 flex flex-col rounded-3xl shadow-xl"
+            className="lg:col-span-2 bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-6 md:p-8 flex flex-col rounded-3xl shadow-xl"
           >
             <h2 className="text-sm font-bold text-slate-300 uppercase tracking-widest mb-6 flex items-center gap-3">
-              <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
+              <div className="p-2 bg-cyan-500/20 rounded-lg text-cyan-400">
                 <Activity className="w-4 h-4" />
               </div>
               Efficiency Trend
@@ -212,30 +213,30 @@ export default function Dashboard() {
                 <AreaChart data={dailyMetrics}>
                   <defs>
                     <linearGradient id="colorDaily" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#22d3ee" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
                       <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} vertical={false} />
-                  <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#334155" tickLine={false} axisLine={false} dy={10} />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#334155" tickLine={false} axisLine={false} dx={-10} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#475569" opacity={0.3} vertical={false} />
+                  <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#475569" tickLine={false} axisLine={false} dy={10} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#475569" tickLine={false} axisLine={false} dx={-10} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(10px)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#f8fafc', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}
+                    contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', backdropFilter: 'blur(10px)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#f8fafc', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}
                     itemStyle={{ color: '#cbd5e1' }}
                   />
                   <Area
                     type="monotone"
                     dataKey="efficiency"
                     name="Daily Efficiency"
-                    stroke="#3b82f6"
+                    stroke="#22d3ee"
                     strokeWidth={3}
                     fillOpacity={1}
                     fill="url(#colorDaily)"
-                    activeDot={{ r: 6, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }}
+                    activeDot={{ r: 6, fill: '#22d3ee', stroke: '#fff', strokeWidth: 2 }}
                   />
                   <Area
                     type="step"
@@ -257,7 +258,7 @@ export default function Dashboard() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
-            className="lg:col-span-1 bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-6 md:p-8 flex flex-col rounded-3xl shadow-xl"
+            className="lg:col-span-1 bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-6 md:p-8 flex flex-col rounded-3xl shadow-xl"
           >
             <h2 className="text-sm font-bold text-slate-300 uppercase tracking-widest mb-6 flex items-center gap-3">
               <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">
@@ -268,11 +269,11 @@ export default function Dashboard() {
             <div className="flex-1 min-h-[250px] w-full ml-[-15px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={ppcData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} vertical={false} />
-                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#334155" tickLine={false} axisLine={false} dy={10} />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#334155" tickLine={false} axisLine={false} dx={-10} hide />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#475569" opacity={0.3} vertical={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#475569" tickLine={false} axisLine={false} dy={10} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} stroke="#475569" tickLine={false} axisLine={false} dx={-10} hide />
                   <Tooltip
-                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(10px)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#f8fafc' }}
+                    contentStyle={{ backgroundColor: 'rgba(30, 41, 59, 0.9)', backdropFilter: 'blur(10px)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#f8fafc' }}
                     itemStyle={{ color: '#cbd5e1' }}
                   />
                   <Line
@@ -295,21 +296,21 @@ export default function Dashboard() {
           variants={sectionVariants}
           initial="hidden"
           animate="visible"
-          className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-6 md:p-8 rounded-3xl shadow-xl"
+          className="bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-6 md:p-8 rounded-3xl shadow-xl"
         >
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
             <h2 className="text-sm font-bold text-slate-300 uppercase tracking-widest flex items-center gap-3">
-              <div className="p-2 bg-slate-800 rounded-lg text-slate-400">
+              <div className="p-2 bg-slate-900 rounded-lg text-slate-400">
                 <Clock className="w-4 h-4" />
               </div>
               Daily Performance Log
             </h2>
           </div>
 
-          <div className="overflow-x-auto max-h-96 rounded-2xl border border-white/5 custom-scrollbar bg-black/20">
+          <div className="overflow-x-auto max-h-96 rounded-2xl border border-slate-700/50 custom-scrollbar bg-slate-900/50">
             <table className="w-full text-sm text-left" data-testid="table-daily-breakdown">
-              <thead className="sticky top-0 bg-slate-900/90 backdrop-blur-md z-10">
-                <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-white/10">
+              <thead className="sticky top-0 bg-slate-800 backdrop-blur-md z-10 border-b border-slate-700/50">
+                <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   <th className="px-5 py-5">Day</th>
                   <th className="px-5 py-5">Output</th>
                   <th className="px-5 py-5">Capacity</th>
@@ -318,7 +319,7 @@ export default function Dashboard() {
                   <th className="px-5 py-5 min-w-[250px]">Lean Insight</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-slate-700/50">
                 {dailyMetrics.map((m, idx) => (
                   <tr
                     key={m.day}
@@ -356,7 +357,7 @@ export default function Dashboard() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
-            className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-6 md:p-8 rounded-3xl shadow-xl"
+            className="bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-6 md:p-8 rounded-3xl shadow-xl"
           >
             <h2 className="text-sm font-bold text-slate-300 uppercase tracking-widest mb-6 flex items-center gap-3">
               <div className="p-2 bg-purple-500/20 rounded-lg text-purple-400">
@@ -392,11 +393,11 @@ export default function Dashboard() {
             variants={sectionVariants}
             initial="hidden"
             animate="visible"
-            className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-6 md:p-8 rounded-3xl shadow-xl"
+            className="bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-6 md:p-8 rounded-3xl shadow-xl"
           >
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-sm font-bold text-slate-300 uppercase tracking-widest flex items-center gap-3">
-                <div className="p-2 bg-slate-800 rounded-lg text-slate-400">
+                <div className="p-2 bg-slate-900 rounded-lg text-slate-400">
                   <Activity className="w-4 h-4" />
                 </div>
                 Activity Log
@@ -410,7 +411,7 @@ export default function Dashboard() {
                   <div
                     key={i}
                     data-testid={`log-entry-${i}`}
-                    className="text-xs text-slate-300 py-3 px-4 bg-black/20 rounded-xl border border-white/5 flex gap-3 leading-relaxed hover:bg-white/5 transition-colors"
+                    className="text-xs text-slate-300 py-3 px-4 bg-slate-900/50 rounded-xl border border-slate-700/50 flex gap-3 leading-relaxed hover:bg-slate-800 transition-colors"
                   >
                     <span className="text-slate-600 font-bold">{(i + 1).toString().padStart(2, '0')}</span>
                     {entry}

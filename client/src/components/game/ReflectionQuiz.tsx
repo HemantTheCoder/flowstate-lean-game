@@ -207,23 +207,23 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', bounce: 0.4 }}
-        className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border-2 border-indigo-200 flex flex-col max-h-[90vh]"
+        className="bg-slate-800 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-700/50 flex flex-col max-h-[90vh]"
       >
-        <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 px-6 py-5">
+        <div className="bg-slate-900/50 border-b border-slate-700/50 px-6 py-5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <Brain className="w-7 h-7 text-white" />
+              <Brain className="w-7 h-7 text-cyan-400" />
               <h2 className="text-xl font-black text-white">Reflection Quiz</h2>
             </div>
             {!quizComplete && (
-              <div className="text-indigo-100 font-semibold text-sm">
+              <div className="text-slate-400 font-semibold text-sm">
                 {currentQuestionIndex + 1} / {QUESTIONS.length}
               </div>
             )}
           </div>
-          <div className="h-2 bg-white/30 rounded-full overflow-hidden">
+          <div className="h-2 bg-slate-700/50 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-white rounded-full"
+              className="h-full bg-cyan-500 rounded-full shadow-[0_0_10px_rgba(6,182,212,0.5)]"
               animate={{
                 width: quizComplete
                   ? '100%'
@@ -245,7 +245,7 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
                 transition={{ duration: 0.3 }}
                 className="space-y-5"
               >
-                <h3 className="text-xl font-bold text-slate-800 leading-relaxed">
+                <h3 className="text-xl font-bold text-slate-200 leading-relaxed">
                   {currentQuestion.text}
                 </h3>
 
@@ -254,16 +254,16 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
                     const isSelected = selectedOption === option.id;
                     const isOptionCorrect = option.isCorrect;
 
-                    let borderClass = 'border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 cursor-pointer';
+                    let borderClass = 'border-slate-700/50 bg-slate-800/50 hover:border-cyan-500/50 hover:bg-cyan-900/10 cursor-pointer';
                     if (showFeedback) {
                       if (isSelected && isOptionCorrect) {
-                        borderClass = 'border-green-500 bg-green-50 ring-2 ring-green-400';
+                        borderClass = 'border-emerald-500/50 bg-emerald-900/20 ring-1 ring-emerald-500/50';
                       } else if (isSelected && !isOptionCorrect) {
-                        borderClass = 'border-red-500 bg-red-50 ring-2 ring-red-400';
+                        borderClass = 'border-red-500/50 bg-red-900/20 ring-1 ring-red-500/50';
                       } else if (isOptionCorrect) {
-                        borderClass = 'border-green-300 bg-green-50';
+                        borderClass = 'border-emerald-500/30 bg-emerald-900/10';
                       } else {
-                        borderClass = 'border-slate-200 bg-slate-50 opacity-60';
+                        borderClass = 'border-slate-700/30 bg-slate-800/30 opacity-50';
                       }
                     }
 
@@ -280,10 +280,10 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1">
-                            <span className="font-bold text-slate-500 mr-2">
+                            <span className="font-bold text-slate-400 mr-2">
                               {String.fromCharCode(65 + index)}.
                             </span>
-                            <span className="text-slate-700">{option.text}</span>
+                            <span className="text-slate-300">{option.text}</span>
                           </div>
                           <div className="flex-shrink-0 mt-0.5">
                             {showFeedback && isSelected && isOptionCorrect && (
@@ -312,12 +312,12 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className={`p-4 rounded-xl border-l-4 ${isCorrect ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}
+                      className={`p-4 rounded-xl border-l-4 bg-slate-800 ${isCorrect ? 'border-emerald-500' : 'border-red-500'}`}
                     >
-                      <div className={`font-bold mb-1 ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>
+                      <div className={`font-bold mb-1 ${isCorrect ? 'text-emerald-400' : 'text-red-400'}`}>
                         {isCorrect ? 'Correct!' : 'Not quite.'}
                       </div>
-                      <div className={`text-sm ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
+                      <div className={`text-sm ${isCorrect ? 'text-emerald-100' : 'text-red-100'}`}>
                         {currentQuestion.explanation}
                       </div>
                     </motion.div>
@@ -329,7 +329,7 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     onClick={handleNext}
-                    className="w-full bg-indigo-500 text-white py-3 rounded-xl font-bold text-lg hover:bg-indigo-600 transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-cyan-600/20 text-cyan-400 border border-cyan-500/50 py-3 rounded-xl font-bold text-lg hover:bg-cyan-600/40 hover:text-white transition-colors flex items-center justify-center gap-2"
                   >
                     {currentQuestionIndex < QUESTIONS.length - 1 ? 'Next Question' : 'See Results'}
                     <ChevronRight className="w-5 h-5" />
@@ -348,12 +348,12 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', bounce: 0.6, delay: 0.2 }}
                 >
-                  <Award className="w-16 h-16 text-indigo-500" />
+                  <Award className="w-16 h-16 text-cyan-400" />
                 </motion.div>
 
                 <div className="text-center space-y-2">
-                  <h3 className="text-3xl font-black text-slate-800">Quiz Complete</h3>
-                  <div className="text-5xl font-black bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+                  <h3 className="text-3xl font-black text-slate-200">Quiz Complete</h3>
+                  <div className="text-5xl font-black bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
                     {score}/{QUESTIONS.length}
                   </div>
                 </div>
@@ -362,7 +362,7 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="text-lg font-semibold text-slate-600 text-center"
+                  className="text-lg font-semibold text-slate-400 text-center"
                 >
                   {score === QUESTIONS.length
                     ? 'Perfect Score! Master of Lean principles.'
@@ -374,8 +374,8 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
                 </motion.div>
 
                 {score < QUESTIONS.length && (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 w-full space-y-3">
-                    <div className="font-semibold text-red-900 text-sm flex items-center gap-2">
+                  <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-4 w-full space-y-3">
+                    <div className="font-semibold text-red-400 text-sm flex items-center gap-2">
                       <XCircle className="w-4 h-4" />
                       Concepts to Review
                     </div>
@@ -385,21 +385,21 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
                       if (wasCorrect) return null;
                       const correctOption = q.options.find(o => o.isCorrect);
                       return (
-                        <div key={q.id} className="border-t border-red-100 pt-2 first:border-0 first:pt-0">
-                          <div className="text-sm font-bold text-red-800">{q.text}</div>
-                          <div className="text-xs text-red-600 mt-1">
-                            Correct answer: <span className="font-semibold">{correctOption?.text}</span>
+                        <div key={q.id} className="border-t border-red-500/20 pt-2 first:border-0 first:pt-0">
+                          <div className="text-sm font-bold text-red-300">{q.text}</div>
+                          <div className="text-xs text-red-400 mt-1">
+                            Correct answer: <span className="font-semibold text-emerald-400">{correctOption?.text}</span>
                           </div>
-                          <div className="text-xs text-red-500 mt-0.5 italic">{q.explanation}</div>
+                          <div className="text-xs text-red-200 mt-0.5 italic opacity-80">{q.explanation}</div>
                         </div>
                       );
                     })}
                   </div>
                 )}
 
-                <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 w-full space-y-2">
-                  <div className="font-semibold text-indigo-900 text-sm">Key Takeaways</div>
-                  <ul className="text-sm text-indigo-800 space-y-1">
+                <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-xl p-4 w-full space-y-2">
+                  <div className="font-semibold text-cyan-400 text-sm">Key Takeaways</div>
+                  <ul className="text-sm text-cyan-100 space-y-1">
                     {chapter === 2 ? (
                       <>
                         <li className="flex items-start gap-2">
@@ -452,7 +452,7 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
 
                 <button
                   onClick={handleComplete}
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-4 rounded-xl font-bold text-lg hover:from-indigo-600 hover:to-purple-700 transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-cyan-600/20 border border-cyan-500/50 text-cyan-400 py-4 rounded-xl font-bold text-lg hover:bg-cyan-500/40 hover:text-white transition-all flex items-center justify-center gap-2"
                   data-testid="button-quiz-continue"
                 >
                   View Chapter Results <ChevronRight className="w-5 h-5" />

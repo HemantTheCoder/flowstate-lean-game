@@ -51,21 +51,21 @@ const item = {
 
 export default function Credits() {
     return (
-        <div className="relative w-full min-h-screen overflow-hidden bg-[#0A0B1A] flex flex-col items-center p-4 md:p-8 font-sans">
+        <div className="relative w-full min-h-screen overflow-hidden bg-slate-900 flex flex-col items-center p-4 md:p-8 font-sans">
 
-            {/* Visual Novel Ambient Background */}
+            {/* Premium Twilight Industrial Ambient Background */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <motion.div
                     animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15] }}
                     transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                    className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/30 blur-[150px] rounded-full"
+                    className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-500/20 blur-[150px] rounded-full"
                 />
                 <motion.div
-                    animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.15, 0.1] }}
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.2, 0.1] }}
                     transition={{ duration: 20, repeat: Infinity, ease: "linear", delay: 5 }}
-                    className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-indigo-600/30 blur-[150px] rounded-full"
+                    className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-cyan-500/20 blur-[150px] rounded-full"
                 />
-                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.03] [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-15 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
             </div>
 
             <div className="z-10 w-full max-w-4xl mx-auto flex flex-col items-center">
@@ -79,14 +79,14 @@ export default function Credits() {
                     <Link href="/">
                         <button
                             onClick={() => soundManager.playSFX('click')}
-                            className="flex items-center gap-3 px-6 py-3 bg-white/5 hover:bg-white/10 backdrop-blur-md rounded-xl transition-all border border-white/10 shadow-lg text-slate-300 hover:text-white font-bold text-xs uppercase tracking-widest"
+                            className="flex items-center gap-3 px-6 py-3 bg-slate-800/50 hover:bg-slate-700/50 backdrop-blur-md rounded-xl transition-all border border-slate-700/50 shadow-lg text-slate-300 hover:text-white font-bold text-xs uppercase tracking-widest"
                         >
                             <ArrowLeft className="w-4 h-4" />
                             <span>Go Back</span>
                         </button>
                     </Link>
 
-                    <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300 drop-shadow-md tracking-wider">
+                    <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-300 drop-shadow-md tracking-wider">
                         CREDITS
                     </h1>
 
@@ -104,7 +104,7 @@ export default function Credits() {
                         <motion.div
                             key={index}
                             variants={item}
-                            className="group relative overflow-hidden p-6 hover:-translate-y-2 transition-all duration-300 bg-slate-900/40 backdrop-blur-xl border-2 border-white/5 rounded-3xl shadow-lg"
+                            className="group relative overflow-hidden p-6 hover:-translate-y-2 transition-all duration-300 bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-3xl shadow-lg"
                         >
                             <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl rounded-full opacity-20 bg-gradient-to-br ${member.color}`} />
 
@@ -151,7 +151,7 @@ export default function Credits() {
                     <p className="text-slate-400 text-lg italic shadow-black drop-shadow-md">
                         "Software is a great combination between artistry and engineering."
                     </p>
-                    <p className="text-blue-400/80 text-xs mt-4 font-bold uppercase tracking-widest drop-shadow-sm">
+                    <p className="text-cyan-400 text-xs mt-4 font-bold uppercase tracking-widest drop-shadow-sm">
                         Crafted with ❤️ for FlowState
                     </p>
                 </motion.div>
