@@ -310,6 +310,13 @@ export default function Game() {
         }, 2000);
       }
 
+      // Chapter 3 Day 15: New Delivery
+      if (day === 15 && chapter === 3) {
+        setTimeout(() => {
+          useGameStore.getState().applyDayEvent(15);
+        }, 2000);
+      }
+
       // Day 11 inspection: Don't auto-show chapter complete here.
       // The flow is: Day 11 dialogue -> End Day -> Summary -> Quiz -> Chapter Complete
 
@@ -586,7 +593,7 @@ export default function Game() {
       if (day === 12) return "Day 12: Sort (Seiri). Throw away broken tools and unnecessary trash into the Red Tag bin.";
       if (day === 13) return "Day 13: Set in Order (Seiton). Give every remaining item a home in the correct zone.";
       if (day === 14) return "Day 14: Shine (Seiso). Click the hazard icons on the floor to clean spills and remove trip risks.";
-      if (day === 15) return "Day 15: Standardize (Seiketsu). Rules are set. Ensure everything is in its designated place.";
+      if (day === 15) return "Day 15: Standardize (Seiketsu). A new delivery arrived! Sort the waste, clean leaks, and set items in order immediately.";
       if (day === 16) return "Day 16: Sustain (Shitsuke). The Inspector is auditing. Ensure no items are out of standard.";
     }
 

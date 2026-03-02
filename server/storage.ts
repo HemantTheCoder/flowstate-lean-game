@@ -19,6 +19,7 @@ export interface IStorage {
   getLeaderboardByChapter(chapter: number): Promise<LeaderboardEntry[]>;
   addLeaderboardEntry(entry: InsertLeaderboardEntry, userId?: number): Promise<LeaderboardEntry>;
   clearLeaderboard(): Promise<void>;
+  deleteLeaderboardEntry(id: number): Promise<void>;
   getUserProfile(userId: number): Promise<UserProfile>;
 
   // Feedback
@@ -168,6 +169,10 @@ export class DatabaseStorage implements IStorage {
 
   async clearLeaderboard(): Promise<void> {
     await getDb().delete(leaderboardEntries);
+  }
+
+  async deleteLeaderboardEntry(id: number): Promise<void> {
+    await getDb().delete(leaderboardEntries).where(eq(leaderboardEntries.id, id));
   }
 
   async getUserProfile(userId: number): Promise<UserProfile> {
@@ -366,6 +371,10 @@ export class MemStorage implements IStorage {
 
   async clearLeaderboard(): Promise<void> {
     this.leaderboard = [];
+  }
+
+  async deleteLeaderboardEntry(id: number): Promise<void> {
+    this.leaderboard = this.leaderboard.filter(l => l.id !== id);
   }
 
   async getUserProfile(userId: number): Promise<UserProfile> {

@@ -59,12 +59,13 @@ export const CHAPTER_3_SCHEDULE: DayConfig[] = [
         dialogue: [
             { character: 'Rao', text: "It's clean. It's organized. Can we go back to building now?", emotion: 'neutral' },
             { character: 'Advisor', text: "Not yet. We need to Standardize. If we don't have a schedule for cleaning, it will be a mess again by Monday.", emotion: 'neutral' },
-            { character: 'Isha', text: "I've created a 5S Checklist. Five minutes at the end of every shift.", emotion: 'happy' },
-            { character: 'Mira', text: "Standardizing makes the 'Shine' step a habit, not a special event.", emotion: 'happy' }
+            { character: 'Mira', text: "Ah, speaking of messes... A new delivery of materials just arrived and they dumped it on the floor.", emotion: 'stressed' },
+            { character: 'Isha', text: "This is why we Standardize! We sort and set new deliveries immediately.", emotion: 'happy' },
+            { character: 'Advisor', text: "Exactly. Standardizing makes the 'Sort, Set, Shine' steps a habit, not a special event. Process the new delivery before ending the day.", emotion: 'happy' }
         ],
         briefing: {
-            objective: "Audit the Setup.",
-            action: "Ensure all items are currently in their correct zones. Standardize the layout by removing any out-of-place items."
+            objective: "Process New Delivery.",
+            action: "A new shipment has arrived on the unassigned floor. Use your 5S standards to Sort the trash, Clean any leaks, and Set the new materials in order."
         }
     },
     {

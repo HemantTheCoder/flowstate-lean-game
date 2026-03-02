@@ -68,19 +68,21 @@ export function AuthModal({ triggerOpen, onOpenChange }: AuthModalProps = {}) {
 
     if (user) {
         return (
-            <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-slate-600">
-                    Hello, {user.username}
+            <div className="flex items-center gap-4 bg-slate-900/50 backdrop-blur border border-slate-700/50 px-4 py-2 rounded-full shadow-lg">
+                <span className="text-sm font-bold text-slate-200 tracking-wider">
+                    <span className="text-cyan-400">@</span>{user.username}
                 </span>
-                <a href="/profile">
-                    <Button variant="outline" size="sm" className="mr-2">
-                        View Profile
+                <div className="flex items-center gap-2">
+                    <a href="/profile">
+                        <Button variant="outline" size="sm" className="bg-slate-800 text-white border-slate-600 hover:bg-slate-700 hover:text-white transition-colors">
+                            Profile
+                        </Button>
+                    </a>
+                    <Button variant="outline" size="sm" onClick={handleLogout} disabled={logoutMutation.isPending} className="bg-red-950/30 text-red-200 border-red-900/50 hover:bg-red-900/50 hover:text-white transition-colors">
+                        {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Logout
                     </Button>
-                </a>
-                <Button variant="outline" size="sm" onClick={handleLogout} disabled={logoutMutation.isPending}>
-                    {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Logout
-                </Button>
+                </div>
             </div>
         );
     }

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, ShieldAlert, Trash2, ArrowRight, Save, LayoutDashboard, MessageSquare, Users, Clock, Activity, Loader2 } from 'lucide-react';
+import { Terminal, ShieldAlert, Trash2, ArrowRight, Save, LayoutDashboard, MessageSquare, Users, Clock, Activity, Loader2, Trophy, Download, FileJson, X } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 
@@ -14,8 +14,13 @@ export default function DevDashboard() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [activeTab, setActiveTab] = useState<'metrics' | 'players' | 'feedbacks'>('metrics');
+    const [activeTab, setActiveTab] = useState<'metrics' | 'players' | 'feedbacks' | 'leaderboards' | 'state'>('metrics');
     const [feedbackTab, setFeedbackTab] = useState<'open' | 'resolved'>('open');
+
+    // Save Viewer Modal State
+    const [viewingSaveId, setViewingSaveId] = useState<number | null>(null);
+    const [viewingSaveData, setViewingSaveData] = useState<any>(null);
+    const [isFetchingSave, setIsFetchingSave] = useState(false);
     const [, setLocation] = useLocation();
     const { toast } = useToast();
     const [, navigate] = useLocation();
@@ -39,6 +44,11 @@ export default function DevDashboard() {
 
     const { data: registeredUsers, isLoading: isLoadingUsers } = useQuery<any[]>({
         queryKey: ['/api/admin/users'],
+        enabled: isAuthenticated
+    });
+
+    const { data: leaderboards, isLoading: isLoadingLeaderboards } = useQuery<any[]>({
+        queryKey: ['/api/leaderboard'],
         enabled: isAuthenticated
     });
 
@@ -111,10 +121,74 @@ export default function DevDashboard() {
         }
     };
 
+    const deleteLeaderboardEntryMutation = useMutation({
+        mutationFn: async (id: number) => {
+            if (!confirm("⚠️ Are you sure you want to permanently delete this leaderboard entry?")) {
+                throw new Error("Cancelled leaderboard deletion");
+            }
+            await apiRequest('DELETE', `/api/leaderboard/${id}`);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['/api/leaderboard'] });
+            toast({ title: "Entry Deleted", description: "The leaderboard entry has been permanently removed." });
+        },
+        onError: (err: Error) => {
+            if (err.message !== "Cancelled leaderboard deletion") {
+                toast({ title: "Error", description: "Failed to delete leaderboard entry", variant: "destructive" });
+            }
+        }
+    });
+
     const handleResetLocal = () => {
         if (!confirm('This will wipe your local game progress. Continue?')) return;
         localStorage.removeItem('persist:game-storage');
         window.location.reload();
+    };
+
+    const exportToCsv = (filename: string, rows: any[]) => {
+        if (!rows || !rows.length) return;
+        const separator = ',';
+        const keys = Object.keys(rows[0]).filter(k => typeof rows[0][k] !== 'object');
+        const csvContent =
+            keys.join(separator) +
+            '\n' +
+            rows.map(row => {
+                return keys.map(k => {
+                    let cell = row[k] === null || row[k] === undefined ? '' : row[k];
+                    cell = cell instanceof Date ? cell.toLocaleString() : cell.toString().replace(/"/g, '""');
+                    if (cell.search(/("|,|\n)/g) >= 0) {
+                        cell = `"${cell}"`;
+                    }
+                    return cell;
+                }).join(separator);
+            }).join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
+    const fetchUserSave = async (id: number) => {
+        setIsFetchingSave(true);
+        setViewingSaveId(id);
+        try {
+            const res = await fetch(`/api/admin/users/${id}/save`);
+            if (!res.ok) throw new Error("No save found");
+            const data = await res.json();
+            setViewingSaveData(data);
+        } catch (e) {
+            setViewingSaveData({ error: "No remote save state found for this user." });
+        } finally {
+            setIsFetchingSave(false);
+        }
     };
 
     if (!isAuthenticated) {
@@ -199,6 +273,20 @@ export default function DevDashboard() {
                         className={`font-bold tracking-widest uppercase ${activeTab === 'feedbacks' ? 'bg-indigo-600' : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'}`}
                     >
                         <MessageSquare className="w-4 h-4 mr-2" /> Feedback Reports
+                    </Button>
+                    <Button
+                        variant={activeTab === 'leaderboards' ? 'default' : 'outline'}
+                        onClick={() => setActiveTab('leaderboards')}
+                        className={`font-bold tracking-widest uppercase ${activeTab === 'leaderboards' ? 'bg-indigo-600' : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'}`}
+                    >
+                        <Trophy className="w-4 h-4 mr-2" /> Leaderboards
+                    </Button>
+                    <Button
+                        variant={activeTab === 'state' ? 'default' : 'outline'}
+                        onClick={() => setActiveTab('state')}
+                        className={`font-bold tracking-widest uppercase ${activeTab === 'state' ? 'bg-indigo-600' : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'}`}
+                    >
+                        <FileJson className="w-4 h-4 mr-2" /> Local State Inspector
                     </Button>
                 </div>
 
@@ -353,11 +441,20 @@ export default function DevDashboard() {
                 {/* Player Directory Tab */}
                 {activeTab === 'players' && (
                     <Card className="bg-slate-900 border-indigo-900/30 w-full animate-in fade-in zoom-in duration-300">
-                        <CardHeader>
+                        <CardHeader className="flex flex-row items-center justify-between">
                             <CardTitle className="text-indigo-400 flex items-center gap-2">
                                 <Users className="w-5 h-5" />
                                 Registered Player Directory
                             </CardTitle>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => exportToCsv('flowstate_players.csv', registeredUsers || [])}
+                                className="border-indigo-800 text-indigo-400 hover:bg-indigo-950/50"
+                                disabled={!registeredUsers || registeredUsers.length === 0}
+                            >
+                                <Download className="w-4 h-4 mr-2" /> Export CSV
+                            </Button>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
@@ -408,13 +505,23 @@ export default function DevDashboard() {
                                                             <td className="px-6 py-4 text-slate-400 whitespace-nowrap">
                                                                 {u.lastPlayed ? new Date(u.lastPlayed).toLocaleString() : 'Never'}
                                                             </td>
-                                                            <td className="px-6 py-4 text-right">
+                                                            <td className="px-6 py-4 text-right flex justify-end gap-2">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={() => fetchUserSave(u.id)}
+                                                                    className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10"
+                                                                    title="Inspect Remote Save"
+                                                                >
+                                                                    <FileJson className="w-4 h-4" />
+                                                                </Button>
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     onClick={() => deleteUserMutation.mutate(u.id)}
                                                                     disabled={deleteUserMutation.isPending || u.role === 'admin'}
                                                                     className="text-red-400 hover:text-red-300 hover:bg-red-500/10 disabled:opacity-30"
+                                                                    title="Delete User"
                                                                 >
                                                                     {deleteUserMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                                                                 </Button>
@@ -434,11 +541,20 @@ export default function DevDashboard() {
                 {/* Feedback Reports Tab */}
                 {activeTab === 'feedbacks' && (
                     <Card className="bg-slate-900 border-cyan-900/30 w-full animate-in fade-in zoom-in duration-300">
-                        <CardHeader>
+                        <CardHeader className="flex flex-row items-center justify-between">
                             <CardTitle className="text-cyan-400 flex items-center gap-2">
                                 <MessageSquare className="w-5 h-5" />
                                 Player Feedback & Reports
                             </CardTitle>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => exportToCsv('flowstate_feedback.csv', feedbacks || [])}
+                                className="border-cyan-800 text-cyan-400 hover:bg-cyan-950/50"
+                                disabled={!feedbacks || feedbacks.length === 0}
+                            >
+                                <Download className="w-4 h-4 mr-2" /> Export CSV
+                            </Button>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
@@ -518,7 +634,164 @@ export default function DevDashboard() {
                         </CardContent>
                     </Card>
                 )}
+
+                {/* Leaderboards Tab */}
+                {activeTab === 'leaderboards' && (
+                    <Card className="bg-slate-900 border-amber-900/30 w-full animate-in fade-in zoom-in duration-300">
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <CardTitle className="text-amber-400 flex items-center gap-2">
+                                <Trophy className="w-5 h-5" />
+                                Ranked Leaderboard Entries
+                            </CardTitle>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => exportToCsv('flowstate_leaderboard.csv', leaderboards || [])}
+                                    className="border-amber-800 text-amber-400 hover:bg-amber-950/50"
+                                    disabled={!leaderboards || leaderboards.length === 0}
+                                >
+                                    <Download className="w-4 h-4 mr-2" /> Export CSV
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={handleClearLeaderboard}
+                                    className="bg-red-900/50 flex-shrink-0 hover:bg-red-900 border border-red-800"
+                                >
+                                    <Trash2 className="w-4 h-4 mr-2" /> Nuke All Entries
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                {isLoadingLeaderboards ? (
+                                    <div className="text-slate-500 animate-pulse flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Loading scores...</div>
+                                ) : !leaderboards || leaderboards.length === 0 ? (
+                                    <div className="text-slate-500 border border-slate-800 p-8 rounded-xl text-center">No scores posted yet.</div>
+                                ) : (
+                                    <div className="overflow-x-auto rounded-xl border border-slate-800">
+                                        <table className="w-full text-left text-sm text-slate-300">
+                                            <thead className="text-xs uppercase bg-slate-950 text-slate-400 border-b border-slate-800">
+                                                <tr>
+                                                    <th className="px-6 py-4 font-bold tracking-widest">Player</th>
+                                                    <th className="px-6 py-4 font-bold tracking-widest">Chapter</th>
+                                                    <th className="px-6 py-4 font-bold tracking-widest">Efficiency</th>
+                                                    <th className="px-6 py-4 font-bold tracking-widest">Total Score</th>
+                                                    <th className="px-6 py-4 font-bold tracking-widest">Date</th>
+                                                    <th className="px-6 py-4 text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {leaderboards.map((l: any) => (
+                                                    <tr key={l.id} className="border-b border-slate-800/50 bg-slate-900/50 hover:bg-slate-800/50 transition-colors">
+                                                        <td className="px-6 py-4">
+                                                            <div className="font-bold text-white flex items-center gap-2">
+                                                                {l.playerName}
+                                                            </div>
+                                                            <div className="text-xs text-slate-500 mt-1">ID: {l.id} | UserID: {l.userId || 'Guest'}</div>
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <span className="bg-amber-500/10 text-amber-400 text-xs px-2 py-1 rounded border border-amber-500/20 font-bold">
+                                                                Chapter {l.chapter}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 font-mono text-slate-400">
+                                                            {l.efficiency}%
+                                                        </td>
+                                                        <td className="px-6 py-4 font-black text-amber-400 text-lg">
+                                                            {l.totalScore.toLocaleString()}
+                                                        </td>
+                                                        <td className="px-6 py-4 text-slate-400 whitespace-nowrap">
+                                                            {new Date(l.completedAt).toLocaleDateString()}
+                                                        </td>
+                                                        <td className="px-6 py-4 text-right">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => deleteLeaderboardEntryMutation.mutate(l.id)}
+                                                                disabled={deleteLeaderboardEntryMutation.isPending}
+                                                                className="text-red-400 hover:text-red-300 hover:bg-red-500/10 disabled:opacity-30"
+                                                            >
+                                                                {deleteLeaderboardEntryMutation.isPending && deleteLeaderboardEntryMutation.variables === l.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Local State Inspector Tab */}
+                {activeTab === 'state' && (
+                    <Card className="bg-slate-900 border-emerald-900/30 w-full animate-in fade-in zoom-in duration-300">
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <CardTitle className="text-emerald-400 flex items-center gap-2">
+                                <FileJson className="w-5 h-5" />
+                                Local Browser State Inspector
+                            </CardTitle>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                    const stateStr = JSON.stringify(useGameStore.getState(), null, 2);
+                                    const blob = new Blob([stateStr], { type: 'application/json' });
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = 'local_state.json';
+                                    a.click();
+                                }}
+                                className="border-emerald-800 text-emerald-400 hover:bg-emerald-950/50"
+                            >
+                                <Download className="w-4 h-4 mr-2" /> Download JSON
+                            </Button>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto max-h-[600px] overflow-y-auto">
+                                <pre className="text-xs text-emerald-400">
+                                    {JSON.stringify(useGameStore.getState(), null, 2)}
+                                </pre>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
+
+            {/* Remote Save Viewer Modal */}
+            {viewingSaveId !== null && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <Card className="bg-slate-900 border-indigo-500/30 w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
+                        <CardHeader className="flex flex-row items-center justify-between shrink-0 border-b border-slate-800 pb-4">
+                            <CardTitle className="text-indigo-400 flex items-center gap-2">
+                                <FileJson className="w-5 h-5" />
+                                Remote Save Data (User {viewingSaveId})
+                            </CardTitle>
+                            <Button variant="ghost" size="sm" onClick={() => setViewingSaveId(null)} className="text-slate-400 hover:text-white">
+                                <X className="w-5 h-5" />
+                            </Button>
+                        </CardHeader>
+                        <CardContent className="flex-1 overflow-auto p-4">
+                            {isFetchingSave ? (
+                                <div className="flex items-center justify-center h-40 text-slate-500 animate-pulse">
+                                    <Loader2 className="w-6 h-6 animate-spin mr-3" /> Fetching remote save state...
+                                </div>
+                            ) : (
+                                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto">
+                                    <pre className="text-xs text-indigo-300 whitespace-pre-wrap">
+                                        {JSON.stringify(viewingSaveData, null, 2)}
+                                    </pre>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
         </div>
     );
 }

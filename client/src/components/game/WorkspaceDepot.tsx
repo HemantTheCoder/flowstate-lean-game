@@ -38,11 +38,21 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
 
     // Handle selecting an item
     const handleItemClick = (item: DepotItem) => {
+        // Prevent interaction with hazards until Day 14 (Shine)
         if (item.type === 'hazard') {
-            if (day < 14) return; // Only allow cleaning from day 14 (Shine) onwards
+            if (day < 14) {
+                soundManager.playSFX('warning', 0.5);
+                return;
+            }
             cleanDepotHazard(item.id);
             soundManager.playSFX('quiz_correct', 0.6);
             if (day === 16) evaluate5S();
+            return;
+        }
+
+        // On Day 12 (Sort), prevent interacting with tools and materials
+        if (day === 12 && item.type !== 'trash' && !item.isBroken) {
+            soundManager.playSFX('warning', 0.5);
             return;
         }
 
@@ -59,6 +69,14 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
     // Handle dropping/moving item to a zone
     const handleZoneClick = (zoneId: string) => {
         if (!selectedItemId) return;
+
+        // Ensure zone is unlocked
+        const zone = depotZones.find(z => z.id === zoneId);
+        if (day === 12 && zone && zone.acceptsType !== 'trash') {
+            // Day 12 allows ONLY trash/broken items to be moved to the Trash zone.
+            soundManager.playSFX('warning', 0.5);
+            return;
+        }
 
         moveDepotItem(selectedItemId, zoneId);
         setSelectedItemId(null);
@@ -188,7 +206,9 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
                                     className="hidden md:flex bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-4 py-2 rounded-xl items-center gap-2 text-sm font-bold shadow-lg"
                                 >
                                     <MousePointerClick className="w-5 h-5 animate-pulse" />
-                                    {day >= 14 ? "Click hazards to clean, or items to select." : "Select an item to assign it."}
+                                    {day === 12 ? "Select trash to Red Tag it. Tools & materials are locked." :
+                                        day === 13 ? "Select tools & materials to give them a home." :
+                                            "Click hazards to clean, or items to assign them."}
                                 </motion.div>
                             ) : (
                                 <motion.div
@@ -261,6 +281,18 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
                                                     Broken / Scrap
                                                 </div>
                                             )}
+
+                                            {/* Locked Overlay for Day 12 Tools/Materials */}
+                                            {day === 12 && item.type !== 'trash' && !item.isBroken && item.type !== 'hazard' && (
+                                                <div className="absolute inset-0 bg-slate-900/60 rounded-2xl md:rounded-3xl flex items-center justify-center">
+                                                    <div className="bg-slate-800/80 px-2 py-1 rounded text-xs font-bold text-slate-400">Locked</div>
+                                                </div>
+                                            )}
+                                            {/* Locked Overlay for Hazards < Day 14 */}
+                                            {day < 14 && item.type === 'hazard' && (
+                                                <div className="absolute inset-0 bg-slate-900/60 rounded-2xl md:rounded-3xl flex items-center justify-center pointer-events-none">
+                                                </div>
+                                            )}
                                         </motion.div>
                                     );
                                 })}
@@ -270,7 +302,7 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
                                 <div className="col-span-full flex flex-col items-center justify-center text-slate-500 pt-20">
                                     <Star className="w-20 h-20 mb-6 text-emerald-500/30 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]" />
                                     <h3 className="text-3xl font-black text-slate-400 tracking-tight">SHOP FLOOR IS CLEAR</h3>
-                                    <p className="font-semibold text-lg mt-2">Excellent Sort phase. Zero unassigned items.</p>
+                                    <p className="font-semibold text-lg mt-2">Workspace is clean and orderly.</p>
                                 </div>
                             )}
                         </div>
@@ -304,6 +336,9 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
                             focusBorderClass = "ring-4 ring-amber-500 border-amber-500";
                         }
 
+                        // Determine if zone is interactable today
+                        const isZoneLocked = day === 12 && zone.acceptsType !== 'trash';
+
                         // Should unassigned block interaction if it's the unassigned zone? No, unassigned is not rendered here.
 
                         return (
@@ -312,13 +347,14 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                onClick={() => selectedItemId && handleZoneClick(zone.id)}
+                                onClick={() => selectedItemId && !isZoneLocked && handleZoneClick(zone.id)}
                                 className={`
                                     relative p-6 rounded-3xl border-2 bg-gradient-to-br backdrop-blur-md overflow-hidden transition-all duration-300 flex flex-col
                                     ${themeClass} ${glowClass}
-                                    ${selectedItemId
+                                    ${selectedItemId && !isZoneLocked
                                         ? `cursor-pointer hover:scale-[1.02] hover:brightness-125 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] ${focusBorderClass}`
                                         : 'opacity-80 scale-100'}
+                                    ${isZoneLocked ? 'grayscale opacity-50 cursor-not-allowed' : ''}
                                     min-h-[200px]
                                 `}
                             >
@@ -365,9 +401,14 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
                                         ))}
 
                                         {/* Empty State Instructions if no items and selected */}
-                                        {zoneItems.length === 0 && selectedItemId && (
+                                        {zoneItems.length === 0 && selectedItemId && !isZoneLocked && (
                                             <div className="w-full h-full flex items-center justify-center absolute inset-0 text-white/40 font-black animate-pulse text-lg tracking-widest">
                                                 CLICK TO ASSIGN
+                                            </div>
+                                        )}
+                                        {isZoneLocked && (
+                                            <div className="w-full h-full flex items-center justify-center absolute inset-0 text-white/20 font-black text-lg tracking-widest uppercase text-center p-4">
+                                                Locked (Sort Phase Only)
                                             </div>
                                         )}
                                     </AnimatePresence>

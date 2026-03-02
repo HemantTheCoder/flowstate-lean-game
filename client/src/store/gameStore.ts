@@ -489,101 +489,163 @@ export const useGameStore = create<GameState>((set, get) => ({
     let nextColumns = state.columns;
 
     // Day-specific insights and adjustments
-    // Only subtract NEW waste created today (not total waste in system)
-    if (state.day === 1) {
-      dayInsight = tasksCompletedToday >= potentialCapacity
-        ? 'Great start! WIP limits respected - Flow Logic engaged.'
-        : 'Tutorial day - learning the ropes!';
-      forceSafeFlow = true;
-    } else if (state.day === 2) {
-      dayInsight = tasksCompletedToday > 0
-        ? 'Adapted to constraints! Efficiency rising.'
-        : 'Bottleneck detected. Zero throughput hurts efficiency.';
-    } else if (state.day === 3) {
-      dayInsight = tasksCompletedToday > 0
-        ? 'Variation managed. Consistent output rewards Flow.'
-        : 'Weather stopped work. Idle teams kill efficiency.';
-    } else if (state.day === 4) {
-      if (state.flags['decision_push_made']) {
-        // Push decision: Waste was created and consumed player capacity
-        dayInsight = 'Push decision created rework - Flow crashes.';
-        // Add waste penalty to potential (they could have done real work instead)
-        adjustedPotential = potentialCapacity + wasteTasksInSystem;
-      } else {
-        // Pull decision: This is the "God Mode" choice for Lean
-        dayInsight = 'Pull decision confirmed! Perfect Flow achieved!';
-        forceSafeFlow = true; // FORCE 100%
-      }
-    } else if (state.day === 5) {
-      if (state.flags['decision_push_made']) {
-        dayInsight = 'Inspection failed. Rework destroys efficiency.';
-        adjustedPotential = potentialCapacity + wasteTasksInSystem;
-      } else {
+    if (state.chapter === 3) {
+      if (state.day === 12) {
+        // Sort Phase
+        const allTrash = state.depotItems.filter(i => i.type === 'trash' || i.isBroken);
+        const sortedTrash = allTrash.filter(i => i.currentZoneId === 'zone-trash');
+        dailyEff = allTrash.length > 0 ? Math.round((sortedTrash.length / allTrash.length) * 100) : 100;
+        adjustedPotential = 100;
+        adjustedCompleted = dailyEff;
+        dayInsight = dailyEff === 100 ? 'Perfect Sort phase. All waste isolated.' : `Sort incomplete. ${allTrash.length - sortedTrash.length} waste items remaining.`;
+      } else if (state.day === 13) {
+        // Set in Order Phase
+        const allUseful = state.depotItems.filter(i => (i.type === 'tool' || i.type === 'material') && !i.isBroken);
+        const sortedUseful = allUseful.filter(i => {
+          const zone = state.depotZones.find(z => z.id === i.currentZoneId);
+          return zone && zone.acceptsType === i.type;
+        });
+        dailyEff = allUseful.length > 0 ? Math.round((sortedUseful.length / allUseful.length) * 100) : 100;
+        adjustedPotential = 100;
+        adjustedCompleted = dailyEff;
+        dayInsight = dailyEff >= 90 ? 'Set in Order complete. Items assigned.' : `Set in Order incomplete. ${allUseful.length - sortedUseful.length} items unassigned or misplaced.`;
+      } else if (state.day === 14) {
+        // Shine Phase
+        const hazardsRemaining = state.depotItems.filter(i => i.type === 'hazard').length;
+        dailyEff = Math.max(0, 100 - (hazardsRemaining * 33));
+        adjustedPotential = 100;
+        adjustedCompleted = dailyEff;
+        dayInsight = hazardsRemaining === 0 ? 'Shine complete. All hazards cleaned.' : `${hazardsRemaining} hazards remaining. Unsafe environment!`;
+      } else if (state.day === 15) {
+        // Standardize Phase (Delivery Arrival)
+        let correct = 0;
+        let total = state.depotItems.filter(i => i.type !== 'hazard').length;
+        state.depotItems.forEach(item => {
+          const zone = state.depotZones.find(z => z.id === item.currentZoneId);
+          if (zone && zone.acceptsType === (item.isBroken ? 'trash' : item.type)) correct++;
+        });
+        const hazLeft = state.depotItems.filter(i => i.type === 'hazard').length;
+        dailyEff = total > 0 ? Math.max(0, Math.round((correct / total) * 100) - (hazLeft * 20)) : 100;
+        adjustedPotential = 100;
+        adjustedCompleted = dailyEff;
+        dayInsight = dailyEff >= 90 ? 'Standardization maintained despite new deliveries!' : 'Standards slipping. New deliveries disorganized the depot.';
+      } else if (state.day === 16) {
+        // Sustain Phase (Final Audit)
+        state.evaluate5S(); // Ensure score is up to date
+        // Note: The actual state evaluation might not be synchronous here in the read phase,
+        // but it was evaluated during the interact. For safety, we can duplicate the calc or read depotScore.
+        // We'll read the state.depotScore or re-calc just in case.
+        let correct = 0;
+        let total = state.depotItems.filter(i => i.type !== 'hazard').length;
+        state.depotItems.forEach(item => {
+          const zone = state.depotZones.find(z => z.id === item.currentZoneId);
+          if (zone && zone.acceptsType === (item.isBroken ? 'trash' : item.type)) correct++;
+        });
+        const hazLeft = state.depotItems.filter(i => i.type === 'hazard').length;
+        const currentDepotScore = total > 0 ? Math.max(0, Math.round((correct / total) * 100) - (hazLeft * 20)) : 100;
 
-        dayInsight = 'Inspection passed. Consistent reliability!';
-        forceSafeFlow = true; // Fix: Ensure Day 5 is 100% efficiency for passing inspection
+        dailyEff = currentDepotScore;
+        adjustedPotential = 100;
+        adjustedCompleted = dailyEff;
+        dayInsight = `Final Audit completed with score: ${dailyEff}%.`;
       }
-    } else if (state.day === 9) {
-      // Day 9: Commitment Day - Efficiency based on Planning Quality
-      const weeklyPlan = state.weeklyPlan || [];
-      if (weeklyPlan.length > 0) {
-        // Calculate how many committed tasks were Sound (no constraints) vs Risky
-        const committedTasks = state.columns.flatMap(c => c.tasks).filter(t => weeklyPlan.includes(t.id));
-        const riskyCount = committedTasks.filter(t => (t.constraints?.length || 0) > 0 || t.fragile).length;
-        const totalCount = committedTasks.length;
-
-        // Base efficiency is 100%, deduct for risky commitments
-        // If 0 tasks committed (which shouldn't happen due to UI checks), 0%
-        if (totalCount > 0) {
-          const riskPenalty = (riskyCount / totalCount) * 50; // Up to 50% penalty if all are risky
-          dailyEff = Math.round(100 - riskPenalty);
-          adjustedPotential = 100; // Normalized scale for graph
-          adjustedCompleted = dailyEff;
-          dayInsight = riskyCount === 0
-            ? 'Perfect Weekly Work Plan! All promises are sound.'
-            : `Plan committed with ${riskyCount} risky tasks. Execution may be unstable.`;
+    } else {
+      // Only subtract NEW waste created today (not total waste in system)
+      if (state.day === 1) {
+        dayInsight = tasksCompletedToday >= potentialCapacity
+          ? 'Great start! WIP limits respected - Flow Logic engaged.'
+          : 'Tutorial day - learning the ropes!';
+        forceSafeFlow = true;
+      } else if (state.day === 2) {
+        dayInsight = tasksCompletedToday > 0
+          ? 'Adapted to constraints! Efficiency rising.'
+          : 'Bottleneck detected. Zero throughput hurts efficiency.';
+      } else if (state.day === 3) {
+        dayInsight = tasksCompletedToday > 0
+          ? 'Variation managed. Consistent output rewards Flow.'
+          : 'Weather stopped work. Idle teams kill efficiency.';
+      } else if (state.day === 4) {
+        if (state.flags['decision_push_made']) {
+          // Push decision: Waste was created and consumed player capacity
+          dayInsight = 'Push decision created rework - Flow crashes.';
+          // Add waste penalty to potential (they could have done real work instead)
+          adjustedPotential = potentialCapacity + wasteTasksInSystem;
         } else {
+          // Pull decision: This is the "God Mode" choice for Lean
+          dayInsight = 'Pull decision confirmed! Perfect Flow achieved!';
+          forceSafeFlow = true; // FORCE 100%
+        }
+      } else if (state.day === 5) {
+        if (state.flags['decision_push_made']) {
+          dayInsight = 'Inspection failed. Rework destroys efficiency.';
+          adjustedPotential = potentialCapacity + wasteTasksInSystem;
+        } else {
+
+          dayInsight = 'Inspection passed. Consistent reliability!';
+          forceSafeFlow = true; // Fix: Ensure Day 5 is 100% efficiency for passing inspection
+        }
+      } else if (state.day === 9) {
+        // Day 9: Commitment Day - Efficiency based on Planning Quality
+        const weeklyPlan = state.weeklyPlan || [];
+        if (weeklyPlan.length > 0) {
+          // Calculate how many committed tasks were Sound (no constraints) vs Risky
+          const committedTasks = state.columns.flatMap(c => c.tasks).filter(t => weeklyPlan.includes(t.id));
+          const riskyCount = committedTasks.filter(t => (t.constraints?.length || 0) > 0 || t.fragile).length;
+          const totalCount = committedTasks.length;
+
+          // Base efficiency is 100%, deduct for risky commitments
+          // If 0 tasks committed (which shouldn't happen due to UI checks), 0%
+          if (totalCount > 0) {
+            const riskPenalty = (riskyCount / totalCount) * 50; // Up to 50% penalty if all are risky
+            dailyEff = Math.round(100 - riskPenalty);
+            adjustedPotential = 100; // Normalized scale for graph
+            adjustedCompleted = dailyEff;
+            dayInsight = riskyCount === 0
+              ? 'Perfect Weekly Work Plan! All promises are sound.'
+              : `Plan committed with ${riskyCount} risky tasks. Execution may be unstable.`;
+          } else {
+            dailyEff = 0;
+            adjustedPotential = 100;
+            adjustedCompleted = 0;
+            dayInsight = 'No tasks committed. Reliability is zero.';
+          }
+        } else {
+          // Fallback if somehow empty
           dailyEff = 0;
           adjustedPotential = 100;
           adjustedCompleted = 0;
-          dayInsight = 'No tasks committed. Reliability is zero.';
+          dayInsight = 'No commitment made.';
         }
-      } else {
-        // Fallback if somehow empty
-        dailyEff = 0;
-        adjustedPotential = 100;
-        adjustedCompleted = 0;
-        dayInsight = 'No commitment made.';
-      }
-    } else if (state.day === 10) {
-      dayInsight = 'All commitments met! Emergency repair completed. Perfect flow.';
-      forceSafeFlow = true;
+      } else if (state.day === 10) {
+        dayInsight = 'All commitments met! Emergency repair completed. Perfect flow.';
+        forceSafeFlow = true;
 
-      // Auto-move committed tasks and emergency tasks to DONE
-      const tasksToMove: Task[] = [];
-      const updatedCols = state.columns.map(col => {
-        if (col.id === 'done') return col;
+        // Auto-move committed tasks and emergency tasks to DONE
+        const tasksToMove: Task[] = [];
+        const updatedCols = state.columns.map(col => {
+          if (col.id === 'done') return col;
 
-        const remainingTasks: Task[] = [];
-        col.tasks.forEach(t => {
-          if (state.weeklyPlan.includes(t.id) || state.weeklyPlan.includes(t.originalId || '') || t.id.startsWith('emergency-')) {
-            tasksToMove.push({ ...t, status: 'done', constraints: [] });
-          } else {
-            remainingTasks.push(t);
-          }
+          const remainingTasks: Task[] = [];
+          col.tasks.forEach(t => {
+            if (state.weeklyPlan.includes(t.id) || state.weeklyPlan.includes(t.originalId || '') || t.id.startsWith('emergency-')) {
+              tasksToMove.push({ ...t, status: 'done', constraints: [] });
+            } else {
+              remainingTasks.push(t);
+            }
+          });
+          return { ...col, tasks: remainingTasks };
         });
-        return { ...col, tasks: remainingTasks };
-      });
 
-      nextColumns = updatedCols.map(col => {
-        if (col.id === 'done') {
-          return { ...col, tasks: [...col.tasks, ...tasksToMove] };
-        }
-        return col;
-      });
-    } else if (state.day === 11) {
-      dayInsight = 'PPC Review passed. Exceptional reliability confirmed.';
-      forceSafeFlow = true;
+        nextColumns = updatedCols.map(col => {
+          if (col.id === 'done') {
+            return { ...col, tasks: [...col.tasks, ...tasksToMove] };
+          }
+          return col;
+        });
+      } else if (state.day === 11) {
+        dayInsight = 'PPC Review passed. Exceptional reliability confirmed.';
+        forceSafeFlow = true;
+      }
     }
 
     // Clamp adjustedCompleted to not exceed adjustedPotential
@@ -987,6 +1049,17 @@ export const useGameStore = create<GameState>((set, get) => ({
   enterPlanningPhase: () => set({ phase: 'planning' }),
 
   applyDayEvent: (day: number) => set((state) => {
+    if (state.chapter === 3 && day === 15) {
+      // Inject new items (Delivery Arrival)
+      const newItems: DepotItem[] = [
+        { id: `d-17-${Date.now()}`, type: 'material', name: 'New Shipment: Tiles', idealZoneId: 'zone-mats', currentZoneId: 'unassigned' },
+        { id: `d-18-${Date.now()}`, type: 'tool', name: 'Replacement Saw', idealZoneId: 'zone-tools', currentZoneId: 'unassigned' },
+        { id: `d-19-${Date.now()}`, type: 'trash', name: 'Packaging Waste', currentZoneId: 'unassigned' },
+        { id: `d-20-${Date.now()}`, type: 'hazard', name: 'Leaking Paint', currentZoneId: 'unassigned' }
+      ];
+      return { depotItems: [...state.depotItems, ...newItems] };
+    }
+
     if (state.chapter !== 2) return {};
 
     if (day === 8) {

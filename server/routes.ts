@@ -148,6 +148,21 @@ export function registerRoutes(app: Express) {
     }
   });
 
+  // Delete Individual Leaderboard Entry
+  app.delete("/api/leaderboard/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid leaderboard ID" });
+      }
+      await storage.deleteLeaderboardEntry(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("[API] Delete Leaderboard Entry Error:", error);
+      res.status(500).json({ message: "Failed to delete leaderboard entry" });
+    }
+  });
+
   // Get User Profile
   app.get("/api/user/profile", async (req, res) => {
     if (!req.isAuthenticated() || !req.user) {
@@ -267,6 +282,20 @@ export function registerRoutes(app: Express) {
     } catch (error) {
       console.error("[API] Delete User Error:", error);
       res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
+  // Fetch a user's remote save state
+  app.get("/api/admin/users/:id/save", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) return res.status(400).json({ message: "Invalid user ID" });
+      const gameState = await storage.getUserGameState(id);
+      if (!gameState) return res.status(404).json({ message: "No save state found for user" });
+      res.json(gameState);
+    } catch (error) {
+      console.error("[API] Fetch User Save Error:", error);
+      res.status(500).json({ message: "Failed to fetch user save state" });
     }
   });
 
