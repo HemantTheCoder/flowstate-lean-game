@@ -51,12 +51,12 @@ export const DialogueBox: React.FC = () => {
     // Mapping for character images (filenames in public/assets)
     const imageMap: Record<string, string> = {
         'Mira': 'mira.png',
-        'Rao': 'rao.png',
-        'Engineer': playerGender === 'female' ? 'architect_female.png' : 'architect.png',
-        'Architect': playerGender === 'female' ? 'architect_female.png' : 'architect.png',
-        'Isha': 'isha.png',
-        'Foreman': 'foreman.png',
-        'Old Foreman': 'foreman.png',
+        'Rao': 'rao.jpg',
+        'Engineer': playerGender === 'female' ? 'architect_female.jpg' : 'architect.jpg',
+        'Architect': playerGender === 'female' ? 'architect_female.jpg' : 'architect.jpg',
+        'Isha': 'isha.jpg',
+        'Foreman': 'foreman.jpg',
+        'Old Foreman': 'foreman.jpg',
         'Advisor': 'advisor.png',
         'Client': 'client.png',
         'Inspector': 'client.png'

@@ -9,20 +9,20 @@ interface CharacterCastModalProps {
 
 const CHARACTER_IMAGES: Record<string, string> = {
   'Mira': 'mira.png',
-  'Rao': 'rao.png',
-  'Old Foreman': 'foreman.png',
-  'Isha': 'isha.png',
+  'Rao': 'rao.jpg',
+  'Old Foreman': 'foreman.jpg',
+  'Isha': 'isha.jpg',
   'Client': 'client.png',
   'Advisor': 'advisor.png',
   'Inspector': 'client.png',
-  'Engineer': 'architect.png'
+  'Engineer': 'architect.jpg'
 };
 
 export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalProps) => {
   const { playerName, playerGender } = useGameStore();
   const chapterCharacters = CHAPTER_CHARACTERS[chapter] || [];
 
-  const playerImage = playerGender === 'female' ? 'architect_female.png' : 'architect.png';
+  const playerImage = playerGender === 'female' ? 'architect_female.jpg' : 'architect.jpg';
 
   const chapterTitles: Record<number, string> = {
     1: 'The Kanban Chronicles',
@@ -80,7 +80,7 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
                   const character = CHARACTERS[charId];
                   if (!character) return null;
                   const imagePath = CHARACTER_IMAGES[charId] || 'worker.png';
-                  
+
                   return (
                     <motion.div
                       key={charId}
