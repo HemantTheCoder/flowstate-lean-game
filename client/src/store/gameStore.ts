@@ -283,7 +283,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         cumulativeTasksCompleted: 0,
         cumulativePotentialCapacity: 0,
         weeklyPlan: [],
-        flags: { ...state.flags, chapter_intro_seen: false }
+        flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false }
       };
     }
 
@@ -318,7 +318,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         cumulativePotentialCapacity: 0,
         weeklyPlan: [],
         ppcHistory: state.ppcHistory,
-        flags: { ...state.flags, chapter_intro_seen: false, day_6_started: false }
+        flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false, day_6_started: false }
       };
     }
 
@@ -373,7 +373,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         cumulativeTasksCompleted: 0,
         cumulativePotentialCapacity: 0,
         weeklyPlan: [],
-        flags: { ...state.flags, chapter_intro_seen: false }
+        flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false }
       };
     }
 

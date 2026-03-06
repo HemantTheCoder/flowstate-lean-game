@@ -26,7 +26,8 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
 
   const chapterTitles: Record<number, string> = {
     1: 'The Kanban Chronicles',
-    2: 'The Promise System'
+    2: 'The Promise System',
+    3: 'The 5S Principles'
   };
 
   return (
