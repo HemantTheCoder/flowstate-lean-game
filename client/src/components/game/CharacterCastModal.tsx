@@ -27,8 +27,18 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
   const chapterTitles: Record<number, string> = {
     1: 'The Kanban Chronicles',
     2: 'The Promise System',
-    3: 'The 5S Principles'
+    3: 'The 5S Principles',
+    4: 'Terminal T-Upgrade',
+    5: 'Coastal Link'
   };
+
+  const getButtonText = () => {
+    if (chapter === 4) return 'Begin Case Study 1';
+    if (chapter === 5) return 'Begin Case Study 2';
+    return `Begin Chapter ${chapter}`;
+  };
+
+  const isCaseStudy = chapter === 4 || chapter === 5;
 
   return (
     <AnimatePresence>
@@ -46,7 +56,7 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
           className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-slate-700 flex flex-col"
         >
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 md:p-6 text-center shrink-0">
-            <p className="text-blue-200 text-xs md:text-sm uppercase tracking-widest mb-1">Chapter {chapter}</p>
+            <p className="text-blue-200 text-xs md:text-sm uppercase tracking-widest mb-1">{isCaseStudy ? 'Premium Scenario' : `Chapter ${chapter}`}</p>
             <h2 className="text-xl md:text-3xl font-bold text-white">{chapterTitles[chapter] || `Chapter ${chapter}`}</h2>
           </div>
 
@@ -63,9 +73,9 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
                   <img
                     src={`/assets/${playerImage}`}
                     alt="Your Character"
-                    className="h-20 md:h-32 object-contain drop-shadow-xl"
+                    className="w-20 h-20 md:w-32 md:h-32 object-cover object-top rounded-full border-4 border-slate-700/50 drop-shadow-xl bg-slate-800"
                   />
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-yellow-500 text-slate-900 text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full">
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-yellow-500 text-slate-900 text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full border-2 border-slate-900">
                     YOU
                   </div>
                 </div>
@@ -88,14 +98,14 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.3 + index * 0.1 }}
-                      className="flex flex-col items-center text-center p-2 md:p-3 rounded-lg bg-slate-800/50"
+                      className="flex flex-col items-center text-center p-2 md:p-3 rounded-xl bg-slate-800/30 border border-slate-700/50"
                     >
                       <img
                         src={`/assets/${imagePath}`}
                         alt={character.name}
-                        className="h-16 md:h-24 object-contain drop-shadow-lg"
+                        className="w-16 h-16 md:w-24 md:h-24 object-cover object-top rounded-full border-2 border-slate-600/50 drop-shadow-lg bg-slate-900/50"
                       />
-                      <p className="text-white font-medium mt-1 md:mt-2 text-xs md:text-sm">{character.name}</p>
+                      <p className="text-white font-bold mt-2 md:mt-3 text-xs md:text-sm">{character.name}</p>
                       <p className="text-blue-400 text-[10px] md:text-xs">{character.role}</p>
                     </motion.div>
                   );
@@ -112,7 +122,7 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
               className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 md:py-4 rounded-xl text-base md:text-lg shadow-lg transition-all"
               data-testid="button-start-chapter"
             >
-              Begin Chapter {chapter}
+              {getButtonText()}
             </motion.button>
           </div>
         </motion.div>

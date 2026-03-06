@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { useGameStore } from '@/store/gameStore';
 import { motion } from 'framer-motion';
-import { Loader2, Trophy, Play, Calendar, LogOut, Award, BarChart3, Clock, ArrowLeft, Target, ShieldCheck, HardHat, Info, BookOpen } from 'lucide-react';
+import { Loader2, Trophy, Play, Calendar, LogOut, Award, BarChart3, Clock, ArrowLeft, Target, ShieldCheck, HardHat, Info, BookOpen, Sparkles, Medal } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { UserProfile } from '@shared/schema';
 import { format } from 'date-fns';
@@ -174,7 +174,9 @@ export default function Profile() {
                                     <div className="space-y-6">
                                         <div>
                                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Current Sector</p>
-                                            <p className="text-3xl font-black text-white uppercase drop-shadow-md">Episode {displayState.chapter}</p>
+                                            <p className="text-3xl font-black text-white uppercase drop-shadow-md">
+                                                {(displayState as any)?.chapter > 3 ? `Case Study ${(displayState as any)?.chapter - 3}` : `Episode ${(displayState as any)?.chapter}`}
+                                            </p>
                                             <p className="text-sm text-cyan-400 mt-1 font-bold">Sim Day {displayState.day}</p>
                                         </div>
                                         <div className="space-y-4 p-5 bg-slate-900/50 rounded-2xl border border-slate-700/50">
@@ -241,6 +243,33 @@ export default function Profile() {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Season Rewards Placeholder */}
+                        <div className="bg-gradient-to-br from-amber-500/5 to-slate-800/60 backdrop-blur-2xl border border-amber-500/20 shadow-xl rounded-3xl overflow-hidden group">
+                            <div className="p-5 border-b border-amber-500/10 bg-amber-500/10 flex items-center justify-between">
+                                <h3 className="text-xs font-black text-amber-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <Sparkles className="w-4 h-4" /> Season 1 Honors
+                                </h3>
+                                <span className="text-[9px] font-black bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full border border-amber-500/20 uppercase tracking-tighter">Active</span>
+                            </div>
+                            <div className="p-8 text-center space-y-4">
+                                <div className="w-16 h-16 mx-auto bg-slate-900/50 rounded-2xl flex items-center justify-center border border-slate-700/50 group-hover:border-amber-500/30 transition-colors">
+                                    <Medal className="w-8 h-8 text-slate-600 group-hover:text-amber-500/50 transition-colors" />
+                                </div>
+                                <div>
+                                    <p className="text-white font-bold text-sm tracking-tight mb-1">Uncalculated Rewards</p>
+                                    <p className="text-slate-500 text-[11px] leading-relaxed">
+                                        Top 10 Rankings are finalized at the end of Season 1. Secure your spot in the <span className="text-amber-500/80 font-bold">Global Leaderboard</span> to claim exclusive architect honors.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setLocation('/leaderboard')}
+                                    className="w-full py-3 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl text-amber-500 font-black text-[10px] uppercase tracking-widest transition-all active:scale-95"
+                                >
+                                    Check My Rank
+                                </button>
+                            </div>
+                        </div>
                     </motion.div>
 
                     {/* Right Column: Badges & History */}
@@ -255,6 +284,7 @@ export default function Profile() {
                             <div className="grid grid-cols-2 xl:grid-cols-3 gap-5">
                                 {BADGES.map((badge, i) => {
                                     const isUnlocked = displayState?.unlockedBadges?.includes(badge.id);
+                                    const unlockDate = (displayState as any)?.badgeDates?.[badge.id];
                                     const Icon = badge.icon;
 
                                     return (
@@ -271,6 +301,11 @@ export default function Profile() {
                                             <div>
                                                 <h3 className={`font-bold text-xs uppercase tracking-wider mb-2 ${isUnlocked ? 'text-white' : 'text-slate-400'}`}>{badge.name}</h3>
                                                 <p className="text-[11px] text-slate-400 leading-relaxed font-light">{badge.description}</p>
+                                                {isUnlocked && unlockDate && (
+                                                    <p className="text-[9px] text-emerald-400 mt-2 font-bold uppercase tracking-wider">
+                                                        Earned: {new Date(unlockDate).toLocaleDateString()}
+                                                    </p>
+                                                )}
                                             </div>
                                         </motion.div>
                                     );
@@ -297,10 +332,12 @@ export default function Profile() {
                                         >
                                             <div className="flex items-center gap-5">
                                                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center text-blue-300 font-black text-2xl border border-blue-500/30">
-                                                    {score.chapter}
+                                                    {score.chapter > 3 ? 'CS' : score.chapter}
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-bold text-white uppercase tracking-widest text-sm">Episode {score.chapter}</h3>
+                                                    <h3 className="font-bold text-white uppercase tracking-widest text-sm">
+                                                        {score.chapter > 3 ? `Case Study ${score.chapter - 3}` : `Episode ${score.chapter}`}
+                                                    </h3>
                                                     <p className="text-xs text-slate-400 mt-1 flex items-center gap-2">
                                                         <Clock className="w-3 h-3 text-slate-500" />
                                                         {score.completedAt ? new Date(score.completedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'Unknown Date'}

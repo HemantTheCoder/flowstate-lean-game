@@ -17,9 +17,11 @@ export const gameStates = pgTable("game_states", {
   sessionId: text("session_id").notNull(), // Identify player by simple token/session
   userId: integer("user_id").references(() => users.id), // Link to registered user
   playerName: text("player_name").default("Architect"),
+  playerGender: text("player_gender").default("male"),
   chapter: integer("chapter").default(1),
   day: integer("day").default(1),
   week: integer("week").default(1),
+  lives: integer("lives").default(3),
 
   // Game Systems State
   resources: jsonb("resources").$type<{
@@ -48,6 +50,7 @@ export const gameStates = pgTable("game_states", {
   flags: jsonb("flags").$type<Record<string, boolean>>(), // Story triggers, tutorial flags
   completedChapters: integer("completed_chapters").array(),
   unlockedBadges: text("unlocked_badges").array(),
+  badgeDates: jsonb("badge_dates").$type<Record<string, string>>().default({}),
 
   // Metrics for "LPI" (Lean Performance Index)
   metrics: jsonb("metrics").$type<{
@@ -87,7 +90,10 @@ export const insertGameStateSchema = createInsertSchema(gameStates, {
     budget: z.number(),
     materials: z.number()
   }),
-  flags: z.record(z.boolean())
+  badgeDates: z.record(z.string()).optional(),
+  flags: z.record(z.boolean()),
+  playerGender: z.enum(['male', 'female']).optional(),
+  lives: z.number().default(3).optional(),
 }).omit({
   id: true,
   lastPlayed: true

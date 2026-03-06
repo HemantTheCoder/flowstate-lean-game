@@ -89,7 +89,7 @@ export const DialogueBox: React.FC = () => {
                             <img
                                 src={`/assets/${portrait}`}
                                 alt={line.character}
-                                className="h-64 md:h-80 object-contain drop-shadow-xl"
+                                className="h-64 md:h-80 w-56 md:w-72 object-cover object-[center_top] rounded-t-3xl border-t border-x border-slate-700/50 drop-shadow-2xl bg-slate-900/50"
                             />
                         </motion.div>
                     )}

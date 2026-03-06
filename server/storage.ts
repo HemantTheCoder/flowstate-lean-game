@@ -324,6 +324,9 @@ export class MemStorage implements IStorage {
         completedChapters: gameState.completedChapters ?? null,
         unlockedBadges: gameState.unlockedBadges ?? null,
         weeklyPlan: gameState.weeklyPlan ?? null,
+        badgeDates: gameState.badgeDates ?? null,
+        playerGender: gameState.playerGender ?? null,
+        lives: gameState.lives ?? 3,
       };
       this.states.set(gameState.sessionId, created);
       return created;

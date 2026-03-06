@@ -46,6 +46,26 @@ export const ChapterIntroModal: React.FC = () => {
                 "LEARN: Implement Sort, Set in Order, Shine, Standardize, and Sustain.",
                 "MASTER: Visual Management and eliminating search waste."
             ]
+        },
+        4: {
+            title: "Terminal T-Upgrade",
+            subtitle: "Case Study 1: Logistics & JIT",
+            description: "You are managing a midfield airport terminal expansion. Space is highly constrained, and passenger disruption must be kept at an absolute minimum.",
+            objectives: [
+                "MISSION: Keep Passenger Disruption Index (PDI) below critical levels.",
+                "LEARN: Schedule hoists effectively and manage Just-in-Time delivery.",
+                "MASTER: Sequencing trades to minimize staging area congestion."
+            ]
+        },
+        5: {
+            title: "Coastal Link Rehabilitation",
+            subtitle: "Case Study 2: Linear Flow",
+            description: "This coastal highway reconstruction requires massive amounts of paving materials. Managing the trucking cycle and staging buffers is the only way to avoid absolute gridlock.",
+            objectives: [
+                "MISSION: Maintain momentum without causing major Traffic Impacts.",
+                "LEARN: Balance active paving segments with appropriate buffer zones.",
+                "MASTER: Real-time logistics dispatching across linear project stages."
+            ]
         }
     }[chapter] || { title: "Unknown Chapter", subtitle: "", description: "", objectives: [] };
 
@@ -54,6 +74,8 @@ export const ChapterIntroModal: React.FC = () => {
         switch (chapter) {
             case 2: return 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600';
             case 3: return 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500';
+            case 4: return 'bg-gradient-to-r from-purple-600 via-fuchsia-600 to-purple-600';
+            case 5: return 'bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-600';
             default: return 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600';
         }
     };
@@ -108,9 +130,11 @@ export const ChapterIntroModal: React.FC = () => {
                         <ul className="space-y-3">
                             {content.objectives.map((obj, i) => (
                                 <li key={i} className="flex items-center gap-3 text-slate-300 font-medium">
-                                    <div className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-xs font-bold ${chapter === 3 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                                        chapter === 2 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                                            'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'}
+                                    <div className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-xs font-bold ${chapter === 5 ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' :
+                                            chapter === 4 ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' :
+                                                chapter === 3 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                                                    chapter === 2 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                                                        'bg-blue-500/20 text-blue-400 border border-blue-500/30'}
                                     `}>
                                         {i + 1}
                                     </div>
@@ -123,13 +147,15 @@ export const ChapterIntroModal: React.FC = () => {
                     <button
                         onClick={handleStart}
                         className={`w-full text-white text-xl font-bold py-4 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 uppercase tracking-wide
-                            ${chapter === 3 ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600' :
-                                chapter === 2 ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700' :
-                                    'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'}
+                            ${chapter === 5 ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700' :
+                                chapter === 4 ? 'bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700' :
+                                    chapter === 3 ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600' :
+                                        chapter === 2 ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700' :
+                                            'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'}
                         `}
                         data-testid="button-start-chapter"
                     >
-                        {chapter === 3 ? 'Begin 5S Simulation' : chapter === 2 ? 'Begin Day 6 Planning' : 'Start Simulation'}
+                        {chapter === 5 ? 'Start Scenario 2' : chapter === 4 ? 'Start Scenario 1' : chapter === 3 ? 'Begin 5S Simulation' : chapter === 2 ? 'Begin Day 6 Planning' : 'Start Simulation'}
                     </button>
                 </div>
             </motion.div>

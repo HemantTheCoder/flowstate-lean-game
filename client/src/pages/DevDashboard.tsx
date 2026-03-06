@@ -25,7 +25,7 @@ export default function DevDashboard() {
     const { toast } = useToast();
     const [, navigate] = useLocation();
 
-    const { setDay, setChapter, day, chapter, playerName } = useGameStore();
+    const { setDay, setChapter, day, chapter, playerName, playerGender, unlockedBadges, badgeDates, unlockedChapters, lives, resetLives } = useGameStore();
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -308,16 +308,30 @@ export default function DevDashboard() {
                                             <span className="text-slate-500">Player:</span> <span className="text-white">{playerName}</span>
                                         </div>
                                         <div>
-                                            <span className="text-slate-500">Chapter:</span> <span className="text-yellow-400">{chapter}</span>
+                                            <span className="text-slate-500">Gender:</span> <span className="text-pink-400 capitalize">{playerGender || '—'}</span>
+                                        </div>
+                                        <div>
+                                            <span className="text-slate-500">Chapter:</span> <span className="text-yellow-400">
+                                                {chapter > 3 ? `Case Study ${chapter - 3}` : `Chapter ${chapter}`}
+                                            </span>
                                         </div>
                                         <div>
                                             <span className="text-slate-500">Day:</span> <span className="text-cyan-400">{day}</span>
+                                        </div>
+                                        <div>
+                                            <span className="text-slate-500">Unlocked:</span> <span className="text-emerald-400">{unlockedBadges?.length || 0} badges</span>
+                                        </div>
+                                        <div>
+                                            <span className="text-slate-500">Chapters:</span> <span className="text-indigo-400">[{unlockedChapters?.join(', ')}]</span>
+                                        </div>
+                                        <div>
+                                            <span className="text-slate-500">Lives (Hearts):</span> <span className={`${lives > 1 ? 'text-rose-400' : 'text-red-600 animate-pulse'} font-black`}>{lives} / 3</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="space-y-4">
-                                    <label className="text-sm font-medium text-slate-400">Chapters</label>
+                                    <label className="text-sm font-medium text-slate-400">Chapters (1–3)</label>
                                     <div className="space-y-3">
                                         <Button
                                             variant="outline"
@@ -328,6 +342,17 @@ export default function DevDashboard() {
                                             className="w-full border-green-800 text-green-400 hover:bg-green-950/50"
                                         >
                                             <ShieldAlert className="w-4 h-4 mr-2" /> Unlock All Chapters
+                                        </Button>
+
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => {
+                                                resetLives();
+                                                toast({ title: "Lives Refilled", description: "System health restored to 3 hearts." });
+                                            }}
+                                            className="w-full border-rose-800 text-rose-400 hover:bg-rose-950/50"
+                                        >
+                                            <Clock className="w-4 h-4 mr-2" /> Refill/Reset Lives
                                         </Button>
 
                                         <div className="grid grid-cols-3 gap-2">
@@ -345,6 +370,25 @@ export default function DevDashboard() {
                                                 </Button>
                                             ))}
                                         </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4 mt-4">
+                                    <label className="text-sm font-medium text-slate-400">Case Studies (4–5)</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {[{ id: 4, label: 'CS1 Terminal' }, { id: 5, label: 'CS2 Coastal' }].map(({ id, label }) => (
+                                            <Button
+                                                key={id}
+                                                variant={chapter === id ? "default" : "outline"}
+                                                onClick={() => {
+                                                    useGameStore.getState().startChapter(id);
+                                                    navigate('/game');
+                                                }}
+                                                className={`border-purple-700 hover:bg-purple-800 hover:text-white text-xs ${chapter === id ? 'bg-purple-600 border-purple-500' : 'text-purple-400'}`}
+                                            >
+                                                {label}
+                                            </Button>
+                                        ))}
                                     </div>
                                 </div>
 
@@ -693,7 +737,7 @@ export default function DevDashboard() {
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <span className="bg-amber-500/10 text-amber-400 text-xs px-2 py-1 rounded border border-amber-500/20 font-bold">
-                                                                Chapter {l.chapter}
+                                                                {l.chapter > 3 ? `Case Study ${l.chapter - 3}` : `Chapter ${l.chapter}`}
                                                             </span>
                                                         </td>
                                                         <td className="px-6 py-4 font-mono text-slate-400">
@@ -752,12 +796,44 @@ export default function DevDashboard() {
                                 <Download className="w-4 h-4 mr-2" /> Download JSON
                             </Button>
                         </CardHeader>
-                        <CardContent>
-                            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto max-h-[600px] overflow-y-auto">
-                                <pre className="text-xs text-emerald-400">
-                                    {JSON.stringify(useGameStore.getState(), null, 2)}
-                                </pre>
+                        <CardContent className="space-y-4">
+                            {/* Structured Profile Summary */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {[
+                                    { label: 'Architect', value: playerName || '—', color: 'text-white' },
+                                    { label: 'Gender', value: playerGender || '—', color: 'text-pink-400' },
+                                    { label: 'Active', value: chapter > 3 ? `Case Study ${chapter - 3} / Day ${day}` : `Chapter ${chapter} / Day ${day}`, color: 'text-yellow-400' },
+                                    { label: 'Badges', value: `${unlockedBadges?.length || 0} earned`, color: 'text-emerald-400' },
+                                ].map(({ label, value, color }) => (
+                                    <div key={label} className="bg-slate-800/60 border border-slate-700 rounded-xl p-3">
+                                        <div className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">{label}</div>
+                                        <div className={`font-bold text-sm ${color}`}>{value}</div>
+                                    </div>
+                                ))}
                             </div>
+                            {/* Badge Dates Summary */}
+                            {badgeDates && Object.keys(badgeDates).length > 0 && (
+                                <div className="bg-slate-800/40 border border-slate-700 rounded-xl p-4">
+                                    <div className="text-[10px] text-slate-500 uppercase tracking-widest mb-3">Badge Earned Dates</div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {Object.entries(badgeDates).map(([badge, date]) => (
+                                            <div key={badge} className="flex items-center justify-between text-xs">
+                                                <span className="text-amber-400 font-bold">{badge}</span>
+                                                <span className="text-slate-500">{new Date(date).toLocaleDateString()}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {/* Raw JSON */}
+                            <details className="group" open>
+                                <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-300 uppercase tracking-widest py-2 select-none">▶ Full Raw State JSON</summary>
+                                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto max-h-[500px] overflow-y-auto mt-2">
+                                    <pre className="text-xs text-emerald-400">
+                                        {JSON.stringify(useGameStore.getState(), null, 2)}
+                                    </pre>
+                                </div>
+                            </details>
                         </CardContent>
                     </Card>
                 )}
@@ -781,13 +857,49 @@ export default function DevDashboard() {
                                 <div className="flex items-center justify-center h-40 text-slate-500 animate-pulse">
                                     <Loader2 className="w-6 h-6 animate-spin mr-3" /> Fetching remote save state...
                                 </div>
-                            ) : (
-                                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto">
-                                    <pre className="text-xs text-indigo-300 whitespace-pre-wrap">
-                                        {JSON.stringify(viewingSaveData, null, 2)}
-                                    </pre>
+                            ) : viewingSaveData?.error ? (
+                                <div className="text-center text-red-400 p-8 border border-red-900/30 rounded-xl">{viewingSaveData.error}</div>
+                            ) : viewingSaveData ? (
+                                <div className="space-y-4">
+                                    {/* Structured Summary */}
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                        {[
+                                            { label: 'Architect', value: viewingSaveData.playerName, color: 'text-white' },
+                                            { label: 'Gender', value: viewingSaveData.playerGender || '—', color: 'text-pink-400' },
+                                            { label: 'Location', value: viewingSaveData.chapter > 3 ? `Case Study ${viewingSaveData.chapter - 3}` : `Chapter ${viewingSaveData.chapter} / Day ${viewingSaveData.kanbanState?.day ?? viewingSaveData.day}`, color: 'text-yellow-400' },
+                                            { label: 'Badges', value: `${viewingSaveData.unlockedBadges?.length || 0} earned`, color: 'text-emerald-400' },
+                                        ].map(({ label, value, color }) => (
+                                            <div key={label} className="bg-slate-800/60 border border-slate-700 rounded-xl p-3">
+                                                <div className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">{label}</div>
+                                                <div className={`font-bold text-sm ${color}`}>{value}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {/* Badge Dates */}
+                                    {viewingSaveData.badgeDates && Object.keys(viewingSaveData.badgeDates).length > 0 && (
+                                        <div className="bg-slate-800/40 border border-slate-700 rounded-xl p-4">
+                                            <div className="text-[10px] text-slate-500 uppercase tracking-widest mb-3">Badge Earned Dates</div>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {Object.entries(viewingSaveData.badgeDates).map(([badge, date]) => (
+                                                    <div key={badge} className="flex items-center justify-between text-xs">
+                                                        <span className="text-amber-400 font-bold">{badge}</span>
+                                                        <span className="text-slate-500">{new Date(date as string).toLocaleDateString()}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {/* Raw JSON */}
+                                    <details className="group">
+                                        <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-300 uppercase tracking-widest py-2 select-none">▶ Raw JSON</summary>
+                                        <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto mt-2">
+                                            <pre className="text-xs text-indigo-300 whitespace-pre-wrap">
+                                                {JSON.stringify(viewingSaveData, null, 2)}
+                                            </pre>
+                                        </div>
+                                    </details>
                                 </div>
-                            )}
+                            ) : null}
                         </CardContent>
                     </Card>
                 </div>

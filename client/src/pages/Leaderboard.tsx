@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Star, Shield, ArrowLeft, Loader2, Sparkles, User, Target } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { RewardsModal } from '@/components/game/RewardsModal';
+import soundManager from '@/lib/soundManager';
 
 interface LeaderboardEntry {
   id: number;
@@ -17,6 +19,7 @@ interface LeaderboardEntry {
 
 export default function Leaderboard() {
   const [, setLocation] = useLocation();
+  const [showRewards, setShowRewards] = useState(false);
 
   const { data: entries = [], isLoading } = useQuery<LeaderboardEntry[]>({
     queryKey: ['/api/leaderboard'],
@@ -38,13 +41,16 @@ export default function Leaderboard() {
   const getRankStyle = (rank: number) => {
     switch (rank) {
       case 1:
-        return "bg-gradient-to-r from-amber-500/10 to-amber-900/10 border-amber-500/30 text-amber-100 shadow-[0_0_30px_rgba(250,204,21,0.1)] scale-[1.02] z-10 border backdrop-blur-md";
+        return "bg-gradient-to-r from-amber-500/15 to-amber-900/10 border-amber-500/40 text-amber-100 shadow-[0_0_30px_rgba(250,204,21,0.2)] scale-[1.02] z-10 border-2 backdrop-blur-md ring-1 ring-amber-500/20";
       case 2:
-        return "bg-gradient-to-r from-slate-400/10 to-slate-800/10 border-slate-400/20 text-slate-100 scale-[1.01] z-10 border backdrop-blur-md";
+        return "bg-gradient-to-r from-slate-400/15 to-slate-800/10 border-slate-400/30 text-slate-100 scale-[1.01] z-10 border-2 backdrop-blur-md";
       case 3:
-        return "bg-gradient-to-r from-orange-700/10 to-orange-900/10 border-orange-700/20 text-orange-100 z-10 border backdrop-blur-md";
+        return "bg-gradient-to-r from-orange-700/15 to-orange-900/10 border-orange-700/30 text-orange-100 z-10 border-2 backdrop-blur-md";
       default:
-        return "bg-slate-800/60 border-slate-700/50 text-slate-300 hover:bg-slate-700/50 border backdrop-blur-md";
+        const isTop10 = rank <= 10;
+        return isTop10
+          ? "bg-gradient-to-r from-indigo-500/10 to-slate-800/60 border-indigo-500/30 text-slate-200 border-2 backdrop-blur-md shadow-[0_0_15px_rgba(99,102,241,0.1)]"
+          : "bg-slate-800/60 border-slate-700/50 text-slate-300 hover:bg-slate-700/50 border backdrop-blur-md";
     }
   };
 
@@ -100,9 +106,16 @@ export default function Leaderboard() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-xl text-amber-400 uppercase tracking-widest text-[10px] font-bold shadow-[0_0_15px_rgba(245,158,11,0.1)]">
-            <Sparkles className="w-3 h-3" /> Season 1 Active
-          </div>
+          <button
+            onClick={() => {
+              soundManager.playSFX('click');
+              setShowRewards(true);
+            }}
+            className="group flex items-center gap-3 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-5 py-3 rounded-2xl text-amber-400 uppercase tracking-widest text-[10px] font-black shadow-[0_0_15px_rgba(245,158,11,0.1)] transition-all active:scale-95"
+          >
+            <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+            View Season 1 Rewards
+          </button>
         </motion.div>
 
         {/* Leaderboard Content */}
@@ -162,9 +175,16 @@ export default function Leaderboard() {
                     </div>
 
                     <div className="flex flex-col">
-                      <span className={`font-bold truncate text-lg tracking-tight ${rank <= 3 ? 'text-white' : 'text-slate-200'}`} data-testid={`text-player-${entry.id}`}>
-                        {entry.playerName}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`font-bold truncate text-lg tracking-tight ${rank <= 3 ? 'text-white' : 'text-slate-200'}`} data-testid={`text-player-${entry.id}`}>
+                          {entry.playerName}
+                        </span>
+                        {rank <= 10 && (
+                          <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full border ${rank <= 3 ? 'bg-amber-500/20 border-amber-500/30 text-amber-400' : 'bg-indigo-500/20 border-indigo-500/30 text-indigo-400'}`}>
+                            {rank <= 3 ? 'Elite' : 'Top 10'}
+                          </span>
+                        )}
+                      </div>
                       <span className="md:hidden text-xs text-amber-400/80 mt-1 font-bold">Score: {entry.totalScore ?? 0}</span>
                     </div>
 
@@ -203,6 +223,10 @@ export default function Leaderboard() {
             <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Displaying Top 50 Architects</p>
           </div>
         </motion.div>
+        <RewardsModal
+          isOpen={showRewards}
+          onClose={() => setShowRewards(false)}
+        />
       </div>
     </div>
   );

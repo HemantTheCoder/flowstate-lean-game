@@ -157,7 +157,7 @@ const KanbanBadge: React.FC<{ tier: { label: string; color: string } }> = ({ tie
 };
 
 export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => void; onContinue: () => void; quizScore?: number }> = ({ isOpen, onClose, onContinue, quizScore }) => {
-    const { funds, lpi, dailyMetrics, flags, cumulativeTasksCompleted, cumulativePotentialCapacity, playerName } = useGameStore();
+    const { funds, lpi, dailyMetrics, flags, cumulativeTasksCompleted, cumulativePotentialCapacity, playerName, chapter } = useGameStore();
     const [activeDay, setActiveDay] = useState<number | null>(null);
     const [showInsights, setShowInsights] = useState(false);
     const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -332,9 +332,11 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 <Award className="w-12 h-12 text-white drop-shadow-lg" />
                             </motion.div>
                             <h1 className="text-4xl md:text-5xl font-black text-white z-10 drop-shadow-lg text-center tracking-tighter">
-                                CHAPTER 1 COMPLETE
+                                {chapter > 3 ? `CASE STUDY ${chapter - 3} COMPLETE` : `CHAPTER ${chapter} COMPLETE`}
                             </h1>
-                            <p className="text-green-100 font-bold tracking-widest uppercase mt-1 text-sm">The Kanban Chronicles</p>
+                            <p className="text-green-100 font-bold tracking-widest uppercase mt-1 text-sm">
+                                {chapter === 1 ? 'The Kanban Chronicles' : chapter === 2 ? 'The Promise System' : chapter === 3 ? 'The 5S Principles' : chapter === 4 ? 'Terminal T-Upgrade' : 'Coastal Link'}
+                            </p>
 
                             <motion.div
                                 initial={{ scale: 0, opacity: 0 }}
@@ -589,12 +591,21 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 </div>
                             </div>
 
-                            <div className="bg-gradient-to-r from-indigo-900/30 to-purple-900/30 border-l-4 border-indigo-500/50 p-4 rounded-r-lg">
-                                <h4 className="font-bold text-indigo-300 text-sm uppercase mb-1">Coming Up: Chapter 2</h4>
-                                <p className="text-indigo-200 text-sm italic">
-                                    "The Promise System". Master the Last Planner System with <strong>Should/Can/Will</strong> planning and constraint management.
-                                </p>
-                            </div>
+                            {chapter < 3 ? (
+                                <div className="bg-gradient-to-r from-indigo-900/30 to-purple-900/30 border-l-4 border-indigo-500/50 p-4 rounded-r-lg">
+                                    <h4 className="font-bold text-indigo-300 text-sm uppercase mb-1">Coming Up: {chapter === 1 ? 'Chapter 2' : 'Chapter 3'}</h4>
+                                    <p className="text-indigo-200 text-sm italic">
+                                        {chapter === 1 ? '"The Promise System". Master the Last Planner System with Should/Can/Will planning and constraint management.' : '"The 5S Principles". Turn the cluttered depot into a visual, high-performance workspace.'}
+                                    </p>
+                                </div>
+                            ) : chapter === 3 ? (
+                                <div className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-l-4 border-cyan-500/50 p-4 rounded-r-lg">
+                                    <h4 className="font-bold text-cyan-300 text-sm uppercase mb-1">Coming Up: Premium Scenarios</h4>
+                                    <p className="text-cyan-200 text-sm italic">
+                                        Ready for a real challenge? Try the Case Studies from the Main Menu.
+                                    </p>
+                                </div>
+                            ) : null}
 
                             <div className="grid grid-cols-2 gap-3">
                                 <button
@@ -608,19 +619,19 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         }
                                         exportChapterReport({
                                             playerName,
-                                            chapter: 1,
-                                            chapterTitle: 'The Kanban Chronicles',
+                                            chapter: chapter,
+                                            chapterTitle: chapter === 1 ? 'The Kanban Chronicles' : chapter === 2 ? 'The Promise System' : chapter === 3 ? 'The 5S Principles' : `Case Study ${chapter - 3}`,
                                             dailyMetrics: metrics,
                                             finalEfficiency,
                                             quizScore,
                                             quizTotal: quizScore !== undefined ? 5 : undefined,
                                             keyDecisions,
-                                            keyLearnings: [
+                                            keyLearnings: chapter === 1 ? [
                                                 'WIP Limits prevent congestion - limiting active work fronts keeps crews focused and prevents spreading resources too thin.',
                                                 'Pull systems eliminate waste from rushing - wait until materials and prerequisites are ready before starting work.',
                                                 'Adaptation keeps flow alive under constraints - keep alternative work ready for disruptions like weather or material shortages.',
                                                 'Flow Efficiency measures value-adding completion vs. potential capacity across all days.',
-                                            ],
+                                            ] : [],
                                             badges: [tier.label],
                                         });
                                     }}
@@ -653,10 +664,10 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
 
                                 <button
                                     onClick={handleContinue}
-                                    className="bg-green-500 hover:bg-green-600 text-white text-lg font-black py-3 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3 w-full"
-                                    data-testid="button-start-chapter-2"
+                                    className={`${chapter >= 4 ? 'bg-cyan-500 hover:bg-cyan-600' : 'bg-green-500 hover:bg-green-600'} text-white text-lg font-black py-3 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all flex items-center justify-center gap-3 w-full`}
+                                    data-testid="button-start-next"
                                 >
-                                    Start Chapter 2 <Play className="w-5 h-5" />
+                                    {chapter >= 3 ? 'Return to Menu' : `Start Chapter ${chapter + 1}`} <Play className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>

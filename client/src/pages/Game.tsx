@@ -17,6 +17,10 @@ import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
 import { CharacterCastModal } from '@/components/game/CharacterCastModal';
 import { DayBriefingModal } from '@/components/game/DayBriefingModal';
 import { WorkspaceDepot } from '@/components/game/WorkspaceDepot';
+import { CASE_1_SCHEDULE } from '@/data/cases/case1';
+import { CASE_2_SCHEDULE } from '@/data/cases/case2';
+import { TerminalView } from '@/components/game/case1/TerminalView';
+import { CoastalView } from '@/components/game/case2/CoastalView';
 import { ChapterCompleteModal } from '@/components/game/ChapterCompleteModal';
 import { Chapter2CompleteModal } from '@/components/game/Chapter2CompleteModal';
 import { Chapter3CompleteModal } from '@/components/game/Chapter3CompleteModal';
@@ -29,6 +33,8 @@ import { ReflectionQuiz } from '@/components/game/ReflectionQuiz';
 import { useAuth } from '@/hooks/use-auth';
 import { AuthModal } from '@/components/ui/AuthModal';
 import { useToast } from '@/hooks/use-toast';
+import { LifeHearts } from '@/components/game/LifeHearts';
+import { GameOverOverlay } from '@/components/game/GameOverOverlay';
 
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
@@ -66,6 +72,8 @@ export default function Game() {
   const phase = useGameStore(s => s.phase);
   const unlockedChapters = useGameStore(s => s.unlockedChapters);
   const depotScore = useGameStore(s => s.depotScore);
+  const loseLife = useGameStore(s => s.loseLife);
+  const gameOverReason = useGameStore(s => s.gameOverReason);
 
   // Phase Change Detection for Transition Screen
   const prevPhaseRef = React.useRef(phase);
@@ -128,16 +136,24 @@ export default function Game() {
     }
   };
 
-  const handleChapter2Continue = () => {
-    useGameStore.getState().completeChapter(2);
-    handleSave(true);
-    navigate('/chapters');
+  const handleChapter2Continue = async () => {
+    try {
+      useGameStore.getState().completeChapter(2);
+      await handleSave(true);
+      navigate('/chapters');
+    } catch (e: any) {
+      console.error("Transition Error:", e);
+    }
   };
 
-  const handleChapter3Continue = () => {
-    useGameStore.getState().completeChapter(3);
-    handleSave(true);
-    navigate('/chapters');
+  const handleChapter3Continue = async () => {
+    try {
+      useGameStore.getState().completeChapter(3);
+      await handleSave(true);
+      navigate('/chapters');
+    } catch (e: any) {
+      console.error("Transition Error:", e);
+    }
   };
 
   // Audio Control Loop
@@ -166,6 +182,26 @@ export default function Game() {
     window.addEventListener('click', handleInteraction);
     return () => window.removeEventListener('click', handleInteraction);
   }, []);
+
+  // Listeners for Case Studies Custom Events
+  useEffect(() => {
+    const onCaseEndDay = () => handleEndDay();
+    const onCaseSaveGame = () => handleSave(false);
+    const onCaseOpenSettings = () => {
+      soundManager.playSFX('click', audioSettings.sfxVolume);
+      setShowSettings(true);
+    };
+
+    window.addEventListener('case-end-day', onCaseEndDay);
+    window.addEventListener('case-save-game', onCaseSaveGame);
+    window.addEventListener('case-open-settings', onCaseOpenSettings);
+
+    return () => {
+      window.removeEventListener('case-end-day', onCaseEndDay);
+      window.removeEventListener('case-save-game', onCaseSaveGame);
+      window.removeEventListener('case-open-settings', onCaseOpenSettings);
+    };
+  }, [audioSettings.sfxVolume]);
 
   // Auth Integration
   const { user } = useAuth();
@@ -215,7 +251,10 @@ export default function Game() {
         metrics: { ...state.lpi, ppcHistory: state.ppcHistory },
         weeklyPlan: state.weeklyPlan,
         completedChapters: state.unlockedChapters.filter(c => c !== 1).map(c => c - 1),
-        unlockedBadges: state.unlockedBadges
+        unlockedBadges: state.unlockedBadges,
+        badgeDates: state.badgeDates,
+        lives: state.lives,
+        playerGender: state.playerGender,
       });
       if (!silent) {
         toast({ title: "Game Saved!", description: "Progress synced to cloud." });
@@ -262,7 +301,9 @@ export default function Game() {
     // Choose Schedule based on Chapter
     const currentSchedule = chapter === 1 ? WEEK_1_SCHEDULE :
       chapter === 2 ? WEEK_2_SCHEDULE :
-        CHAPTER_3_SCHEDULE;
+        chapter === 3 ? CHAPTER_3_SCHEDULE :
+          chapter === 4 ? CASE_1_SCHEDULE :
+            CASE_2_SCHEDULE;
     // Check if we have config for this day
     const dayConfig = currentSchedule.find(d => d.day === day);
     const dayKey = `day_${day}_started`;
@@ -398,7 +439,8 @@ export default function Game() {
       onSelect: (id: string) => {
         if (id === 'push') {
           useGameStore.getState().addLog("Decision: Pushed work. Created Waste.");
-          useGameStore.getState().addLog("NEXT STEP: A 'Rework' task was added. Finish it IMMEDIATELY to clear the waste!");
+          useGameStore.getState().addLog("NEXT STEP: A 'REWORK' task was added. Finish it IMMEDIATELY to clear the waste!");
+          loseLife("Allowing 'Push' creation of unready work caused a system failure and rework loop.");
           setFlag('decision_push_made', true);
           useGameStore.getState().injectWaste();
         } else {
@@ -423,6 +465,7 @@ export default function Game() {
       onSelect: (id: string) => {
         if (id === 'accept') {
           useGameStore.getState().addLog("Decision: Accepted extra work. Overcommitment risk!");
+          loseLife("Overcommitting to unplanned client requests destabilized the production flow.");
           setFlag('overcommitment_accepted', true);
           const state = useGameStore.getState();
           const extraTaskId = `extra-${Date.now()}`;
@@ -484,6 +527,16 @@ export default function Game() {
 
     if (currentDay > 16 && chapter === 3) {
       setShowQuiz(true);
+      return;
+    }
+
+    if (currentDay > 12 && chapter === 4) {
+      setShowChapterComplete(true);
+      return;
+    }
+
+    if (currentDay > 14 && chapter === 5) {
+      setShowChapterComplete(true);
       return;
     }
 
@@ -595,6 +648,24 @@ export default function Game() {
       if (day === 14) return "Day 14: Shine (Seiso). Click the hazard icons on the floor to clean spills and remove trip risks.";
       if (day === 15) return "Day 15: Standardize (Seiketsu). A new delivery arrived! Sort the waste, clean leaks, and set items in order immediately.";
       if (day === 16) return "Day 16: Sustain (Shitsuke). The Inspector is auditing. Ensure no items are out of standard.";
+    }
+
+    // CASE STUDY 1 (CHAPTER 4) SPECIFIC GUIDANCE
+    if (chapter === 4) {
+      const currentDayConfig = CASE_1_SCHEDULE.find(d => d.day === day);
+      if (currentDayConfig?.briefing) {
+        return `[Terminal T-Upgrade]: ${currentDayConfig.briefing.action}`;
+      }
+      return "Manage the hoist and keep passenger disruption low.";
+    }
+
+    // CASE STUDY 2 (CHAPTER 5) SPECIFIC GUIDANCE
+    if (chapter === 5) {
+      const currentDayConfig = CASE_2_SCHEDULE.find(d => d.day === day);
+      if (currentDayConfig?.briefing) {
+        return `[Coastal Link]: ${currentDayConfig.briefing.action}`;
+      }
+      return "Balance the buffers and minimize traffic impact.";
     }
 
     // 0. NARRATIVE SPECIFIC ADVICE & "END DAY" TRIGGERS
@@ -711,7 +782,7 @@ export default function Game() {
         <motion.div
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="flex flex-col md:flex-row justify-between items-start pointer-events-auto gap-4 w-full md:w-auto"
+          className={`flex flex-col md:flex-row justify-between items-start pointer-events-auto gap-4 w-full md:w-auto ${chapter >= 4 ? 'hidden' : ''}`}
         >
           <div className="flex gap-4 w-full md:w-auto">
             <div id="smart-advisor-box" className="bg-slate-800/80 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border border-slate-700/50 w-full md:min-w-[300px] md:w-auto flex-1">
@@ -725,9 +796,9 @@ export default function Game() {
             <button
               onClick={handleEndDay}
               data-testid="button-end-day"
-              className={`${(day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-b-4 border-amber-700 ring-2 ring-amber-300/50' : 'bg-cyan-600 hover:bg-cyan-500 border-b-4 border-cyan-800'} text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') ? 'animate-bounce ring-4 ring-amber-400/50' : ''}`}
+              className={`${((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 12 && chapter === 4) || (day === 14 && chapter === 5)) ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-b-4 border-amber-700 ring-2 ring-amber-300/50' : 'bg-cyan-600 hover:bg-cyan-500 border-b-4 border-cyan-800'} text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') || getSmartObjective().includes('Project Complete') ? 'animate-bounce ring-4 ring-amber-400/50' : ''}`}
             >
-              {((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3)) ? 'Finish Chapter' : 'End Day'}
+              {(((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 12 && chapter === 4) || (day === 14 && chapter === 5))) ? 'Finish Chapter' : 'End Day'}
             </button>
           </div>
 
@@ -780,9 +851,13 @@ export default function Game() {
         <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="flex justify-center pointer-events-auto pb-2 sm:pb-4"
+          className={`flex justify-center pointer-events-auto pb-2 sm:pb-4 ${chapter >= 4 ? 'hidden' : ''}`}
         >
-          <div className="bg-slate-800/80 backdrop-blur-md px-2 sm:px-6 py-1.5 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg border border-slate-700/50">
+          {/* Stats Bar */}
+          <div className="flex items-center gap-3 sm:gap-6 bg-slate-900/60 backdrop-blur-md px-4 sm:px-6 py-3 rounded-2xl border border-white/5 shadow-2xl">
+            <LifeHearts />
+
+            <div className="h-8 w-px bg-white/10 hidden sm:block" />
             <div className="flex gap-1.5 sm:gap-4 items-center">
               <button
                 id="btn-kanban"
@@ -850,9 +925,12 @@ export default function Game() {
 
         {/* Modals & Screens */}
         <AnimatePresence>
-          {showKanban && chapter !== 3 && <KanbanBoard onClose={() => setShowKanban(false)} />}
+          {showKanban && chapter !== 3 && chapter < 4 && <KanbanBoard onClose={() => setShowKanban(false)} />}
           {showKanban && chapter === 3 && <WorkspaceDepot onClose={() => setShowKanban(false)} />}
         </AnimatePresence>
+
+        {chapter === 4 && <div className="absolute inset-0 pointer-events-auto bg-slate-950 z-20"><TerminalView objective={getSmartObjective()} /></div>}
+        {chapter === 5 && <div className="absolute inset-0 pointer-events-auto bg-slate-950 z-20"><CoastalView objective={getSmartObjective()} /></div>}
 
         <DailySummary
           isOpen={showSummary}
@@ -874,13 +952,13 @@ export default function Game() {
         committedTasks={useGameStore.getState().weeklyPlan.length}
       />
       {/* Root Level Modals (Interactive) */}
-      {flags['character_created'] && !flags['character_cast_seen'] && (
+      {chapter < 4 && flags['character_created'] && !flags['character_cast_seen'] && (
         <CharacterCastModal
           chapter={chapter}
           onContinue={() => setFlag('character_cast_seen', true)}
         />
       )}
-      {flags['character_cast_seen'] && !flags['chapter_intro_seen'] && <ChapterIntroModal />}
+      {chapter < 4 && flags['character_cast_seen'] && !flags['chapter_intro_seen'] && <ChapterIntroModal />}
       {showChapterComplete && chapter === 1 && (
         <ChapterCompleteModal
           isOpen={true}
@@ -903,6 +981,13 @@ export default function Game() {
           onClose={() => setShowChapterComplete(false)}
           onContinue={handleChapter3Continue}
           quizScore={quizScore}
+        />
+      )}
+      {/* Game Over Overlay */}
+      {flags.game_over && (
+        <GameOverOverlay
+          reason={gameOverReason || "The project has been cancelled due to excessive waste."}
+          chapter={chapter}
         />
       )}
     </div>

@@ -50,6 +50,7 @@ export interface GameState {
   phase: GamePhase; // New: Tracks if we are in Planning Room or Site
   unlockedChapters: number[];
   unlockedBadges: string[];
+  badgeDates: Record<string, string>;
   completeChapter: (chapter: number) => void;
   unlockBadge: (badgeId: string) => void;
 
@@ -57,6 +58,10 @@ export interface GameState {
   playerName: string;
   playerGender: 'male' | 'female';
   setPlayerProfile: (name: string, gender: 'male' | 'female') => void;
+  lives: number;
+  gameOverReason: string | null;
+  loseLife: (reason: string) => void;
+  resetLives: () => void;
 
   // Tutorial
   tutorialActive: boolean;
@@ -178,6 +183,15 @@ export interface GameState {
   addConstraintsToRandomTasks: (count: number, constraintType: ConstraintType) => void;
   // Generic Task Update (for events)
   updateTask: (taskId: string, updates: Partial<Task>) => void;
+
+  // Chapter 4 (Case 1): Terminal T-Upgrade
+  hoistSlots: number;
+  pdi: number; // Passenger Disruption Index
+  reworkRate: number;
+
+  // Chapter 5 (Case 2): Coastal Link
+  trafficImpact: number;
+  segmentBuffers: Record<string, number>;
 }
 
 const INITIAL_COLUMNS: Column[] = [
@@ -199,10 +213,25 @@ export const useGameStore = create<GameState>((set, get) => ({
   phase: 'action',
   unlockedChapters: [1],
   unlockedBadges: [],
+  badgeDates: {},
 
   playerName: 'Engineer',
   playerGender: 'male',
   setPlayerProfile: (name, gender) => set({ playerName: name, playerGender: gender }),
+  lives: 3,
+  gameOverReason: null,
+  loseLife: (reason) => {
+    const currentLives = get().lives;
+    if (currentLives > 0) {
+      const remaining = currentLives - 1;
+      set({ lives: remaining });
+      get().addLog(`⚠️ Life Lost: ${reason}`);
+      if (remaining === 0) {
+        set({ gameOverReason: reason, flags: { ...get().flags, game_over: true } });
+      }
+    }
+  },
+  resetLives: () => set({ lives: 3 }),
 
   // Dev Actions
   setDay: (day) => set((state) => ({ day, week: Math.ceil(day / 5) })),
@@ -242,6 +271,15 @@ export const useGameStore = create<GameState>((set, get) => ({
   depotZones: [],
   depotScore: 0,
 
+  // Chapter 4 Defaults
+  hoistSlots: 3,
+  pdi: 0,
+  reworkRate: 0,
+
+  // Chapter 5 Defaults
+  trafficImpact: 0,
+  segmentBuffers: {},
+
   flags: {},
   bypassHydration: false,
 
@@ -265,8 +303,13 @@ export const useGameStore = create<GameState>((set, get) => ({
       chapter,
       currentDialogue: null,
       dialogueIndex: 0,
+      gameOverReason: null,
       bypassHydration: true, // Manual chapter start should ignore server state on next mount
     };
+
+    // Reset lives only if starting fresh (Ch 1) or if following a Game Over
+    const shouldResetLives = chapter === 1 || state.lives <= 0;
+    const finalLives = shouldResetLives ? 3 : state.lives;
 
     if (chapter === 1) {
       return {
@@ -280,10 +323,10 @@ export const useGameStore = create<GameState>((set, get) => ({
         dailyMetrics: [],
         previousDoneCount: 0,
         previousWasteCount: 0,
-        cumulativeTasksCompleted: 0,
         cumulativePotentialCapacity: 0,
         weeklyPlan: [],
-        flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false }
+        lives: 3,
+        flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false, game_over: false }
       };
     }
 
@@ -318,7 +361,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         cumulativePotentialCapacity: 0,
         weeklyPlan: [],
         ppcHistory: state.ppcHistory,
-        flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false, day_6_started: false }
+        lives: finalLives,
+        flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false, day_6_started: false, game_over: false }
       };
     }
 
@@ -373,7 +417,43 @@ export const useGameStore = create<GameState>((set, get) => ({
         cumulativeTasksCompleted: 0,
         cumulativePotentialCapacity: 0,
         weeklyPlan: [],
-        flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false }
+        lives: finalLives,
+        flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false, game_over: false }
+      };
+    }
+
+    if (chapter === 4) {
+      return {
+        ...commonUpdates,
+        day: 1, // Will be overridden by the custom case logic if needed, or 1 is fine
+        week: 1,
+        phase: 'action', // Case 1 plays directly
+        columns: INITIAL_COLUMNS, // Fallback, not strictly used the same way
+        funds: 10000,
+        materials: 500,
+        hoistSlots: 3,
+        pdi: 0,
+        reworkRate: 0,
+        lives: finalLives,
+        flags: { ...state.flags, case_intro_seen: false, character_cast_seen: true, chapter_intro_seen: true, game_over: false }
+      };
+    }
+
+    if (chapter === 5) {
+      return {
+        ...commonUpdates,
+        day: 1,
+        week: 1,
+        phase: 'action',
+        columns: INITIAL_COLUMNS,
+        funds: 20000,
+        materials: 1000,
+        trafficImpact: 0,
+        segmentBuffers: {
+          's1': 0, 's2': 0, 's3': 0, 's4': 0, 's5': 0, 's6': 0, 's7': 0, 's8': 0
+        },
+        lives: finalLives,
+        flags: { ...state.flags, case_intro_seen: false, character_cast_seen: true, chapter_intro_seen: true, game_over: false }
       };
     }
 
@@ -398,7 +478,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   unlockBadge: (badgeId) => set((state) => {
     if (!state.unlockedBadges.includes(badgeId)) {
       console.log(`Badge Unlocked: ${badgeId}`);
-      return { unlockedBadges: [...state.unlockedBadges, badgeId] };
+      return {
+        unlockedBadges: [...state.unlockedBadges, badgeId],
+        badgeDates: { ...state.badgeDates, [badgeId]: new Date().toISOString() }
+      };
     }
     return {};
   }),
@@ -966,6 +1049,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       depotItems: data.depotItems ?? state.depotItems,
       depotZones: data.depotZones ?? state.depotZones,
       depotScore: data.depotScore ?? state.depotScore,
+      hoistSlots: data.hoistSlots ?? state.hoistSlots,
+      pdi: data.pdi ?? state.pdi,
+      reworkRate: data.reworkRate ?? state.reworkRate,
+      trafficImpact: data.trafficImpact ?? state.trafficImpact,
+      segmentBuffers: data.segmentBuffers ?? state.segmentBuffers,
     };
   }),
 
@@ -991,11 +1079,24 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     const hazardsScore = state.depotItems.filter(i => i.type === 'hazard').length === 0 ? 5 : 0;
 
-    const finalScore = Math.round((score / totalItems) * 100) + hazardsScore;
+    const finalScore = totalItems > 0 ? Math.round((score / totalItems) * 100) : 100;
+
+    // Penalize for hazards
+    const hazardsLeft = state.depotItems.filter(i => i.type === 'hazard').length;
+    const adjustedScore = Math.max(0, finalScore - (hazardsLeft * 20));
+
+    // Sustain Phase (Day 16) Audit - Life Loss
+    if (state.day === 16) {
+      if (hazardsLeft > 0) {
+        get().loseLife("Safety Audit Failed: Active hazards were left in the workspace during the final inspection.");
+      } else if (adjustedScore < 40) {
+        get().loseLife("Operational Audit Failed: Workspace organization standards were critically low (below 40%).");
+      }
+    }
 
     return {
-      depotScore: finalScore,
-      lpi: { ...state.lpi, teamMorale: Math.min(100, state.lpi.teamMorale + Math.floor(finalScore / 10)) }
+      depotScore: adjustedScore,
+      lpi: { ...state.lpi, teamMorale: Math.min(100, state.lpi.teamMorale + Math.floor(adjustedScore / 10)) }
     };
   }),
 

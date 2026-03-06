@@ -68,5 +68,7 @@ export const CHARACTERS: Record<string, Character> = {
 export const CHAPTER_CHARACTERS: Record<number, string[]> = {
   1: ['Mira', 'Rao', 'Old Foreman', 'Isha'],
   2: ['Client', 'Old Foreman', 'Isha', 'Advisor'],
-  3: ['Rao', 'Mira', 'Advisor', 'Isha']
+  3: ['Rao', 'Mira', 'Advisor', 'Isha'],
+  4: ['Mira', 'Client', 'Inspector', 'Rao'], // Case Study 1
+  5: ['Old Foreman', 'Advisor', 'Isha', 'Client'] // Case Study 2
 };

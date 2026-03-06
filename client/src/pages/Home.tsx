@@ -6,6 +6,7 @@ import soundManager from '@/lib/soundManager';
 
 import { ComingSoonModal } from '../components/game/ComingSoonModal';
 import { AuthModal } from '@/components/ui/AuthModal';
+import { CaseStudiesModal } from '@/components/game/CaseStudiesModal';
 
 const buttonVariants = {
   hidden: { opacity: 0, x: -20 },
@@ -22,7 +23,8 @@ const buttonVariants = {
 };
 
 export default function Home() {
-  const [pendingFeature, setPendingFeature] = useState<'multiplayer' | 'cases' | null>(null);
+  const [pendingFeature, setPendingFeature] = useState<'multiplayer' | null>(null);
+  const [showCaseStudies, setShowCaseStudies] = useState(false);
 
   useEffect(() => {
     soundManager.playBGM('menu', 0.3);
@@ -164,14 +166,13 @@ export default function Home() {
           {/* Secondary Option Menu */}
           <div className="flex flex-col gap-3 mt-2">
             <button
-              onClick={() => setPendingFeature('cases')}
-              className="w-full group relative flex items-center justify-between px-6 py-4 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-xs hover:text-slate-200 hover:bg-slate-800 hover:border-slate-600 transition-all shadow-md"
+              onClick={() => setShowCaseStudies(true)}
+              className="w-full group relative flex items-center justify-between px-6 py-4 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-300 font-bold uppercase tracking-widest text-xs hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all shadow-md"
             >
               <span className="flex items-center gap-3">
-                <ExternalLink className="w-4 h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+                <ExternalLink className="w-4 h-4 text-cyan-500 group-hover:text-cyan-400 transition-colors" />
                 Case Studies
               </span>
-              <span className="text-[9px] bg-slate-900 px-2 py-0.5 rounded text-slate-500 font-bold border border-slate-800">COMING SOON</span>
             </button>
 
             <button
@@ -222,6 +223,15 @@ export default function Home() {
         onClose={() => setPendingFeature(null)}
         mode={pendingFeature || 'multiplayer'}
       />
+
+      <AnimatePresence>
+        {showCaseStudies && (
+          <CaseStudiesModal
+            isOpen={showCaseStudies}
+            onClose={() => setShowCaseStudies(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
