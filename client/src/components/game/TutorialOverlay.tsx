@@ -8,7 +8,7 @@ interface Props {
 }
 
 export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
-    const { tutorialStep, tutorialActive, completeTutorial, setTutorialStep, setFlag } = useGameStore();
+    const { chapter, tutorialStep, tutorialActive, completeTutorial, setTutorialStep, setFlag } = useGameStore();
     const [spotlightPos, setSpotlightPos] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
 
     useEffect(() => {
@@ -25,7 +25,8 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
             if (tutorialStep === 5) targetId = 'col-doing';
             if (tutorialStep === 6) targetId = 'smart-advisor-box';
             if (tutorialStep === 7) targetId = 'stats-box';
-            if (tutorialStep === 8) targetId = 'btn-save';
+            if (tutorialStep === 8) targetId = 'lives-box';
+            if (tutorialStep === 9) targetId = 'btn-save';
 
             if (targetId) {
                 const el = document.getElementById(targetId);
@@ -232,31 +233,61 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 onClick={() => setTutorialStep(8)}
                                 className="bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-green-500 transition-colors"
                             >
+                                Next: Project Health
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Step 8: Lives (Hearts) (Bottom Bar - Tooltip Above) */}
+                {tutorialStep === 8 && spotlightPos && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                        style={{ bottom: window.innerHeight - spotlightPos.y + 20, left: spotlightPos.x - 100 }}
+                        className="absolute z-[90] w-72 pointer-events-auto"
+                    >
+                        <div className="bg-slate-900 text-slate-200 px-5 py-4 rounded-xl shadow-2xl border-4 border-rose-500 relative">
+                            {/* Arrow pointing DOWN */}
+                            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                                <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[15px] border-t-rose-500 animate-bounce"></div>
+                            </div>
+
+                            <h3 className="font-black text-rose-400 text-lg mb-1">Project Health</h3>
+                            <p className="text-sm font-medium mb-3 leading-snug text-slate-300">
+                                You have <b>3 Lives</b> <span className="text-rose-400">♥♥♥</span>. <br />
+                                If your <b>Funds</b> drop below zero, or your <b>Morale</b> crashes, you lose a life. Lose all 3, and it's Game Over!
+                            </p>
+                            <button
+                                onClick={() => setTutorialStep(9)}
+                                className="bg-rose-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-rose-500 transition-colors"
+                            >
                                 Next: Saving
                             </button>
                         </div>
                     </motion.div>
                 )}
 
-                {/* Step 8: Settings & Save */}
-                {tutorialStep === 8 && spotlightPos && (
+                {/* Step 9: Settings & Save (Bottom Bar - Tooltip Below) */}
+                {tutorialStep === 9 && spotlightPos && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                         style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x - 150 }}
                         className="absolute z-[90] w-72 pointer-events-auto"
                     >
                         <div className="bg-slate-900 text-slate-200 px-5 py-4 rounded-xl shadow-2xl border-4 border-purple-500 relative">
-                            {/* Arrow pointing UP to the button */}
+                            {/* Arrow pointing UP */}
                             <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
                                 <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[15px] border-b-purple-500 animate-bounce"></div>
                             </div>
 
                             <h3 className="font-black text-purple-400 text-lg mb-1">Save Your Progress</h3>
                             <p className="text-sm font-medium mb-3 leading-snug text-slate-300">
-                                Click the <b>Save</b> icon to save your game to the cloud! <br /> You'll need to <b>Login</b> or <b>Register</b> to keep your progress safe across devices.
+                                Click the <b>Save</b> icon to manually save your game to the cloud. <br /><br />
+                                <span className="text-cyan-400">⚡ Auto-Save:</span> The game will also automatically save at the end of every day! <br /><br />
+                                You'll need to <b>Login</b> or <b>Register</b> to keep your progress safe.
                             </p>
                             <button
-                                onClick={() => setTutorialStep(9)}
+                                onClick={() => setTutorialStep(10)}
                                 className="bg-purple-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold w-full hover:bg-purple-500 transition-colors"
                             >
                                 Finish Tutorial
@@ -265,8 +296,8 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                     </motion.div>
                 )}
 
-                {/* Step 9: Complete */}
-                {tutorialStep === 9 && (
+                {/* Step 10: Complete */}
+                {tutorialStep === 10 && chapter === 1 && (
                     <motion.div
                         initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-auto z-[90]"
@@ -288,7 +319,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 {/* --- CHAPTER 2: PLANNING ROOM TUTORIAL --- */}
 
                 {/* Step 10: Lookahead Window (Red/Green) */}
-                {tutorialStep === 10 && (
+                {tutorialStep === 10 && chapter === 2 && (
                     <div className="absolute top-20 right-20 z-[90] w-72 pointer-events-auto">
                         <div className="bg-blue-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-blue-400">
                             <h3 className="font-bold text-blue-300 text-lg mb-1">Lookahead Window</h3>
@@ -308,7 +339,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 )}
 
                 {/* Step 11: Removing Constraints */}
-                {tutorialStep === 11 && (
+                {tutorialStep === 11 && chapter === 2 && (
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[90] w-80 pointer-events-auto">
                         <div className="bg-red-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-red-500">
                             <h3 className="font-bold text-red-300 text-lg mb-1 flex items-center gap-2"><Ban className="w-5 h-5" /> Remove Constraints!</h3>
@@ -327,7 +358,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 )}
 
                 {/* Step 12: Weekly Commitment */}
-                {tutorialStep === 12 && (
+                {tutorialStep === 12 && chapter === 2 && (
                     <div className="absolute bottom-20 right-20 z-[90] w-72 pointer-events-auto">
                         <div className="bg-green-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-green-500">
                             <h3 className="font-bold text-green-300 text-lg mb-1">The Weekly Promise</h3>

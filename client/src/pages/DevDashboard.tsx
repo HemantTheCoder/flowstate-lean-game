@@ -355,6 +355,19 @@ export default function DevDashboard() {
                                             <Clock className="w-4 h-4 mr-2" /> Refill/Reset Lives
                                         </Button>
 
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => {
+                                                const store = useGameStore.getState();
+                                                store.customTasks.forEach(t => store.deleteCustomTask(t.id));
+                                                store.setTaskModeSelected(false);
+                                                toast({ title: "Custom Tasks Cleared", description: "Reset to default task mode selection." });
+                                            }}
+                                            className="w-full border-amber-800 text-amber-400 hover:bg-amber-950/50"
+                                        >
+                                            <FileJson className="w-4 h-4 mr-2" /> Clear Custom Tasks
+                                        </Button>
+
                                         <div className="grid grid-cols-3 gap-2">
                                             {[1, 2, 3].map((c) => (
                                                 <Button

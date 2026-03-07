@@ -35,6 +35,7 @@ import { AuthModal } from '@/components/ui/AuthModal';
 import { useToast } from '@/hooks/use-toast';
 import { LifeHearts } from '@/components/game/LifeHearts';
 import { GameOverOverlay } from '@/components/game/GameOverOverlay';
+import { TaskModeSelector } from '@/components/game/TaskModeSelector';
 
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
@@ -73,6 +74,8 @@ export default function Game() {
   const unlockedChapters = useGameStore(s => s.unlockedChapters);
   const depotScore = useGameStore(s => s.depotScore);
   const loseLife = useGameStore(s => s.loseLife);
+  const taskModeSelected = useGameStore(s => s.taskModeSelected);
+  const setTaskModeSelected = useGameStore(s => s.setTaskModeSelected);
   const gameOverReason = useGameStore(s => s.gameOverReason);
 
   // Phase Change Detection for Transition Screen
@@ -246,6 +249,8 @@ export default function Game() {
           phase: state.phase,
           currentDialogue: state.currentDialogue,
           dialogueIndex: state.dialogueIndex,
+          customTasks: state.customTasks,
+          taskModeSelected: state.taskModeSelected,
         } as any,
         flags: state.flags,
         metrics: { ...state.lpi, ppcHistory: state.ppcHistory },
@@ -855,8 +860,9 @@ export default function Game() {
         >
           {/* Stats Bar */}
           <div className="flex items-center gap-3 sm:gap-6 bg-slate-900/60 backdrop-blur-md px-4 sm:px-6 py-3 rounded-2xl border border-white/5 shadow-2xl">
-            <LifeHearts />
-
+            <div id="lives-box">
+              <LifeHearts />
+            </div>
             <div className="h-8 w-px bg-white/10 hidden sm:block" />
             <div className="flex gap-1.5 sm:gap-4 items-center">
               <button
@@ -990,6 +996,13 @@ export default function Game() {
           chapter={chapter}
         />
       )}
+      {/* Task Mode Selector — shown once at start of a Kanban chapter (1 or 2) */}
+      <TaskModeSelector
+        isOpen={chapter < 3 && day === 1 && !taskModeSelected && !flags.game_over}
+        onSelect={(mode) => {
+          setTaskModeSelected(true);
+        }}
+      />
     </div>
   );
 }

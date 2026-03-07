@@ -3,6 +3,7 @@ import { useGameStore, Task, ConstraintType } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, CheckCircle, Package, Users, FileCheck, Cloud, ArrowRight, Briefcase, Target, Lock, Calendar, ClipboardCheck, Wrench, HandshakeIcon, Play, BarChart3, Sun, ShieldAlert, Eye, Ban, Save } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
+import { TaskIconDisplay } from './TaskIconDisplay';
 
 const constraintConfig: Record<ConstraintType, { icon: React.ReactNode, label: string, color: string, action: string, cost: string }> = {
     material: { icon: <Package className="w-4 h-4" />, label: 'Material', color: 'red', action: 'Call Supplier', cost: '$200' },
@@ -452,11 +453,16 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                     onClick={() => moveToReady(task.id)}
                                     data-testid={`task-master-${task.id}`}
                                 >
-                                    <div className="flex justify-between items-start mb-1">
-                                        <span className="font-bold text-sm text-slate-200 leading-tight">{task.title}</span>
-                                        <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
+                                    <div className="flex items-start gap-2 mb-1">
+                                        <TaskIconDisplay icon={task.icon} type={task.type} size="md" className="mt-0.5 shadow-sm" />
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-start">
+                                                <span className="font-bold text-sm text-slate-200 leading-tight">{task.title}</span>
+                                                <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex justify-between items-center mt-2">
+                                    <div className="flex justify-between items-center mt-2 ml-8">
                                         <span className="text-[10px] text-slate-400 font-mono">{task.type}</span>
                                         {(task.constraints?.length || 0) > 0 && (
                                             <span className="text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded font-bold">
@@ -524,15 +530,18 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                                     } ${isSelected ? 'ring-2 ring-cyan-500/50 scale-[1.02] bg-slate-800' : ''}`}
                                                 data-testid={`task-lookahead-${task.id}`}
                                             >
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <span className="font-bold text-sm text-slate-200 leading-tight">{task.title}</span>
-                                                    {isBlocked ? (
-                                                        <AlertTriangle className="w-4 h-4 text-red-500" />
-                                                    ) : isRisky ? (
-                                                        <AlertTriangle className="w-4 h-4 text-amber-500" />
-                                                    ) : (
-                                                        <CheckCircle className="w-4 h-4 text-green-500" />
-                                                    )}
+                                                <div className="flex items-start gap-2 mb-2">
+                                                    <TaskIconDisplay icon={task.icon} type={task.type} size="md" className="mt-0.5 shadow-sm" />
+                                                    <div className="flex-1 min-w-0 flex justify-between items-start">
+                                                        <span className="font-bold text-sm text-slate-200 leading-tight">{task.title}</span>
+                                                        {isBlocked ? (
+                                                            <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
+                                                        ) : isRisky ? (
+                                                            <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                                                        ) : (
+                                                            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 <div className="flex flex-wrap gap-1">
                                                     {day >= 7 ? (
@@ -681,9 +690,12 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
 
                             {selectedTask ? (
                                 <div className="space-y-5">
-                                    <div>
-                                        <h2 className="text-lg font-black text-slate-200 leading-tight">{selectedTask.title}</h2>
-                                        <p className="text-xs text-slate-400 mt-2 leading-relaxed">{selectedTask.description}</p>
+                                    <div className="flex items-start gap-3">
+                                        <TaskIconDisplay icon={selectedTask.icon} type={selectedTask.type} size="lg" />
+                                        <div className="flex-1">
+                                            <h2 className="text-lg font-black text-slate-200 leading-tight">{selectedTask.title}</h2>
+                                            <p className="text-xs text-slate-400 mt-2 leading-relaxed">{selectedTask.description}</p>
+                                        </div>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-2 text-sm">

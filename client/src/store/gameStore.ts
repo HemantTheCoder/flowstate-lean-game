@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import { getRandomTask, TaskType, CONSTRUCTION_TASKS, CHAPTER_2_TASKS } from '@/data/tasks';
+import { saveCustomTasks, loadCustomTasks } from '@/lib/customTaskStorage';
 
 export interface DialogueLine {
   character: string;
@@ -151,6 +152,15 @@ export interface GameState {
   moveTask: (taskId: string, sourceColId: string, destColId: string) => boolean; // Return success/fail
   setWipLimit: (colId: string, limit: number) => void;
   addTask: () => void;
+
+  // Custom Task Actions
+  customTasks: TaskType[];
+  taskModeSelected: boolean;
+  setTaskModeSelected: (val: boolean) => void;
+  addCustomTask: (task: TaskType) => void;
+  editCustomTask: (id: string, updates: Partial<TaskType>) => void;
+  deleteCustomTask: (id: string) => void;
+  replaceTask: (existingTaskOriginalId: string, newTask: TaskType) => void;
 
   // Tutorial Actions
   setTutorialStep: (step: number) => void;
@@ -966,6 +976,73 @@ export const useGameStore = create<GameState>((set, get) => ({
     };
   }),
 
+  // Custom Task CRUD
+  taskModeSelected: false,
+  setTaskModeSelected: (val) => set({ taskModeSelected: val }),
+  customTasks: loadCustomTasks(),
+
+  addCustomTask: (task) => set((state) => {
+    const updated = [...state.customTasks, task];
+    saveCustomTasks(updated);
+    const newTask: Task = {
+      ...task,
+      id: uuidv4(),
+      status: 'backlog',
+      originalId: task.id,
+    };
+    return {
+      customTasks: updated,
+      columns: state.columns.map(col =>
+        col.id === 'backlog'
+          ? { ...col, tasks: [...col.tasks, newTask] }
+          : col
+      ),
+    };
+  }),
+
+  editCustomTask: (id, updates) => set((state) => {
+    const updated = state.customTasks.map(t => t.id === id ? { ...t, ...updates } : t);
+    saveCustomTasks(updated);
+    // Also update the task on the board if it exists
+    return {
+      customTasks: updated,
+      columns: state.columns.map(col => ({
+        ...col,
+        tasks: col.tasks.map(t =>
+          t.originalId === id ? { ...t, ...updates } : t
+        ),
+      })),
+    };
+  }),
+
+  deleteCustomTask: (id) => set((state) => {
+    const updated = state.customTasks.filter(t => t.id !== id);
+    saveCustomTasks(updated);
+    return {
+      customTasks: updated,
+      columns: state.columns.map(col => ({
+        ...col,
+        tasks: col.tasks.filter(t => t.originalId !== id),
+      })),
+    };
+  }),
+
+  replaceTask: (existingTaskOriginalId, newTask) => set((state) => {
+    const updated = [...state.customTasks, newTask];
+    saveCustomTasks(updated);
+    return {
+      customTasks: updated,
+      columns: state.columns.map(col => ({
+        ...col,
+        tasks: col.tasks.map(t =>
+          t.originalId === existingTaskOriginalId
+            ? { ...newTask, id: t.id, status: t.status, originalId: newTask.id }
+            : t
+        ),
+      })),
+    };
+  }),
+
   setTutorialStep: (step) => set({ tutorialStep: step }),
   completeTutorial: () => set({ tutorialActive: false, tutorialStep: 99 }),
   addMaterials: (amount) => set((s) => ({ materials: s.materials + amount })),
@@ -1019,7 +1096,16 @@ export const useGameStore = create<GameState>((set, get) => ({
   importState: (data: any) => set((state) => {
     const ks = data.kanbanState || {};
     const restoredDay = ks.day ?? data.day ?? state.day;
+
+    // Sync custom tasks to local storage if provided by server
+    const restoredCustomTasks = ks.customTasks ?? data.customTasks ?? state.customTasks;
+    if (ks.customTasks || data.customTasks) {
+      saveCustomTasks(restoredCustomTasks);
+    }
+
     return {
+      customTasks: restoredCustomTasks,
+      taskModeSelected: ks.taskModeSelected ?? data.taskModeSelected ?? state.taskModeSelected,
       chapter: data.chapter ?? state.chapter,
       unlockedChapters: data.completedChapters
         ? [1, ...data.completedChapters.map((c: number) => c + 1)]

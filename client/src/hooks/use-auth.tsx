@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useGameStore } from "@/store/gameStore";
 import { InsertUser, User } from "@shared/schema";
 
 type AuthContextType = {
@@ -70,6 +71,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
         onSuccess: () => {
             queryClient.setQueryData(["/api/user"], null);
+            // Completely wipe browser storage to prevent cross-account leak
+            localStorage.removeItem('flowstate-storage');
+            localStorage.removeItem('activeSessionId');
+            localStorage.removeItem('flowstate_custom_tasks');
+            // Force a hard reload to the home page to clear all React memory state
+            window.location.href = '/';
         },
     });
 
