@@ -111,7 +111,15 @@ export default function ChapterSelect() {
             <CharacterCreationModal />
 
             {/* Premium Twilight Industrial Ambient Background */}
-            <div className="absolute inset-0 pointer-events-none z-0">
+            <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+                {/* Photographic Background Asset */}
+                <div
+                    className="absolute inset-0 bg-[url('/images/chapter_bg.jpg')] bg-cover bg-center bg-no-repeat opacity-25 mix-blend-luminosity"
+                    style={{ filter: 'grayscale(0.5) contrast(1.2)' }}
+                />
+                {/* Dark Gradient Overlay for optimal contrast */}
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/90 to-slate-950" />
+
                 <motion.div
                     animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15] }}
                     transition={{ duration: 15, repeat: Infinity, ease: "linear" }}

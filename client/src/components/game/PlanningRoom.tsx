@@ -338,9 +338,9 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
             </div>
 
             {/* Main Content */}
-            <div className="relative z-10 flex-1 flex overflow-hidden">
+            <div className="relative z-10 flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
                 {/* LPS Workflow Sidebar */}
-                <div className="w-56 bg-slate-900/60 backdrop-blur-md text-slate-300 border-r border-slate-700/50 flex flex-col p-4">
+                <div className="w-full lg:w-56 shrink-0 bg-slate-900/60 backdrop-blur-md text-slate-300 border-r border-slate-700/50 flex flex-col p-4">
                     <h3 className="text-slate-400 font-black uppercase tracking-wider text-[10px] mb-4 flex items-center gap-2">
                         <Target className="w-4 h-4 text-cyan-500" />
                         LPS Workflow
@@ -425,10 +425,10 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                 </div>
 
                 {/* Main 3-Column Grid */}
-                <div className="flex-1 p-4 grid grid-cols-12 gap-4 overflow-hidden bg-slate-900/40">
+                <div className="flex-1 p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:overflow-hidden bg-slate-900/40 shrink-0 min-h-screen lg:min-h-0">
 
                     {/* LEFT: Master Plan */}
-                    <div className={`col-span-3 bg-slate-800/60 backdrop-blur-md rounded-3xl shadow-xl border ${showTutorial && tutorialSteps[tutorialIndex].highlight === 'master' ? 'border-cyan-500 ring-2 ring-cyan-500/30' : 'border-slate-700/50'} flex flex-col overflow-hidden transition-all`}>
+                    <div className={`col-span-1 lg:col-span-3 bg-slate-800/60 backdrop-blur-md rounded-3xl shadow-xl border ${showTutorial && tutorialSteps[tutorialIndex].highlight === 'master' ? 'border-cyan-500 ring-2 ring-cyan-500/30' : 'border-slate-700/50'} flex flex-col overflow-hidden transition-all min-h-[400px]`}>
                         <div className="p-4 border-b border-slate-700/50 bg-slate-800/80 rounded-t-3xl">
                             <div className="flex items-center gap-2 mb-1">
                                 <div className="w-8 h-8 bg-slate-700/50 rounded-xl flex items-center justify-center border border-slate-600/50">
@@ -481,7 +481,7 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                     </div>
 
                     {/* CENTER: Lookahead + Weekly Plan */}
-                    <div className="col-span-6 flex flex-col gap-4">
+                    <div className="col-span-1 lg:col-span-6 flex flex-col gap-4 min-h-[500px]">
                         {/* Lookahead Board */}
                         <div className={`flex-1 bg-slate-800/60 backdrop-blur-md rounded-3xl shadow-xl border ${showTutorial && tutorialSteps[tutorialIndex].highlight === 'lookahead' ? 'border-orange-500 ring-2 ring-orange-500/30' : 'border-slate-700/50'} flex flex-col overflow-hidden transition-all`}>
                             <div className="p-4 border-b border-slate-700/50 bg-slate-800/80 flex justify-between items-center rounded-t-3xl">
@@ -661,7 +661,7 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                     </div>
 
                     {/* RIGHT: Task Inspector */}
-                    <div className={`col-span-3 bg-slate-800/60 backdrop-blur-md rounded-3xl shadow-xl border ${showTutorial && tutorialSteps[tutorialIndex].highlight === 'inspector' ? 'border-purple-500 ring-2 ring-purple-500/30' : 'border-slate-700/50'} flex flex-col overflow-hidden transition-all`}>
+                    <div className={`col-span-1 lg:col-span-3 bg-slate-800/60 backdrop-blur-md rounded-3xl shadow-xl border ${showTutorial && tutorialSteps[tutorialIndex].highlight === 'inspector' ? 'border-purple-500 ring-2 ring-purple-500/30' : 'border-slate-700/50'} flex flex-col overflow-hidden transition-all min-h-[400px]`}>
                         <div className="p-4 border-b border-slate-700/50 bg-slate-800/80 rounded-t-3xl">
                             <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 bg-purple-900/50 rounded-xl flex items-center justify-center border border-purple-500/30">
