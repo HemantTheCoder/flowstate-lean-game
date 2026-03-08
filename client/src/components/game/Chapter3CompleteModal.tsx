@@ -27,8 +27,13 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
 
     const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
-    // Ensure final score is calculated if not yet done
-    const finalScore = depotScore > 0 ? depotScore : (evaluate5S() ?? 0);
+    useEffect(() => {
+        if (isOpen && depotScore === 0) {
+            evaluate5S();
+        }
+    }, [isOpen]);
+
+    const finalScore = depotScore;
 
     useEffect(() => {
         if (isOpen) {
