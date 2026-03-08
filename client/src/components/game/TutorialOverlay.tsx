@@ -4,6 +4,33 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowDown, ChevronRight, Ban, ArrowRight, Gauge } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 
+const TOOLTIP_MARGIN = 12;
+
+function clampToViewport(
+    style: { top?: number; bottom?: number; left?: number; right?: number },
+    tooltipW: number,
+    tooltipH: number
+): React.CSSProperties {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const result: React.CSSProperties = {};
+
+    if (style.top !== undefined) {
+        result.top = Math.max(TOOLTIP_MARGIN, Math.min(style.top, vh - tooltipH - TOOLTIP_MARGIN));
+    }
+    if (style.bottom !== undefined) {
+        result.bottom = Math.max(TOOLTIP_MARGIN, Math.min(style.bottom, vh - tooltipH - TOOLTIP_MARGIN));
+    }
+    if (style.left !== undefined) {
+        result.left = Math.max(TOOLTIP_MARGIN, Math.min(style.left, vw - tooltipW - TOOLTIP_MARGIN));
+    }
+    if (style.right !== undefined) {
+        result.right = Math.max(TOOLTIP_MARGIN, Math.min(style.right, vw - tooltipW - TOOLTIP_MARGIN));
+    }
+
+    return result;
+}
+
 interface Props {
     showKanban: boolean;
 }
@@ -83,7 +110,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 {tutorialStep === 1 && !showKanban && spotlightPos && (
                     <motion.div
                         initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
-                        style={{ top: spotlightPos.y + 20, left: spotlightPos.x - 320 }}
+                        style={clampToViewport({ top: spotlightPos.y + 20, left: spotlightPos.x - 320 }, 360, 80)}
                         className="absolute flex items-center gap-4"
                     >
                         <div className="bg-blue-600 px-4 py-2 rounded-xl text-lg shadow-xl text-right">
@@ -100,7 +127,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         {tutorialStep === 2 && (
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-                                style={{ top: spotlightPos.y - 100, left: spotlightPos.x }}
+                                style={clampToViewport({ top: spotlightPos.y - 100, left: spotlightPos.x }, 256, 160)}
                                 className="absolute z-[90] w-64 pointer-events-none"
                             >
                                 <div className="flex justify-center mb-2">
@@ -117,7 +144,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         {tutorialStep === 3 && (
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-                                style={{ top: spotlightPos.y - 120, left: spotlightPos.x }}
+                                style={clampToViewport({ top: spotlightPos.y - 120, left: spotlightPos.x }, 256, 180)}
                                 className="absolute z-[90] w-64 pointer-events-none"
                             >
                                 <div className="flex justify-center mb-2">
@@ -134,7 +161,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         {tutorialStep === 4 && (
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-                                style={{ top: spotlightPos.y - 120, left: spotlightPos.x }}
+                                style={clampToViewport({ top: spotlightPos.y - 120, left: spotlightPos.x }, 256, 180)}
                                 className="absolute z-[90] w-64 pointer-events-none"
                             >
                                 <div className="flex justify-center mb-2">
@@ -193,7 +220,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 {tutorialStep === 6 && spotlightPos && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                        style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x }}
+                        style={clampToViewport({ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x }, 288, 200)}
                         className="absolute z-[90] w-72 pointer-events-auto"
                     >
                         <div className="bg-slate-900 text-slate-200 px-5 py-4 rounded-xl shadow-2xl border-4 border-blue-500 relative">
@@ -216,7 +243,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 {tutorialStep === 7 && spotlightPos && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                        style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x }}
+                        style={clampToViewport({ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x }, 288, 280)}
                         className="absolute z-[90] w-72 pointer-events-auto"
                     >
                         <div className="bg-slate-900 text-slate-200 px-5 py-4 rounded-xl shadow-2xl border-4 border-green-500 relative">
@@ -241,7 +268,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 {tutorialStep === 8 && spotlightPos && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                        style={{ bottom: window.innerHeight - spotlightPos.y + 20, left: spotlightPos.x - 100 }}
+                        style={clampToViewport({ bottom: window.innerHeight - spotlightPos.y + 20, left: spotlightPos.x - 100 }, 288, 220)}
                         className="absolute z-[90] w-72 pointer-events-auto"
                     >
                         <div className="bg-slate-900 text-slate-200 px-5 py-4 rounded-xl shadow-2xl border-4 border-rose-500 relative">
@@ -269,7 +296,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 {tutorialStep === 9 && spotlightPos && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                        style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x - 150 }}
+                        style={clampToViewport({ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x - 150 }, 288, 280)}
                         className="absolute z-[90] w-72 pointer-events-auto"
                     >
                         <div className="bg-slate-900 text-slate-200 px-5 py-4 rounded-xl shadow-2xl border-4 border-purple-500 relative">
@@ -318,7 +345,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
 
                 {/* Step 10: Lookahead Window (Red/Green) */}
                 {tutorialStep === 10 && chapter === 2 && (
-                    <div className="absolute top-20 right-20 z-[90] w-72 pointer-events-auto">
+                    <div className="absolute z-[90] w-72 max-w-[calc(100vw-24px)] pointer-events-auto" style={clampToViewport({ top: 80, right: 80 }, 288, 200)}>
                         <div className="bg-blue-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-blue-400">
                             <h3 className="font-bold text-blue-300 text-lg mb-1">Lookahead Window</h3>
                             <p className="text-sm mb-3">
@@ -357,7 +384,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
 
                 {/* Step 12: Weekly Commitment */}
                 {tutorialStep === 12 && chapter === 2 && (
-                    <div className="absolute bottom-20 right-20 z-[90] w-72 pointer-events-auto">
+                    <div className="absolute z-[90] w-72 max-w-[calc(100vw-24px)] pointer-events-auto" style={clampToViewport({ bottom: 80, right: 80 }, 288, 200)}>
                         <div className="bg-green-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-green-500">
                             <h3 className="font-bold text-green-300 text-lg mb-1">The Weekly Promise</h3>
                             <p className="text-sm mb-3">
@@ -381,7 +408,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
 
                 {/* Step 20: Pull Board WIP Limits */}
                 {tutorialStep === 20 && chapter === 4 && (
-                    <div className="absolute top-20 left-20 z-[90] w-80 pointer-events-auto">
+                    <div className="absolute z-[90] w-80 max-w-[calc(100vw-24px)] pointer-events-auto" style={clampToViewport({ top: 80, left: 80 }, 320, 260)}>
                         <div className="bg-indigo-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-indigo-400 relative">
                             <h3 className="font-bold text-indigo-300 text-lg mb-2">Trade Pull Board</h3>
                             <p className="text-sm mb-3">
@@ -400,7 +427,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
 
                 {/* Step 21: JIT Scheduler */}
                 {tutorialStep === 21 && chapter === 4 && (
-                    <div className="absolute top-20 right-[370px] z-[90] w-80 pointer-events-auto">
+                    <div className="absolute z-[90] w-80 max-w-[calc(100vw-24px)] pointer-events-auto" style={clampToViewport({ top: 80, right: 370 }, 320, 260)}>
                         <div className="bg-emerald-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-emerald-400 relative">
                             <h3 className="font-bold text-emerald-300 text-lg mb-2">JIT Scheduler & Buffers</h3>
                             <p className="text-sm mb-3">

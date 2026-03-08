@@ -19,8 +19,9 @@ The project is a fullstack TypeScript application comprising a React frontend wi
 
 **UI/UX Decisions:**
 - **Thematic Chapters:** Chapter 1 utilizes a blue theme for Kanban concepts, while Chapter 2 uses a purple/indigo theme for the Last Planner System, providing clear visual differentiation.
-- **Responsive Design:** Mobile toolbars and components are optimized for smaller screens, with consistent icon sizing.
-- **Interactive Modals:** Use interactive, responsive modals for daily summaries, chapter completion, and reflection quizzes.
+- **Responsive Design:** All components use Tailwind responsive breakpoints (sm/md/lg) for mobile-first design. Modals use max-height with overflow-y-auto. Tutorial tooltips use viewport clamping to stay on-screen. DialogueBox portraits hidden on very small screens. Home page title sizes scale down for mobile.
+- **Dark Theme Consistency:** All pages (including Settings) use the dark industrial theme (bg-slate-900). Settings page has functional BGM/SFX volume sliders wired to Zustand store and soundManager.
+- **Interactive Modals:** Use interactive, responsive modals for daily summaries, chapter completion, and reflection quizzes. DecisionModal has max-height and scroll for mobile.
 - **Contextual Help:** LeanTooltipText highlights and defines Lean terms in dialogue, enhancing learning.
 - **Visual Kanban:** Task cards are color-coded by type (Structural, Systems, Interior, Management) with badges and borders.
 

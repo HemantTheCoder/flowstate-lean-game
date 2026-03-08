@@ -84,37 +84,37 @@ export const DialogueBox: React.FC = () => {
                             initial={{ opacity: 0, x: -20, scale: 0.95 }}
                             animate={{ opacity: 1, x: 0, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className={`absolute bottom-24 ${isPlayer ? 'right-10' : 'left-0 md:-left-10'} z-0 bg-transparent`}
+                            className={`absolute bottom-20 sm:bottom-24 ${isPlayer ? 'right-2 sm:right-10' : 'left-0 sm:left-0 md:-left-10'} z-0 bg-transparent hidden sm:block`}
                         >
                             <img
                                 src={`/assets/${portrait}`}
                                 alt={line.character}
-                                className="h-64 md:h-80 w-56 md:w-72 object-cover object-[center_top] rounded-t-3xl border-t border-x border-slate-700/50 drop-shadow-2xl bg-slate-900/50"
+                                className="h-40 sm:h-64 md:h-80 w-36 sm:w-56 md:w-72 object-cover object-[center_top] rounded-t-3xl border-t border-x border-slate-700/50 drop-shadow-2xl bg-slate-900/50"
                             />
                         </motion.div>
                     )}
 
                     {/* Text Box Container */}
                     <div
-                        className="relative bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-[0_0_30px_rgba(30,58,138,0.3)] border border-slate-700/50 p-6 md:p-8 cursor-pointer z-10 min-h-[160px] flex flex-col justify-center"
+                        className="relative bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-[0_0_30px_rgba(30,58,138,0.3)] border border-slate-700/50 p-4 sm:p-6 md:p-8 cursor-pointer z-10 min-h-[120px] sm:min-h-[160px] flex flex-col justify-center"
                         onClick={() => {
                             soundManager.playSFX('typing', 0.6);
                             advanceDialogue();
                         }}
                     >
                         {/* Character Name Tag */}
-                        <div className={`absolute -top-5 left-8 px-6 py-2 rounded-xl text-white font-black text-lg shadow-lg transform -rotate-1 ${bgColor}`}>
+                        <div className={`absolute -top-4 sm:-top-5 left-4 sm:left-8 px-3 sm:px-6 py-1 sm:py-2 rounded-xl text-white font-black text-sm sm:text-base md:text-lg shadow-lg transform -rotate-1 ${bgColor}`}>
                             {displayName.toUpperCase()}
                         </div>
 
                         {/* Text Content */}
-                        <div className="text-xl md:text-2xl text-slate-200 font-medium leading-relaxed font-sans mt-2">
+                        <div className="text-base sm:text-lg md:text-2xl text-slate-200 font-medium leading-relaxed font-sans mt-2">
                             <LeanTooltipText text={processedText} />
                         </div>
 
                         {/* Continue Indicator */}
-                        <div className="absolute bottom-4 right-6 text-slate-400 text-sm animate-pulse font-bold tracking-widest uppercase flex items-center gap-1">
-                            Next <ChevronRight className="w-5 h-5" />
+                        <div className="absolute bottom-2 sm:bottom-4 right-4 sm:right-6 text-slate-400 text-xs sm:text-sm animate-pulse font-bold tracking-widest uppercase flex items-center gap-1">
+                            Next <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
                     </div>
                 </div>
