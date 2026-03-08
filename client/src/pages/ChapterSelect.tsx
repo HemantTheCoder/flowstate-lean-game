@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Lock, ChevronRight, ArrowLeft, BookOpen, AlertTriangle, Target, HardHat } from 'lucide-react';
+import { Play, Lock, ChevronRight, ArrowLeft, BookOpen, AlertTriangle, Target, HardHat, Gauge, Timer } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 import { useGameStore } from '@/store/gameStore';
 import { CharacterCreationModal } from '@/components/game/CharacterCreationModal';
@@ -253,6 +253,36 @@ export default function ChapterSelect() {
                         );
                     })}
                 </div>
+
+                {/* Coming Soon Feature Placeholders */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6, duration: 0.5 }}
+                    className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4"
+                >
+                    <div
+                        data-testid="feature-difficulty-coming-soon"
+                        className="group relative flex items-center justify-between px-6 py-4 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-xs cursor-default shadow-md"
+                    >
+                        <span className="flex items-center gap-3">
+                            <Gauge className="w-4 h-4 opacity-70" />
+                            Difficulty Levels
+                        </span>
+                        <span className="text-[9px] bg-slate-900 px-2 py-0.5 rounded text-slate-500 font-bold border border-slate-800">COMING SOON</span>
+                    </div>
+
+                    <div
+                        data-testid="feature-timed-challenge-coming-soon"
+                        className="group relative flex items-center justify-between px-6 py-4 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-xs cursor-default shadow-md"
+                    >
+                        <span className="flex items-center gap-3">
+                            <Timer className="w-4 h-4 opacity-70" />
+                            Timed Challenge Mode
+                        </span>
+                        <span className="text-[9px] bg-slate-900 px-2 py-0.5 rounded text-slate-500 font-bold border border-slate-800">COMING SOON</span>
+                    </div>
+                </motion.div>
             </div>
 
             {/* Upcoming Episode Preview Modal - Visual Novel Readability */}

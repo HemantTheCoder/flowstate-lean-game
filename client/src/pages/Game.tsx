@@ -26,6 +26,7 @@ import { Chapter2CompleteModal } from '@/components/game/Chapter2CompleteModal';
 import { Chapter3CompleteModal } from '@/components/game/Chapter3CompleteModal';
 import { Chapter4CompleteModal } from '@/components/game/Chapter4CompleteModal';
 import { SettingsModal } from '@/components/game/SettingsModal';
+import { LoadingScreen } from '@/components/game/LoadingScreen';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
 import { LayoutDashboard, HardHat, Save, Settings, BookOpen, Package } from 'lucide-react';
@@ -83,6 +84,7 @@ export default function Game() {
   const prevPhaseRef = React.useRef(phase);
   useEffect(() => {
     if (prevPhaseRef.current === 'planning' && phase === 'action') {
+      soundManager.playSFX('phase_change');
       setShowTransition(true);
     }
     prevPhaseRef.current = phase;
@@ -177,7 +179,19 @@ export default function Game() {
   // Audio Control Loop
   const audioSettings = useGameStore(s => s.audioSettings);
   useEffect(() => {
-    if (chapter === 2 && phase === 'planning') {
+    if (chapter === 3) {
+      if (phase === 'planning') {
+        soundManager.playBGM('planning', audioSettings.bgmVolume * 0.8);
+      } else {
+        soundManager.playBGM('depot', audioSettings.bgmVolume);
+      }
+    } else if (chapter === 4) {
+      if (phase === 'planning') {
+        soundManager.playBGM('planning', audioSettings.bgmVolume * 0.8);
+      } else {
+        soundManager.playBGM('logistics', audioSettings.bgmVolume);
+      }
+    } else if (chapter === 2 && phase === 'planning') {
       soundManager.playBGM('planning', audioSettings.bgmVolume * 0.8);
     } else if (day === 3) {
       soundManager.playBGM('rain', audioSettings.bgmVolume);
@@ -1062,6 +1076,10 @@ export default function Game() {
     }
     navigate('/');
   };
+  if (isServerLoading || isInitializing) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className={`w-full h-screen relative overflow-hidden transition-colors duration-1000 bg-slate-950/60`}>
       {/* 1. Phaser Layer (Background) */}

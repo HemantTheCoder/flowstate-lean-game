@@ -12,6 +12,8 @@ const MANIFEST: SoundManifest = {
         rain: '',
         construction: '',
         planning: '',
+        depot: '',
+        logistics: '',
     },
 };
 
@@ -20,7 +22,8 @@ type SFXKey =
     | 'ding' | 'whoosh' | 'warning' | 'unlock' | 'typing'
     | 'drag' | 'drop' | 'quiz_correct' | 'quiz_wrong'
     | 'day_transition' | 'fanfare' | 'storm' | 'card_flip'
-    | 'constraint' | 'badge' | 'morale_up' | 'morale_down';
+    | 'constraint' | 'badge' | 'morale_up' | 'morale_down'
+    | 'typing_fast' | 'phase_change';
 
 class SoundManager {
     private bgm: Howl | null = null;
@@ -227,6 +230,19 @@ class SoundManager {
 
             case 'morale_down':
                 this.playTone(440, 0.15, v * 0.2, 'triangle', 0.01, 0.05, 280);
+                break;
+
+            case 'typing_fast':
+                for (let i = 0; i < 5; i++) {
+                    const f = 500 + Math.random() * 600;
+                    setTimeout(() => this.playTone(f, 0.03, v * 0.1, 'square', 0.002, 0.008), i * 40);
+                }
+                break;
+
+            case 'phase_change':
+                this.playNoise(0.15, v * 0.1, 3000);
+                this.playTone(330, 0.25, v * 0.2, 'triangle', 0.02, 0.08, 660);
+                setTimeout(() => this.playTone(660, 0.3, v * 0.25, 'sine', 0.01, 0.1), 200);
                 break;
 
             default:

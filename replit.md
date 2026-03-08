@@ -91,3 +91,25 @@ All chapter completion modals include enriched visual metrics:
 - **Icons**: `client/public/icons/` — 192x192, 512x512, apple-touch-icon (180x180)
 - **Registration**: `client/src/main.tsx` registers the service worker on page load
 - **Meta Tags**: `client/index.html` includes theme-color, apple-mobile-web-app-capable, Open Graph tags
+
+## Loading & Onboarding
+
+- **LoadingScreen** (`client/src/components/game/LoadingScreen.tsx`): Branded splash screen shown during game initialization (server loading + 500ms grace period). Displays FlowState logo, animated loading dots, and a random Lean Construction tip.
+- **CharacterCreationModal**: Polished with real avatar image previews (architect.jpg/architect_female.jpg), animated gender selection with live preview, and "Story So Far" recap for returning players showing chapter, day, efficiency, and badges earned.
+
+## Audio System
+
+- **BGM Tracks** (6 total via Pixabay CDN): `menu`, `cozy`, `tense`, `rain`, `construction`, `planning`, `depot` (Ch3), `logistics` (Ch4)
+- **Chapter BGM Selection**: Ch1/2 use construction/planning/tense dynamically; Ch3 uses `depot`; Ch4 uses `logistics`; planning phase triggers `planning` track
+- **SFX** (22+ synthesized via Web Audio API): click, typing, typing_fast, drag, drop, card_flip, success, complete, alert, warning, ding, money, unlock, day_transition, fanfare, storm, quiz_correct, quiz_wrong, morale_up, morale_down, constraint, badge, phase_change
+
+## PDF Export
+
+- All 4 chapter completion modals have "Export Report" buttons generating detailed jsPDF performance reports
+- Reports include: player info, performance summary, day-by-day breakdown, key decisions, chapter-specific key learnings, and badges earned
+- Key files: `client/src/lib/exportPDF.ts`, all chapter completion modals
+
+## Coming Soon Features
+
+- **Difficulty Levels**: Placeholder on ChapterSelect page with "Coming Soon" badge
+- **Timed Challenge Mode**: Placeholder on ChapterSelect page with "Coming Soon" badge

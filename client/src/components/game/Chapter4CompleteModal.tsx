@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Award, Target, Brain, ArrowRight, ShieldCheck, Flame, Medal, Truck, BarChart3 } from 'lucide-react';
+import { Award, Target, Brain, ArrowRight, ShieldCheck, Flame, Medal, Truck, BarChart3, Download } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
 import { AnimatedCounter, PerformanceGrade } from '@/components/game/AnimatedCounter';
 import soundManager from '@/lib/soundManager';
 import { apiRequest } from '@/lib/queryClient';
+import { exportChapterReport } from '@/lib/exportPDF';
 
 interface Chapter4CompleteModalProps {
     isOpen: boolean;
@@ -18,7 +19,7 @@ export const Chapter4CompleteModal: React.FC<Chapter4CompleteModalProps> = ({
     onContinue,
     quizScore
 }) => {
-    const lpi = useGameStore(s => s.lpi);
+    const lpi = useGameStore(s => s.lpi) ?? { flowEfficiency: 0, teamMorale: 50, wasteRemoved: 0, tasksDone: 0, potentialCapacity: 0, ppc: 0 };
     const playerName = useGameStore(s => s.playerName);
 
     const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -152,7 +153,44 @@ export const Chapter4CompleteModal: React.FC<Chapter4CompleteModalProps> = ({
                     </motion.div>
 
                     <div className="flex flex-col gap-3">
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-3 gap-3">
+                            <button
+                                onClick={() => {
+                                    const days = [17, 18, 19, 20, 21];
+                                    const phases = ['Pull Board Setup', 'JIT Scheduling', 'Demand Matching', 'Flow Optimization', 'System Integration'];
+                                    exportChapterReport({
+                                        playerName: playerName || 'Architect',
+                                        chapter: 4,
+                                        chapterTitle: 'The Midfield Terminal - Pull Systems & JIT Delivery',
+                                        dailyMetrics: days.map((d, i) => ({
+                                            day: d,
+                                            efficiency: i === 0 ? lpi.flowEfficiency : Math.round(lpi.flowEfficiency * (0.6 + i * 0.1)),
+                                            tasksCompletedToday: 0,
+                                            potentialCapacity: 0,
+                                            cumulativeEfficiency: lpi.flowEfficiency,
+                                            insight: phases[i],
+                                        })),
+                                        finalEfficiency: lpi.flowEfficiency,
+                                        ppc: lpi.ppc || 0,
+                                        quizScore: quizScore,
+                                        quizTotal: 5,
+                                        keyLearnings: [
+                                            'Pull systems only move materials when downstream demands them, eliminating overproduction waste.',
+                                            'Just-In-Time (JIT) delivery synchronizes material arrivals with actual site needs, reducing storage costs and damage.',
+                                            'Flow efficiency measures the ratio of value-adding time to total lead time - higher is better.',
+                                            'Kanban signals (cards, bins, digital alerts) create a visual trigger for replenishment without central scheduling.',
+                                            'Batch size reduction increases flow speed - smaller, more frequent deliveries beat large infrequent ones.',
+                                            'Takt time planning aligns trade handoffs so work flows continuously through zones without waiting.',
+                                            'Buffer management balances protection against variability with the waste of excess inventory.',
+                                        ],
+                                        badges: ['The JIT Strategist'],
+                                    });
+                                }}
+                                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/50 text-slate-300 font-bold hover:bg-slate-700/50 transition-colors shadow-md"
+                                data-testid="button-export-report-ch4"
+                            >
+                                <Download className="w-4 h-4" /> Export Report
+                            </button>
                             <button
                                 onClick={() => window.location.href = '/leaderboard'}
                                 className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/50 text-slate-300 font-bold hover:bg-slate-700/50 transition-colors shadow-md"

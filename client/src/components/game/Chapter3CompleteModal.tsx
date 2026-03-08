@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Award, Target, Brain, ArrowRight, ShieldCheck, Flame, Medal } from 'lucide-react';
+import { Award, Target, Brain, ArrowRight, ShieldCheck, Flame, Medal, Download } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
 import { AnimatedCounter, PerformanceGrade } from '@/components/game/AnimatedCounter';
 import soundManager from '@/lib/soundManager';
 import { apiRequest } from '@/lib/queryClient';
+import { exportChapterReport } from '@/lib/exportPDF';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from 'recharts';
 
 interface Chapter3CompleteModalProps {
@@ -182,12 +183,52 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
                     </motion.div>
 
                     <div className="flex flex-col gap-3">
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-3 gap-3">
+                            <button
+                                onClick={() => {
+                                    const metricsData = (dailyMetrics as { day: number; efficiency: number; tasksCompletedToday?: number; potentialCapacity?: number; cumulativeEfficiency?: number; insight?: string }[]);
+                                    const principles = ['Sort', 'Set in Order', 'Shine', 'Standardize', 'Sustain'];
+                                    const days = [12, 13, 14, 15, 16];
+                                    exportChapterReport({
+                                        playerName: playerName || 'Architect',
+                                        chapter: 3,
+                                        chapterTitle: 'The Tangled Depot - 5S Workplace Organization',
+                                        dailyMetrics: days.map((d, i) => {
+                                            const metric = metricsData.find(m => m.day === d);
+                                            return {
+                                                day: d,
+                                                efficiency: metric?.efficiency ?? 0,
+                                                tasksCompletedToday: metric?.tasksCompletedToday ?? 0,
+                                                potentialCapacity: metric?.potentialCapacity ?? 0,
+                                                cumulativeEfficiency: metric?.cumulativeEfficiency ?? 0,
+                                                insight: metric?.insight ?? `${principles[i]} phase`,
+                                            };
+                                        }),
+                                        finalEfficiency: finalScore,
+                                        quizScore: quizScore,
+                                        quizTotal: 5,
+                                        keyLearnings: [
+                                            'Sort (Seiri) - Remove unnecessary items from the workspace. If in doubt, tag it and decide later.',
+                                            'Set in Order (Seiton) - A place for everything and everything in its place. Minimize search time.',
+                                            'Shine (Seiso) - Clean the workspace regularly. Cleaning is inspection - it reveals hidden problems.',
+                                            'Standardize (Seiketsu) - Create visual standards so anyone can tell normal from abnormal at a glance.',
+                                            'Sustain (Shitsuke) - Build habits and discipline. 5S is not a one-time event but a daily practice.',
+                                            'Visual management makes problems visible immediately, reducing response time from hours to minutes.',
+                                            'An organized workspace reduces waste from searching, waiting, and unnecessary motion.',
+                                        ],
+                                        badges: ['The 5S Auditor'],
+                                    });
+                                }}
+                                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/50 text-slate-300 font-bold hover:bg-slate-700/50 transition-colors shadow-md"
+                                data-testid="button-export-report-ch3"
+                            >
+                                <Download className="w-4 h-4" /> Export Report
+                            </button>
                             <button
                                 onClick={() => window.location.href = '/leaderboard'}
                                 className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/50 text-slate-300 font-bold hover:bg-slate-700/50 transition-colors shadow-md"
                             >
-                                <Award className="w-4 h-4" /> View Leaderboard
+                                <Award className="w-4 h-4" /> Leaderboard
                             </button>
                             <button
                                 onClick={handleSubmitScore}
