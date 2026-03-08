@@ -25,7 +25,10 @@ export default function DevDashboard() {
     const { toast } = useToast();
     const [, navigate] = useLocation();
 
-    const { setDay, setChapter, day, chapter, playerName, playerGender, unlockedBadges, badgeDates, unlockedChapters, lives, resetLives } = useGameStore();
+    const { setDay, setChapter, day, chapter, playerName, playerGender, unlockedBadges, badgeDates, unlockedChapters, lives, resetLives, funds, materials, lpi } = useGameStore();
+    const [dayInput, setDayInput] = useState(String(day));
+    const [fundsInput, setFundsInput] = useState(String(funds));
+    const [materialsInput, setMaterialsInput] = useState(String(materials));
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -247,7 +250,7 @@ export default function DevDashboard() {
                             Feedbacks: <span className="text-white font-bold">{feedbacks?.length || 0}</span>
                         </div>
                         <div className="text-xs text-slate-500">
-                            Session: <span className="text-emerald-500 font-bold">Active Administraiton</span>
+                            Session: <span className="text-emerald-500 font-bold">Active</span>
                         </div>
                     </div>
                 </header>
@@ -302,94 +305,190 @@ export default function DevDashboard() {
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="p-4 bg-slate-950 rounded-lg border border-slate-800 space-y-2">
-                                    <div className="text-xs text-slate-500 uppercase tracking-wider">Current State</div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <span className="text-slate-500">Player:</span> <span className="text-white">{playerName}</span>
-                                        </div>
-                                        <div>
-                                            <span className="text-slate-500">Gender:</span> <span className="text-pink-400 capitalize">{playerGender || '—'}</span>
-                                        </div>
-                                        <div>
-                                            <span className="text-slate-500">Chapter:</span> <span className="text-yellow-400">
-                                                {chapter > 3 ? `Case Study ${chapter - 3}` : `Chapter ${chapter}`}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span className="text-slate-500">Day:</span> <span className="text-cyan-400">{day}</span>
-                                        </div>
-                                        <div>
-                                            <span className="text-slate-500">Unlocked:</span> <span className="text-emerald-400">{unlockedBadges?.length || 0} badges</span>
-                                        </div>
-                                        <div>
-                                            <span className="text-slate-500">Chapters:</span> <span className="text-indigo-400">[{unlockedChapters?.join(', ')}]</span>
-                                        </div>
-                                        <div>
-                                            <span className="text-slate-500">Lives (Hearts):</span> <span className={`${lives > 1 ? 'text-rose-400' : 'text-red-600 animate-pulse'} font-black`}>{lives} / 3</span>
-                                        </div>
+                                    <div className="text-xs text-slate-500 uppercase tracking-wider mb-2">Current State</div>
+                                    <div className="grid grid-cols-2 gap-3 text-xs">
+                                        <div><span className="text-slate-500">Player:</span> <span className="text-white font-bold">{playerName || '—'}</span></div>
+                                        <div><span className="text-slate-500">Gender:</span> <span className="text-pink-400 capitalize font-bold">{playerGender || '—'}</span></div>
+                                        <div><span className="text-slate-500">Chapter:</span> <span className="text-yellow-400 font-bold">{chapter > 3 ? `Case Study ${chapter - 3}` : `Ep ${chapter}`}</span></div>
+                                        <div><span className="text-slate-500">Day:</span> <span className="text-cyan-400 font-bold">{day}</span></div>
+                                        <div><span className="text-slate-500">Funds:</span> <span className="text-emerald-400 font-bold">${funds.toLocaleString()}</span></div>
+                                        <div><span className="text-slate-500">Materials:</span> <span className="text-amber-400 font-bold">{materials}</span></div>
+                                        <div><span className="text-slate-500">Lives:</span> <span className={`${lives > 1 ? 'text-rose-400' : 'text-red-600 animate-pulse'} font-black`}>{'❤'.repeat(lives)}{'🖤'.repeat(3 - lives)}</span></div>
+                                        <div><span className="text-slate-500">Morale:</span> <span className="text-blue-400 font-bold">{lpi.teamMorale}%</span></div>
+                                        <div><span className="text-slate-500">Efficiency:</span> <span className="text-indigo-400 font-bold">{lpi.flowEfficiency}%</span></div>
+                                        <div><span className="text-slate-500">Badges:</span> <span className="text-emerald-400 font-bold">{unlockedBadges?.length || 0}</span></div>
+                                        <div className="col-span-2"><span className="text-slate-500">Unlocked Chapters:</span> <span className="text-indigo-400 font-bold">[{unlockedChapters?.join(', ')}]</span></div>
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <label className="text-sm font-medium text-slate-400">Chapters (1–3)</label>
-                                    <div className="space-y-3">
+                                <div className="space-y-3">
+                                    <div className="text-xs text-slate-500 uppercase tracking-wider font-bold">Quick Actions</div>
+                                    <div className="grid grid-cols-2 gap-2">
                                         <Button
                                             variant="outline"
                                             onClick={() => {
                                                 useGameStore.getState().unlockAllChapters();
-                                                alert('All Chapters Unlocked!');
+                                                toast({ title: "All Episodes Unlocked", description: "Episodes 1-4 are now accessible from the chapter select screen." });
                                             }}
-                                            className="w-full border-green-800 text-green-400 hover:bg-green-950/50"
+                                            className="border-green-800 text-green-400 hover:bg-green-950/50 text-xs"
+                                            data-testid="button-unlock-all"
                                         >
-                                            <ShieldAlert className="w-4 h-4 mr-2" /> Unlock All Chapters
+                                            <ShieldAlert className="w-3 h-3 mr-1" /> Unlock All Episodes
                                         </Button>
-
                                         <Button
                                             variant="outline"
                                             onClick={() => {
                                                 resetLives();
-                                                toast({ title: "Lives Refilled", description: "System health restored to 3 hearts." });
+                                                toast({ title: "Lives Refilled", description: "Hearts restored to 3/3." });
                                             }}
-                                            className="w-full border-rose-800 text-rose-400 hover:bg-rose-950/50"
+                                            className="border-rose-800 text-rose-400 hover:bg-rose-950/50 text-xs"
+                                            data-testid="button-reset-lives"
                                         >
-                                            <Clock className="w-4 h-4 mr-2" /> Refill/Reset Lives
+                                            <Clock className="w-3 h-3 mr-1" /> Refill Lives
                                         </Button>
-
                                         <Button
                                             variant="outline"
                                             onClick={() => {
                                                 const store = useGameStore.getState();
                                                 store.customTasks.forEach(t => store.deleteCustomTask(t.id));
                                                 store.setTaskModeSelected(false);
-                                                toast({ title: "Custom Tasks Cleared", description: "Reset to default task mode selection." });
+                                                toast({ title: "Custom Tasks Cleared", description: "Reset to default task mode." });
                                             }}
-                                            className="w-full border-amber-800 text-amber-400 hover:bg-amber-950/50"
+                                            className="border-amber-800 text-amber-400 hover:bg-amber-950/50 text-xs"
+                                            data-testid="button-clear-tasks"
                                         >
-                                            <FileJson className="w-4 h-4 mr-2" /> Clear Custom Tasks
+                                            <FileJson className="w-3 h-3 mr-1" /> Clear Tasks
                                         </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={handleResetLocal}
+                                            className="border-red-800 text-red-400 hover:bg-red-950/50 text-xs"
+                                            data-testid="button-reset-local"
+                                        >
+                                            <Trash2 className="w-3 h-3 mr-1" /> Reset Local Save
+                                        </Button>
+                                    </div>
+                                </div>
 
-                                        <div className="grid grid-cols-3 gap-2">
-                                            {[1, 2, 3].map((c) => (
+                                <div className="space-y-3">
+                                    <div className="text-xs text-slate-500 uppercase tracking-wider font-bold">Set Day / Resources</div>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 uppercase mb-1 block">Day</label>
+                                            <div className="flex gap-1">
+                                                <Input
+                                                    type="number"
+                                                    value={dayInput}
+                                                    onChange={(e) => setDayInput(e.target.value)}
+                                                    className="bg-slate-950 border-slate-700 text-slate-100 font-mono h-8 text-xs"
+                                                    min={1}
+                                                    data-testid="input-day"
+                                                />
                                                 <Button
-                                                    key={c}
-                                                    variant={chapter === c ? "default" : "outline"}
+                                                    size="sm"
+                                                    variant="outline"
                                                     onClick={() => {
-                                                        setChapter(c);
-                                                        alert(`Warped to Chapter ${c}`);
+                                                        const val = parseInt(dayInput);
+                                                        if (!isNaN(val) && val > 0) {
+                                                            setDay(val);
+                                                            toast({ title: "Day Set", description: `Warped to Day ${val}` });
+                                                        }
                                                     }}
-                                                    className={`border-slate-700 hover:bg-slate-800 hover:text-white ${chapter === c ? 'bg-indigo-600' : ''}`}
+                                                    className="border-cyan-800 text-cyan-400 hover:bg-cyan-950/50 h-8 px-2 text-xs"
+                                                    data-testid="button-set-day"
                                                 >
-                                                    Ch {c}
+                                                    Set
                                                 </Button>
-                                            ))}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 uppercase mb-1 block">Funds ($)</label>
+                                            <div className="flex gap-1">
+                                                <Input
+                                                    type="number"
+                                                    value={fundsInput}
+                                                    onChange={(e) => setFundsInput(e.target.value)}
+                                                    className="bg-slate-950 border-slate-700 text-slate-100 font-mono h-8 text-xs"
+                                                    data-testid="input-funds"
+                                                />
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => {
+                                                        const val = parseInt(fundsInput);
+                                                        if (!isNaN(val)) {
+                                                            useGameStore.setState({ funds: val });
+                                                            toast({ title: "Funds Set", description: `Funds set to $${val.toLocaleString()}` });
+                                                        }
+                                                    }}
+                                                    className="border-emerald-800 text-emerald-400 hover:bg-emerald-950/50 h-8 px-2 text-xs"
+                                                    data-testid="button-set-funds"
+                                                >
+                                                    Set
+                                                </Button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 uppercase mb-1 block">Materials</label>
+                                            <div className="flex gap-1">
+                                                <Input
+                                                    type="number"
+                                                    value={materialsInput}
+                                                    onChange={(e) => setMaterialsInput(e.target.value)}
+                                                    className="bg-slate-950 border-slate-700 text-slate-100 font-mono h-8 text-xs"
+                                                    data-testid="input-materials"
+                                                />
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => {
+                                                        const val = parseInt(materialsInput);
+                                                        if (!isNaN(val)) {
+                                                            useGameStore.setState({ materials: val });
+                                                            toast({ title: "Materials Set", description: `Materials set to ${val}` });
+                                                        }
+                                                    }}
+                                                    className="border-amber-800 text-amber-400 hover:bg-amber-950/50 h-8 px-2 text-xs"
+                                                    data-testid="button-set-materials"
+                                                >
+                                                    Set
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="space-y-4 mt-4">
-                                    <label className="text-sm font-medium text-slate-400">Case Studies (4–5)</label>
+                                <div className="space-y-3">
+                                    <div className="text-xs text-slate-500 uppercase tracking-wider font-bold">Warp to Episode</div>
+                                    <div className="grid grid-cols-4 gap-2">
+                                        {[
+                                            { id: 1, label: 'Ep 1', sub: 'Kanban', color: 'cyan' },
+                                            { id: 2, label: 'Ep 2', sub: 'LPS', color: 'emerald' },
+                                            { id: 3, label: 'Ep 3', sub: '5S', color: 'amber' },
+                                            { id: 4, label: 'Ep 4', sub: 'JIT', color: 'purple' },
+                                        ].map(({ id, label, sub, color }) => (
+                                            <Button
+                                                key={id}
+                                                variant={chapter === id ? "default" : "outline"}
+                                                onClick={() => {
+                                                    useGameStore.getState().startChapter(id);
+                                                    if (!useGameStore.getState().unlockedChapters.includes(id)) {
+                                                        useGameStore.setState((s) => ({
+                                                            unlockedChapters: [...s.unlockedChapters, id]
+                                                        }));
+                                                    }
+                                                    toast({ title: `Warped to ${label}`, description: `${sub} — Chapter initialized and unlocked.` });
+                                                }}
+                                                className={`flex flex-col items-center gap-0.5 h-auto py-2 text-xs ${chapter === id ? `bg-${color}-600` : `border-slate-700 hover:bg-slate-800 hover:text-white`}`}
+                                                data-testid={`button-warp-ch${id}`}
+                                            >
+                                                <span className="font-bold">{label}</span>
+                                                <span className={`text-[9px] ${chapter === id ? 'text-white/80' : `text-${color}-400`}`}>{sub}</span>
+                                            </Button>
+                                        ))}
+                                    </div>
                                     <div className="grid grid-cols-2 gap-2">
-                                        {[{ id: 4, label: 'CS1 Terminal' }, { id: 5, label: 'CS2 Coastal' }].map(({ id, label }) => (
+                                        {[{ id: 4, label: 'CS1: Terminal', color: 'violet' }, { id: 5, label: 'CS2: Coastal', color: 'sky' }].map(({ id, label, color }) => (
                                             <Button
                                                 key={id}
                                                 variant={chapter === id ? "default" : "outline"}
@@ -397,7 +496,8 @@ export default function DevDashboard() {
                                                     useGameStore.getState().startChapter(id);
                                                     navigate('/game');
                                                 }}
-                                                className={`border-purple-700 hover:bg-purple-800 hover:text-white text-xs ${chapter === id ? 'bg-purple-600 border-purple-500' : 'text-purple-400'}`}
+                                                className={`text-xs ${chapter === id ? `bg-${color}-600 border-${color}-500` : `border-${color}-800 text-${color}-400 hover:bg-${color}-950/50`}`}
+                                                data-testid={`button-warp-cs${id - 3}`}
                                             >
                                                 {label}
                                             </Button>
@@ -405,12 +505,12 @@ export default function DevDashboard() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-2 mt-4">
-                                    <Button onClick={() => navigate('/game')} className="w-full bg-emerald-600 hover:bg-emerald-700">
+                                <div className="space-y-2 mt-2">
+                                    <Button onClick={() => navigate('/game')} className="w-full bg-emerald-600 hover:bg-emerald-700" data-testid="button-return-game">
                                         <ArrowRight className="w-4 h-4 mr-2" /> Return to Game
                                     </Button>
-                                    <Button onClick={() => navigate('/')} variant="outline" className="w-full border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white">
-                                        <ArrowRight className="w-4 h-4 mr-2" /> Return to Home Page
+                                    <Button onClick={() => navigate('/')} variant="outline" className="w-full border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white" data-testid="button-return-home">
+                                        <ArrowRight className="w-4 h-4 mr-2" /> Return to Home
                                     </Button>
                                 </div>
                             </CardContent>

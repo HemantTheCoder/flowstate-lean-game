@@ -264,7 +264,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   // Dev Actions
   setDay: (day) => set((state) => ({ day, week: Math.ceil(day / 5) })),
   setChapter: (chapter) => get().startChapter(chapter),
-  unlockAllChapters: () => set({ unlockedChapters: [1, 2, 3] }),
+  unlockAllChapters: () => set({ unlockedChapters: [1, 2, 3, 4] }),
 
   tutorialActive: true,
   tutorialStep: 0,
