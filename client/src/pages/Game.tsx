@@ -225,57 +225,59 @@ export default function Game() {
   const { user } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
+  const buildSavePayload = () => {
+    const state = useGameStore.getState();
+    return {
+      sessionId: '',
+      userId: user?.id,
+      playerName: state.playerName,
+      chapter: state.chapter,
+      week: state.week,
+      resources: {
+        morale: state.lpi.teamMorale,
+        stress: 0,
+        trust: 50,
+        productivity: 40,
+        quality: 80,
+        budget: state.funds,
+        materials: state.materials
+      },
+      kanbanState: {
+        columns: state.columns,
+        day: state.day,
+        playerGender: state.playerGender,
+        tutorialActive: state.tutorialActive,
+        tutorialStep: state.tutorialStep,
+        dailyMetrics: state.dailyMetrics,
+        previousDoneCount: state.previousDoneCount,
+        previousWasteCount: state.previousWasteCount,
+        cumulativeTasksCompleted: state.cumulativeTasksCompleted,
+        cumulativePotentialCapacity: state.cumulativePotentialCapacity,
+        phase: state.phase,
+        currentDialogue: state.currentDialogue,
+        dialogueIndex: state.dialogueIndex,
+        customTasks: state.customTasks,
+        taskModeSelected: state.taskModeSelected,
+      } as any,
+      flags: state.flags,
+      metrics: { ...state.lpi, ppcHistory: state.ppcHistory },
+      weeklyPlan: state.weeklyPlan,
+      completedChapters: state.unlockedChapters.filter(c => c !== 1).map(c => c - 1),
+      unlockedBadges: state.unlockedBadges,
+      badgeDates: state.badgeDates,
+      lives: state.lives,
+      playerGender: state.playerGender,
+    };
+  };
+
   const handleSave = async (silent = false) => {
-    // If not authenticated, show Auth Modal instead of saving immediately (unless silent auto-save)
     if (!user && !silent) {
       setShowAuthModal(true);
       return;
     }
 
     try {
-      const state = useGameStore.getState();
-      await saveGame.mutateAsync({
-        sessionId: '', // Handled by hook
-        userId: user?.id, // Attach User ID if logged in
-        playerName: state.playerName,
-        chapter: state.chapter,
-        week: state.week,
-        resources: {
-          morale: state.lpi.teamMorale,
-          stress: 0,
-          trust: 50,
-          productivity: 40,
-          quality: 80,
-          budget: state.funds,
-          materials: state.materials
-        },
-        kanbanState: {
-          columns: state.columns,
-          day: state.day,
-          playerGender: state.playerGender,
-          tutorialActive: state.tutorialActive,
-          tutorialStep: state.tutorialStep,
-          dailyMetrics: state.dailyMetrics,
-          previousDoneCount: state.previousDoneCount,
-          previousWasteCount: state.previousWasteCount,
-          cumulativeTasksCompleted: state.cumulativeTasksCompleted,
-          cumulativePotentialCapacity: state.cumulativePotentialCapacity,
-          // Narrative & Phase Persistence
-          phase: state.phase,
-          currentDialogue: state.currentDialogue,
-          dialogueIndex: state.dialogueIndex,
-          customTasks: state.customTasks,
-          taskModeSelected: state.taskModeSelected,
-        } as any,
-        flags: state.flags,
-        metrics: { ...state.lpi, ppcHistory: state.ppcHistory },
-        weeklyPlan: state.weeklyPlan,
-        completedChapters: state.unlockedChapters.filter(c => c !== 1).map(c => c - 1),
-        unlockedBadges: state.unlockedBadges,
-        badgeDates: state.badgeDates,
-        lives: state.lives,
-        playerGender: state.playerGender,
-      });
+      await saveGame.mutateAsync(buildSavePayload());
       if (!silent) {
         toast({ title: "Game Saved!", description: "Progress synced to cloud." });
       }
@@ -1051,7 +1053,13 @@ export default function Game() {
   };
 
   const handleSaveAndExit = async () => {
-    await handleSave(false);
+    try {
+      await saveGame.mutateAsync(buildSavePayload());
+      toast({ title: "Game Saved!", description: user ? "Progress synced to cloud." : "Progress saved locally." });
+    } catch (err) {
+      console.error("Save failed on exit:", err);
+      toast({ title: "Progress Saved Locally", description: "Cloud sync unavailable. Your progress is safe on this device.", variant: "destructive" });
+    }
     navigate('/');
   };
   return (

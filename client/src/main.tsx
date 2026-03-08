@@ -23,4 +23,12 @@ console.log(
     "color: #888", "color: #ff00ff; font-weight: bold;", "color: #888"
 );
 
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((err) => {
+      console.warn('Service worker registration failed:', err);
+    });
+  });
+}
+
 createRoot(document.getElementById("root")!).render(<App />);

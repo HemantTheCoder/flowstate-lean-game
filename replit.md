@@ -74,3 +74,20 @@ All chapter completion modals include enriched visual metrics:
 - **Chapter 3 (Chapter3CompleteModal)**: 5S RadarChart (5 axes: Sort/Set in Order/Shine/Standardize/Sustain) with target overlay polygon at 80%, AnimatedCounter, PerformanceGrade, performance context message.
 - **Chapter 4 (Chapter4CompleteModal)**: AnimatedCounter, PerformanceGrade, performance context message for Pull/JIT mastery.
 - **DailySummary**: Efficiency sparkline (AreaChart) showing day-over-day trend with current day highlighted dot, trend arrow indicator (↑/↓/—), and 80% target reference line. Only shown when ≥2 days of data exist.
+
+## Save/Load System
+
+- **Dual Persistence**: Saves to both localStorage (immediate) and PostgreSQL (cloud sync). Falls back to localStorage if server unreachable.
+- **Save & Exit**: Always saves to localStorage before navigating home, even for anonymous users. Authenticated users also get cloud sync.
+- **Auto-Save**: Triggers silently at chapter completions, day transitions, and chapter starts. Silent saves bypass the auth modal.
+- **Load Priority**: Server first, then localStorage fallback if 404 or unreachable.
+- **Session ID**: UUID stored in localStorage (`flowstate_session_id`), links anonymous saves to a specific browser.
+- **Key Files**: `client/src/hooks/use-game.ts` (persistence hook), `client/src/pages/Game.tsx` (save triggers), `server/routes.ts` (API endpoints).
+
+## PWA Configuration
+
+- **Manifest**: `client/public/manifest.json` — standalone display mode, dark navy theme (#0f172a)
+- **Service Worker**: `client/public/sw.js` — stale-while-revalidate for static assets, network-only for API calls with offline fallback
+- **Icons**: `client/public/icons/` — 192x192, 512x512, apple-touch-icon (180x180)
+- **Registration**: `client/src/main.tsx` registers the service worker on page load
+- **Meta Tags**: `client/index.html` includes theme-color, apple-mobile-web-app-capable, Open Graph tags
