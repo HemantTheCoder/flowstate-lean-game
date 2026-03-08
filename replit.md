@@ -35,6 +35,8 @@ The project is a fullstack TypeScript application comprising a React frontend wi
 **Feature Specifications:**
 - **Chapter 1: The Kanban Chronicles:** Teaches WIP Limits, Pull Systems, and Flow Management through a 5-day simulation. Includes a tutorial, efficiency tracking, daily summaries with Lean lessons, and a reflection quiz. Features constraint banners and a Smart Advisor for contextual tips.
 - **Chapter 2: The Promise System (Last Planner System):** Teaches Should/Can/Will planning via a 6-day simulation. Features a Planning Room UI, constraint removal mechanics, PPC calculation, and a "Fragile/Risky Task System" to simulate overcommitment consequences. Includes an event system to introduce dynamic challenges.
+- **Chapter 3: The 5S Principles:** Teaches Sort, Set in Order, Shine, Standardize, and Sustain via the Workspace Depot interface across days 12-16. Each day maps to one of the 5S steps with daily Lean lessons.
+- **Chapter 4: Pull & JIT Systems (Case Study 1):** Airport terminal expansion scenario teaching Pull Systems, JIT delivery, Safety Buffers, and the Bullwhip Effect via the PullSystemDashboard.
 - **Performance Dashboard:** A `/dashboard` route provides a comprehensive overview of player performance, including efficiency, PPC, morale, and waste removed, with trend charts and a day-by-day breakdown.
 - **Leaderboard:** A database-backed `/leaderboard` tracks and displays player scores, filtered by chapter, with weighted scoring based on efficiency, PPC, and quiz results.
 - **PDF Export:** Chapter completion modals offer an "Export Report" button to generate a detailed PDF report of player performance, key decisions, and learnings using jsPDF.

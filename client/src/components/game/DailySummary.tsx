@@ -65,6 +65,31 @@ const LEAN_LESSONS: Record<number, { concept: string; explanation: string; examp
         concept: "PPC - Percent Plan Complete",
         explanation: "PPC measures reliability: (Tasks Completed / Tasks Promised) x 100. It's NOT about how much work you did - it's about how many PROMISES you kept. High PPC means the team can trust your plans.",
         example: "World-class construction projects target 80%+ PPC. Every broken promise is analyzed: Why did it fail? Was there a hidden constraint? This weekly learning cycle is what makes LPS powerful."
+    },
+    12: {
+        concept: "Sort (Seiri) - The First S",
+        explanation: "Sort means separating the necessary from the unnecessary. Red-tag items that are broken, expired, or unused. Removing clutter is the first step to an organized workspace.",
+        example: "On a real construction site, sorting means red-tagging broken scaffolding, expired chemicals, and obsolete drawings. If it hasn't been used in 30 days and isn't scheduled, it goes."
+    },
+    13: {
+        concept: "Set in Order (Seiton) - The Second S",
+        explanation: "Everything should have a designated place, and everything should be in its place. The goal is '30-second retrieval' - any tool or material should be findable within 30 seconds.",
+        example: "Shadow boards for tools (outlines showing where each tool belongs), labeled bins for fasteners, and color-coded zones for materials. Workers never waste time searching."
+    },
+    14: {
+        concept: "Shine (Seiso) - The Third S",
+        explanation: "Cleaning is not just about appearance - it's a form of inspection. When you clean equipment, you notice oil leaks, cracks, and wear before they become failures.",
+        example: "A crew sweeping a concrete floor notices hairline cracks that would have been missed. Cleaning the crane reveals a hydraulic leak. Shine prevents expensive breakdowns."
+    },
+    15: {
+        concept: "Standardize (Seiketsu) - The Fourth S",
+        explanation: "Standardize means creating consistent rules and visual cues so that the first 3S become routine. Without standards, improvements fade within days.",
+        example: "Posting zone maps, creating checklists for end-of-shift cleanup, and using color-coded labels so new workers can follow the system without training."
+    },
+    16: {
+        concept: "Sustain (Shitsuke) - The Fifth S",
+        explanation: "Sustain is the hardest S - it means building discipline so the standards stick. Regular audits, team accountability, and management support keep the system alive.",
+        example: "Weekly 5S audits score each zone. Teams that score above 80% earn recognition. The goal is making 5S a habit, not a one-time event."
     }
 };
 
@@ -164,7 +189,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                         data-testid="button-next-day"
                         className="w-full bg-blue-600 border border-blue-500/50 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-500 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_4px_20px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2"
                     >
-                        {(displayDay >= 5 && chapter === 1) || (displayDay >= 11 && chapter === 2) ? 'View Results' : `Start Day ${displayDay + 1}`}
+                        {(displayDay >= 5 && chapter === 1) || (displayDay >= 11 && chapter === 2) || (displayDay >= 16 && chapter === 3) ? 'View Results' : `Start Day ${displayDay + 1}`}
                     </button>
                 </div>
             </motion.div>

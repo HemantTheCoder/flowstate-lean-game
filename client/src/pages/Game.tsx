@@ -417,11 +417,13 @@ export default function Game() {
 
   // Bankruptcy Check
   useEffect(() => {
-    if (funds < 0) {
-      alert("BANKRUPTCY\n\nYou ran out of funds! The project has been shut down.\n\nTip: Keep the flow moving to generate revenue faster than the Daily Overhead expenses.");
-      window.location.reload();
+    if (funds < 0 && !flags.game_over) {
+      useGameStore.setState({
+        gameOverReason: "BANKRUPTCY: You ran out of funds! The project has been shut down. Tip: Keep the flow moving to generate revenue faster than the Daily Overhead expenses.",
+        flags: { ...useGameStore.getState().flags, game_over: true }
+      });
     }
-  }, [funds]);
+  }, [funds, flags.game_over]);
 
   // Tutorial Logic
   useEffect(() => {
@@ -437,38 +439,28 @@ export default function Game() {
 
   const triggerRetryDecision = () => {
     setDecisionProps({
-      title: "Inspection Failed ❌",
+      title: "Inspection Failed",
       prompt: "The Inspector flagged the project for 'Excessive Waste' due to your Push decision. Relying on false demand has put the project at risk.",
       options: [
-        { id: 'retry', text: "🔄 Replay Day 4 (Fix Mistake)", type: 'safe', description: "Go back in time. Choose 'Pull' this time." },
+        { id: 'retry', text: "Replay Day 4 (Fix Mistake)", type: 'safe', description: "Go back in time. Choose 'Pull' this time." },
         { id: 'accept', text: "Accept Consequences", type: 'risky', description: "Funding stops. Project fails. (GAME OVER)" }
       ],
       onSelect: async (id: string) => {
         if (id === 'retry') {
-          // Reset to Day 4 Start
           useGameStore.setState(s => ({
             day: 4,
-            // Reset flags related to Day 4/5
-            flags: { ...s.flags, decision_push_made: false, [`day_4_started`]: false, [`day_5_started`]: false },
-            // Clear 'Doing' tasks to remove the "Waste" created by Push
+            flags: { ...s.flags, decision_push_made: false, decision_push_seen: false, decision_retry_seen: false, [`day_4_started`]: false, [`day_5_started`]: false },
             columns: s.columns.map(c =>
               c.id === 'doing' ? { ...c, tasks: [] } : c
             )
           }));
-          // Force a UI refresh by invalidating current day view logic? 
-          // The store update should trigger re-render.
-          alert("Rewinding to Day 4... Make the Lean choice this time!");
-          window.location.reload(); // Cleanest way to restart day logic
+          setShowDecision(false);
         } else {
-          // GAME OVER
-          alert("GAME OVER\n\nThe funding was pulled due to poor management and excessive waste. The project has been cancelled.\n\nReturning to Title Screen...");
-          // Reset Game State completely
-          useGameStore.getState().startChapter(1); // Reset store basics if needed, or just let server reset
-          // Use the mutation if available or just hard reload to clear session if local?
-          // Simple approach: Reload to root, user can restart.
-          // Ideally we call the `resetGame` hook if we had it exposed here, but a reload works for now or forcing chapter 1.
-          localStorage.clear(); // Clear local client state if any
-          window.location.reload();
+          setShowDecision(false);
+          useGameStore.setState({
+            gameOverReason: "The funding was pulled due to poor management and excessive waste. The project has been cancelled.",
+            flags: { ...useGameStore.getState().flags, game_over: true }
+          });
         }
       }
     });
@@ -1178,10 +1170,10 @@ export default function Game() {
                 className="flex flex-col items-center gap-0.5 sm:gap-1 group"
                 data-testid="button-glossary"
               >
-                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors border border-emerald-500/30">
                   <BookOpen className="w-4 h-4 sm:w-6 sm:h-6" />
                 </div>
-                <span className="text-[9px] sm:text-xs font-bold text-slate-600">Glossary</span>
+                <span className="text-[9px] sm:text-xs font-bold text-slate-400">Glossary</span>
               </button>
             </div>
           </div>
