@@ -95,6 +95,7 @@ export default function ChapterSelect() {
             setShowChapter4Modal(true);
             return;
         }
+
         if (!isLocked) {
             // chapterId is 0-indexed in DUMMY_CHAPTERS, so add 1 to get the store's chapter number
             setChapter(chapterId + 1);

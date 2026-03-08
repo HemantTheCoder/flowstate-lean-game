@@ -126,7 +126,11 @@ export default function Game() {
     if (!flags['character_created']) {
       navigate('/chapters');
     }
-  }, [flags, navigate, isServerLoading, gameState, isInitializing]);
+    // Prevent unauthorized access to Case Studies 
+    if (chapter >= 4 && !flags['admin_unlocked']) {
+      navigate('/chapters');
+    }
+  }, [flags, navigate, isServerLoading, gameState, isInitializing, chapter]);
 
   const handleChapterContinue = async () => {
     try {
@@ -297,6 +301,30 @@ export default function Game() {
       if (day === 9 && chapter === 2 && !flags['overcommitment_accepted'] && !flags['overcommitment_declined']) {
         triggerClientPressureDecision();
       }
+
+      // --- CASE STUDY 1 (CHAPTER 4) DECISION TRIGGERS ---
+      if (chapter === 4) {
+        if (day === 2 && !flags['case1_d2_decision']) {
+          setFlag('case1_d2_decision', true);
+          triggerCase1Day2Decision();
+        }
+        if (day === 4 && !flags['case1_d4_decision']) {
+          setFlag('case1_d4_decision', true);
+          triggerCase1Day4Decision();
+        }
+        if (day === 6 && !flags['case1_d6_decision']) {
+          setFlag('case1_d6_decision', true);
+          triggerCase1Day6Decision();
+        }
+        if (day === 9 && !flags['case1_d9_decision']) {
+          setFlag('case1_d9_decision', true);
+          triggerCase1Day9Decision();
+        }
+        if (day === 11 && !flags['case1_d11_decision']) {
+          setFlag('case1_d11_decision', true);
+          triggerCase1Day11Decision();
+        }
+      }
     }
     prevDialogueRef.current = currentDialogue;
   }, [currentDialogue, day, flags, setFlag]);
@@ -313,7 +341,10 @@ export default function Game() {
     const dayConfig = currentSchedule.find(d => d.day === day);
     const dayKey = `day_${day}_started`;
 
-    if (dayConfig && !flags[dayKey] && flags['character_created'] && flags['chapter_intro_seen']) {
+    // Only block dialogue for Chapter 5's case tutorial now
+    const tutorialPending = chapter === 5 && !flags['case2_tutorial_seen'];
+
+    if (dayConfig && !flags[dayKey] && flags['character_created'] && flags['chapter_intro_seen'] && !tutorialPending) {
       // 1. Play Dialogue
       let dialogue = dayConfig.dialogue;
 
@@ -428,6 +459,116 @@ export default function Game() {
           localStorage.clear(); // Clear local client state if any
           window.location.reload();
         }
+      }
+    });
+    setShowDecision(true);
+  };
+
+  const triggerCase1Day2Decision = () => {
+    setDecisionProps({
+      title: "Broken Elevator (Vertical Limits)",
+      prompt: "One of the freight elevators' winch motors has burnt out, halving vertical capacity. Trucks are waiting downstairs.",
+      options: [
+        { id: 'pay', text: "Emergency Fix ($2k)", type: 'safe', description: "Pay expedited fee. Restores capacity immediately." },
+        { id: 'reroute', text: "Reroute Schedule (Risky)", type: 'risky', description: "Save money, but increase passenger disruption by 5%." }
+      ],
+      onSelect: (id: string) => {
+        if (id === 'pay') {
+          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 2000) }));
+          soundManager.playSFX('success');
+        } else {
+          useGameStore.setState(s => ({ pdi: Math.min(100, s.pdi + 5), hoistSlots: Math.max(1, s.hoistSlots - 1) }));
+          soundManager.playSFX('click');
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
+
+  const triggerCase1Day4Decision = () => {
+    setDecisionProps({
+      title: "Security Sweep",
+      prompt: "TSA is performing an unannounced audit of all access logs. Workers are stuck at the sterile boundary.",
+      options: [
+        { id: 'expedite', text: "Hire Expediter ($1k)", type: 'risky', description: "Pay administrative fee to fast-track our crews." },
+        { id: 'wait', text: "Accept Delay (Safe)", type: 'safe', description: "Focus only on WIP tasks inside. Lose 1 hoist slot today." }
+      ],
+      onSelect: (id: string) => {
+        if (id === 'expedite') {
+          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 1000) }));
+          soundManager.playSFX('click');
+        } else {
+          useGameStore.setState(s => ({ hoistSlots: Math.max(1, s.hoistSlots - 1) }));
+          soundManager.playSFX('success');
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
+
+  const triggerCase1Day6Decision = () => {
+    setDecisionProps({
+      title: "Supplier Mix-up",
+      prompt: "The HVAC supplier sent round duct fittings instead of rectangular ones. The crew is already hanging them!",
+      options: [
+        { id: 'rework', text: "Tear Down ($1.5k)", type: 'safe', description: "Stop the line and fix it now. Reduces rework rate by 5%." },
+        { id: 'patch', text: "Patch it Later", type: 'risky', description: "Keep hanging them. Adds 10% to Rework Rate risk." }
+      ],
+      onSelect: (id: string) => {
+        if (id === 'rework') {
+          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 1500), reworkRate: Math.max(0, s.reworkRate - 5) }));
+          soundManager.playSFX('success');
+        } else {
+          useGameStore.setState(s => ({ reworkRate: Math.min(100, s.reworkRate + 10) }));
+          soundManager.playSFX('click');
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
+
+  const triggerCase1Day9Decision = () => {
+    setDecisionProps({
+      title: "The VIP Surge",
+      prompt: "A massive conference hit town. Operations demands absolute silence in the terminal for the next 24 hours.",
+      options: [
+        { id: 'halt', text: "Halt All Noisy Work", type: 'safe', description: "Lose 1 Hoist Slot, protect PDI." },
+        { id: 'push', text: "Ignore Operations", type: 'risky', description: "Keep working at full speed. +15% PDI penalty." }
+      ],
+      onSelect: (id: string) => {
+        if (id === 'halt') {
+          useGameStore.setState(s => ({ hoistSlots: Math.max(1, s.hoistSlots - 1) }));
+          soundManager.playSFX('click');
+        } else {
+          useGameStore.setState(s => ({ pdi: Math.min(100, s.pdi + 15) }));
+          soundManager.playSFX('click');
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
+
+  const triggerCase1Day11Decision = () => {
+    setDecisionProps({
+      title: "Power Emergency",
+      prompt: "The temporary breaker panel blew, cutting power to the East side. We need an immediate workaround.",
+      options: [
+        { id: 'gen', text: "Rent Generator ($3k)", type: 'safe', description: "Keep power flowing, lose cash." },
+        { id: 'manual', text: "Manual Labour", type: 'risky', description: "Free, but exhausts the crew. +5% Rework Risk." }
+      ],
+      onSelect: (id: string) => {
+        if (id === 'gen') {
+          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 3000) }));
+          soundManager.playSFX('success');
+        } else {
+          useGameStore.setState(s => ({ reworkRate: Math.min(100, s.reworkRate + 5) }));
+          soundManager.playSFX('alert');
+        }
+        setShowDecision(false);
       }
     });
     setShowDecision(true);

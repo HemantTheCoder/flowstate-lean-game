@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, BookOpen, X, User, UserCircle, Hexagon, ArrowLeft } from 'lucide-react';
+import { Play, BookOpen, X, User, UserCircle, Hexagon, ArrowLeft, Lock } from 'lucide-react';
 import { useLocation } from 'wouter';
 import soundManager from '@/lib/soundManager';
 import { useGameStore } from '@/store/gameStore';
@@ -20,14 +20,14 @@ const CASE_STUDIES: ChapterDef[] = [
         id: 3, // Maps to chapter 4 in store
         title: "Case Study 1: Terminal T-Upgrade",
         description: "Manage logistics and minimize passenger disruption in a constrained airport midfield expansion.",
-        isLocked: false,
+        isLocked: true,
         theme: "purple"
     },
     {
         id: 4, // Maps to chapter 5 in store
         title: "Case Study 2: Coastal Link",
         description: "Handle linear-project flow, staging buffers, and traffic management on a coastal highway.",
-        isLocked: false,
+        isLocked: true,
         theme: "cyan"
     }
 ];
@@ -48,6 +48,11 @@ export function CaseStudiesModal({ isOpen, onClose }: CaseStudiesModalProps) {
     const [hoveredCase, setHoveredCase] = useState<number | null>(null);
     const [step, setStep] = useState<ModalStep>('select');
     const [pendingCaseId, setPendingCaseId] = useState<number | null>(null);
+
+    // Admin Lock state
+    const [showAdminLock, setShowAdminLock] = useState<number | null>(null);
+    const [adminPassword, setAdminPassword] = useState('');
+    const [adminError, setAdminError] = useState(false);
 
     // Profile form state
     const [name, setName] = useState('');
@@ -70,17 +75,34 @@ export function CaseStudiesModal({ isOpen, onClose }: CaseStudiesModalProps) {
         soundManager.playSFX('click');
         const storeChapterId = caseStudy.id + 1; // 3→4, 4→5
 
-        if (flags['character_created'] || hasExistingProfile) {
-            // Profile exists — resume it (set it in store if not already set) then launch
-            if (hasExistingProfile && !flags['character_created']) {
-                setPlayerProfile(savedName!, savedGender ?? 'male');
-                setFlag('character_created', true);
+        setShowAdminLock(storeChapterId);
+        setAdminPassword('');
+        setAdminError(false);
+    };
+
+    const handleAdminSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (adminPassword === "banhae12@" && showAdminLock !== null) {
+            soundManager.playSFX('success');
+            const storeChapterId = showAdminLock;
+            setShowAdminLock(null);
+
+            if (flags['character_created'] || hasExistingProfile) {
+                // Profile exists — resume it (set it in store if not already set) then launch
+                if (hasExistingProfile && !flags['character_created']) {
+                    setPlayerProfile(savedName!, savedGender ?? 'male');
+                    setFlag('character_created', true);
+                }
+                launchCase(storeChapterId);
+            } else {
+                // No profile — show inline creation
+                setPendingCaseId(storeChapterId);
+                setStep('create-profile');
             }
-            launchCase(storeChapterId);
         } else {
-            // No profile — show inline creation
-            setPendingCaseId(storeChapterId);
-            setStep('create-profile');
+            soundManager.playSFX('alert');
+            setAdminError(true);
+            setAdminPassword('');
         }
     };
 
@@ -179,8 +201,8 @@ export function CaseStudiesModal({ isOpen, onClose }: CaseStudiesModalProps) {
                                                         </h3>
                                                     </div>
 
-                                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ${isHovered ? 'scale-110 shadow-[0_0_20px_rgba(255,255,255,0.2)]' : 'shadow-lg'} ${theme.button}`}>
-                                                        <Play className="w-5 h-5 fill-white text-white ml-1" />
+                                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 border border-white/10 ${isHovered ? 'scale-110 shadow-[0_0_20px_rgba(255,255,255,0.2)]' : 'shadow-inner bg-black/40'}`}>
+                                                        <Lock className={`w-5 h-5 ${theme.color}`} />
                                                     </div>
                                                 </div>
 
@@ -189,8 +211,8 @@ export function CaseStudiesModal({ isOpen, onClose }: CaseStudiesModalProps) {
                                                 </p>
 
                                                 <div className="pt-4 border-t border-white/10 flex justify-between items-center relative">
-                                                    <span className="flex items-center gap-2 text-white font-bold uppercase tracking-wider text-xs bg-white/10 px-4 py-2 rounded-full border border-white/20 group-hover:bg-white/20 transition-all">
-                                                        Start Scenario
+                                                    <span className={`flex items-center gap-2 font-bold uppercase tracking-wider text-xs bg-black/40 px-4 py-2 rounded-full border border-white/10 ${theme.color}`}>
+                                                        <Lock className="w-3 h-3" /> Admin Access
                                                     </span>
                                                 </div>
                                             </div>
@@ -281,6 +303,68 @@ export function CaseStudiesModal({ isOpen, onClose }: CaseStudiesModalProps) {
                             </button>
                         </div>
                     </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Admin Password Modal */}
+            <AnimatePresence>
+                {showAdminLock !== null && (
+                    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-slate-950/90 backdrop-blur-md"
+                            onClick={() => setShowAdminLock(null)}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="relative w-full max-w-md bg-slate-900 border border-slate-700 rounded-3xl overflow-hidden shadow-2xl"
+                        >
+                            <div className="p-6 md:p-8">
+                                <div className="w-16 h-16 mx-auto bg-rose-500/20 rounded-full flex items-center justify-center mb-6">
+                                    <Lock className="w-8 h-8 text-rose-500" />
+                                </div>
+                                <h2 className="text-2xl font-black text-white text-center mb-2">Admin Access Required</h2>
+                                <p className="text-slate-400 text-center text-sm mb-6">
+                                    This case study is currently in testing. Please enter the admin password to unlock it for playtesting.
+                                </p>
+
+                                <form onSubmit={handleAdminSubmit} className="space-y-4">
+                                    <div>
+                                        <input
+                                            type="password"
+                                            value={adminPassword}
+                                            onChange={(e) => setAdminPassword(e.target.value)}
+                                            placeholder="Enter Password"
+                                            className={`w-full bg-slate-800 border ${adminError ? 'border-rose-500' : 'border-slate-700'} rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all`}
+                                            autoFocus
+                                        />
+                                        {adminError && (
+                                            <p className="text-rose-500 text-xs mt-2 font-bold">Incorrect password.</p>
+                                        )}
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowAdminLock(null)}
+                                            className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="flex-1 py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors shadow-lg shadow-indigo-900/20"
+                                        >
+                                            Unlock
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </motion.div>
+                    </div>
                 )}
             </AnimatePresence>
         </div>

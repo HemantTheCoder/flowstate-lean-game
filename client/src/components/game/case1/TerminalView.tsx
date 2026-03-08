@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
@@ -6,23 +6,65 @@ import {
     Building2, ArrowUpCircle, Users, AlertTriangle,
     Save, Settings, Clock, CheckCircle, Zap
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SettingsModal } from './../SettingsModal';
-import { CaseTutorialOverlay } from '../CaseTutorialOverlay';
 import { CaseSmartAdvisor } from '../CaseSmartAdvisor';
 
 export function TerminalView({ objective }: { objective?: string }) {
-    const { day, hoistSlots, pdi, reworkRate, flags } = useGameStore();
+    const { day, hoistSlots, pdi, reworkRate, flags, currentDialogue } = useGameStore();
     const { saveGame } = useGame();
     const [showSettings, setShowSettings] = useState(false);
 
     // Derived flags for guidance
     const isDay1 = day === 1;
-    const showGuidance = isDay1 && !flags.case1_tutorial_seen;
+    const showGuidance = isDay1 && !flags.case1_tutorial_seen && !currentDialogue && flags.day_1_started;
+
+    // Tutorial sequence: 0 = Click Hoist, 1 = Click Kanban, 2 = Click End Day
+    const [tutorialStep, setTutorialStep] = useState(0);
+    const [spotlightPos, setSpotlightPos] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
+
+    useEffect(() => {
+        if (!showGuidance) return;
+        let animationFrameId: number;
+
+        const updateSpotlight = () => {
+            let targetId = '';
+            if (tutorialStep === 0) targetId = 'btn-hoist-night';
+            if (tutorialStep === 1) targetId = 'task-t1';
+            if (tutorialStep === 2) targetId = 'btn-end-day';
+
+            if (targetId) {
+                const el = document.getElementById(targetId);
+                if (el) {
+                    const rect = el.getBoundingClientRect();
+                    const newPos = { x: rect.left - 10, y: rect.top - 10, w: rect.width + 20, h: rect.height + 20 };
+                    setSpotlightPos(prev => {
+                        if (prev && Math.abs(prev.x - newPos.x) < 1 && Math.abs(prev.y - newPos.y) < 1 && Math.abs(prev.w - newPos.w) < 1 && Math.abs(prev.h - newPos.h) < 1) return prev;
+                        return newPos;
+                    });
+                }
+            } else { setSpotlightPos(null); }
+            animationFrameId = requestAnimationFrame(updateSpotlight);
+        };
+        updateSpotlight();
+        return () => cancelAnimationFrame(animationFrameId);
+    }, [showGuidance, tutorialStep]);
+
+    const getMaskPath = () => {
+        if (!spotlightPos) return "M0 0 h100% v100% h-100% z";
+        const { x, y, w, h } = spotlightPos;
+        return `M0 0 h${window.innerWidth} v${window.innerHeight} h-${window.innerWidth} z M${x} ${y} v${h} h${w} v-${h} z`;
+    };
 
     const handleEndDay = () => {
+        if (showGuidance && tutorialStep < 2) return; // Block early end day
         window.dispatchEvent(new CustomEvent('case-end-day'));
         soundManager.playSFX('click');
+        if (showGuidance) {
+            useGameStore.setState(state => ({
+                flags: { ...state.flags, case1_tutorial_seen: true }
+            }));
+        }
     };
 
     // Derived visual state
@@ -82,8 +124,9 @@ export function TerminalView({ objective }: { objective?: string }) {
                 {/* Right: controls */}
                 <div className="flex items-center gap-2 shrink-0">
                     <button
+                        id="btn-end-day"
                         onClick={handleEndDay}
-                        className={`bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-6 rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.4)] transition-all active:scale-95 border-b-4 border-indigo-800 ${showGuidance ? 'animate-pulse ring-2 ring-indigo-400 ring-offset-2 ring-offset-slate-900' : ''}`}
+                        className={`relative z-50 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-6 rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.4)] transition-all active:scale-95 border-b-4 border-indigo-800 ${showGuidance && tutorialStep === 2 ? 'animate-pulse ring-2 ring-indigo-400 ring-offset-2 ring-offset-slate-900 pointer-events-auto' : ''}`}
                     >
                         End Day
                     </button>
@@ -166,27 +209,34 @@ export function TerminalView({ objective }: { objective?: string }) {
                 <section className="flex-[35] flex flex-col gap-0 border-r border-slate-700/40 min-h-0 overflow-hidden">
 
                     {/* Hoist Scheduler */}
-                    <div className="flex-[45] flex flex-col border-b border-slate-700/40 min-h-0 overflow-hidden">
+                    <div className="flex-[45] flex flex-col border-b border-slate-700/40 min-h-0 overflow-hidden relative">
                         <div className="px-4 py-2.5 border-b border-slate-700/40 bg-slate-900/30 flex items-center gap-2 shrink-0">
                             <Clock className="w-3.5 h-3.5 text-purple-400" />
                             <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hoist Scheduler</h2>
                         </div>
-                        <div className="flex-1 p-6 flex flex-col justify-center gap-4">
+                        <div className="flex-1 p-6 flex flex-col justify-center gap-4 relative z-20">
                             <p className="text-slate-400 text-sm">Allocate hoist time to reduce contractor delays.</p>
                             <div className="flex items-center gap-4">
                                 <button
-                                    className={`flex-1 py-3 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/50 rounded-xl text-purple-300 font-bold transition-all ${showGuidance ? 'animate-bounce shadow-[0_0_15px_rgba(168,85,247,0.3)]' : ''}`}
+                                    id="btn-hoist-night"
+                                    className={`relative z-50 flex-1 py-3 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/50 rounded-xl text-purple-300 font-bold transition-all ${showGuidance && tutorialStep === 0 ? 'animate-bounce border-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.4)] pointer-events-auto' : ''}`}
                                     onClick={() => {
+                                        if (showGuidance && tutorialStep !== 0) return;
                                         useGameStore.setState({ pdi: Math.max(0, useGameStore.getState().pdi - 5) });
                                         soundManager.playSFX('click');
+                                        if (showGuidance && tutorialStep === 0) setTutorialStep(1);
                                     }}
                                 >
                                     Dedicated Night Run (-5% PDI)
                                 </button>
-                                <button className="flex-1 py-3 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/50 rounded-xl text-indigo-300 font-bold transition-all" onClick={() => {
-                                    useGameStore.setState({ hoistSlots: useGameStore.getState().hoistSlots + 1 });
-                                    soundManager.playSFX('ding');
-                                }}>
+                                <button
+                                    className={`flex-1 py-3 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/50 rounded-xl text-indigo-300 font-bold transition-all ${showGuidance && tutorialStep === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    onClick={() => {
+                                        if (showGuidance) return; // Completely blocked during Day 1 tutorial
+                                        useGameStore.setState({ hoistSlots: useGameStore.getState().hoistSlots + 1 });
+                                        soundManager.playSFX('ding');
+                                    }}
+                                >
                                     Add JIT Slot (+1 Slot)
                                 </button>
                             </div>
@@ -199,44 +249,122 @@ export function TerminalView({ objective }: { objective?: string }) {
                             <Building2 className="w-3.5 h-3.5 text-emerald-400" />
                             <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Floor Kanban</h2>
                         </div>
-                        <div className="flex-1 p-3 flex flex-col gap-2 overflow-y-auto min-h-0">
-                            {[
-                                {
-                                    label: 'L2 Security Screening Fitout',
-                                    action: 'Push to QA',
-                                    color: 'emerald',
-                                    onClick: () => { useGameStore.setState({ reworkRate: Math.max(0, useGameStore.getState().reworkRate - 2) }); soundManager.playSFX('success'); },
-                                    effect: '−2% Rework'
-                                },
-                                {
-                                    label: 'L3 Lounge Carpet Install',
-                                    action: 'Expedite',
-                                    color: 'amber',
-                                    onClick: () => { useGameStore.setState({ pdi: Math.min(100, useGameStore.getState().pdi + 3) }); soundManager.playSFX('click'); },
-                                    effect: '+3% PDI'
-                                },
-                                {
-                                    label: 'L1 Baggage Claim Belts',
-                                    action: 'Material Arrived',
-                                    color: 'blue',
-                                    onClick: () => { soundManager.playSFX('click'); },
-                                    effect: 'Unlocks next'
-                                },
-                            ].map((task) => (
-                                <div key={task.label} className="flex items-center justify-between gap-2 p-3 bg-slate-900/50 border border-slate-700/60 rounded-xl">
-                                    <div className="min-w-0">
-                                        <p className="text-xs font-bold text-white truncate">{task.label}</p>
-                                        <p className={`text-[10px] font-bold text-${task.color}-400/70 mt-0.5`}>{task.effect}</p>
+                        <div className="flex-1 p-3 flex flex-col gap-2 overflow-y-auto min-h-0 relative">
+
+                            {(() => {
+                                let tasks = [];
+                                if (day <= 4) {
+                                    tasks = [
+                                        {
+                                            id: 't1',
+                                            label: 'L2 Security Screening Fitout',
+                                            action: 'Push to QA',
+                                            color: 'emerald',
+                                            onClick: () => {
+                                                if (showGuidance && tutorialStep !== 1) return;
+                                                useGameStore.setState({ reworkRate: Math.max(0, useGameStore.getState().reworkRate - 2) });
+                                                soundManager.playSFX('success');
+                                                if (showGuidance && tutorialStep === 1) setTutorialStep(2);
+                                            },
+                                            effect: '−2% Rework',
+                                            isTutorialTarget: showGuidance && tutorialStep === 1
+                                        },
+                                        {
+                                            id: 't2',
+                                            label: 'L3 Core Drilling',
+                                            action: 'Expedite',
+                                            color: 'amber',
+                                            onClick: () => {
+                                                if (showGuidance) return;
+                                                useGameStore.setState({ pdi: Math.min(100, useGameStore.getState().pdi + 3) });
+                                                soundManager.playSFX('click');
+                                            },
+                                            effect: '+3% PDI'
+                                        },
+                                        {
+                                            id: 't3',
+                                            label: 'L1 Demolition Clearance',
+                                            action: 'Clear Area',
+                                            color: 'blue',
+                                            onClick: () => {
+                                                if (showGuidance) return;
+                                                soundManager.playSFX('click');
+                                            },
+                                            effect: 'Unlocks L1 Framing'
+                                        },
+                                    ];
+                                } else if (day <= 8) {
+                                    tasks = [
+                                        {
+                                            id: 't4',
+                                            label: 'L2 HVAC Duct Installation',
+                                            action: 'QA Inspect',
+                                            color: 'emerald',
+                                            onClick: () => { useGameStore.setState({ reworkRate: Math.max(0, useGameStore.getState().reworkRate - 1) }); soundManager.playSFX('success'); },
+                                            effect: '−1% Rework'
+                                        },
+                                        {
+                                            id: 't5',
+                                            label: 'L3 Lounge Framing',
+                                            action: 'Expedite',
+                                            color: 'amber',
+                                            onClick: () => { useGameStore.setState({ pdi: Math.min(100, useGameStore.getState().pdi + 2) }); soundManager.playSFX('click'); },
+                                            effect: '+2% PDI'
+                                        },
+                                        {
+                                            id: 't6',
+                                            label: 'L1 Baggage Belts (Rough-in)',
+                                            action: 'Material Arrived',
+                                            color: 'blue',
+                                            onClick: () => { soundManager.playSFX('click'); },
+                                            effect: 'Unlocks Motors'
+                                        },
+                                    ];
+                                } else {
+                                    tasks = [
+                                        {
+                                            id: 't7',
+                                            label: 'L2 Security Scanners Install',
+                                            action: 'Final QA',
+                                            color: 'emerald',
+                                            onClick: () => { useGameStore.setState({ reworkRate: Math.max(0, useGameStore.getState().reworkRate - 3) }); soundManager.playSFX('success'); },
+                                            effect: '−3% Rework'
+                                        },
+                                        {
+                                            id: 't8',
+                                            label: 'L3 VIP Carpet',
+                                            action: 'Expedite',
+                                            color: 'amber',
+                                            onClick: () => { useGameStore.setState({ pdi: Math.min(100, useGameStore.getState().pdi + 5) }); soundManager.playSFX('click'); },
+                                            effect: '+5% PDI'
+                                        },
+                                        {
+                                            id: 't9',
+                                            label: 'L1 Terrazzo Flooring Polish',
+                                            action: 'Commission',
+                                            color: 'purple',
+                                            onClick: () => { soundManager.playSFX('success'); },
+                                            effect: 'Area Complete'
+                                        },
+                                    ];
+                                }
+
+                                return tasks.map((task) => (
+                                    <div id={`task-${task.id}`} key={task.id} className={`flex items-center justify-between gap-2 p-3 bg-slate-900/50 border rounded-xl transition-all relative ${task.isTutorialTarget ? 'border-emerald-500/60 shadow-[0_0_20px_rgba(16,185,129,0.3)] z-50 pointer-events-auto' : 'border-slate-700/60'}`}>
+                                        <div className="min-w-0">
+                                            <p className="text-xs font-bold text-white truncate">{task.label}</p>
+                                            <p className={`text-[10px] font-bold text-${task.color}-400/70 mt-0.5`}>{task.effect}</p>
+                                        </div>
+                                        <button
+                                            onClick={task.onClick}
+                                            className={`shrink-0 px-3 py-1.5 bg-${task.color}-600/15 text-${task.color}-400 border border-${task.color}-500/30 rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-${task.color}-600/30 transition-all active:scale-95 flex items-center gap-1 ${task.isTutorialTarget ? 'animate-bounce' : ''}`}
+                                        >
+                                            <CheckCircle className="w-3 h-3" />
+                                            {task.action}
+                                        </button>
                                     </div>
-                                    <button
-                                        onClick={task.onClick}
-                                        className={`shrink-0 px-3 py-1.5 bg-${task.color}-600/15 text-${task.color}-400 border border-${task.color}-500/30 rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-${task.color}-600/30 transition-all active:scale-95 flex items-center gap-1`}
-                                    >
-                                        <CheckCircle className="w-3 h-3" />
-                                        {task.action}
-                                    </button>
-                                </div>
-                            ))}
+                                ));
+                            })()}
                         </div>
                     </div>
                 </section>
@@ -253,8 +381,53 @@ export function TerminalView({ objective }: { objective?: string }) {
                 </section>
             </main>
 
-            {/* Tutorial overlay — above everything when visible */}
-            <CaseTutorialOverlay caseId={1} />
+            {/* Spotlight guidance overlay */}
+            {showGuidance && (
+                <div className="fixed inset-0 z-[70] pointer-events-none overflow-hidden text-white font-bold text-shadow-lg">
+                    <svg className="absolute inset-0 w-full h-full opacity-75 pointer-events-none">
+                        <path d={getMaskPath()} fill="black" fillRule="evenodd" />
+                    </svg>
+
+                    <AnimatePresence>
+                        {tutorialStep === 0 && spotlightPos && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                                style={{ top: spotlightPos.y - 80, left: spotlightPos.x }}
+                                className="absolute z-[90] w-64 pointer-events-none"
+                            >
+                                <div className="bg-purple-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white text-center">
+                                    <p className="font-bold text-lg">Step 1: Night Run</p>
+                                    <p className="text-sm">Click here to clear the morning backlog!</p>
+                                </div>
+                            </motion.div>
+                        )}
+                        {tutorialStep === 1 && spotlightPos && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                                style={{ top: spotlightPos.y - 80, left: spotlightPos.x }}
+                                className="absolute z-[90] w-64 pointer-events-none"
+                            >
+                                <div className="bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white text-center">
+                                    <p className="font-bold text-lg">Step 2: Push Work</p>
+                                    <p className="text-sm">Complete available tasks to keep flow moving.</p>
+                                </div>
+                            </motion.div>
+                        )}
+                        {tutorialStep === 2 && spotlightPos && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                                style={{ top: spotlightPos.y + spotlightPos.h + 20, left: spotlightPos.x - 150 }}
+                                className="absolute z-[90] w-64 pointer-events-none"
+                            >
+                                <div className="bg-indigo-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white text-center">
+                                    <p className="font-bold text-lg">Step 3: End Day</p>
+                                    <p className="text-sm">Advance the schedule when no more work can be done.</p>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            )}
 
             {/* Settings Modal */}
             {showSettings && (

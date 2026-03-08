@@ -43,7 +43,7 @@ export const CharacterCreationModal: React.FC = () => {
     const showChoice = hasExistingProfile && step === 'choice';
 
     return (
-        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-[#050812]/90 backdrop-blur-xl p-4 md:p-6 pointer-events-auto font-sans">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#050812]/90 backdrop-blur-xl p-4 md:p-6 pointer-events-auto font-sans">
             <AnimatePresence mode="wait">
                 {showChoice ? (
                     <motion.div
