@@ -51,7 +51,7 @@ export function TerminalView({ objective }: { objective?: string }) {
     }, [showGuidance, tutorialStep]);
 
     const getMaskPath = () => {
-        if (!spotlightPos) return "M0 0 h100% v100% h-100% z";
+        if (!spotlightPos) return `M0 0 h${window.innerWidth} v${window.innerHeight} h-${window.innerWidth} z`;
         const { x, y, w, h } = spotlightPos;
         return `M0 0 h${window.innerWidth} v${window.innerHeight} h-${window.innerWidth} z M${x} ${y} v${h} h${w} v-${h} z`;
     };

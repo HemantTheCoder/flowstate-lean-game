@@ -65,12 +65,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
     if (!tutorialActive || tutorialStep === 0) return null;
 
     const getMaskPath = () => {
-        if (!spotlightPos) return "M0 0 h100% v100% h-100% z";
+        if (!spotlightPos) return `M0 0 h${window.innerWidth} v${window.innerHeight} h-${window.innerWidth} z`;
         const { x, y, w, h } = spotlightPos;
-        return `
-            M0 0 h${window.innerWidth} v${window.innerHeight} h - ${window.innerWidth} z 
-            M${x} ${y} v${h} h${w} v - ${h} z
-    `;
+        return `M0 0 h${window.innerWidth} v${window.innerHeight} h-${window.innerWidth} z M${x} ${y} v${h} h${w} v-${h} z`;
     };
 
     return (
