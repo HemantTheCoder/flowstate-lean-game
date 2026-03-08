@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -17,6 +18,24 @@ import Profile from "@/pages/Profile";
 import DevDashboard from "@/pages/DevDashboard";
 import Credits from "@/pages/Credits";
 import Feedback from "@/pages/Feedback";
+
+function useDismissSplash() {
+  useEffect(() => {
+    const splash = document.getElementById("splash-screen");
+    if (!splash) return;
+    const minDisplayTime = 1500;
+    const startTime = performance.timing?.navigationStart || performance.now();
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, minDisplayTime - elapsed);
+
+    const timer = setTimeout(() => {
+      splash.style.opacity = "0";
+      splash.style.visibility = "hidden";
+      setTimeout(() => splash.remove(), 600);
+    }, remaining);
+    return () => clearTimeout(timer);
+  }, []);
+}
 
 function Router() {
   return (
@@ -38,6 +57,8 @@ function Router() {
 }
 
 function App() {
+  useDismissSplash();
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
