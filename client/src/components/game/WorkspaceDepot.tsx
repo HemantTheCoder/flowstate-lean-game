@@ -102,7 +102,20 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
         return { label: 'C (Cluttered)', color: 'text-slate-400' };
     };
 
-    const currentScore = depotScore || 0;
+    const currentScore = React.useMemo(() => {
+        let score = 0;
+        let totalItems = depotItems.filter(i => i.type !== 'hazard').length;
+        depotItems.forEach(item => {
+            const isTrash = item.type === 'trash' || item.isBroken;
+            if (isTrash && item.currentZoneId === 'zone-trash') score++;
+            if (!isTrash && item.type === 'tool' && item.currentZoneId === 'zone-tools') score++;
+            if (!isTrash && item.type === 'material' && item.currentZoneId === 'zone-mats') score++;
+        });
+        const finalScore = totalItems > 0 ? Math.round((score / totalItems) * 100) : 100;
+        const hazardsLeft = depotItems.filter(i => i.type === 'hazard').length;
+        return Math.max(0, finalScore - (hazardsLeft * 20));
+    }, [depotItems]);
+
     const grade = get5SGrade(currentScore);
     const unassignedItems = depotItems.filter(i => i.currentZoneId === 'unassigned');
     const selectedItemObj = depotItems.find(i => i.id === selectedItemId);

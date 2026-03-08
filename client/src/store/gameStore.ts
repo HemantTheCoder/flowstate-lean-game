@@ -710,39 +710,65 @@ export const useGameStore = create<GameState>((set, get) => ({
           dayInsight = 'No commitment made.';
         }
       } else if (state.day === 10) {
-        dayInsight = 'All commitments met! Emergency repair completed. Perfect flow.';
-        forceSafeFlow = true;
+        // Day 10 is Execution. Efficiency is based on how many promises were actually completed.
+        const weeklyPlan = state.weeklyPlan || [];
+        const doneTasks = state.columns.find(c => c.id === 'done')?.tasks || [];
 
-        // Auto-move committed tasks and emergency tasks to DONE
-        const tasksToMove: Task[] = [];
-        const updatedCols = state.columns.map(col => {
-          if (col.id === 'done') return col;
+        let promisedCompleted = 0;
+        let promisedTotal = weeklyPlan.length;
 
-          const remainingTasks: Task[] = [];
-          col.tasks.forEach(t => {
-            if (state.weeklyPlan.includes(t.id) || state.weeklyPlan.includes(t.originalId || '') || t.id.startsWith('emergency-')) {
-              tasksToMove.push({ ...t, status: 'done', constraints: [] });
-            } else {
-              remainingTasks.push(t);
-            }
-          });
-          return { ...col, tasks: remainingTasks };
-        });
-
-        nextColumns = updatedCols.map(col => {
-          if (col.id === 'done') {
-            return { ...col, tasks: [...col.tasks, ...tasksToMove] };
+        doneTasks.forEach(t => {
+          if (weeklyPlan.includes(t.id) || weeklyPlan.includes(t.originalId || '')) {
+            promisedCompleted++;
           }
-          return col;
         });
+
+        if (promisedTotal > 0) {
+          dailyEff = Math.round((promisedCompleted / promisedTotal) * 100);
+          adjustedPotential = promisedTotal;
+          adjustedCompleted = promisedCompleted;
+          dayInsight = promisedCompleted === promisedTotal
+            ? 'All commitments met! Perfect flow.'
+            : `${promisedCompleted} out of ${promisedTotal} commitments met. Focus on finishing!`;
+        } else {
+          dailyEff = 0;
+          adjustedPotential = 1;
+          adjustedCompleted = 0;
+          dayInsight = 'No commitments were made to track execution.';
+        }
+
       } else if (state.day === 11) {
-        dayInsight = 'PPC Review passed. Exceptional reliability confirmed.';
-        forceSafeFlow = true;
+        // Day 11 is PPC Review. Final Efficiency carries over the completion rate.
+        const weeklyPlan = state.weeklyPlan || [];
+        const doneTasks = state.columns.find(c => c.id === 'done')?.tasks || [];
+
+        let promisedCompleted = 0;
+        let promisedTotal = weeklyPlan.length;
+
+        doneTasks.forEach(t => {
+          if (weeklyPlan.includes(t.id) || weeklyPlan.includes(t.originalId || '')) {
+            promisedCompleted++;
+          }
+        });
+
+        if (promisedTotal > 0) {
+          dailyEff = Math.round((promisedCompleted / promisedTotal) * 100);
+          adjustedPotential = promisedTotal;
+          adjustedCompleted = promisedCompleted;
+          dayInsight = dailyEff === 100
+            ? 'PPC Review passed. Exceptional reliability confirmed.'
+            : `PPC Review complete. Reliability reached ${dailyEff}%.`;
+        } else {
+          dailyEff = 0;
+          adjustedPotential = 1;
+          adjustedCompleted = 0;
+          dayInsight = 'PPC Review: No plan to measure against.';
+        }
       }
     }
 
     // Clamp adjustedCompleted to not exceed adjustedPotential
-    adjustedCompleted = Math.min(adjustedCompleted, adjustedPotential);
+    adjustedCompleted = Math.max(0, Math.min(adjustedCompleted, adjustedPotential));
 
     // Daily efficiency for the graph
 
@@ -1158,9 +1184,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     let totalItems = state.depotItems.filter(i => i.type !== 'hazard').length;
 
     state.depotItems.forEach(item => {
-      if (item.type === 'trash' && item.currentZoneId === 'zone-trash') score++;
-      if (item.type === 'tool' && item.currentZoneId === 'zone-tools') score++;
-      if (item.type === 'material' && item.currentZoneId === 'zone-mats') score++;
+      const isTrash = item.type === 'trash' || item.isBroken;
+      if (isTrash && item.currentZoneId === 'zone-trash') score++;
+      if (!isTrash && item.type === 'tool' && item.currentZoneId === 'zone-tools') score++;
+      if (!isTrash && item.type === 'material' && item.currentZoneId === 'zone-mats') score++;
     });
 
     const hazardsScore = state.depotItems.filter(i => i.type === 'hazard').length === 0 ? 5 : 0;

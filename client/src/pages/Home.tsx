@@ -132,7 +132,7 @@ export default function Home() {
 
           {/* Main Menu Grid */}
           <div className="grid grid-cols-2 gap-4 mt-2">
-            <Link href="/dashboard" className="w-full">
+            <Link href="/profile" className="w-full">
               <motion.button
                 variants={buttonVariants}
                 initial="hidden"

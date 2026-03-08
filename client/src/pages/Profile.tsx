@@ -18,6 +18,10 @@ export default function Profile() {
         enabled: !!user,
     });
 
+    const { data: leaderboardEntries = [] } = useQuery<any[]>({
+        queryKey: ['/api/leaderboard'],
+    });
+
     if (isAuthLoading || (user && isProfileLoading)) {
         return (
             <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 relative overflow-x-hidden font-sans">
@@ -71,6 +75,16 @@ export default function Profile() {
             bestPpc = Math.max(...localGameState.ppcHistory.map(p => p.ppc));
         }
     }
+
+    // Combine DB scores and Local Scores for the history view
+    const displayScores = scores.length > 0 ? scores : Array.from({ length: completedChapters }).map((_, i) => ({
+        id: i,
+        chapter: i + 1,
+        efficiency: localGameState.dailyMetrics?.find(m => m.day === (i + 1) * 5)?.cumulativeEfficiency || 0,
+        ppc: localGameState.ppcHistory?.find(p => p.week === i + 1)?.ppc || 0,
+        totalScore: localGameState.funds,
+        completedAt: new Date().toISOString()
+    }));
 
     const joinDate = user?.createdAt ? new Date(user.createdAt) : new Date();
     const displayUsername = user?.username || localGameState.playerName || 'Guest Engineer';
@@ -253,20 +267,47 @@ export default function Profile() {
                                 <span className="text-[9px] font-black bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full border border-amber-500/20 uppercase tracking-tighter">Active</span>
                             </div>
                             <div className="p-8 text-center space-y-4">
-                                <div className="w-16 h-16 mx-auto bg-slate-900/50 rounded-2xl flex items-center justify-center border border-slate-700/50 group-hover:border-amber-500/30 transition-colors">
-                                    <Medal className="w-8 h-8 text-slate-600 group-hover:text-amber-500/50 transition-colors" />
-                                </div>
-                                <div>
-                                    <p className="text-white font-bold text-sm tracking-tight mb-1">Uncalculated Rewards</p>
-                                    <p className="text-slate-500 text-[11px] leading-relaxed">
-                                        Top 10 Rankings are finalized at the end of Season 1. Secure your spot in the <span className="text-amber-500/80 font-bold">Global Leaderboard</span> to claim exclusive architect honors.
-                                    </p>
-                                </div>
+                                {(() => {
+                                    const rankIndex = leaderboardEntries.findIndex(e => e.playerName === displayUsername);
+                                    const playerRank = rankIndex !== -1 ? rankIndex + 1 : null;
+
+                                    if (playerRank) {
+                                        return (
+                                            <>
+                                                <div className="w-16 h-16 mx-auto bg-amber-500/10 rounded-2xl flex items-center justify-center border border-amber-500/30">
+                                                    <Trophy className="w-8 h-8 text-amber-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-white font-bold text-sm tracking-tight mb-1">Rank #{playerRank} Architect</p>
+                                                    <p className="text-slate-400 text-[11px] leading-relaxed">
+                                                        {playerRank <= 10
+                                                            ? "You are currently in the Top 10! Hold your position to claim exclusive season rewards."
+                                                            : "You are on the board! Keep improving your efficiency and PPC to reach the Top 10."}
+                                                    </p>
+                                                </div>
+                                            </>
+                                        );
+                                    } else {
+                                        return (
+                                            <>
+                                                <div className="w-16 h-16 mx-auto bg-slate-900/50 rounded-2xl flex items-center justify-center border border-slate-700/50 group-hover:border-amber-500/30 transition-colors">
+                                                    <Medal className="w-8 h-8 text-slate-600 group-hover:text-amber-500/50 transition-colors" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-white font-bold text-sm tracking-tight mb-1">Uncalculated Rewards</p>
+                                                    <p className="text-slate-500 text-[11px] leading-relaxed">
+                                                        Top 10 Rankings are finalized at the end of Season 1. Complete an episode to secure your spot in the <span className="text-amber-500/80 font-bold">Global Leaderboard</span>.
+                                                    </p>
+                                                </div>
+                                            </>
+                                        );
+                                    }
+                                })()}
                                 <button
                                     onClick={() => setLocation('/leaderboard')}
                                     className="w-full py-3 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl text-amber-500 font-black text-[10px] uppercase tracking-widest transition-all active:scale-95"
                                 >
-                                    Check My Rank
+                                    View Full Leaderboard
                                 </button>
                             </div>
                         </div>
@@ -320,9 +361,9 @@ export default function Profile() {
                                 Project History Log
                             </h2>
 
-                            {scores.length > 0 ? (
+                            {displayScores.length > 0 ? (
                                 <div className="grid gap-4">
-                                    {scores.map((score, idx) => (
+                                    {displayScores.map((score, idx) => (
                                         <motion.div
                                             key={score.id}
                                             initial={{ opacity: 0, scale: 0.98 }}

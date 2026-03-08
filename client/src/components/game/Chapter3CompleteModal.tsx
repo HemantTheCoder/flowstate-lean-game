@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Award, Target, Brain, ArrowRight, ShieldCheck, Flame, Medal } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
+import { apiRequest } from '@/lib/queryClient';
 
 interface Chapter3CompleteModalProps {
     isOpen: boolean;
@@ -18,11 +19,46 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
 }) => {
     const depotScore = useGameStore(s => s.depotScore) || 0;
     const evaluate5S = useGameStore(s => s.evaluate5S);
+    const playerName = useGameStore(s => s.playerName);
 
-    if (!isOpen) return null;
+    const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
     // Ensure final score is calculated if not yet done
     const finalScore = depotScore > 0 ? depotScore : (evaluate5S() ?? 0);
+
+    useEffect(() => {
+        if (isOpen) {
+            handleSubmitScore();
+        } else {
+            setSubmissionStatus('idle');
+        }
+    }, [isOpen]);
+
+    const handleSubmitScore = async () => {
+        if (submissionStatus === 'success' || submissionStatus === 'submitting') return;
+
+        setSubmissionStatus('submitting');
+        const calculatedTotalScore = finalScore + Math.round((quizScore || 0) * 20);
+
+        try {
+            await apiRequest('POST', '/api/leaderboard', {
+                playerName: playerName || 'Architect',
+                chapter: 3,
+                efficiency: finalScore, // Store 5S score as efficiency for simplicity
+                ppc: 0,
+                quizScore: quizScore || 0,
+                totalScore: calculatedTotalScore,
+            });
+            setSubmissionStatus('success');
+            soundManager.playSFX('success', 0.5);
+        } catch (error) {
+            console.error(error);
+            setSubmissionStatus('error');
+            soundManager.playSFX('warning', 0.5);
+        }
+    };
+
+    if (!isOpen) return null;
 
     const getGrade = (score: number) => {
         if (score >= 90) return { letter: 'S', color: 'text-amber-500', phrase: 'Master Organizer' };
@@ -81,7 +117,7 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
                             <h3 className="text-sm font-bold text-blue-400 uppercase tracking-widest mb-2">Knowledge Check</h3>
                             <div className="flex items-center gap-2 mb-2">
                                 <Brain className="w-8 h-8 text-blue-500" />
-                                <span className="text-4xl font-black text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">{quizScore}%</span>
+                                <span className="text-4xl font-black text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">{quizScore * 20}%</span>
                             </div>
                             <p className="text-xs text-blue-500 font-bold text-center px-4 uppercase tracking-widest">Principles Understood</p>
                         </div>
@@ -109,16 +145,38 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
                         </div>
                     </motion.div>
 
-                    <button
-                        onClick={() => {
-                            soundManager.playSFX('success', 0.6);
-                            onContinue();
-                        }}
-                        className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-lg py-5 rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 uppercase tracking-wider group"
-                    >
-                        Return to Chapters
-                        <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                    </button>
+                    <div className="flex flex-col gap-3">
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                onClick={() => window.location.href = '/leaderboard'}
+                                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/50 text-slate-300 font-bold hover:bg-slate-700/50 transition-colors shadow-md"
+                            >
+                                <Award className="w-4 h-4" /> View Leaderboard
+                            </button>
+                            <button
+                                onClick={handleSubmitScore}
+                                disabled={submissionStatus === 'submitting' || submissionStatus === 'success'}
+                                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-colors font-bold shadow-md ${submissionStatus === 'success' ? 'bg-green-900/30 border-green-500/50 text-green-400' :
+                                    submissionStatus === 'error' ? 'bg-red-900/30 border-red-500/50 text-red-400' :
+                                        'border-amber-500/50 text-amber-500 hover:bg-amber-900/20'
+                                    }`}
+                            >
+                                {submissionStatus === 'submitting' && <span className="animate-spin">⏳</span>}
+                                {submissionStatus === 'success' ? 'Score Submitted!' :
+                                    submissionStatus === 'error' ? 'Try Again' : 'Submit Score'}
+                            </button>
+                        </div>
+                        <button
+                            onClick={() => {
+                                soundManager.playSFX('success', 0.6);
+                                onContinue();
+                            }}
+                            className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-lg py-5 rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 uppercase tracking-wider group"
+                        >
+                            Return to Chapters
+                            <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                    </div>
                 </div>
             </motion.div>
         </div>

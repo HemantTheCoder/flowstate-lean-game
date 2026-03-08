@@ -648,11 +648,57 @@ export default function Game() {
 
     // CHAPTER 3 SPECIFIC GUIDANCE (5S Teaching)
     if (chapter === 3) {
-      if (day === 12) return "Day 12: Sort (Seiri). Throw away broken tools and unnecessary trash into the Red Tag bin.";
-      if (day === 13) return "Day 13: Set in Order (Seiton). Give every remaining item a home in the correct zone.";
-      if (day === 14) return "Day 14: Shine (Seiso). Click the hazard icons on the floor to clean spills and remove trip risks.";
-      if (day === 15) return "Day 15: Standardize (Seiketsu). A new delivery arrived! Sort the waste, clean leaks, and set items in order immediately.";
-      if (day === 16) return "Day 16: Sustain (Shitsuke). The Inspector is auditing. Ensure no items are out of standard.";
+      const depotItems = state.depotItems || [];
+      const depotZones = state.depotZones || [];
+      let isComplete = false;
+
+      if (day === 12) {
+        const allTrash = depotItems.filter(i => i.type === 'trash' || i.isBroken);
+        const sortedTrash = allTrash.filter(i => i.currentZoneId === 'zone-trash');
+        isComplete = allTrash.length > 0 && sortedTrash.length === allTrash.length;
+        if (isComplete) return "Sort complete. All waste isolated. Click 'End Day'.";
+        return "Day 12: Sort (Seiri). Throw away broken tools and unnecessary trash into the Red Tag bin.";
+      }
+      if (day === 13) {
+        const allUseful = depotItems.filter(i => (i.type === 'tool' || i.type === 'material') && !i.isBroken);
+        const sortedUseful = allUseful.filter(i => {
+          const zone = depotZones.find(z => z.id === i.currentZoneId);
+          return zone && zone.acceptsType === i.type;
+        });
+        isComplete = allUseful.length > 0 && sortedUseful.length === allUseful.length;
+        if (isComplete) return "Set in Order complete. Items assigned. Click 'End Day'.";
+        return "Day 13: Set in Order (Seiton). Give every remaining item a home in the correct zone.";
+      }
+      if (day === 14) {
+        const hazardsRemaining = depotItems.filter(i => i.type === 'hazard').length;
+        isComplete = hazardsRemaining === 0;
+        if (isComplete) return "Shine complete. All hazards cleaned. Click 'End Day'.";
+        return "Day 14: Shine (Seiso). Click the hazard icons on the floor to clean spills and remove trip risks.";
+      }
+      if (day === 15) {
+        let correct = 0;
+        let total = depotItems.filter(i => i.type !== 'hazard').length;
+        depotItems.forEach(item => {
+          const zone = depotZones.find(z => z.id === item.currentZoneId);
+          if (zone && zone.acceptsType === (item.isBroken ? 'trash' : item.type)) correct++;
+        });
+        const hazLeft = depotItems.filter(i => i.type === 'hazard').length;
+        isComplete = total > 0 && correct === total && hazLeft === 0;
+        if (isComplete) return "Standardization maintained. Click 'End Day'.";
+        return "Day 15: Standardize (Seiketsu). A new delivery arrived! Sort the waste, clean leaks, and set items in order immediately.";
+      }
+      if (day === 16) {
+        let correct = 0;
+        let total = depotItems.filter(i => i.type !== 'hazard').length;
+        depotItems.forEach(item => {
+          const zone = depotZones.find(z => z.id === item.currentZoneId);
+          if (zone && zone.acceptsType === (item.isBroken ? 'trash' : item.type)) correct++;
+        });
+        const hazLeft = depotItems.filter(i => i.type === 'hazard').length;
+        isComplete = total > 0 && correct === total && hazLeft === 0;
+        if (isComplete) return "Audit ready. Click 'Finish Chapter'.";
+        return "Day 16: Sustain (Shitsuke). The Inspector is auditing. Ensure no items are out of standard.";
+      }
     }
 
     // CASE STUDY 1 (CHAPTER 4) SPECIFIC GUIDANCE

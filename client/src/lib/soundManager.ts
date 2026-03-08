@@ -31,11 +31,15 @@ class SoundManager {
     private isMuted: boolean = false;
 
     private getCtx(): AudioContext {
-        if (!this.audioCtx) {
+        if (!this.audioCtx || this.audioCtx.state === 'closed') {
             this.audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
         }
         if (this.audioCtx.state === 'suspended') {
-            this.audioCtx.resume();
+            try {
+                this.audioCtx.resume().catch(() => { });
+            } catch (e) {
+                console.warn("AudioContext resume failed:", e);
+            }
         }
         return this.audioCtx;
     }
@@ -283,10 +287,10 @@ class SoundManager {
 
     resumeAudio() {
         if (Howler.ctx && Howler.ctx.state === 'suspended') {
-            Howler.ctx.resume();
+            try { Howler.ctx.resume().catch(() => { }); } catch (e) { }
         }
         if (this.audioCtx && this.audioCtx.state === 'suspended') {
-            this.audioCtx.resume();
+            try { this.audioCtx.resume().catch(() => { }); } catch (e) { }
         }
     }
 
