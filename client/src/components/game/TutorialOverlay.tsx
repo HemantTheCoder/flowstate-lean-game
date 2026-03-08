@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowDown, ChevronRight, Ban, ArrowRight, Gauge } from 'lucide-react';
+import soundManager from '@/lib/soundManager';
 
 interface Props {
     showKanban: boolean;
@@ -67,9 +68,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
         if (!spotlightPos) return "M0 0 h100% v100% h-100% z";
         const { x, y, w, h } = spotlightPos;
         return `
-            M0 0 h${window.innerWidth} v${window.innerHeight} h-${window.innerWidth} z 
-            M${x} ${y} v${h} h${w} v-${h} z
-        `;
+            M0 0 h${window.innerWidth} v${window.innerHeight} h - ${window.innerWidth} z 
+            M${x} ${y} v${h} h${w} v - ${h} z
+    `;
     };
 
     return (
@@ -378,8 +379,51 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         </div>
                     </div>
                 )}
-            </AnimatePresence>
 
+                {/* --- CHAPTER 4: PULL & JIT TUTORIAL --- */}
+
+                {/* Step 20: Pull Board WIP Limits */}
+                {tutorialStep === 20 && chapter === 4 && (
+                    <div className="absolute top-20 left-20 z-[90] w-80 pointer-events-auto">
+                        <div className="bg-indigo-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-indigo-400 relative">
+                            <h3 className="font-bold text-indigo-300 text-lg mb-2">Trade Pull Board</h3>
+                            <p className="text-sm mb-3">
+                                You are now in a <b>Pull System</b>. You don't assign tasks. <br /><br />
+                                Instead, you set a <b>WIP Limit</b> (Work-in-Progress limit) for each trade. If there's capacity on site, the trade will automatically "pull" work downstream.
+                            </p>
+                            <button
+                                onClick={() => setTutorialStep(21)}
+                                className="bg-indigo-500 w-full py-2 rounded text-sm font-bold shadow-lg"
+                            >
+                                Next: JIT Deliveries
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Step 21: JIT Scheduler */}
+                {tutorialStep === 21 && chapter === 4 && (
+                    <div className="absolute top-20 right-[370px] z-[90] w-80 pointer-events-auto">
+                        <div className="bg-emerald-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-emerald-400 relative">
+                            <h3 className="font-bold text-emerald-300 text-lg mb-2">JIT Scheduler & Buffers</h3>
+                            <p className="text-sm mb-3">
+                                As trades pull work, they consume materials. You must order deliveries <b>Just-In-Time</b> to arrive before they run out!
+                                <br /><br />
+                                Set a <b>Safety Buffer</b> to ensure you always have a minimum stock, but watch out—large buffers hurt your "Flow" score due to overcrowding.
+                            </p>
+                            <button
+                                onClick={() => {
+                                    setTutorialStep(99);
+                                    soundManager.playSFX('success');
+                                }}
+                                className="bg-emerald-500 w-full py-2 rounded text-sm font-bold shadow-lg"
+                            >
+                                Begin Day 1
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

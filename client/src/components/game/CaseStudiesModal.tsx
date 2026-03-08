@@ -86,6 +86,7 @@ export function CaseStudiesModal({ isOpen, onClose }: CaseStudiesModalProps) {
             soundManager.playSFX('success');
             const storeChapterId = showAdminLock;
             setShowAdminLock(null);
+            setFlag('admin_unlocked', true);
 
             if (flags['character_created'] || hasExistingProfile) {
                 // Profile exists — resume it (set it in store if not already set) then launch
@@ -226,12 +227,11 @@ export function CaseStudiesModal({ isOpen, onClose }: CaseStudiesModalProps) {
                     <motion.div
                         key="create-profile"
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="relative w-full max-w-lg bg-slate-900/95 backdrop-blur-2xl border border-blue-500/20 rounded-3xl shadow-[0_0_80px_-15px_rgba(99,102,241,0.3)] overflow-hidden"
+                        className="relative w-full max-w-lg bg-slate-900/95 backdrop-blur-2xl border border-blue-500/20 rounded-3xl shadow-[0_0_80px_-15px_rgba(99,102,241,0.3)] overflow-hidden flex flex-col max-h-[90vh]"
                     >
                         {/* Back button + header */}
-                        <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-slate-900 p-6 md:p-8 relative overflow-hidden border-b border-blue-500/20">
+                        <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-slate-900 p-6 md:p-8 relative overflow-hidden border-b border-blue-500/20 shrink-0">
                             <div className="absolute inset-0 opacity-20 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
                             <button
                                 onClick={() => setStep('select')}
@@ -248,7 +248,7 @@ export function CaseStudiesModal({ isOpen, onClose }: CaseStudiesModalProps) {
                             </div>
                         </div>
 
-                        <div className="p-6 md:p-8 space-y-8">
+                        <div className="p-6 md:p-8 space-y-8 overflow-y-auto custom-scrollbar">
                             {/* Name Input */}
                             <div className="space-y-3">
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">

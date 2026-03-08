@@ -36,46 +36,53 @@ const CHAPTERS: ChapterDef[] = [
         description: "Organize the chaotic depot. Sort, Set in order, Shine, Standardize, and Sustain.",
         isLocked: true,
         theme: "amber"
+    },
+    {
+        id: 3,
+        title: "Episode 4: Pull & JIT Systems",
+        description: "Master Pull Systems and JIT (Just-in-Time) delivery to eliminate overproduction waste.",
+        isLocked: true,
+        theme: "purple"
     }
 ];
 
-// Enhanced content for Chapter 4 overview
-const CHAPTER_4_PREVIEW = {
-    title: "Episode 4: Pull & JIT Systems",
-    subtitle: "Let Work Be Asked For",
-    overview: "After 5S creates an organized environment and Last Planner systems ensure reliable promises, the next critical step is controlling production flow. Implement Pull Systems and Just-In-Time (JIT) delivery to ensure you produce exactly what is needed, only when it's needed.",
+// Enhanced content for Chapter 5 overview (Coming Soon)
+const CHAPTER_5_PREVIEW = {
+    title: "Episode 5: Heijunka & Takt",
+    subtitle: "Leveling the Load",
+    overview: "Once the work is pulled Just-In-Time, the next challenge is creating stability. Learn to level production (Heijunka) and maintain a steady beat (Takt Time) to avoid the cycle of 'hurry up and wait'.",
     learningGoals: [
-        "Differentiate between Push and Pull production systems",
-        "Implement Kanban card signaling across multiple trades",
-        "Design JIT delivery schedules to eliminate bulk storage",
-        "Balance inventory buffers against lead time variability",
-        "Respond to supply chain shocks without overproducing"
+        "Calculate Takt Time based on customer demand",
+        "Implement Heijunka boxes for production leveling",
+        "Manage changeover times between different types of work",
+        "Apply the Yamazumi technique for task balancing",
+        "Create rhythmic production cycles to reduce stress"
     ],
     gameplay: [
-        "Design pull-based workflows for finishing trades",
-        "Manage dynamic Kanban limits based on demand",
-        "Schedule JIT material deliveries to precise zones",
-        "Mitigate the 'Bullwhip Effect' during disruptions"
+        "Distribute complex tasks evenly across the work week",
+        "Balance crew assignments to match the site beat",
+        "Adjust production rate to avoid over-pacing downstream trades",
+        "Handle mix-model production (Drywall vs. Electrical vs. Plumbing)"
     ],
-    scenario: "The mall's finishing phase requires intense coordination between drywallers, painters, and electricians. Upstream teams are pushing work, creating massive bottlenecks. You must design a pull system where work is only requested when the downstream trade is ready."
+    scenario: "The project has entered the repeating floor phase. Instead of chaos, you must create a 'Production Train' where every crew moves at the same speed, floor by floor. Any break in the beat causes the whole train to derail. Can you hold the Takt?"
 };
 
 const DUMMY_CHAPTERS: ChapterDef[] = [
     ...CHAPTERS,
     {
-        id: 3,
-        title: "Episode 4: Coming Soon",
-        description: "Master Pull Systems and JIT (Just-in-Time) delivery to eliminate overproduction waste.",
+        id: 4,
+        title: "Episode 5: Coming Soon",
+        description: "Experience Heijunka (Production Leveling) and Takt Time to create a smooth, rhythmic site beat.",
         isLocked: true,
         isComingSoon: true,
-        theme: "purple"
+        theme: "cyan"
     }
 ];
 
 export default function ChapterSelect() {
     const [, setLocation] = useLocation();
     const [hoveredChapter, setHoveredChapter] = useState<number | null>(null);
-    const [showChapter4Modal, setShowChapter4Modal] = useState(false);
+    const [showUpcomingModal, setShowUpcomingModal] = useState(false);
 
     // Get unlocked chapters from state
     const { unlockedChapters, setChapter } = useGameStore();
@@ -92,7 +99,7 @@ export default function ChapterSelect() {
     const handleSelectChapter = (chapterId: number, isLocked?: boolean, isComingSoon?: boolean) => {
         soundManager.playSFX('click');
         if (isComingSoon) {
-            setShowChapter4Modal(true);
+            setShowUpcomingModal(true);
             return;
         }
 
@@ -176,8 +183,9 @@ export default function ChapterSelect() {
                             if (chapter.id === 0) theme = { color: 'text-cyan-400', border: 'border-cyan-500/40', bg: 'bg-slate-800/80', glow: 'rgba(34,211,238,0.25)', button: 'bg-cyan-600' };
                             else if (chapter.id === 1) theme = { color: 'text-emerald-400', border: 'border-emerald-500/40', bg: 'bg-slate-800/80', glow: 'rgba(16,185,129,0.25)', button: 'bg-emerald-600' };
                             else if (chapter.id === 2) theme = { color: 'text-amber-400', border: 'border-amber-500/40', bg: 'bg-slate-800/80', glow: 'rgba(245,158,11,0.25)', button: 'bg-amber-600' };
+                            else if (chapter.id === 3) theme = { color: 'text-purple-400', border: 'border-purple-500/40', bg: 'bg-slate-800/80', glow: 'rgba(168,85,247,0.25)', button: 'bg-purple-600' };
                         } else if (chapter.isComingSoon) {
-                            theme = { color: 'text-purple-400', border: 'border-purple-500/40', bg: 'bg-slate-800/60', glow: 'rgba(168,85,247,0.15)', button: 'bg-purple-900/60' };
+                            theme = { color: 'text-cyan-400', border: 'border-cyan-500/40', bg: 'bg-slate-800/60', glow: 'rgba(34,211,238,0.15)', button: 'bg-cyan-900/60' };
                         }
 
                         return (
@@ -247,23 +255,23 @@ export default function ChapterSelect() {
                 </div>
             </div>
 
-            {/* Chapter 4 Preview Modal - Visual Novel Readability */}
+            {/* Upcoming Episode Preview Modal - Visual Novel Readability */}
             <AnimatePresence>
-                {showChapter4Modal && (
+                {showUpcomingModal && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
-                            onClick={() => setShowChapter4Modal(false)}
+                            onClick={() => setShowUpcomingModal(false)}
                         />
 
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="relative w-full max-w-4xl bg-slate-800/95 backdrop-blur-2xl border border-slate-600/50 rounded-3xl flex flex-col max-h-[90vh] overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.15)]"
+                            className="relative w-full max-w-4xl bg-slate-800/95 backdrop-blur-2xl border border-slate-600/50 rounded-3xl flex flex-col max-h-[90vh] overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.15)]"
                         >
                             {/* Premium Header */}
                             <div className="bg-gradient-to-r from-purple-900/50 to-slate-900/50 p-6 md:p-8 border-b border-white/5 flex justify-between items-start shrink-0 relative overflow-hidden">
@@ -272,11 +280,11 @@ export default function ChapterSelect() {
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">
                                         Upcoming Episode
                                     </div>
-                                    <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight mb-2 drop-shadow-md">{CHAPTER_4_PREVIEW.title}</h2>
-                                    <p className="text-lg text-slate-300 font-light">{CHAPTER_4_PREVIEW.subtitle}</p>
+                                    <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight mb-2 drop-shadow-md">{CHAPTER_5_PREVIEW.title}</h2>
+                                    <p className="text-lg text-slate-300 font-light">{CHAPTER_5_PREVIEW.subtitle}</p>
                                 </div>
                                 <button
-                                    onClick={() => setShowChapter4Modal(false)}
+                                    onClick={() => setShowUpcomingModal(false)}
                                     className="relative z-10 p-2 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-colors"
                                 >
                                     <AlertTriangle className="w-5 h-5" />
@@ -285,7 +293,7 @@ export default function ChapterSelect() {
 
                             <div className="p-6 md:p-8 overflow-y-auto flex-1 font-sans custom-scrollbar">
                                 <p className="text-lg text-slate-300 leading-relaxed mb-8 max-w-3xl">
-                                    {CHAPTER_4_PREVIEW.overview}
+                                    {CHAPTER_5_PREVIEW.overview}
                                 </p>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -294,7 +302,7 @@ export default function ChapterSelect() {
                                             <BookOpen className="w-4 h-4" /> Learning Goals
                                         </h3>
                                         <ul className="space-y-3">
-                                            {CHAPTER_4_PREVIEW.learningGoals.map((goal, i) => (
+                                            {CHAPTER_5_PREVIEW.learningGoals.map((goal, i) => (
                                                 <li key={i} className="flex gap-3 text-slate-300 text-sm leading-relaxed">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
                                                     {goal}
@@ -308,7 +316,7 @@ export default function ChapterSelect() {
                                             <Target className="w-4 h-4" /> Planned Gameplay
                                         </h3>
                                         <ul className="space-y-3">
-                                            {CHAPTER_4_PREVIEW.gameplay.map((item, i) => (
+                                            {CHAPTER_5_PREVIEW.gameplay.map((item, i) => (
                                                 <li key={i} className="flex gap-3 text-slate-300 text-sm leading-relaxed">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
                                                     {item}
@@ -318,17 +326,17 @@ export default function ChapterSelect() {
                                     </div>
                                 </div>
 
-                                <div className="bg-gradient-to-br from-purple-900/30 to-slate-900/30 border border-purple-500/20 p-6 rounded-2xl relative overflow-hidden">
-                                    <h3 className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3">Narrative Scenario</h3>
+                                <div className="bg-gradient-to-br from-cyan-900/30 to-slate-900/30 border border-cyan-500/20 p-6 rounded-2xl relative overflow-hidden">
+                                    <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest mb-3">Narrative Scenario</h3>
                                     <p className="text-slate-300 leading-relaxed text-sm italic">
-                                        "{CHAPTER_4_PREVIEW.scenario}"
+                                        "{CHAPTER_5_PREVIEW.scenario}"
                                     </p>
                                 </div>
                             </div>
 
                             <div className="p-6 bg-black/40 border-t border-white/5 shrink-0 flex justify-end">
                                 <button
-                                    onClick={() => setShowChapter4Modal(false)}
+                                    onClick={() => setShowUpcomingModal(false)}
                                     className="w-full md:w-auto px-8 py-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl uppercase tracking-widest text-xs transition-colors shadow-lg shadow-purple-900/20"
                                 >
                                     Close Briefing

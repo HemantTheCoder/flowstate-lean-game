@@ -110,7 +110,7 @@ export const CharacterCreationModal: React.FC = () => {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0, y: -20 }}
                         transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
-                        className="bg-slate-900/90 backdrop-blur-2xl w-full max-w-lg rounded-3xl shadow-[0_0_80px_-15px_rgba(59,130,246,0.15)] border border-blue-500/20 flex flex-col overflow-hidden"
+                        className="bg-slate-900/90 backdrop-blur-2xl w-full max-w-lg rounded-3xl shadow-[0_0_80px_-15px_rgba(59,130,246,0.15)] border border-blue-500/20 flex flex-col overflow-hidden max-h-[90vh]"
                     >
                         {/* Header */}
                         <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-slate-900 p-6 md:p-8 relative overflow-hidden shrink-0 border-b border-blue-500/20">
@@ -132,7 +132,7 @@ export const CharacterCreationModal: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="p-6 md:p-8 space-y-8">
+                        <div className="p-6 md:p-8 space-y-8 overflow-y-auto custom-scrollbar">
                             {/* Name Input */}
                             <div className="space-y-3">
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">

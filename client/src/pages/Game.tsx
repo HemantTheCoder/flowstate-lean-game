@@ -17,9 +17,9 @@ import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
 import { CharacterCastModal } from '@/components/game/CharacterCastModal';
 import { DayBriefingModal } from '@/components/game/DayBriefingModal';
 import { WorkspaceDepot } from '@/components/game/WorkspaceDepot';
+import { PullSystemDashboard } from '@/components/game/PullSystemDashboard';
 import { CASE_1_SCHEDULE } from '@/data/cases/case1';
 import { CASE_2_SCHEDULE } from '@/data/cases/case2';
-import { TerminalView } from '@/components/game/case1/TerminalView';
 import { CoastalView } from '@/components/game/case2/CoastalView';
 import { ChapterCompleteModal } from '@/components/game/ChapterCompleteModal';
 import { Chapter2CompleteModal } from '@/components/game/Chapter2CompleteModal';
@@ -645,6 +645,84 @@ export default function Game() {
     setShowDecision(true);
   };
 
+  const triggerChapter4Day2Decision = () => {
+    setDecisionProps({
+      title: "VIP Demand Spike",
+      prompt: "The client wants the VIP lounge finished early. Finish materials demand is doubling for the next 48 hours.",
+      options: [
+        { id: 'limit', text: "Rush Setup ($500)", type: 'safe', description: "Increase Carpentry & Finishing limits. Faster flow, small cost." },
+        { id: 'expedite', text: "Expedite Log ($1k)", type: 'risky', description: "Order immediate delivery of extra materials. High cost, prevents stockout." },
+        { id: 'nothing', text: "Hold the Line", type: 'risky', description: "Risk running out of materials. Zero cost today." }
+      ],
+      onSelect: (id: string) => {
+        const state = useGameStore.getState();
+        if (id === 'limit') {
+          useGameStore.setState(s => ({
+            funds: Math.max(0, s.funds - 500),
+            kanbanLimits: { ...s.kanbanLimits, 'carpentry': (s.kanbanLimits['carpentry'] || 4) + 2, 'finishing': (s.kanbanLimits['finishing'] || 4) + 2 }
+          }));
+          soundManager.playSFX('success');
+        } else if (id === 'expedite') {
+          state.orderMaterial('timber', 50, state.day + 1);
+          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 1000) }));
+          soundManager.playSFX('success');
+        } else {
+          soundManager.playSFX('click');
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
+
+  const triggerChapter4Day3Decision = () => {
+    setDecisionProps({
+      title: "Bullwhip Warning",
+      prompt: "Local demand spiked. Mira warns that over-ordering now will cause a 'Bullwhip' chaos for suppliers. What's your strategy?",
+      options: [
+        { id: 'smooth', text: "Demand Smoothing", type: 'safe', description: "Order slightly less than max demand. Stabilizes supply chain. (+10 Pull Score)" },
+        { id: 'panic', text: "Safety Surge", type: 'risky', description: "Order 3x expected demand. Prevents stockout, but increases Bullwhip Index." }
+      ],
+      onSelect: (id: string) => {
+        const state = useGameStore.getState();
+        if (id === 'smooth') {
+          useGameStore.setState(s => ({ pullScore: s.pullScore + 10 }));
+          state.orderMaterial('pipes', 20, state.day + 2);
+          soundManager.playSFX('success');
+        } else {
+          useGameStore.setState(s => ({ bullwhipIndex: s.bullwhipIndex + 25 }));
+          state.orderMaterial('pipes', 80, state.day + 1);
+          soundManager.playSFX('alert');
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
+
+  const triggerChapter4Day4Decision = () => {
+    setDecisionProps({
+      title: "Truck Breakdown",
+      prompt: "A major delivery is stuck on the highway. 24-hour delay. Your JIT system is at breaking point!",
+      options: [
+        { id: 'buffer', text: "Rely on Buffer", type: 'safe', description: "Use existing safety stock. Zero cost if you planned well." },
+        { id: 'sub', text: "Emergency Courier ($2k)", type: 'risky', description: "Expensive same-day delivery. Guaranteed materials." }
+      ],
+      onSelect: (id: string) => {
+        const state = useGameStore.getState();
+        if (id === 'sub') {
+          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 2000) }));
+          state.orderMaterial('electrical', 30, state.day);
+          soundManager.playSFX('success');
+        } else {
+          soundManager.playSFX('click');
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
+
   const handleEndDay = () => {
     const state = useGameStore.getState();
     const previousDoneCount = state.previousDoneCount;
@@ -691,6 +769,13 @@ export default function Game() {
     }
 
     if (chapter === 3 && currentDay >= 12 && currentDay <= 16) {
+      return;
+    }
+
+    if (chapter === 4) {
+      if (currentDay === 2) triggerChapter4Day2Decision();
+      if (currentDay === 3) triggerChapter4Day3Decision();
+      if (currentDay === 4) triggerChapter4Day4Decision();
       return;
     }
 
@@ -844,11 +929,15 @@ export default function Game() {
 
     // CASE STUDY 1 (CHAPTER 4) SPECIFIC GUIDANCE
     if (chapter === 4) {
-      const currentDayConfig = CASE_1_SCHEDULE.find(d => d.day === day);
-      if (currentDayConfig?.briefing) {
-        return `[Terminal T-Upgrade]: ${currentDayConfig.briefing.action}`;
-      }
-      return "Manage the hoist and keep passenger disruption low.";
+      if (day === 1) return "Day 1: Intro to Pull. Set Kanban limits for trades and order your first JIT delivery in the Scheduler.";
+
+      const lowInventory = Object.entries(state.materialsInventory).find(([_, qty]) => (qty as number) < 10);
+      if (lowInventory) return `Warning: ${lowInventory[0]} stock is LOW! Open Scheduler and order a JIT delivery immediately.`;
+
+      const pendingDeliveries = state.deliveries.length;
+      if (pendingDeliveries === 0 && day < 5) return "Your site is running! Keep monitoring inventory and schedule deliveries to arrive just before stockouts.";
+
+      return "Flow is steady. Monitor the Bullwhip Index – try not to over-order when demand fluctuates.";
     }
 
     // CASE STUDY 2 (CHAPTER 5) SPECIFIC GUIDANCE
@@ -1122,7 +1211,11 @@ export default function Game() {
           {showKanban && chapter === 3 && <WorkspaceDepot onClose={() => setShowKanban(false)} />}
         </AnimatePresence>
 
-        {chapter === 4 && <div className="absolute inset-0 pointer-events-auto bg-slate-950 z-20"><TerminalView objective={getSmartObjective()} /></div>}
+        {chapter === 4 && (
+          <div className="absolute inset-x-0 bottom-0 top-[80px] sm:top-[100px] pointer-events-auto bg-slate-950/80 z-20 backdrop-blur-sm overflow-hidden">
+            <PullSystemDashboard />
+          </div>
+        )}
         {chapter === 5 && <div className="absolute inset-0 pointer-events-auto bg-slate-950 z-20"><CoastalView objective={getSmartObjective()} /></div>}
 
         <DailySummary

@@ -202,6 +202,24 @@ export interface GameState {
   // Chapter 5 (Case 2): Coastal Link
   trafficImpact: number;
   segmentBuffers: Record<string, number>;
+
+  // Chapter 4 (Core Version): Pull & JIT Systems
+  bullwhipIndex: number;
+  pullScore: number;
+  inventoryTurns: number;
+  jitOnTimeDelivery: number;
+  buffers: Record<string, number>; // Safety stock per material
+  materialsInventory: Record<string, number>; // current on-site stock
+  kanbanLimits: Record<string, number>; // wip limit per trade
+  deliveries: any[]; // active scheduled deliveries
+  pullMetrics: { day: number; demand: number; ordersUpstream: number }[]; // Track variance over days
+
+  // Chapter 4 Actions
+  setKanbanLimit: (trade: string, limit: number) => void;
+  setBuffer: (material: string, amount: number) => void;
+  orderMaterial: (material: string, amount: number, etaDay: number) => void;
+  receiveDeliveries: (currentDay: number) => void;
+  consumeMaterial: (material: string, amount: number) => boolean;
 }
 
 const INITIAL_COLUMNS: Column[] = [
@@ -285,6 +303,16 @@ export const useGameStore = create<GameState>((set, get) => ({
   hoistSlots: 3,
   pdi: 0,
   reworkRate: 0,
+
+  bullwhipIndex: 0,
+  pullScore: 0,
+  inventoryTurns: 0,
+  jitOnTimeDelivery: 100,
+  buffers: { timber: 0, pipes: 0, electrical: 0 },
+  materialsInventory: { timber: 0, pipes: 0, electrical: 0 },
+  kanbanLimits: { carpentry: 3, finish: 2, electrical: 2 },
+  deliveries: [],
+  pullMetrics: [],
 
   // Chapter 5 Defaults
   trafficImpact: 0,
@@ -642,6 +670,60 @@ export const useGameStore = create<GameState>((set, get) => ({
         adjustedCompleted = dailyEff;
         dayInsight = `Final Audit completed with score: ${dailyEff}%.`;
       }
+    } else if (state.chapter === 4) {
+      // Chapter 4: Pull & JIT Mechanics 
+
+      // Calculate Demand for the day based on tasks moved or completed
+      const demand = tasksCompletedToday * 10; // Simple conversion: 1 task = 10 units demand
+      const upstreamOrders = state.deliveries.filter(d => d.etaDay > state.day).reduce((sum, d) => sum + d.amount, 0);
+
+      const metric = { day: state.day, demand, ordersUpstream: upstreamOrders };
+
+      // Process arriving deliveries
+      const arriving = state.deliveries.filter(d => d.etaDay === nextDay);
+      let missingMaterials = false;
+
+      // Extremely simplified consumption for demo 
+      const currentInventory = { ...state.materialsInventory };
+      if (tasksCompletedToday > 0) {
+        // Just deduct a generic chunk to simulate pull. If stockouts happen, throughput drops.
+        ['timber', 'pipes', 'electrical'].forEach(mat => {
+          currentInventory[mat] = Math.max(0, (currentInventory[mat] || 0) - (tasksCompletedToday * 5));
+          if (currentInventory[mat] === 0) missingMaterials = true;
+        });
+      }
+
+      // Add arriving
+      arriving.forEach(d => {
+        currentInventory[d.material] = (currentInventory[d.material] || 0) + d.amount;
+      });
+
+      // Events
+      if (state.day === 1) {
+        dayInsight = "First Pull scheduling complete. Watch those buffers.";
+      } else if (state.day === 2) {
+        dayInsight = "Demand spike handled.";
+      } else if (state.day === 3) {
+        dayInsight = "Bullwhip test incoming. Smoothing saves costs.";
+      } else if (state.day === 4) {
+        dayInsight = "Supplier disruption! Those safety buffers were critical.";
+      }
+
+      // If we ran out of materials, tank efficiency
+      if (missingMaterials) {
+        dailyEff = 50;
+        adjustedCompleted = Math.floor(potentialCapacity / 2);
+        dayInsight = "Material Stockout! Throughput crashed. Use buffers next time.";
+      } else {
+        dailyEff = potentialCapacity > 0 ? Math.round((adjustedCompleted / potentialCapacity) * 100) : 0;
+      }
+
+      set(s => ({
+        pullMetrics: [...s.pullMetrics, metric],
+        materialsInventory: currentInventory,
+        deliveries: s.deliveries.filter(d => d.etaDay > nextDay) // clear arrived
+      }));
+
     } else {
       // Only subtract NEW waste created today (not total waste in system)
       if (state.day === 1) {
@@ -1399,6 +1481,40 @@ export const useGameStore = create<GameState>((set, get) => ({
     }));
 
     return ppc;
+  },
+  // Chapter 4 Methods
+  setKanbanLimit: (trade, limit) => set((state) => ({ kanbanLimits: { ...state.kanbanLimits, [trade]: limit } })),
+
+  setBuffer: (material, amount) => set((state) => ({ buffers: { ...state.buffers, [material]: amount } })),
+
+  orderMaterial: (material, amount, etaDay) => set((state) => ({
+    deliveries: [...state.deliveries, { id: uuidv4(), material, amount, etaDay }]
+  })),
+
+  receiveDeliveries: (currentDay) => set((state) => {
+    const arriving = state.deliveries.filter(d => d.etaDay <= currentDay);
+    const pending = state.deliveries.filter(d => d.etaDay > currentDay);
+
+    // Process arriving inventory
+    const newInventory = { ...state.materialsInventory };
+    arriving.forEach(d => {
+      newInventory[d.material] = (newInventory[d.material] || 0) + d.amount;
+    });
+
+    return {
+      materialsInventory: newInventory,
+      deliveries: pending
+    };
+  }),
+
+  consumeMaterial: (material, amount) => {
+    const state = get();
+    const current = state.materialsInventory[material] || 0;
+    if (current >= amount) {
+      set({ materialsInventory: { ...state.materialsInventory, [material]: current - amount } });
+      return true; // Success
+    }
+    return false; // Stockout
   },
 
   updateTask: (taskId: string, updates: Partial<Task>) => {
