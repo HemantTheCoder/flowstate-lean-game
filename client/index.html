@@ -36,11 +36,34 @@
           <span class="splash-dot" style="animation-delay:0.45s;"></span>
           <span class="splash-dot" style="animation-delay:0.6s;"></span>
         </div>
+        <div id="splash-tip" style="background:rgba(15,23,42,0.8);border:1px solid #1e293b;border-radius:12px;padding:14px 18px;max-width:340px;opacity:0;animation:splash-fade-in 0.6s ease-out 0.4s forwards;">
+          <div style="font-family:Inter,system-ui,sans-serif;font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:3px;margin-bottom:6px;">Lean Principle</div>
+          <div id="splash-tip-text" style="font-family:Inter,system-ui,sans-serif;font-size:13px;color:#94a3b8;line-height:1.5;"></div>
+        </div>
       </div>
     </div>
+    <script>
+      (function(){
+        var tips=[
+          "Kanban limits Work-In-Progress to maximize throughput and expose bottlenecks on the construction site.",
+          "The Last Planner System builds reliability: only promise work that CAN be done, not what SHOULD be done.",
+          "5S (Sort, Set in Order, Shine, Standardize, Sustain) eliminates the 7 wastes of searching and motion.",
+          "Pull Systems let downstream demand trigger upstream work \u2014 never push unready tasks onto the crew.",
+          "Percent Plan Complete (PPC) measures planning reliability, not just productivity.",
+          "Takt Time Planning synchronizes trade handoffs so work flows continuously without waiting.",
+          "Constraint Analysis finds blockers before they hit the site \u2014 the foundation of reliable planning.",
+          "Muda (Waste): Overproduction is the worst form of waste because it generates all other wastes.",
+          "Visual Management makes work status visible to everyone \u2014 if you can see it, you can manage it.",
+          "Continuous Improvement (Kaizen): Small daily gains on site compound into transformational project outcomes."
+        ];
+        var el=document.getElementById("splash-tip-text");
+        if(el) el.textContent=tips[Math.floor(Math.random()*tips.length)];
+      })();
+    </script>
     <style>
       @keyframes splash-wobble { 0%,100%{transform:rotate(0deg)} 25%{transform:rotate(10deg)} 75%{transform:rotate(-10deg)} }
       @keyframes splash-pulse { 0%,100%{opacity:0.2;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
+      @keyframes splash-fade-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
       .splash-dot{width:10px;height:10px;border-radius:50%;background:#3b82f6;animation:splash-pulse 1.2s ease-in-out infinite;}
     </style>
     <div id="root"></div>
