@@ -3,7 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
 import { apiRequest } from '@/lib/queryClient';
-import { CheckCircle, XCircle, AlertTriangle, Award, TrendingUp, Users, Target, Lightbulb, BookOpen, ChevronDown, ChevronUp, Download, Trophy } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Award, TrendingUp, Users, Target, Lightbulb, BookOpen, ChevronDown, ChevronUp, Download, Trophy, BarChart3 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from 'recharts';
+import { AnimatedCounter, PerformanceGrade } from '@/components/game/AnimatedCounter';
 import { exportChapterReport } from '@/lib/exportPDF';
 
 interface Chapter2CompleteModalProps {
@@ -53,7 +55,8 @@ const DAY_INSIGHTS: Record<number, { title: string; concept: string; lesson: str
 };
 
 export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ isOpen, onClose, onContinue, quizScore }) => {
-    const { funds, lpi, weeklyPlan, columns, flags, playerName, dailyMetrics } = useGameStore();
+    const { funds, lpi, weeklyPlan, columns, flags, playerName, dailyMetrics: rawDailyMetrics } = useGameStore();
+    const dailyMetrics = rawDailyMetrics ?? [];
     const [animatedPPC, setAnimatedPPC] = useState(0);
     const [expandedDay, setExpandedDay] = useState<number | null>(null);
 
@@ -195,6 +198,7 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                 <div className="relative w-44 h-44">
                                     <svg className="w-44 h-44 transform -rotate-90">
                                         <circle cx="88" cy="88" r="74" stroke="#e5e7eb" strokeWidth="14" fill="none" />
+                                        <circle cx="88" cy="88" r="74" stroke="#22c55e" strokeWidth="14" fill="none" strokeLinecap="butt" strokeDasharray={`0 ${465 * 0.8 - 3} 6 ${465 * 0.2 - 3}`} strokeOpacity={0.5} />
                                         <motion.circle
                                             cx="88" cy="88" r="74"
                                             stroke={ppc >= 80 ? '#22c55e' : ppc >= 50 ? '#eab308' : '#ef4444'}
@@ -206,14 +210,37 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                         />
                                     </svg>
                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span className={`text-4xl font-black ${getPPCColor()}`}>{animatedPPC}%</span>
+                                        <AnimatedCounter target={ppc} className={`text-4xl font-black ${getPPCColor()}`} />
                                         <span className="text-slate-400 text-sm font-bold uppercase">PPC</span>
                                     </div>
                                 </div>
+                                <PerformanceGrade score={ppc} />
                                 <p className="text-slate-300 text-center mt-2">
                                     You promised <strong>{totalPromises}</strong> tasks and completed <strong>{completedPromises}</strong>.
                                 </p>
                                 <p className="text-slate-400 text-sm text-center mt-1 italic">{tier.desc}</p>
+                            </div>
+
+                            <div className="bg-slate-800/40 rounded-2xl border border-slate-700/50 p-4" data-testid="chart-ppc-daily">
+                                <h4 className="font-bold text-slate-300 text-sm uppercase mb-3 flex items-center gap-2">
+                                    <BarChart3 className="w-4 h-4" /> Commitment Reliability by Day
+                                </h4>
+                                <div className="h-44">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={dailyMetrics.filter(m => m.day >= 6 && m.day <= 11).map(m => ({ dayLabel: `Day ${m.day}`, efficiency: m.efficiency, day: m.day }))}>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                                            <XAxis dataKey="dayLabel" tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                                            <YAxis domain={[0, 100]} tick={{ fill: '#94a3b8', fontSize: 12 }} tickFormatter={(v: number) => `${v}%`} />
+                                            <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px', color: '#e2e8f0' }} formatter={(value: number) => [`${value}%`, 'Reliability']} />
+                                            <ReferenceLine y={80} stroke="#22c55e" strokeDasharray="5 5" label={{ value: 'Reliable Target (80%)', fill: '#22c55e', fontSize: 11, position: 'insideTopRight' }} />
+                                            <Bar dataKey="efficiency" radius={[4, 4, 0, 0]}>
+                                                {dailyMetrics.filter(m => m.day >= 6 && m.day <= 11).map((m, index) => (
+                                                    <Cell key={`cell-${index}`} fill={m.efficiency >= 80 ? '#22c55e' : m.efficiency >= 50 ? '#f59e0b' : '#ef4444'} />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </div>
 
                             <div className={`p-4 rounded-xl ${ppcLevel === 'excellent' ? 'bg-green-900/20 border border-green-500/30' :

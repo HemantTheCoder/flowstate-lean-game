@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Award, Target, Brain, ArrowRight, ShieldCheck, Flame, Medal, Truck, BarChart3 } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
+import { AnimatedCounter, PerformanceGrade } from '@/components/game/AnimatedCounter';
 import soundManager from '@/lib/soundManager';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -101,8 +102,9 @@ export const Chapter4CompleteModal: React.FC<Chapter4CompleteModalProps> = ({
                         <div className="flex-1 bg-slate-800/80 rounded-2xl p-6 border border-purple-500/30 flex flex-col items-center justify-center shadow-inner relative overflow-hidden">
                             <h3 className="text-sm font-bold text-purple-500 uppercase tracking-widest mb-2 z-10">Flow Efficiency</h3>
                             <div className="flex items-end justify-center gap-2 z-10 mb-1">
-                                <span className={`text-6xl font-black ${gradeInfo.color} drop-shadow-[0_0_15px_rgba(168,85,247,0.3)]`}>{lpi.flowEfficiency}%</span>
+                                <AnimatedCounter target={lpi.flowEfficiency} className={`text-6xl font-black ${gradeInfo.color} drop-shadow-[0_0_15px_rgba(168,85,247,0.3)]`} />
                             </div>
+                            <PerformanceGrade score={lpi.flowEfficiency} />
                             <span className={`text-sm font-black uppercase tracking-widest ${gradeInfo.color} px-3 py-1 bg-purple-950/50 rounded-full z-10 shadow-md border border-purple-500/20`}>
                                 {gradeInfo.phrase}
                             </span>
@@ -119,7 +121,15 @@ export const Chapter4CompleteModal: React.FC<Chapter4CompleteModalProps> = ({
                         </div>
                     </div>
 
-                    {/* Unlocked Badge */}
+                    <div className={`p-4 rounded-xl mb-6 border ${lpi.flowEfficiency >= 90 ? 'bg-green-900/20 border-green-500/30' : lpi.flowEfficiency >= 70 ? 'bg-blue-900/20 border-blue-500/30' : lpi.flowEfficiency >= 50 ? 'bg-amber-900/20 border-amber-500/30' : 'bg-red-900/20 border-red-500/30'}`} data-testid="text-performance-context">
+                        <p className={`text-sm font-bold ${lpi.flowEfficiency >= 90 ? 'text-green-300' : lpi.flowEfficiency >= 70 ? 'text-blue-300' : lpi.flowEfficiency >= 50 ? 'text-amber-300' : 'text-red-300'}`}>
+                            {lpi.flowEfficiency >= 90 ? "Outstanding! You've mastered Pull-based flow and JIT delivery. Supply chain fully synchronized."
+                                : lpi.flowEfficiency >= 70 ? "Good logistics management. The supply chain mostly aligned with demand, with some room for optimization."
+                                : lpi.flowEfficiency >= 50 ? "Acceptable flow, but JIT delivery timing could be tighter. Review trade sequencing."
+                                : "Significant supply chain waste detected. Focus on matching deliveries to actual demand, not forecasts."}
+                        </p>
+                    </div>
+
                     <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}

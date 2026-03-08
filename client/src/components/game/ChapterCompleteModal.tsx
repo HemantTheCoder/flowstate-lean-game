@@ -6,6 +6,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
 import { Play, CheckCircle2, AlertTriangle, TrendingUp, Target, Award, Lightbulb, ChevronRight, Zap, Users, Hammer, CloudRain, Shield, Download, Trophy } from 'lucide-react';
 import { exportChapterReport } from '@/lib/exportPDF';
+import { AnimatedCounter, PerformanceGrade } from '@/components/game/AnimatedCounter';
 
 interface DayBreakdown {
     day: number;
@@ -345,13 +346,25 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 className={`mt-4 px-6 py-2 rounded-full ${tier.bg} ${tier.border} border-2 flex items-center gap-2`}
                             >
                                 <TrendingUp className={`w-5 h-5 ${tier.color}`} />
-                                <span className={`font-black text-2xl ${tier.color}`}>{finalEfficiency}%</span>
+                                <AnimatedCounter target={finalEfficiency} className={`font-black text-2xl ${tier.color}`} />
                                 <span className="text-white/80 text-sm font-medium">Flow Score</span>
                             </motion.div>
-                            <p className={`mt-2 text-sm font-bold ${tier.color}`}>{tier.label}</p>
+                            <div className="flex items-center gap-3 mt-2">
+                                <p className={`text-sm font-bold ${tier.color}`}>{tier.label}</p>
+                                <PerformanceGrade score={finalEfficiency} />
+                            </div>
                         </div>
 
                         <div className="p-6 overflow-y-auto flex-1 space-y-5">
+
+                            <div className={`p-4 rounded-xl border ${finalEfficiency >= 90 ? 'bg-green-900/20 border-green-500/30' : finalEfficiency >= 70 ? 'bg-blue-900/20 border-blue-500/30' : finalEfficiency >= 50 ? 'bg-amber-900/20 border-amber-500/30' : 'bg-red-900/20 border-red-500/30'}`} data-testid="text-performance-context">
+                                <p className={`text-sm font-bold ${finalEfficiency >= 90 ? 'text-green-300' : finalEfficiency >= 70 ? 'text-blue-300' : finalEfficiency >= 50 ? 'text-amber-300' : 'text-red-300'}`}>
+                                    {finalEfficiency >= 90 ? "Outstanding! You've mastered Kanban flow management. WIP limits and pull systems are second nature."
+                                        : finalEfficiency >= 70 ? "Good work. You understand flow principles, but there's room to optimize WIP limits further."
+                                        : finalEfficiency >= 50 ? "You're learning. Review how WIP limits affect flow and try to adapt to daily constraints."
+                                        : "Flow was disrupted significantly. Focus on keeping WIP low and pulling only ready work."}
+                                </p>
+                            </div>
 
                             <BeforeAfterComparison pushed={pushed} />
 
@@ -391,6 +404,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                                 axisLine={false}
                                                 tickFormatter={(v) => `${v}%`}
                                             />
+                                            <ReferenceLine y={80} stroke="#f59e0b" strokeDasharray="5 5" strokeOpacity={0.6} label={{ value: 'Lean Target', fill: '#f59e0b', fontSize: 10, fontWeight: 600, position: 'right' }} />
                                             <ReferenceLine y={100} stroke="#22c55e" strokeDasharray="5 5" strokeOpacity={0.5} />
                                             <Tooltip
                                                 contentStyle={{

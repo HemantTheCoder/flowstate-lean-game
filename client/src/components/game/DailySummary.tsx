@@ -3,6 +3,7 @@ import { useGameStore } from '@/store/gameStore';
 import { motion } from 'framer-motion';
 import { TrendingUp, BookOpen, Lightbulb } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
+import { ResponsiveContainer, AreaChart, Area, ReferenceLine } from 'recharts';
 
 interface Props {
     isOpen: boolean;
@@ -97,7 +98,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
     const day = useGameStore(s => s.day);
     const chapter = useGameStore(s => s.chapter);
     const funds = useGameStore(s => s.funds);
-    const dailyMetrics = useGameStore(s => s.dailyMetrics);
+    const dailyMetrics = useGameStore(s => s.dailyMetrics) ?? [];
 
     useEffect(() => {
         if (isOpen) {
@@ -150,6 +151,50 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                             </div>
                         </div>
                     </div>
+
+                    {dailyMetrics.length >= 2 && (() => {
+                        const sparklineData = dailyMetrics.map(metric => ({ day: metric.day, eff: metric.efficiency }));
+                        const currentEff = dailyMetrics[dailyMetrics.length - 1].efficiency;
+                        const prevEff = dailyMetrics[dailyMetrics.length - 2].efficiency;
+                        const diff = currentEff - prevEff;
+                        const trendArrow = diff > 0 ? '\u2191' : diff < 0 ? '\u2193' : '\u2014';
+                        const trendColor = diff > 0 ? 'text-green-400' : diff < 0 ? 'text-red-400' : 'text-slate-400';
+                        const trendLabel = diff > 0 ? `+${diff}%` : diff < 0 ? `${diff}%` : '0%';
+
+                        return (
+                            <div data-testid="sparkline-trend">
+                                <div className={`text-xs ${trendColor} mb-1`}>
+                                    Trend: {trendArrow} {trendLabel}
+                                </div>
+                                <div className="h-20">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={sparklineData} margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
+                                            <defs>
+                                                <linearGradient id="sparklineGradient" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.6} />
+                                                    <stop offset="100%" stopColor="#06b6d4" stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <ReferenceLine y={80} stroke="#94a3b8" strokeDasharray="4 4" label={{ value: 'Target', fill: '#94a3b8', fontSize: 10, position: 'right' }} />
+                                            <Area
+                                                type="monotone"
+                                                dataKey="eff"
+                                                stroke="#06b6d4"
+                                                fill="url(#sparklineGradient)"
+                                                strokeWidth={2}
+                                                dot={(props: any) => {
+                                                    if (props.index === sparklineData.length - 1) {
+                                                        return <circle cx={props.cx} cy={props.cy} r={4} fill="#06b6d4" stroke="#fff" strokeWidth={2} />;
+                                                    }
+                                                    return <circle cx={0} cy={0} r={0} fill="none" />;
+                                                }}
+                                            />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        );
+                    })()}
 
                     {insight && (
                         <div className={`p-3 rounded-xl text-sm font-bold border ${dailyEfficiency >= 80 ? 'bg-green-900/20 border-green-500/30 text-green-300' : dailyEfficiency >= 50 ? 'bg-blue-900/20 border-blue-500/30 text-blue-300' : 'bg-orange-900/20 border-orange-500/30 text-orange-300'}`}>

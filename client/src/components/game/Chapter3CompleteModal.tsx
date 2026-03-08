@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Award, Target, Brain, ArrowRight, ShieldCheck, Flame, Medal } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
+import { AnimatedCounter, PerformanceGrade } from '@/components/game/AnimatedCounter';
 import soundManager from '@/lib/soundManager';
 import { apiRequest } from '@/lib/queryClient';
+import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from 'recharts';
 
 interface Chapter3CompleteModalProps {
     isOpen: boolean;
@@ -20,6 +22,7 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
     const depotScore = useGameStore(s => s.depotScore) || 0;
     const evaluate5S = useGameStore(s => s.evaluate5S);
     const playerName = useGameStore(s => s.playerName);
+    const dailyMetrics = (useGameStore(s => s.dailyMetrics) ?? []) as { day: number; efficiency: number }[];
 
     const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
@@ -100,13 +103,38 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
                         </p>
                     </div>
 
-                    <div className="flex flex-col md:flex-row gap-6 mb-8">
-                        {/* 5S Score Card */}
+                    <div className="bg-slate-800/40 rounded-2xl border border-amber-500/20 p-4 mb-6" data-testid="chart-5s-radar">
+                        <h3 className="text-sm font-bold text-amber-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <Target className="w-4 h-4" /> 5S Audit Breakdown
+                        </h3>
+                        <div className="h-56 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <RadarChart data={(() => {
+                                    const principles = ['Sort', 'Set in Order', 'Shine', 'Standardize', 'Sustain'];
+                                    const days = [12, 13, 14, 15, 16];
+                                    return principles.map((name, i) => {
+                                        const metric = dailyMetrics.find(m => m.day === days[i]);
+                                        return { principle: name, score: metric?.efficiency ?? 0, target: 80 };
+                                    });
+                                })()}>
+                                    <PolarGrid stroke="#334155" />
+                                    <PolarAngleAxis dataKey="principle" tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }} />
+                                    <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: '#475569', fontSize: 9 }} tickCount={5} />
+                                    <Radar name="Target" dataKey="target" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.08} strokeDasharray="4 4" strokeWidth={1.5} />
+                                    <Radar name="Your Score" dataKey="score" stroke="#22c55e" fill="#22c55e" fillOpacity={0.25} strokeWidth={2} dot={{ r: 4, fill: '#22c55e', stroke: '#fff', strokeWidth: 1 }} />
+                                    <Legend wrapperStyle={{ fontSize: '11px', fontWeight: 600 }} />
+                                </RadarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row gap-6 mb-6">
                         <div className="flex-1 bg-slate-800/80 rounded-2xl p-6 border border-amber-500/30 flex flex-col items-center justify-center shadow-inner relative overflow-hidden">
                             <h3 className="text-sm font-bold text-amber-500 uppercase tracking-widest mb-2 z-10">5S Audit Score</h3>
                             <div className="flex items-end justify-center gap-2 z-10 mb-1">
-                                <span className={`text-6xl font-black ${gradeInfo.color} drop-shadow-[0_0_15px_rgba(245,158,11,0.3)]`}>{finalScore}%</span>
+                                <AnimatedCounter target={finalScore} className={`text-6xl font-black ${gradeInfo.color} drop-shadow-[0_0_15px_rgba(245,158,11,0.3)]`} />
                             </div>
+                            <PerformanceGrade score={finalScore} />
                             <span className={`text-sm font-black uppercase tracking-widest ${gradeInfo.color} px-3 py-1 bg-amber-950/50 rounded-full z-10 shadow-md border border-amber-500/20`}>
                                 {gradeInfo.phrase}
                             </span>
@@ -123,7 +151,15 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
                         </div>
                     </div>
 
-                    {/* Unlocked Badge */}
+                    <div className={`p-4 rounded-xl mb-6 border ${finalScore >= 90 ? 'bg-green-900/20 border-green-500/30' : finalScore >= 70 ? 'bg-blue-900/20 border-blue-500/30' : finalScore >= 50 ? 'bg-amber-900/20 border-amber-500/30' : 'bg-red-900/20 border-red-500/30'}`} data-testid="text-performance-context">
+                        <p className={`text-sm font-bold ${finalScore >= 90 ? 'text-green-300' : finalScore >= 70 ? 'text-blue-300' : finalScore >= 50 ? 'text-amber-300' : 'text-red-300'}`}>
+                            {finalScore >= 90 ? "Outstanding! You've mastered the 5S principles. Your workspace is a model of efficiency."
+                                : finalScore >= 70 ? "Good work. The workspace is well-organized, but there's room to optimize further."
+                                : finalScore >= 50 ? "You're learning. Review the 5S concepts and focus on maintaining standards."
+                                : "This area needs attention. Re-read the 5S lessons and practice organizing more thoroughly."}
+                        </p>
+                    </div>
+
                     <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}

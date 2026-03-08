@@ -63,3 +63,14 @@ The project is a fullstack TypeScript application comprising a React frontend wi
 - **jsPDF:** Library for generating PDF documents.
 - **PostgreSQL:** Relational database for leaderboard and player data storage.
 - **Lucide:** Icon library (used for all UI icons).
+- **Recharts:** Chart library for visual metrics (RadarChart, BarChart, AreaChart, sparklines).
+
+## Visual Metrics System
+
+All chapter completion modals include enriched visual metrics:
+- **AnimatedCounter** (`client/src/components/game/AnimatedCounter.tsx`): Reusable component that counts from 0 to target value using requestAnimationFrame with easeOutCubic easing. Exports `AnimatedCounter` and `PerformanceGrade` (letter grade S/A/B/C/D with animated glow).
+- **Chapter 1 (ChapterCompleteModal)**: AreaChart with daily efficiency, 80% "Lean Target" benchmark line, AnimatedCounter, PerformanceGrade, performance context message.
+- **Chapter 2 (Chapter2CompleteModal)**: PPC circular gauge with 80% benchmark tick, AnimatedCounter, PerformanceGrade, day-by-day PPC BarChart with color-coded bars and 80% "Reliable Target" reference line.
+- **Chapter 3 (Chapter3CompleteModal)**: 5S RadarChart (5 axes: Sort/Set in Order/Shine/Standardize/Sustain) with target overlay polygon at 80%, AnimatedCounter, PerformanceGrade, performance context message.
+- **Chapter 4 (Chapter4CompleteModal)**: AnimatedCounter, PerformanceGrade, performance context message for Pull/JIT mastery.
+- **DailySummary**: Efficiency sparkline (AreaChart) showing day-over-day trend with current day highlighted dot, trend arrow indicator (↑/↓/—), and 80% target reference line. Only shown when ≥2 days of data exist.
