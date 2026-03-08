@@ -24,6 +24,7 @@ import { CoastalView } from '@/components/game/case2/CoastalView';
 import { ChapterCompleteModal } from '@/components/game/ChapterCompleteModal';
 import { Chapter2CompleteModal } from '@/components/game/Chapter2CompleteModal';
 import { Chapter3CompleteModal } from '@/components/game/Chapter3CompleteModal';
+import { Chapter4CompleteModal } from '@/components/game/Chapter4CompleteModal';
 import { SettingsModal } from '@/components/game/SettingsModal';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
@@ -126,8 +127,8 @@ export default function Game() {
     if (!flags['character_created']) {
       navigate('/chapters');
     }
-    // Prevent unauthorized access to Case Studies 
-    if (chapter >= 4 && !flags['admin_unlocked']) {
+    // Prevent unauthorized access to Case Studies (Chapter 5 remains locked)
+    if (chapter >= 5 && !flags['admin_unlocked']) {
       navigate('/chapters');
     }
   }, [flags, navigate, isServerLoading, gameState, isInitializing, chapter]);
@@ -156,6 +157,16 @@ export default function Game() {
   const handleChapter3Continue = async () => {
     try {
       useGameStore.getState().completeChapter(3);
+      await handleSave(true);
+      navigate('/chapters');
+    } catch (e: any) {
+      console.error("Transition Error:", e);
+    }
+  };
+
+  const handleChapter4Continue = async () => {
+    try {
+      useGameStore.getState().completeChapter(4);
       await handleSave(true);
       navigate('/chapters');
     } catch (e: any) {
@@ -1266,6 +1277,14 @@ export default function Game() {
           isOpen={true}
           onClose={() => setShowChapterComplete(false)}
           onContinue={handleChapter3Continue}
+          quizScore={quizScore}
+        />
+      )}
+      {showChapterComplete && chapter === 4 && (
+        <Chapter4CompleteModal
+          isOpen={true}
+          onClose={() => setShowChapterComplete(false)}
+          onContinue={handleChapter4Continue}
           quizScore={quizScore}
         />
       )}

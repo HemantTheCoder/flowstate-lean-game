@@ -473,6 +473,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         pdi: 0,
         reworkRate: 0,
         lives: finalLives,
+        tutorialStep: state.flags['chapter4_tutorial_seen'] ? 0 : 20,
+        tutorialActive: !state.flags['chapter4_tutorial_seen'],
         flags: { ...state.flags, case_intro_seen: false, character_cast_seen: true, chapter_intro_seen: true, game_over: false }
       };
     }
