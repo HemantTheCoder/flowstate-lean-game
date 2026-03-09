@@ -595,11 +595,11 @@ export default function Game() {
 
   const triggerPushDecision = () => {
     setDecisionProps({
-      title: "Rao's Ultimatum",
-      prompt: "Rao is furious about the client visit. He wants to push unready tasks to 'Doing' to look busy. This violates WIP limits.",
+      title: "Rajiv's Ultimatum",
+      prompt: "Rajiv is furious about the client visit. He wants to push unready tasks to 'Doing' to look busy. This violates WIP limits.",
       options: [
-        { id: 'push', text: "Allow Push (Risky)", type: 'risky', description: "Morale drops, but Rao is happy. Generates Waste." },
-        { id: 'pull', text: "Enforce Pull (Safe)", type: 'safe', description: "Rao is angry, but Flow remains stable." }
+        { id: 'push', text: "Allow Push (Risky)", type: 'risky', description: "Morale drops, but Rajiv is happy. Generates Waste." },
+        { id: 'pull', text: "Enforce Pull (Safe)", type: 'safe', description: "Rajiv is angry, but Flow remains stable." }
       ],
       onSelect: (id: string) => {
         if (id === 'push') {
@@ -1020,9 +1020,9 @@ export default function Game() {
       // Prioritize the decision advice logic specific to the choice made
       if (flags['decision_pull_enforced']) {
         if (doingCount === 0 && readyCount === 0) {
-          return "Flow Protected. Rao is annoyed, but the site is stable. Click 'End Day'.";
+          return "Flow Protected. Rajiv is annoyed, but the site is stable. Click 'End Day'.";
         }
-        return "Good Choice! Now, ONLY pull work if you have space. Don't let Rao pressure you.";
+        return "Good Choice! Now, ONLY pull work if you have space. Don't let Rajiv pressure you.";
       }
 
       if (flags['decision_push_made']) {
@@ -1036,7 +1036,7 @@ export default function Game() {
       }
 
       if (!state.flags.decision_push_made && !state.flags.decision_pull_enforced) {
-        return "DISCIPLINE: Rao wants to push. Wait for the key decision.";
+        return "DISCIPLINE: Rajiv wants to push. Wait for the key decision.";
       }
     }
 

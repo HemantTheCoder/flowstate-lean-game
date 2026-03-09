@@ -36,7 +36,7 @@ export const WEEK_2_SCHEDULE: DayConfig[] = [
     {
         day: 7,
         title: "Constraint Discovery",
-        description: "The Anil reveals that half the planned tasks have hidden blockers.",
+        description: "Anil reveals that half the planned tasks have hidden blockers.",
         lesson: "Concept: Constraints — The reasons tasks fail.",
         dialogue: [
             { character: 'Old Foreman', text: "Morning, Engineer. I spent last night reviewing your Lookahead plan.", emotion: 'neutral' },

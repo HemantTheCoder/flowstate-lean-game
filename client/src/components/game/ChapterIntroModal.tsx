@@ -20,7 +20,7 @@ export const ChapterIntroModal: React.FC = () => {
         1: {
             title: "The Jam at Juniper Pier",
             subtitle: "Chapter 1: Flow vs. Chaos",
-            description: "You are the new Lean Engineer. The project is behind schedule, over budget, and chaotic. Manager Rajiv wants to 'Push' harder, but that only creates waste.",
+            description: "You are the new Lean Engineer. The project is behind schedule, over budget, and chaotic. Site Supervisor Rajiv wants to 'Push' harder, but that only creates waste.",
             objectives: [
                 "MISSION: Stabilize the project before the Client Inspector arrives on Day 5.",
                 "LEARN: Manage WIP Limits to stop 'Starvation' and 'Bottlenecks'.",
