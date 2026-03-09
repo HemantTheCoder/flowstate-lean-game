@@ -226,7 +226,7 @@ export const CharacterCreationModal: React.FC = () => {
                         transition={{ type: "spring", bounce: 0.25, duration: 0.6 }}
                         className="bg-slate-900/90 backdrop-blur-2xl w-full max-w-lg rounded-3xl shadow-[0_0_80px_-15px_rgba(59,130,246,0.15)] border border-blue-500/20 flex flex-col overflow-hidden max-h-[90vh]"
                     >
-                        <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-slate-900 p-6 md:p-8 relative overflow-hidden shrink-0 border-b border-blue-500/20">
+                        <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-slate-900 p-4 md:p-6 relative overflow-hidden shrink-0 border-b border-blue-500/20">
                             <div className="absolute inset-0 opacity-20 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
                             {hasExistingProfile && (
                                 <button
@@ -255,7 +255,7 @@ export const CharacterCreationModal: React.FC = () => {
                             </motion.div>
                         </div>
 
-                        <div className="p-6 md:p-8 space-y-8 overflow-y-auto custom-scrollbar">
+                        <div className="p-4 md:p-6 space-y-4 md:space-y-6 overflow-y-auto custom-scrollbar">
                             <motion.div
                                 initial={{ x: -15, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
@@ -272,7 +272,7 @@ export const CharacterCreationModal: React.FC = () => {
                                     onChange={(e) => setName(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
                                     data-testid="input-player-name"
-                                    className="w-full bg-slate-950/50 border border-slate-700/50 focus:border-blue-500 rounded-xl px-5 py-4 text-white text-lg font-bold outline-none placeholder-slate-600 transition-all shadow-inner focus:shadow-[0_0_20px_rgba(59,130,246,0.1)]"
+                                    className="w-full bg-slate-950/50 border border-slate-700/50 focus:border-blue-500 rounded-xl px-4 py-3 text-white text-base md:text-lg font-bold outline-none placeholder-slate-600 transition-all shadow-inner focus:shadow-[0_0_20px_rgba(59,130,246,0.1)]"
                                     placeholder="Enter Name..."
                                     autoFocus
                                 />
@@ -292,9 +292,9 @@ export const CharacterCreationModal: React.FC = () => {
                                     <button
                                         onClick={() => setGender('male')}
                                         data-testid="button-gender-male"
-                                        className={`flex-1 p-4 rounded-2xl border transition-all duration-300 flex flex-col items-center gap-3 ${gender === 'male' ? 'bg-blue-900/20 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.15)]' : 'bg-slate-950/40 border-slate-800/50 hover:border-slate-700 hover:bg-slate-900'}`}
+                                        className={`flex-1 p-3 rounded-2xl border transition-all duration-300 flex flex-col items-center gap-2 ${gender === 'male' ? 'bg-blue-900/20 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.15)]' : 'bg-slate-950/40 border-slate-800/50 hover:border-slate-700 hover:bg-slate-900'}`}
                                     >
-                                        <div className={`w-16 h-16 rounded-full overflow-hidden border-2 transition-all duration-300 ${gender === 'male' ? 'border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'border-slate-700'}`}>
+                                        <div className={`w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-300 ${gender === 'male' ? 'border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'border-slate-700'}`}>
                                             <img
                                                 src={maleAvatarSrc}
                                                 alt="Male architect avatar"
@@ -306,9 +306,9 @@ export const CharacterCreationModal: React.FC = () => {
                                     <button
                                         onClick={() => setGender('female')}
                                         data-testid="button-gender-female"
-                                        className={`flex-1 p-4 rounded-2xl border transition-all duration-300 flex flex-col items-center gap-3 ${gender === 'female' ? 'bg-indigo-900/20 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.15)]' : 'bg-slate-950/40 border-slate-800/50 hover:border-slate-700 hover:bg-slate-900'}`}
+                                        className={`flex-1 p-3 rounded-2xl border transition-all duration-300 flex flex-col items-center gap-2 ${gender === 'female' ? 'bg-indigo-900/20 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.15)]' : 'bg-slate-950/40 border-slate-800/50 hover:border-slate-700 hover:bg-slate-900'}`}
                                     >
-                                        <div className={`w-16 h-16 rounded-full overflow-hidden border-2 transition-all duration-300 ${gender === 'female' ? 'border-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.5)]' : 'border-slate-700'}`}>
+                                        <div className={`w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-300 ${gender === 'female' ? 'border-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.5)]' : 'border-slate-700'}`}>
                                             <img
                                                 src={femaleAvatarSrc}
                                                 alt="Female architect avatar"
@@ -327,9 +327,9 @@ export const CharacterCreationModal: React.FC = () => {
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     transition={{ duration: 0.3 }}
-                                    className="flex flex-col items-center gap-3 py-2"
+                                    className="flex flex-col items-center gap-2 py-1"
                                 >
-                                    <div className={`w-24 h-24 rounded-full overflow-hidden border-3 shadow-lg ${gender === 'female' ? 'border-indigo-400/60 shadow-indigo-500/20' : 'border-blue-400/60 shadow-blue-500/20'}`}>
+                                    <div className={`w-16 h-16 rounded-full overflow-hidden border-3 shadow-lg ${gender === 'female' ? 'border-indigo-400/60 shadow-indigo-500/20' : 'border-blue-400/60 shadow-blue-500/20'}`}>
                                         <motion.img
                                             src={gender === 'female' ? femaleAvatarSrc : maleAvatarSrc}
                                             alt="Selected avatar preview"
@@ -352,7 +352,7 @@ export const CharacterCreationModal: React.FC = () => {
                                 onClick={handleConfirm}
                                 disabled={!name.trim()}
                                 data-testid="button-start-simulation"
-                                className="w-full bg-blue-600/20 hover:bg-blue-500 text-blue-400 hover:text-white border border-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600/20 disabled:hover:text-blue-400 font-bold py-4 rounded-xl text-sm uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] active:scale-[0.98]"
+                                className="w-full bg-blue-600/20 hover:bg-blue-500 text-blue-400 hover:text-white border border-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600/20 disabled:hover:text-blue-400 font-bold py-3 md:py-4 rounded-xl text-sm uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] active:scale-[0.98]"
                             >
                                 Start Simulation
                             </motion.button>

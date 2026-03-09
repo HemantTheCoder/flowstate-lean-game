@@ -85,19 +85,19 @@ const BeforeAfterComparison: React.FC<{ pushed: boolean }> = ({ pushed }) => {
 const CharacterReactions: React.FC<{ pushed: boolean; efficiency: number }> = ({ pushed, efficiency }) => {
     const reactions = [
         {
-            name: 'Mira',
+            name: 'Ranjit',
             text: efficiency >= 80
                 ? "See how limiting work helped everything move?"
                 : "We have room to improve, but the system works.",
             color: 'bg-blue-900/20 border-blue-500/30 text-blue-300'
         },
         {
-            name: 'Old Foreman',
+            name: 'Anil',
             text: "Finish beats busy. Always has, always will.",
             color: 'bg-amber-900/20 border-amber-500/30 text-amber-300'
         },
         {
-            name: 'Rao',
+            name: 'Rajiv',
             text: pushed
                 ? "Fine. Maybe pushing wasn't the answer. But I still want results!"
                 : "I hate to admit it... the site IS calmer. And the Inspector was impressed.",
@@ -361,8 +361,8 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 <p className={`text-sm font-bold ${finalEfficiency >= 90 ? 'text-green-300' : finalEfficiency >= 70 ? 'text-blue-300' : finalEfficiency >= 50 ? 'text-amber-300' : 'text-red-300'}`}>
                                     {finalEfficiency >= 90 ? "Outstanding! You've mastered Kanban flow management. WIP limits and pull systems are second nature."
                                         : finalEfficiency >= 70 ? "Good work. You understand flow principles, but there's room to optimize WIP limits further."
-                                        : finalEfficiency >= 50 ? "You're learning. Review how WIP limits affect flow and try to adapt to daily constraints."
-                                        : "Flow was disrupted significantly. Focus on keeping WIP low and pulling only ready work."}
+                                            : finalEfficiency >= 50 ? "You're learning. Review how WIP limits affect flow and try to adapt to daily constraints."
+                                                : "Flow was disrupted significantly. Focus on keeping WIP low and pulling only ready work."}
                                 </p>
                             </div>
 

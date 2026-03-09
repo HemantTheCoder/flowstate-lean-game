@@ -20,7 +20,7 @@ export const ChapterIntroModal: React.FC = () => {
         1: {
             title: "The Jam at Juniper Pier",
             subtitle: "Chapter 1: Flow vs. Chaos",
-            description: "You are the new Lean Engineer. The project is behind schedule, over budget, and chaotic. Manager Rao wants to 'Push' harder, but that only creates waste.",
+            description: "You are the new Lean Engineer. The project is behind schedule, over budget, and chaotic. Manager Rajiv wants to 'Push' harder, but that only creates waste.",
             objectives: [
                 "MISSION: Stabilize the project before the Client Inspector arrives on Day 5.",
                 "LEARN: Manage WIP Limits to stop 'Starvation' and 'Bottlenecks'.",
@@ -131,10 +131,10 @@ export const ChapterIntroModal: React.FC = () => {
                             {content.objectives.map((obj, i) => (
                                 <li key={i} className="flex items-center gap-3 text-slate-300 font-medium">
                                     <div className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-xs font-bold ${chapter === 5 ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' :
-                                            chapter === 4 ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' :
-                                                chapter === 3 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                                                    chapter === 2 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                                                        'bg-blue-500/20 text-blue-400 border border-blue-500/30'}
+                                        chapter === 4 ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' :
+                                            chapter === 3 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                                                chapter === 2 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                                                    'bg-blue-500/20 text-blue-400 border border-blue-500/30'}
                                     `}>
                                         {i + 1}
                                     </div>

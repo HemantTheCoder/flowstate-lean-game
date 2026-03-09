@@ -36,7 +36,7 @@ const CHAPTER_1_QUESTIONS: Question[] = [
   },
   {
     id: 'push-vs-pull',
-    text: "On Day 4, Rao wanted to 'Push' workers to look busy for the Inspector. Why is this harmful?",
+    text: "On Day 4, Rajiv wanted to 'Push' workers to look busy for the Inspector. Why is this harmful?",
     options: [
       { id: 'a', text: 'It costs too much money', isCorrect: false },
       { id: 'b', text: "Workers don't like being told what to do", isCorrect: false },
