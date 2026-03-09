@@ -103,7 +103,7 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
                       <img
                         src={`/assets/${imagePath}`}
                         alt={character.name}
-                        className={`w-16 h-16 md:w-24 md:h-24 object-cover ${charId === 'Mira' ? 'object-[center_15%]' : 'object-top'} rounded-full border-2 border-slate-600/50 drop-shadow-lg bg-slate-900/50`}
+                        className={`w-16 h-16 md:w-24 md:h-24 object-cover ${charId === 'Mira' ? 'object-bottom' : 'object-top'} rounded-full border-2 border-slate-600/50 drop-shadow-lg bg-slate-900/50`}
                       />
                       <p className="text-white font-bold mt-2 md:mt-3 text-xs md:text-sm">{character.name}</p>
                       <p className="text-blue-400 text-[10px] md:text-xs">{character.role}</p>
