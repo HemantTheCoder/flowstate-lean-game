@@ -76,42 +76,42 @@ export default function Home() {
         <div className="absolute top-0 right-0 w-[200%] h-[200%] rotate-45 bg-gradient-to-t from-transparent via-cyan-500/[0.03] to-transparent transform -translate-x-[50%] -translate-y-[50%]" />
       </div>
 
-      <div className="absolute top-4 right-4 z-50">
+      <div className="absolute top-6 right-6 z-50">
         {!user ? (
           <Link href="/auth">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="group flex items-center gap-2 px-3 py-2 bg-slate-900/80 backdrop-blur-xl border border-slate-700/50 rounded-xl text-slate-300 hover:text-white hover:border-cyan-500/50 transition-all shadow-lg"
+              className="group flex items-center gap-3 px-5 py-3 bg-slate-900/80 backdrop-blur-xl border border-slate-700/50 rounded-2xl text-slate-300 hover:text-white hover:border-cyan-500/50 transition-all shadow-xl"
             >
-              <div className="p-1.5 rounded-md bg-slate-800 border border-slate-700 group-hover:bg-slate-700 transition-colors">
-                <User className="w-3.5 h-3.5 text-cyan-400" />
+              <div className="p-2 rounded-xl bg-slate-800 border border-slate-700 group-hover:bg-slate-700 transition-colors">
+                <User className="w-4 h-4 text-cyan-400" />
               </div>
-              <div className="flex flex-col items-start leading-none">
-                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Portal</span>
-                <span className="text-[10px] font-bold uppercase tracking-tight">Login</span>
+              <div className="flex flex-col items-start leading-tight">
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Architect</span>
+                <span className="text-xs font-bold uppercase">Login Portal</span>
               </div>
             </motion.button>
           </Link>
         ) : (
-          <div className="flex items-center gap-2">
-            {/* Compact Authenticated User Status */}
+          <div className="flex items-center gap-3">
+            {/* Streamlined Authenticated User Status */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               onClick={() => setLocation('/profile')}
-              className="flex items-center gap-2 px-3 py-2 bg-slate-900/80 backdrop-blur-xl border border-cyan-500/20 rounded-xl text-white shadow-lg group hover:border-cyan-500/40 transition-all"
+              className="flex items-center gap-3 px-5 py-2.5 bg-slate-900/80 backdrop-blur-xl border border-cyan-500/20 rounded-2xl text-white shadow-xl group hover:border-cyan-500/40 transition-all"
             >
-              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
-                <User className="w-4 h-4 text-cyan-400" />
+              <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                <User className="w-4.5 h-4.5 text-cyan-400" />
               </div>
-              <div className="flex flex-col items-start leading-none pr-1">
-                <span className="text-[7px] font-black text-cyan-500 uppercase tracking-widest">Architect</span>
-                <span className="text-[11px] font-bold uppercase tracking-tight truncate max-w-[80px]">{user.username}</span>
+              <div className="flex flex-col items-start leading-tight pr-1">
+                <span className="text-[8px] font-black text-cyan-500 uppercase tracking-widest">Architect</span>
+                <span className="text-sm font-bold uppercase tracking-tight">{user.username}</span>
               </div>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-cyan-400 transition-all" />
+              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-all" />
             </motion.button>
 
-            {/* Compact Logout Button */}
+            {/* Logout Button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -119,10 +119,10 @@ export default function Home() {
                 soundManager.playSFX('click');
                 logoutMutation.mutate();
               }}
-              className="p-2 bg-slate-900/80 backdrop-blur-xl border border-red-500/20 rounded-xl text-red-400 hover:text-red-300 hover:border-red-500/40 transition-all shadow-lg"
+              className="p-3 bg-slate-900/80 backdrop-blur-xl border border-red-500/20 rounded-2xl text-red-400 hover:text-red-300 hover:border-red-500/40 transition-all shadow-xl"
               title="Logout"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-5 h-5" />
             </motion.button>
           </div>
         )}
