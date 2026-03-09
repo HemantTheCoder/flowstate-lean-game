@@ -45,7 +45,7 @@ export const PullSystemDashboard: React.FC = () => {
             </div>
 
             {/* Left Column: Pull Board (Kanban limits and flow) */}
-            <div className={`flex-1 bg-slate-900/40 backdrop-blur-md border border-slate-700/50 rounded-2xl flex flex-col overflow-hidden ${(activeTab === 'board' || typeof window !== 'undefined' && window.innerWidth >= 768) ? 'flex' : 'hidden md:flex'}`}>
+            <div id="pull-board-title" className={`flex-1 bg-slate-900/40 backdrop-blur-md border border-slate-700/50 rounded-2xl flex flex-col overflow-hidden ${(activeTab === 'board' || typeof window !== 'undefined' && window.innerWidth >= 768) ? 'flex' : 'hidden md:flex'}`}>
                 {/* Header */}
                 <div className="p-4 border-b border-white/5 bg-gradient-to-r from-indigo-900/40 to-transparent flex items-center gap-3">
                     <div className="p-2 bg-indigo-500/20 rounded-xl">
@@ -79,7 +79,7 @@ export const PullSystemDashboard: React.FC = () => {
             </div>
 
             {/* Right Column: JIT Scheduler (Logistics and inventory) */}
-            <div className={`w-full md:w-[350px] bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl flex flex-col overflow-hidden shadow-2xl ${(activeTab === 'scheduler' || typeof window !== 'undefined' && window.innerWidth >= 768) ? 'flex' : 'hidden md:flex'}`}>
+            <div id="jit-scheduler-title" className={`w-full md:w-[350px] bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl flex flex-col overflow-hidden shadow-2xl ${(activeTab === 'scheduler' || typeof window !== 'undefined' && window.innerWidth >= 768) ? 'flex' : 'hidden md:flex'}`}>
                 <div className="p-4 border-b border-white/5 bg-gradient-to-r from-emerald-900/40 to-transparent flex items-center gap-3">
                     <div className="p-2 bg-emerald-500/20 rounded-xl">
                         <Package className="w-5 h-5 text-emerald-400" />

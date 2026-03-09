@@ -56,6 +56,10 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
             if (tutorialStep === 8) targetId = 'lives-box';
             if (tutorialStep === 9) targetId = 'btn-save';
 
+            // Chapter 4 Target IDs
+            if (tutorialStep === 20) targetId = 'pull-board-title'; // Needs to exist in PullBoard UI
+            if (tutorialStep === 21) targetId = 'jit-scheduler-title'; // Needs to exist in JITScheduler UI
+
             if (targetId) {
                 const el = document.getElementById(targetId);
                 if (el) {

@@ -8,9 +8,9 @@ export const CHAPTER_3_SCHEDULE: DayConfig[] = [
         lesson: "Concept: Sort — If you don't use it, Red Tag it.",
         dialogue: [
             { character: 'Rao', text: "Where is my power drill? I had it here five minutes ago!", emotion: 'angry' },
-            { character: 'Mira', text: "Look at this floor, Rao. It's covered in scrap metal, empty pallets, and... is that a broken saw?", emotion: 'stressed' },
+            { character: 'Mira', text: "Look at this floor, Rajiv. It's covered in scrap metal, empty pallets, and... is that a broken saw?", emotion: 'stressed' },
             { character: 'Rao', text: "It's a construction site, not a palace! We work, we move on!", emotion: 'angry' },
-            { character: 'Advisor', text: "Wait. Rao is right that we move fast, but Mira is right that the mess is slowing us down.", emotion: 'neutral' },
+            { character: 'Advisor', text: "Wait. Rajiv is right that we move fast, but Ranjit is right that the mess is slowing us down.", emotion: 'neutral' },
             { character: 'Advisor', text: "If we can't find tools, we aren't working. If we trip over trash, we're in danger.", emotion: 'neutral' },
             { character: 'Advisor', text: "Today, we Sort. If it's broken or useless, it goes to the Red Tag Area.", emotion: 'happy' }
         ],
@@ -29,7 +29,7 @@ export const CHAPTER_3_SCHEDULE: DayConfig[] = [
             { character: 'Advisor', text: "That's Seiton. 'A place for everything, and everything in its place.'", emotion: 'happy' },
             { character: 'Mira', text: "I've labeled the Material Requisition zone and the Shadow Board for the tools.", emotion: 'happy' },
             { character: 'Rao', text: "Labels? I know where a hammer goes!", emotion: 'angry' },
-            { character: 'Advisor', text: "Maybe you do, Rao. But does the new guy? Visual management means anyone can find anything in 30 seconds.", emotion: 'neutral' }
+            { character: 'Advisor', text: "Maybe you do, Rajiv. But does the new guy? Visual management means anyone can find anything in 30 seconds.", emotion: 'neutral' }
         ],
         briefing: {
             objective: "Organize the Depot.",

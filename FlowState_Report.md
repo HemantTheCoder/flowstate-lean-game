@@ -54,26 +54,36 @@ FlowState uses a **"learn by doing"** pedagogical approach structured around fou
 
 ---
 
-### Chapter 4: Pull Systems & JIT — "Midfield Terminal" (Days 1–12)
+### Chapter 4: Pull Systems & JIT — "Midfield Terminal" (Days 17–28)
 
 **What It Teaches:** Pull-based material flow, Just-In-Time delivery, the Bullwhip Effect, demand smoothing, safety buffers, and takt time planning.
 
-**Gameplay:** A three-panel logistics dashboard introduces supply chain management. The Pull Board lets players set WIP limits per trade (Carpentry, Finishing, Electrical) using sliders, with visual Kanban cards showing capacity. The JIT Scheduler allows ordering materials with specific lead times and costs, with options to expedite shipments at 1.5x cost or set safety buffer levels. A Site Map Overlay visualizes three airport zones (Baggage Claim, Security Hall, VIP Lounges) with strict storage capacities — exceeding them triggers overcapacity penalties. Day 3 simulates the Bullwhip Effect when the crew over-orders materials; Day 4 introduces a supply shock (truck breakdown) testing whether safety buffers hold.
+**Gameplay:** A three-panel logistics dashboard introduces supply chain management. The Pull Board lets players set WIP limits per trade (Carpentry, Finishing, Electrical) using sliders, with visual Kanban cards showing capacity. The JIT Scheduler allows ordering materials with specific lead times and costs, with options to expedite shipments at 1.5x cost or set safety buffer levels. A Site Map Overlay visualizes three airport zones (Baggage Claim, Security Hall, VIP Lounges) with strict storage capacities — exceeding them triggers overcapacity penalties. Day 19 (formerly Day 3) simulates the Bullwhip Effect when the crew over-orders materials; Day 20 (formerly Day 4) introduces a supply shock (truck breakdown) testing whether safety buffers hold.
 
 **Key Learning Outcomes:** Matching deliveries to actual demand rather than forecasts; understanding that smaller, more frequent deliveries improve flow; balancing protection against variability with the waste of excess inventory.
+
+---
+
+### Chapter 5: Heijunka & Takt — "The Vertical City" (Coming Soon)
+
+**What It Teaches:** Production leveling (Heijunka), Takt Time planning, Yamazumi balancing, and rhythmic production cycles.
+
+**Gameplay:** Players will manage a "Production Train" in a high-rise residential project. Instead of managing individual tasks, players must balance the speed of different trades (Drywall, Electrical, Plumbing, Painting) to match a calculated Takt Time based on the client's completion deadline. A Heijunka Box interface will be used to distribute complex tasks evenly across the work week, avoiding the "hurry up and wait" cycles of traditional construction.
+
+**Key Learning Outcomes:** Calculating Takt Time based on customer demand; implementing Heijunka for stability; recognizing how rhythmic production reduces stress and improves quality.
 
 ---
 
 ## Unique Features
 
 | Feature | Description |
-|---|---|
+| --- | --- |
 | **Visual Novel Narrative** | Story-driven learning with recurring characters (Mira, Rao, Isha) who embody Lean vs. traditional thinking through animated dialogue with emotion states |
-| **Four Unique Gameplay Systems** | Each chapter features its own interactive mechanic (Kanban board, Planning Room, Depot Organizer, Logistics Dashboard) rather than repeating a single format |
+| **Unique Gameplay Systems** | Each chapter features its own interactive mechanic (Kanban board, Planning Room, Depot Organizer, Logistics Dashboard, Heijunka Box) |
 | **Real-Time Performance Metrics** | Animated counters track Flow Efficiency, PPC, Team Morale, WIP Compliance, and Bullwhip Index with live visual feedback |
-| **Performance Grading & Badges** | Letter grades (S through D) with animated effects, plus unlockable achievement badges (Flow Master, Promise Keeper, 5S Auditor, JIT Strategist) |
+| **Performance Grading & Badges** | Letter grades (S through D) with animated effects, plus unlockable achievement badges (Flow Master, Promise Keeper, 5S Auditor, JIT Strategist, Takt Master) |
 | **Exportable PDF Reports** | One-click generation of detailed performance reports with day-by-day breakdowns, key decisions, and learnings for each chapter |
-| **Global Leaderboard** | Competitive ranking system tracking total score, efficiency, and PPC across all players |
+| **Global Leaderboard & Rewards** | Competitive ranking system with seasonal rewards for top-ranked architects |
 | **Progressive Web App** | Installable on mobile and desktop with offline support, enabling learning anywhere |
 | **Dual Save System** | Automatic progress saving via local storage (guest) and cloud database (registered users) with full resume capability |
 | **Knowledge Check Quizzes** | End-of-chapter reflection quizzes testing core principles, with scores factored into the final grade |
@@ -82,7 +92,7 @@ FlowState uses a **"learn by doing"** pedagogical approach structured around fou
 
 ## Technical Stack
 
-Built with React, TypeScript, Express.js, PostgreSQL, Phaser 3, Zustand (state management), Tailwind CSS, and Framer Motion. The application runs as a full-stack web app with PWA capabilities and procedurally generated sound effects via the Web Audio API.
+Built with React, TypeScript, Vite, Express.js, PostgreSQL, Phaser 3, Zustand (state management), Tailwind CSS, and Framer Motion. The application runs as a full-stack web app with PWA capabilities and procedurally generated sound effects via the Web Audio API.
 
 ---
 

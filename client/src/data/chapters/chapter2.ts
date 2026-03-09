@@ -36,7 +36,7 @@ export const WEEK_2_SCHEDULE: DayConfig[] = [
     {
         day: 7,
         title: "Constraint Discovery",
-        description: "The Foreman reveals that half the planned tasks have hidden blockers.",
+        description: "The Anil reveals that half the planned tasks have hidden blockers.",
         lesson: "Concept: Constraints — The reasons tasks fail.",
         dialogue: [
             { character: 'Old Foreman', text: "Morning, Engineer. I spent last night reviewing your Lookahead plan.", emotion: 'neutral' },
@@ -74,7 +74,7 @@ export const WEEK_2_SCHEDULE: DayConfig[] = [
     {
         day: 9,
         title: "The Weekly Promise",
-        description: "Rao demands a commitment. The Client adds pressure. What will you promise?",
+        description: "Rajiv demands a commitment. The Client adds pressure. What will you promise?",
         lesson: "Concept: Weekly Work Plan — Only promise what you CAN deliver.",
         dialogue: [
             { character: 'Rao', text: "Enough planning! I need a commitment. What WILL be done by Friday? Give me a number!", emotion: 'angry' },
@@ -148,7 +148,7 @@ export const PPC_AVERAGE: DialogueLine[] = [
 export const PPC_BAD: DialogueLine[] = [
     { character: 'Inspector', text: "This is concerning. More than half your promises were broken. The team cannot rely on your plans.", emotion: 'angry' },
     { character: 'Rao', text: "I told you to commit more! Now we look unreliable AND slow!", emotion: 'angry' },
-    { character: 'Engineer', text: "That's the trap, Rao. You pushed me to promise more than we could deliver. That's exactly why PPC exists - to expose overcommitment.", emotion: 'stressed' },
+    { character: 'Engineer', text: "That's the trap, Rajiv. You pushed me to promise more than we could deliver. That's exactly why PPC exists - to expose overcommitment.", emotion: 'stressed' },
     { character: 'Mira', text: "When PPC is low, every trade downstream suffers. The electricians waited for walls that weren't ready. The tilers waited for plumbing that wasn't done.", emotion: 'stressed' },
     { character: 'Advisor', text: "Overcommitment is the #1 enemy of reliable planning. Next time, promise LESS and deliver MORE. A smaller plan that's 100% complete is better than a big plan that's 40% complete.", emotion: 'neutral' }
 ];

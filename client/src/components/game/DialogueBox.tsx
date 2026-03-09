@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 import { LeanTooltipText } from './LeanTooltip';
+import { CHARACTERS } from '@/data/characters';
 
 export const DialogueBox: React.FC = () => {
     const { currentDialogue, dialogueIndex, advanceDialogue, playerName, playerGender, weeklyPlan, columns, lpi } = useGameStore();
@@ -31,7 +32,7 @@ export const DialogueBox: React.FC = () => {
     const isPlayer = line.character === 'Engineer' || line.character === 'Architect';
 
     // Dynamic Name Display
-    const displayName = isPlayer ? playerName : line.character;
+    const displayName = isPlayer ? playerName : (CHARACTERS[line.character]?.name || line.character);
 
     const colorMap: Record<string, string> = {
         'Engineer': 'bg-blue-500',

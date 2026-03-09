@@ -24,133 +24,157 @@ interface ChapterReportData {
 export function exportChapterReport(data: ChapterReportData): void {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
-  let y = 20;
+  const pageHeight = doc.internal.pageSize.getHeight();
+  let y = 15;
 
-  doc.setFontSize(24);
+  doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
   doc.text('FLOWSTATE', pageWidth / 2, y, { align: 'center' });
-  y += 8;
-  doc.setFontSize(12);
+  y += 6;
+  doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.text('Performance Report', pageWidth / 2, y, { align: 'center' });
-  y += 12;
+  y += 8;
 
   doc.setDrawColor(200, 200, 200);
-  doc.line(20, y, pageWidth - 20, y);
-  y += 10;
+  doc.line(15, y, pageWidth - 15, y);
+  y += 6;
 
-  doc.setFontSize(11);
+  doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  doc.text(`Player: ${data.playerName}`, 20, y);
-  y += 7;
-  doc.text(`Chapter ${data.chapter}: ${data.chapterTitle}`, 20, y);
-  y += 7;
-  doc.setFont('helvetica', 'normal');
-  doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, y);
-  y += 12;
-
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Performance Summary', 20, y);
-  y += 8;
-
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`Final Efficiency: ${data.finalEfficiency}%`, 25, y);
-  y += 7;
-  if (data.ppc !== undefined) {
-    doc.text(`PPC (Percent Plan Complete): ${data.ppc}%`, 25, y);
-    y += 7;
-  }
-  if (data.quizScore !== undefined && data.quizTotal !== undefined) {
-    doc.text(`Quiz Score: ${data.quizScore} / ${data.quizTotal}`, 25, y);
-    y += 7;
-  }
+  doc.text(`Player: ${data.playerName}`, 15, y);
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 50, y);
   y += 5;
+  doc.text(`Chapter ${data.chapter}: ${data.chapterTitle}`, 15, y);
+  y += 8;
 
-  doc.setFontSize(14);
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('Day-by-Day Breakdown', 20, y);
-  y += 8;
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.setFillColor(240, 240, 240);
-  doc.rect(20, y - 4, pageWidth - 40, 7, 'F');
-  doc.text('Day', 22, y);
-  doc.text('Tasks', 45, y);
-  doc.text('Capacity', 65, y);
-  doc.text('Daily Eff.', 90, y);
-  doc.text('Cumul. Eff.', 115, y);
-  doc.text('Insight', 145, y);
-  y += 8;
-
-  doc.setFont('helvetica', 'normal');
-  data.dailyMetrics.forEach(m => {
-    if (y > 270) {
-      doc.addPage();
-      y = 20;
-    }
-    doc.text(`${m.day}`, 22, y);
-    doc.text(`${m.tasksCompletedToday}`, 45, y);
-    doc.text(`${m.potentialCapacity}`, 65, y);
-    doc.text(`${m.efficiency}%`, 90, y);
-    doc.text(`${m.cumulativeEfficiency}%`, 115, y);
-    const truncatedInsight = m.insight.length > 30 ? m.insight.substring(0, 30) + '...' : m.insight;
-    doc.text(truncatedInsight, 145, y);
-    y += 6;
-  });
-  y += 8;
-
-  if (data.keyDecisions && data.keyDecisions.length > 0) {
-    if (y > 250) { doc.addPage(); y = 20; }
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Key Decisions', 20, y);
-    y += 8;
-
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    data.keyDecisions.forEach(d => {
-      const marker = d.outcome === 'good' ? '[+]' : '[-]';
-      doc.text(`${marker} ${d.label}`, 25, y);
-      y += 6;
-    });
-    y += 5;
-  }
-
-  if (y > 240) { doc.addPage(); y = 20; }
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Key Learnings', 20, y);
-  y += 8;
+  doc.text('Performance Summary', 15, y);
+  y += 6;
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  data.keyLearnings.forEach(lesson => {
-    if (y > 275) { doc.addPage(); y = 20; }
-    const lines = doc.splitTextToSize(`- ${lesson}`, pageWidth - 45);
-    doc.text(lines, 25, y);
-    y += lines.length * 5 + 2;
-  });
+  doc.text(`Final Efficiency: ${data.finalEfficiency}%`, 20, y);
   y += 5;
+  if (data.ppc !== undefined) {
+    doc.text(`PPC: ${data.ppc}%`, 20, y);
+    y += 5;
+  }
+  if (data.quizScore !== undefined && data.quizTotal !== undefined) {
+    doc.text(`Quiz: ${data.quizScore} / ${data.quizTotal}`, 20, y);
+    y += 5;
+  }
+  y += 3;
 
-  if (data.badges && data.badges.length > 0) {
-    if (y > 260) { doc.addPage(); y = 20; }
-    doc.setFontSize(14);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Day-by-Day Breakdown', 15, y);
+  y += 6;
+
+  // Table Headers
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.setFillColor(245, 245, 245);
+  doc.rect(15, y - 4, pageWidth - 30, 6, 'F');
+
+  const colX = {
+    day: 17,
+    tasks: 28,
+    capacity: 45,
+    dailyEff: 65,
+    cumulEff: 85,
+    insight: 105
+  };
+
+  doc.text('Day', colX.day, y);
+  doc.text('Tasks', colX.tasks, y);
+  doc.text('Capacity', colX.capacity, y);
+  doc.text('Daily Eff.', colX.dailyEff, y);
+  doc.text('Cumul.', colX.cumulEff, y);
+  doc.text('Insight', colX.insight, y);
+  y += 6;
+
+  // Table Content
+  doc.setFont('helvetica', 'normal');
+  data.dailyMetrics.forEach(m => {
+    if (y > pageHeight - 15) {
+      doc.addPage();
+      y = 15;
+    }
+    doc.text(`${m.day}`, colX.day, y);
+    doc.text(`${m.tasksCompletedToday}`, colX.tasks, y);
+    doc.text(`${m.potentialCapacity}`, colX.capacity, y);
+    doc.text(`${m.efficiency}%`, colX.dailyEff, y);
+    doc.text(`${m.cumulativeEfficiency}%`, colX.cumulEff, y);
+
+    const insightLines = doc.splitTextToSize(m.insight, pageWidth - colX.insight - 15);
+    doc.text(insightLines, colX.insight, y);
+
+    const rowHeight = Math.max(5, insightLines.length * 4);
+    y += rowHeight;
+  });
+  y += 4;
+
+  if (data.keyDecisions && data.keyDecisions.length > 0) {
+    if (y > pageHeight - 25) { doc.addPage(); y = 15; }
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text('Badges Earned', 20, y);
-    y += 8;
+    doc.text('Key Decisions', 15, y);
+    y += 6;
 
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text(data.badges.join(', '), 25, y);
-    y += 10;
+    data.keyDecisions.forEach(d => {
+      const marker = d.outcome === 'good' ? '[+]' : '[-]';
+      const lines = doc.splitTextToSize(`${marker} ${d.label}`, pageWidth - 35);
+      if (y + (lines.length * 4) > pageHeight - 15) { doc.addPage(); y = 15; }
+      doc.text(lines, 20, y);
+      y += lines.length * 4 + 1;
+    });
+    y += 4;
   }
 
-  doc.setFontSize(8);
-  doc.setTextColor(150, 150, 150);
-  doc.text('Generated by FLOWSTATE - Saga of the Flow Architect', pageWidth / 2, 285, { align: 'center' });
+  if (y > pageHeight - 25) { doc.addPage(); y = 15; }
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Key Learnings', 15, y);
+  y += 6;
+
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  data.keyLearnings.forEach(lesson => {
+    const lines = doc.splitTextToSize(`- ${lesson}`, pageWidth - 35);
+    if (y + (lines.length * 4) > pageHeight - 15) { doc.addPage(); y = 15; }
+    doc.text(lines, 20, y);
+    y += lines.length * 4 + 1;
+  });
+  y += 4;
+
+  if (data.badges && data.badges.length > 0) {
+    if (y > pageHeight - 25) { doc.addPage(); y = 15; }
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Badges Earned', 15, y);
+    y += 6;
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    const badgeLines = doc.splitTextToSize(data.badges.join(', '), pageWidth - 35);
+    if (y + (badgeLines.length * 4) > pageHeight - 15) { doc.addPage(); y = 15; }
+    doc.text(badgeLines, 20, y);
+    y += badgeLines.length * 4 + 4;
+  }
+
+  // Footer & Page Numbers
+  const pageCount = (doc as any).internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text(`Page ${i} of ${pageCount}`, pageWidth - 25, pageHeight - 8);
+    doc.text('Generated by FLOWSTATE - Saga of the Flow Architect', pageWidth / 2, pageHeight - 8, { align: 'center' });
+  }
 
   doc.save(`FLOWSTATE_Chapter${data.chapter}_Report.pdf`);
 }

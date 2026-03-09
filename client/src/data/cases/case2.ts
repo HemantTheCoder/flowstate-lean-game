@@ -51,7 +51,7 @@ export const CASE_2_SCHEDULE: DayConfig[] = [
         lesson: "Concept: Catching up vs Standard Work.",
         dialogue: [
             { character: 'Rao', text: "We lost nearly a whole day! Double the truck orders!", emotion: 'angry' },
-            { character: 'Engineer', text: "No, Rao. That will cause a traffic collapse. We return to standard work.", emotion: 'neutral' }
+            { character: 'Engineer', text: "No, Rajiv. That will cause a traffic collapse. We return to standard work.", emotion: 'neutral' }
         ],
         briefing: {
             objective: "Resist the Rush.",
@@ -163,7 +163,7 @@ export const CASE_2_SCHEDULE: DayConfig[] = [
         dialogue: [
             { character: 'Inspector', text: "I'm here for a core sample on the new asphalt.", emotion: 'neutral' },
             { character: 'Rao', text: "But we haven't finished rolling it yet!", emotion: 'stressed' },
-            { character: 'Engineer', text: "If we followed standard procedures, the quality will be there, Rao.", emotion: 'neutral' }
+            { character: 'Engineer', text: "If we followed standard procedures, the quality will be there, Rajiv.", emotion: 'neutral' }
         ],
         event: 'inspection',
         briefing: {

@@ -11,7 +11,7 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         dialogue: [
             { character: 'Mira', text: "Welcome to Juniper Pier, Engineer. The project is behind schedule. We have two weeks until the grand opening.", emotion: 'stressed' },
             { character: 'Rao', text: "My teams are working at 100% capacity! Look at the number of active work fronts!", emotion: 'angry' },
-            { character: 'Engineer', text: "Excessive active fronts lead to congestion, Rao. We need to focus on handover and throughput, not just activity.", emotion: 'neutral' },
+            { character: 'Engineer', text: "Excessive active fronts lead to congestion, Rajiv. We need to focus on handover and throughput, not just activity.", emotion: 'neutral' },
             { character: 'Engineer', text: "We will implement a Kanban system to limit our Work In Progress (WIP). This will stabilize the site and improve our cycle time.", emotion: 'happy' }
         ],
         briefing: {
@@ -27,7 +27,7 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         dialogue: [
             { character: 'Mira', text: "Bad news. The concrete mixer is stuck on the highway—overturned truck blocking three lanes.", emotion: 'stressed' },
             { character: 'Rao', text: "What?! The men are standing around! This idle time is a disaster!", emotion: 'angry' },
-            { character: 'Engineer', text: "Calm down, Rao. This is 'Resource Starvation'—a classic supply chain failure.", emotion: 'neutral' },
+            { character: 'Engineer', text: "Calm down, Rajiv. This is 'Resource Starvation'—a classic supply chain failure.", emotion: 'neutral' },
             { character: 'Engineer', text: "In a Push system, we'd panic. But in a Pull system, we pivot to tasks that don't need the delayed material.", emotion: 'neutral' },
             { character: 'Mira', text: "We have site surveys and safety inspections pending. Zero material cost.", emotion: 'neutral' },
             { character: 'Engineer', text: "Exactly. Pull those into the queue. We maintain value-added activity while we wait.", emotion: 'happy' }
@@ -60,11 +60,11 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
     {
         day: 4,
         title: "The Push to Finish",
-        description: "Rao wants to rush tasks to look good for the client.",
+        description: "Rajiv wants to rush tasks to look good for the client.",
         lesson: "Concept: Push vs Pull.",
         dialogue: [
             { character: 'Rao', text: "The Client's Chief Inspector is coming tomorrow! I walked the site—it looks empty!", emotion: 'angry' },
-            { character: 'Mira', text: "We are prepping drainage, Rao. Use your eyes. Digging now creates a mud pit.", emotion: 'stressed' },
+            { character: 'Mira', text: "We are prepping drainage, Rajiv. Use your eyes. Digging now creates a mud pit.", emotion: 'stressed' },
             { character: 'Rao', text: "I don't care about mud! I care about optics! If the Inspector sees idle workers, we are fired!", emotion: 'angry' },
             { character: 'Rao', text: "PUSH everyone to the South Lawn! Make it look busy! Now!", emotion: 'angry' },
             { character: 'Engineer', text: "That's false demand. Pushing unready work creates 'Waste'—rework later.", emotion: 'neutral' },
@@ -73,7 +73,7 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         event: 'decision_push',
         briefing: {
             objective: "Resist Pressure.",
-            action: "Rao wants to 'Push'. REFUSE him! Choose 'Pull' logic to keep the site clean for the Inspector."
+            action: "Rajiv wants to 'Push'. REFUSE him! Choose 'Pull' logic to keep the site clean for the Inspector."
         }
     },
     {
@@ -96,7 +96,7 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
 export const DAY_5_GOOD: DialogueLine[] = [
     { character: 'Inspector', text: "I see a clean site. No piles of material blocking paths. Workers are focused.", emotion: 'happy' },
     { character: 'Rao', text: "Yes! exactly as planned! We run a tight ship!", emotion: 'happy' },
-    { character: 'Inspector', text: "Your Lead Engineer deserves credit, Rao. They resisted the urge to clutter the site for show.", emotion: 'happy' },
+    { character: 'Inspector', text: "Your Lead Engineer deserves credit, Rajiv. They resisted the urge to clutter the site for show.", emotion: 'happy' },
     { character: 'Inspector', text: "This is true 'Flow'. Phase 1 is officially APPROVED.", emotion: 'happy' },
     { character: 'Mira', text: "Look around! The crew is happy, the site is safe, and we actually finished the foundation ahead of schedule.", emotion: 'happy' },
     { character: 'Engineer', text: "Thank you. Flow is about finishing, not just starting.", emotion: 'happy' },

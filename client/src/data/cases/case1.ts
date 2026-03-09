@@ -9,7 +9,7 @@ export const CASE_1_SCHEDULE: DayConfig[] = [
         dialogue: [
             { character: 'Mira', text: "Welcome to the Terminal T-Upgrade, Engineer. We have 12 days to complete a staged opening.", emotion: 'neutral' },
             { character: 'Rao', text: "It's impossible! We only have one access road and two freight elevators. How do we move anything?!", emotion: 'stressed' },
-            { character: 'Engineer', text: "By using flow principles and JIT delivery, Rao. We can't use the apron as a dumping ground.", emotion: 'neutral' },
+            { character: 'Engineer', text: "By using flow principles and JIT delivery, Rajiv. We can't use the apron as a dumping ground.", emotion: 'neutral' },
             { character: 'Engineer', text: "We need to schedule hoist slots strictly and keep the passenger zones clear. Disruption is our biggest risk.", emotion: 'neutral' }
         ],
         briefing: {
@@ -137,7 +137,7 @@ export const CASE_1_SCHEDULE: DayConfig[] = [
         lesson: "Concept: Pulling to Completion.",
         dialogue: [
             { character: 'Rao', text: "We are so close! Let's work double shifts!", emotion: 'happy' },
-            { character: 'Engineer', text: "Only if the work is ready, Rao. Overproduction now will just create bottlenecks at commissioning.", emotion: 'neutral' }
+            { character: 'Engineer', text: "Only if the work is ready, Rajiv. Overproduction now will just create bottlenecks at commissioning.", emotion: 'neutral' }
         ],
         briefing: {
             objective: "Stay Disciplined.",
