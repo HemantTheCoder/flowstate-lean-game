@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Trophy, User, Users, Settings, ExternalLink, HardHat, Info, MessageSquare, Terminal } from 'lucide-react';
+import { Play, Trophy, User, Users, Settings, ExternalLink, HardHat, Info, MessageSquare, Terminal, LogOut, ChevronRight } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
+import { useAuth } from '@/hooks/use-auth';
+import { useLocation } from 'wouter';
 
 import { ComingSoonModal } from '../components/game/ComingSoonModal';
 import { AuthModal } from '@/components/ui/AuthModal';
@@ -23,6 +25,8 @@ const buttonVariants = {
 };
 
 export default function Home() {
+  const { user, logoutMutation } = useAuth();
+  const [, setLocation] = useLocation();
   const [pendingFeature, setPendingFeature] = useState<'multiplayer' | null>(null);
   const [showCaseStudies, setShowCaseStudies] = useState(false);
 
@@ -72,8 +76,56 @@ export default function Home() {
         <div className="absolute top-0 right-0 w-[200%] h-[200%] rotate-45 bg-gradient-to-t from-transparent via-cyan-500/[0.03] to-transparent transform -translate-x-[50%] -translate-y-[50%]" />
       </div>
 
-      <div className="absolute top-6 right-6 z-50">
-        <AuthModal />
+      <div className="absolute top-4 right-4 z-50">
+        {!user ? (
+          <Link href="/auth">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="group flex items-center gap-2 px-3 py-2 bg-slate-900/80 backdrop-blur-xl border border-slate-700/50 rounded-xl text-slate-300 hover:text-white hover:border-cyan-500/50 transition-all shadow-lg"
+            >
+              <div className="p-1.5 rounded-md bg-slate-800 border border-slate-700 group-hover:bg-slate-700 transition-colors">
+                <User className="w-3.5 h-3.5 text-cyan-400" />
+              </div>
+              <div className="flex flex-col items-start leading-none">
+                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Portal</span>
+                <span className="text-[10px] font-bold uppercase tracking-tight">Login</span>
+              </div>
+            </motion.button>
+          </Link>
+        ) : (
+          <div className="flex items-center gap-2">
+            {/* Compact Authenticated User Status */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              onClick={() => setLocation('/profile')}
+              className="flex items-center gap-2 px-3 py-2 bg-slate-900/80 backdrop-blur-xl border border-cyan-500/20 rounded-xl text-white shadow-lg group hover:border-cyan-500/40 transition-all"
+            >
+              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                <User className="w-4 h-4 text-cyan-400" />
+              </div>
+              <div className="flex flex-col items-start leading-none pr-1">
+                <span className="text-[7px] font-black text-cyan-500 uppercase tracking-widest">Architect</span>
+                <span className="text-[11px] font-bold uppercase tracking-tight truncate max-w-[80px]">{user.username}</span>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-cyan-400 transition-all" />
+            </motion.button>
+
+            {/* Compact Logout Button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                soundManager.playSFX('click');
+                logoutMutation.mutate();
+              }}
+              className="p-2 bg-slate-900/80 backdrop-blur-xl border border-red-500/20 rounded-xl text-red-400 hover:text-red-300 hover:border-red-500/40 transition-all shadow-lg"
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4" />
+            </motion.button>
+          </div>
+        )}
       </div>
 
       {/* Main Content Container - Visual Novel Title Screen Layout */}

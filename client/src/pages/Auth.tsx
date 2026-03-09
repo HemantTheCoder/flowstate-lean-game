@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, HardHat, ArrowLeft, ShieldCheck, UserPlus, LogIn } from "lucide-react";
+import { Loader2, HardHat, ArrowLeft, ShieldCheck, UserPlus, LogIn, Sparkles } from "lucide-react";
 import { useLocation } from "wouter";
 import soundManager from "@/lib/soundManager";
 
@@ -23,7 +23,7 @@ export default function AuthPage() {
     useEffect(() => {
         // Redir if already logged in
         if (user) {
-            setLocation("/profile");
+            setLocation("/");
         }
     }, [user, setLocation]);
 
@@ -33,7 +33,7 @@ export default function AuthPage() {
         loginMutation.mutate({ username, password }, {
             onSuccess: () => {
                 toast({ title: "Welcome back!", description: "You are now logged in." });
-                setLocation("/profile");
+                setLocation("/");
             },
             onError: (error: Error) => {
                 toast({ title: "Login failed", description: error.message, variant: "destructive" });
@@ -47,7 +47,7 @@ export default function AuthPage() {
         registerMutation.mutate({ username, password }, {
             onSuccess: () => {
                 toast({ title: "Account created!", description: "You are now logged in." });
-                setLocation("/profile");
+                setLocation("/");
             },
             onError: (error: Error) => {
                 toast({ title: "Registration failed", description: error.message, variant: "destructive" });
@@ -57,99 +57,132 @@ export default function AuthPage() {
 
     if (isAuthLoading) {
         return (
-            <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-                <Loader2 className="w-12 h-12 text-cyan-500 animate-spin" />
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-[url('/assets/bg_title_screen.png')] bg-cover opacity-10 grayscale scale-110" />
+                <div className="relative flex flex-col items-center gap-4">
+                    <Loader2 className="w-16 h-16 text-cyan-500 animate-spin" />
+                    <span className="text-cyan-400 font-black text-xs uppercase tracking-[0.3em]">Syncing Data...</span>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
+        <div className="min-h-screen w-full relative flex items-center justify-center overflow-hidden bg-slate-950 px-4 md:px-0 font-sans">
 
-            {/* Dark Industrial Background with Gradients */}
-            <div className="absolute inset-0 pointer-events-none z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/10 blur-[120px] rounded-full" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-cyan-500/10 blur-[120px] rounded-full" />
-                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
+            {/* Dark Construction Site Background */}
+            <div className="absolute inset-0 z-0">
+                <div
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 scale-105"
+                    style={{ backgroundImage: "url('/assets/construction_bg.png')" }}
+                />
+                {/* Heavy Gradient Overlays for Visibility */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-slate-950 via-slate-950/90 to-slate-900/40" />
+                <div className="absolute inset-0 bg-slate-950/20 backdrop-blur-[2px]" />
+                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10" />
             </div>
 
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="w-full max-w-md z-10"
-            >
-                {/* Back Button */}
+            {/* Subtle Particles */}
+            <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
+                {Array.from({ length: 15 }).map((_, i) => (
+                    <motion.div
+                        key={i}
+                        initial={{
+                            x: Math.random() * 100 + "%",
+                            y: "110%",
+                            opacity: 0,
+                        }}
+                        animate={{
+                            y: "-10%",
+                            opacity: [0, 0.2, 0],
+                        }}
+                        transition={{
+                            duration: Math.random() * 20 + 15,
+                            repeat: Infinity,
+                            delay: Math.random() * 10,
+                            ease: "linear"
+                        }}
+                        className="absolute w-1 h-1 rounded-full bg-cyan-400/20"
+                    />
+                ))}
+            </div>
+
+            {/* Back Button */}
+            <div className="absolute top-8 left-8 z-50">
                 <button
                     onClick={() => setLocation("/")}
-                    className="flex items-center gap-2 text-slate-500 hover:text-cyan-400 transition-colors mb-8 group"
+                    className="group flex items-center gap-3 px-5 py-2.5 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-xl text-slate-300 transition-all hover:text-white hover:border-cyan-500/50 hover:bg-slate-800"
                 >
                     <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                    <span className="text-xs font-bold uppercase tracking-widest">Back to Title</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Return to Site</span>
                 </button>
+            </div>
 
-                <div className="bg-slate-900/60 backdrop-blur-2xl border border-slate-800 rounded-3xl shadow-2xl overflow-hidden shadow-cyan-500/5">
+            {/* Main Auth Container */}
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="relative z-20 w-full max-w-md mx-auto"
+            >
+                <div className="bg-slate-900/80 backdrop-blur-2xl border border-slate-700/50 rounded-[2.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden">
 
                     {/* Header Branding */}
-                    <div className="bg-slate-900/80 p-8 text-center border-b border-slate-800">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-800 mb-4 border border-slate-700 shadow-inner">
-                            <HardHat className="w-8 h-8 text-cyan-400" />
+                    <div className="p-10 text-center border-b border-white/5 bg-white/[0.02]">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-950/50 border border-white/10 mb-6 group transition-all hover:border-cyan-500/30">
+                            <HardHat className="w-8 h-8 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]" />
                         </div>
-                        <h1 className="text-2xl font-black text-white tracking-tight">FLOW<span className="text-cyan-400">STATE</span></h1>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mt-1">Lean Construction Portal</p>
+
+                        <h1 className="text-4xl font-black text-white tracking-tighter mb-1">
+                            FLOW<span className="text-cyan-400">STATE</span>
+                        </h1>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Lean Engineering Portal</p>
                     </div>
 
-                    <div className="p-8">
+                    <div className="p-10 pt-8">
                         <Tabs defaultValue="login" className="w-full" onValueChange={setActiveTab}>
-                            <TabsList className="grid w-full grid-cols-2 bg-slate-950 border border-slate-800/50 p-1 rounded-xl mb-8">
+                            <TabsList className="grid w-full grid-cols-2 bg-slate-950 border border-white/5 p-1 rounded-2xl mb-10">
                                 <TabsTrigger
                                     value="login"
-                                    className="rounded-lg data-[state=active]:bg-slate-800 data-[state=active]:text-white font-bold text-xs uppercase tracking-widest transition-all"
+                                    className="rounded-xl data-[state=active]:bg-cyan-600 data-[state=active]:text-white font-bold text-[10px] uppercase tracking-widest transition-all py-3"
                                 >
-                                    Log In
+                                    Login
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="register"
-                                    className="rounded-lg data-[state=active]:bg-slate-800 data-[state=active]:text-white font-bold text-xs uppercase tracking-widest transition-all"
+                                    className="rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white font-bold text-[10px] uppercase tracking-widest transition-all py-3"
                                 >
-                                    Create Account
+                                    Register
                                 </TabsTrigger>
                             </TabsList>
 
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
-                                    initial={{ opacity: 0, x: 10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -10 }}
+                                    initial={{ opacity: 0, scale: 0.98 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.98 }}
                                     transition={{ duration: 0.2 }}
                                 >
                                     {activeTab === "login" ? (
                                         <form onSubmit={handleLogin} className="space-y-6">
-                                            <div className="space-y-4 text-center mb-6">
-                                                <h2 className="text-xl font-bold text-slate-200">Welcome Back</h2>
-                                                <p className="text-sm text-slate-500 leading-relaxed">Continue your journey as a Lean Architect and sync your progress to the cloud.</p>
-                                            </div>
-
                                             <div className="space-y-4">
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="username" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Username</Label>
+                                                    <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Architect Username</Label>
                                                     <Input
-                                                        id="username"
-                                                        placeholder="Enter your username"
-                                                        className="bg-slate-950 border-slate-800 focus:border-cyan-500/50 h-12 text-slate-200"
+                                                        placeholder="Enter username"
+                                                        className="bg-slate-950 border-slate-800 focus:border-cyan-500/50 h-14 rounded-xl text-white placeholder:text-slate-700 px-5 text-sm transition-all"
                                                         value={username}
                                                         onChange={(e) => setUsername(e.target.value)}
                                                         required
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="password" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Password</Label>
+                                                    <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Security Key</Label>
                                                     <Input
-                                                        id="password"
                                                         type="password"
                                                         placeholder="••••••••"
-                                                        className="bg-slate-950 border-slate-800 focus:border-cyan-500/50 h-12 text-slate-200"
+                                                        className="bg-slate-950 border-slate-800 focus:border-cyan-500/50 h-14 rounded-xl text-white placeholder:text-slate-700 px-5 text-sm transition-all"
                                                         value={password}
                                                         onChange={(e) => setPassword(e.target.value)}
                                                         required
@@ -159,45 +192,38 @@ export default function AuthPage() {
 
                                             <Button
                                                 type="submit"
-                                                className="w-full py-6 bg-cyan-600 hover:bg-cyan-500 text-white font-black uppercase tracking-widest text-xs relative overflow-hidden group shadow-lg shadow-cyan-900/20"
+                                                className="w-full h-14 bg-cyan-600 hover:bg-cyan-500 text-white font-black uppercase tracking-widest text-[10px] rounded-xl shadow-lg shadow-cyan-900/20 active:scale-[0.98] transition-all"
                                                 disabled={loginMutation.isPending}
                                             >
                                                 {loginMutation.isPending ? (
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    <Loader2 className="w-5 h-5 animate-spin" />
                                                 ) : (
-                                                    <span className="flex items-center gap-2">
+                                                    <span className="flex items-center gap-3">
                                                         <LogIn className="w-4 h-4" />
-                                                        Verify Identity
+                                                        Verify Access
                                                     </span>
                                                 )}
                                             </Button>
                                         </form>
                                     ) : (
                                         <form onSubmit={handleRegister} className="space-y-6">
-                                            <div className="space-y-4 text-center mb-6">
-                                                <h2 className="text-xl font-bold text-slate-200">Initialize Profile</h2>
-                                                <p className="text-sm text-slate-500 leading-relaxed">Create a persistent architectural profile to secure your career metrics and leaderboard standing.</p>
-                                            </div>
-
                                             <div className="space-y-4">
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="username-reg" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Architect Username</Label>
+                                                    <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">New Architect Code</Label>
                                                     <Input
-                                                        id="username-reg"
-                                                        placeholder="How should the crew call you?"
-                                                        className="bg-slate-950 border-slate-800 focus:border-indigo-500/50 h-12 text-slate-200"
+                                                        placeholder="Create username"
+                                                        className="bg-slate-950 border-slate-800 focus:border-indigo-500/50 h-14 rounded-xl text-white placeholder:text-slate-700 px-5 text-sm transition-all"
                                                         value={username}
                                                         onChange={(e) => setUsername(e.target.value)}
                                                         required
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="password-reg" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Security Key</Label>
+                                                    <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Profile Passphrase</Label>
                                                     <Input
-                                                        id="password-reg"
                                                         type="password"
-                                                        placeholder="Choose a strong password"
-                                                        className="bg-slate-950 border-slate-800 focus:border-indigo-500/50 h-12 text-slate-200"
+                                                        placeholder="Choose password"
+                                                        className="bg-slate-950 border-slate-800 focus:border-indigo-500/50 h-14 rounded-xl text-white placeholder:text-slate-700 px-5 text-sm transition-all"
                                                         value={password}
                                                         onChange={(e) => setPassword(e.target.value)}
                                                         required
@@ -207,15 +233,15 @@ export default function AuthPage() {
 
                                             <Button
                                                 type="submit"
-                                                className="w-full py-6 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-xs relative overflow-hidden group shadow-lg shadow-indigo-900/20"
+                                                className="w-full h-14 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-[10px] rounded-xl shadow-lg shadow-indigo-900/20 active:scale-[0.98] transition-all"
                                                 disabled={registerMutation.isPending}
                                             >
                                                 {registerMutation.isPending ? (
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    <Loader2 className="w-5 h-5 animate-spin" />
                                                 ) : (
-                                                    <span className="flex items-center gap-2">
+                                                    <span className="flex items-center gap-3">
                                                         <UserPlus className="w-4 h-4" />
-                                                        Confirm Registration
+                                                        Confirm Profile
                                                     </span>
                                                 )}
                                             </Button>
@@ -226,17 +252,16 @@ export default function AuthPage() {
                         </Tabs>
                     </div>
 
-                    <div className="bg-slate-950/80 p-6 flex items-center justify-center gap-2 border-t border-slate-800">
-                        <ShieldCheck className="w-4 h-4 text-slate-600" />
-                        <span className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">Encrypted Cloud Access Active</span>
+                    {/* Footer Status */}
+                    <div className="bg-slate-950/80 p-6 flex items-center justify-center gap-2 border-t border-white/5">
+                        <ShieldCheck className="w-4 h-4 text-emerald-500/50" />
+                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.3em]">Encrypted Session Enabled</span>
                     </div>
                 </div>
 
-                <div className="mt-8 text-center">
-                    <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest leading-relaxed">
-                        By initializing access, you agree to comply with<br />site security & data management protocols.
-                    </p>
-                </div>
+                <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest text-center mt-8 opacity-50">
+                    By accessing, you agree to Site Safety & Data Protocols.
+                </p>
             </motion.div>
         </div>
     );

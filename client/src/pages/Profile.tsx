@@ -158,8 +158,14 @@ export default function Profile() {
                         ) : (
                             <button
                                 onClick={() => setLocation('/auth')}
-                                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-xl transition-colors text-xs font-bold uppercase tracking-widest text-cyan-400"
+                                className="flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-cyan-600/20 to-indigo-600/20 hover:from-cyan-600/30 hover:to-indigo-600/30 border border-cyan-500/30 hover:border-cyan-400 rounded-2xl transition-all text-xs font-black uppercase tracking-[0.2em] text-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.1)] group"
                             >
+                                <motion.div
+                                    animate={{ rotate: [0, 10, -10, 0] }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                >
+                                    <Sparkles className="w-4 h-4 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
+                                </motion.div>
                                 Create Account to Auto-Save
                             </button>
                         )}
