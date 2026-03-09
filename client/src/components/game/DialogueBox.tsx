@@ -44,7 +44,8 @@ export const DialogueBox: React.FC = () => {
         'Foreman': 'bg-slate-600',
         'Advisor': 'bg-indigo-500',
         'Client': 'bg-rose-600',
-        'Inspector': 'bg-rose-600'
+        'Inspector': 'bg-amber-600',
+        'Owner': 'bg-fuchsia-700'
     };
 
     const bgColor = colorMap[line.character] || 'bg-slate-700';
@@ -58,9 +59,10 @@ export const DialogueBox: React.FC = () => {
         'Isha': 'isha.jpg',
         'Foreman': 'foreman.jpg',
         'Old Foreman': 'foreman.jpg',
-        'Advisor': 'advisor.png',
-        'Client': 'client.png',
-        'Inspector': 'client.png'
+        'Advisor': 'lps_advisor.jpg',
+        'Client': 'client_rep.jpg',
+        'Inspector': 'quality_inspector.jpg',
+        'Owner': 'client_owner.jpg'
     };
 
     const portrait = imageMap[line.character];

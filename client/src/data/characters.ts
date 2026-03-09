@@ -44,24 +44,31 @@ export const CHARACTERS: Record<string, Character> = {
   },
   Client: {
     id: 'Client',
-    name: 'Mr. Nakamura',
+    name: 'Priya Patel',
     role: 'Client Representative',
     description: 'Demands reliability and hates excuses. The final judge.',
     avatar: 'Client'
   },
   Advisor: {
     id: 'Advisor',
-    name: 'Dr. Lean',
+    name: 'Shikha Doshi',
     role: 'LPS Advisor',
     description: 'Your mentor in the Last Planner System. Calm and methodical.',
     avatar: 'Advisor'
   },
   Inspector: {
     id: 'Inspector',
-    name: 'Inspector Yang',
+    name: 'Sumit Chaudhary',
     role: 'Quality Inspector',
     description: 'Strict but fair. Measures what matters.',
     avatar: 'Inspector'
+  },
+  Owner: {
+    id: 'Owner',
+    name: 'Arun Sharma',
+    role: 'Client Owner',
+    description: 'The primary stakeholder. Cares deeply about budget and timely delivery.',
+    avatar: 'Owner'
   }
 };
 

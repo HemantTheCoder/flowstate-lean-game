@@ -12,9 +12,10 @@ const CHARACTER_IMAGES: Record<string, string> = {
   'Rao': 'rao.jpg',
   'Old Foreman': 'foreman.jpg',
   'Isha': 'isha.jpg',
-  'Client': 'client.png',
-  'Advisor': 'advisor.png',
-  'Inspector': 'client.png',
+  'Client': 'client_rep.jpg',
+  'Advisor': 'lps_advisor.jpg',
+  'Inspector': 'quality_inspector.jpg',
+  'Owner': 'client_owner.jpg',
   'Engineer': 'architect.jpg'
 };
 
