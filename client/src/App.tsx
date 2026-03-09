@@ -15,6 +15,7 @@ import Dashboard from "@/pages/Dashboard";
 import ChapterSelect from "@/pages/ChapterSelect";
 import Leaderboard from "@/pages/Leaderboard";
 import Profile from "@/pages/Profile";
+import Auth from "@/pages/Auth";
 import DevDashboard from "@/pages/DevDashboard";
 import Credits from "@/pages/Credits";
 import Feedback from "@/pages/Feedback";
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/settings" component={Settings} />
       <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/profile" component={Profile} />
+      <Route path="/auth" component={Auth} />
       <Route path="/dev" component={DevDashboard} />
       <Route path="/credits" component={Credits} />
       <Route path="/feedback" component={Feedback} />
