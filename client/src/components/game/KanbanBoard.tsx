@@ -353,9 +353,9 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                     <ConstraintBanner day={day} materials={materials} />
 
                     <DragDropContext onDragEnd={onDragEnd}>
-                        <div className="flex-1 relative">
+                        <div className="flex-1 relative min-h-0">
                             <ScrollHint containerRef={scrollContainerRef} />
-                        <div ref={scrollContainerRef} className={`flex-1 flex flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-hidden bg-slate-900/60 scroll-smooth h-full`} style={{ WebkitOverflowScrolling: 'touch' }}>
+                        <div ref={scrollContainerRef} className={`flex flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-auto bg-slate-900/60 scroll-smooth absolute inset-0`} style={{ WebkitOverflowScrolling: 'touch' }}>
                             {columns.map(col => {
                                 let highlightClass = "border-slate-700/50";
                                 let adviceText: string | null = null;
@@ -391,7 +391,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                         {(provided, snapshot) => (
                                             <div
                                                 id={`col-${col.id}`}
-                                                className={`min-w-[280px] md:w-[320px] flex flex-col h-full bg-slate-800/60 rounded-3xl border transition-all relative ${highlightClass} ${snapshot.isDraggingOver ? 'bg-cyan-900/20 border-cyan-500/50' : ''} overflow-visible shrink-0 ${isBlurred ? 'opacity-50 grayscale' : ''}`}
+                                                className={`min-w-[280px] md:w-[320px] flex flex-col self-stretch bg-slate-800/60 rounded-3xl border transition-all relative ${highlightClass} ${snapshot.isDraggingOver ? 'bg-cyan-900/20 border-cyan-500/50' : ''} overflow-visible shrink-0 ${isBlurred ? 'opacity-50 grayscale' : ''}`}
                                             >
                                                 <BottleneckPulse isBottleneck={isBottleneck} />
                                                 {col.id === 'doing' && <CongestionCloud intensity={congestion} />}
