@@ -131,14 +131,14 @@ export default function Home() {
       </div>
 
       {/* Main Content Container - Visual Novel Title Screen Layout */}
-      <div className="z-10 w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 md:gap-12 relative min-h-0 md:min-h-[80vh]">
+      <div className="z-10 w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 relative min-h-0 pt-20 md:pt-24">
 
         {/* Left Side: Title & Branding */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="flex-1 flex flex-col justify-center text-center md:text-left"
+          className="flex flex-col justify-center text-center md:text-left"
         >
           <div className="bg-slate-900/40 backdrop-blur-md p-5 sm:p-8 md:p-12 rounded-2xl md:rounded-3xl border border-slate-700/50 shadow-2xl inline-block w-fit mx-auto md:mx-0">
             {/* Tagline pill */}
@@ -163,7 +163,7 @@ export default function Home() {
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-          className="w-full max-w-xs md:max-w-sm flex flex-col gap-4 self-center pt-8 md:pt-0"
+          className="w-full max-w-sm flex flex-col gap-4 self-center"
         >
           {/* Primary Action */}
           <Link href="/chapters" className="w-full">

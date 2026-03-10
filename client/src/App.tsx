@@ -24,7 +24,7 @@ function useDismissSplash() {
   useEffect(() => {
     const splash = document.getElementById("splash-screen");
     if (!splash) return;
-    const minDisplayTime = 3000; // Increased to 3 seconds for better readability
+    const minDisplayTime = 3000;
     const startTime = performance.timing?.navigationStart || performance.now();
     const elapsed = Date.now() - startTime;
     const remaining = Math.max(0, minDisplayTime - elapsed);
