@@ -190,7 +190,7 @@ export function registerRoutes(app: Express) {
         res.status(500).send();
       }
     } else {
-      res.status(401).send();
+      res.status(200).send();
     }
   });
 

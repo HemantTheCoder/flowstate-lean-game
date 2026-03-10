@@ -1,23 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import {
   LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
-import { ArrowLeft, Target, GitBranch, Activity, Clock, Layers, HardHat, Loader2 } from 'lucide-react';
-
-interface RunEntry {
-  id: number;
-  playerName: string;
-  chapter: number;
-  day: number;
-  totalScore: number;
-  completedAt: string;
-  stats: Record<string, unknown>;
-  logs: string[];
-}
+import { ArrowLeft, Target, GitBranch, Activity, Clock, Layers, HardHat } from 'lucide-react';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -28,24 +16,12 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const gameState = useGameStore();
 
-  const { data: runs = [], isLoading } = useQuery<RunEntry[]>({
-    queryKey: ['/api/runs/recent'],
-  });
-
-  // If the user has completed a run that saved to the server, use that, 
-  // otherwise fallback to the active local game state.
-  const sourceMetrics = runs.length > 0 && runs[0].stats?.dailyMetrics
-    ? runs[0].stats.dailyMetrics as any[]
-    : gameState.dailyMetrics;
-
   const dailyMetrics = useMemo(() => {
-    if (sourceMetrics && sourceMetrics.length > 0) return sourceMetrics;
-    return []; // Return empty if no plays yet
-  }, [sourceMetrics]);
+    if (gameState.dailyMetrics && gameState.dailyMetrics.length > 0) return gameState.dailyMetrics;
+    return [];
+  }, [gameState.dailyMetrics]);
 
-  const sourcePpc = runs.length > 0 && runs[0].stats?.ppcHistory
-    ? runs[0].stats.ppcHistory as any[]
-    : gameState.ppcHistory;
+  const sourcePpc = gameState.ppcHistory;
 
   const ppcData = useMemo(() => {
     if (sourcePpc && sourcePpc.length > 0) return sourcePpc;
@@ -60,7 +36,7 @@ export default function Dashboard() {
     { label: 'Pushed Work vs Pulled Work', positive: !gameState.flags['decision_push_made'] },
   ].filter(d => Boolean(d.positive)); // Only show things they actually did
 
-  const recentLogs = runs.flatMap(r => r.logs).slice(0, 15).filter(Boolean);
+  const recentLogs = (gameState.log || []).slice(0, 15);
 
   const getEfficiencyBarColor = (eff: number) => {
     if (eff >= 80) return 'bg-emerald-500';
@@ -68,16 +44,7 @@ export default function Dashboard() {
     return 'bg-red-500';
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-slate-200 font-sans relative overflow-x-hidden">
-        <Loader2 className="w-12 h-12 text-cyan-500 animate-spin mb-4" />
-        <p className="text-xl font-medium tracking-wide">Loading your operation parameters...</p>
-      </div>
-    );
-  }
-
-  if ((!gameState || dailyMetrics.length === 0) && runs.length === 0 && !isLoading) {
+  if (!gameState || dailyMetrics.length === 0) {
     return (
       <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-slate-200 font-sans relative overflow-x-hidden">
         {/* Premium Twilight Industrial Ambient Background */}
@@ -166,7 +133,7 @@ export default function Dashboard() {
               <Activity className="w-32 h-32" />
             </div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 z-10">Overall Score</p>
-            <p className="text-4xl font-black text-white z-10 drop-shadow-md">{runs.reduce((acc, curr) => acc + (curr.totalScore || 0), 0)}</p>
+            <p className="text-4xl font-black text-white z-10 drop-shadow-md" data-testid="text-overall-score">{dailyMetrics.length > 0 ? Math.round(dailyMetrics[dailyMetrics.length - 1].cumulativeEfficiency || 0) : 0}</p>
           </motion.div>
 
           <motion.div variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }} className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 p-6 flex flex-col relative overflow-hidden rounded-3xl shadow-lg group">
@@ -196,7 +163,7 @@ export default function Dashboard() {
               <Clock className="w-32 h-32" />
             </div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 z-10">Days Completed</p>
-            <p className="text-4xl font-black text-purple-400 drop-shadow-[0_0_15px_rgba(168,85,247,0.3)] z-10">{runs.length || 0}</p>
+            <p className="text-4xl font-black text-purple-400 drop-shadow-[0_0_15px_rgba(168,85,247,0.3)] z-10" data-testid="text-days-completed">{dailyMetrics.length || 0}</p>
           </motion.div>
         </div>
 
