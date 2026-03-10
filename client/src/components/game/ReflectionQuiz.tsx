@@ -196,10 +196,69 @@ const CHAPTER_3_QUESTIONS: Question[] = [
   },
 ];
 
+const CHAPTER_4_QUESTIONS: Question[] = [
+  {
+    id: 'jit-pull',
+    text: 'What is the core principle behind a "Pull System" in Lean Construction?',
+    options: [
+      { id: 'a', text: 'Push as many materials to site as possible to avoid shortages', isCorrect: false },
+      { id: 'b', text: 'Only move materials or start work when downstream demand signals the need', isCorrect: true },
+      { id: 'c', text: 'Order all materials at the start of the project to get bulk discounts', isCorrect: false },
+      { id: 'd', text: 'Let each trade decide independently when to order their supplies', isCorrect: false },
+    ],
+    explanation: 'A Pull System triggers upstream action only when there is actual downstream demand. This prevents overproduction — the worst form of waste — and ensures materials arrive when truly needed.',
+  },
+  {
+    id: 'jit-bullwhip',
+    text: 'What is the "Bullwhip Effect" in supply chain management?',
+    options: [
+      { id: 'a', text: 'When workers crack under pressure and quit the project', isCorrect: false },
+      { id: 'b', text: 'When small demand fluctuations get amplified into large supply chain swings upstream', isCorrect: true },
+      { id: 'c', text: 'When materials are delivered too quickly and overwhelm the site', isCorrect: false },
+      { id: 'd', text: 'When the project schedule is compressed by the client', isCorrect: false },
+    ],
+    explanation: 'The Bullwhip Effect occurs when small changes in customer demand cause progressively larger order fluctuations up the supply chain. Demand smoothing and information sharing help prevent it.',
+  },
+  {
+    id: 'jit-buffer',
+    text: 'Why are safety buffers important in a JIT delivery system?',
+    options: [
+      { id: 'a', text: 'They are not important — JIT means zero inventory at all times', isCorrect: false },
+      { id: 'b', text: 'They protect against variability (weather, traffic, supplier delays) without excessive stockpiling', isCorrect: true },
+      { id: 'c', text: 'They give workers something to do when waiting for tasks', isCorrect: false },
+      { id: 'd', text: 'They increase warehouse revenue by storing more materials', isCorrect: false },
+    ],
+    explanation: 'Safety buffers are small, calculated reserves that absorb supply chain variability. Too much buffer creates waste (storage costs, damage risk); too little causes starvation. The goal is the minimum needed for reliable flow.',
+  },
+  {
+    id: 'jit-batch',
+    text: 'Why does reducing batch sizes improve flow in Lean delivery?',
+    options: [
+      { id: 'a', text: 'Smaller batches are easier to carry by hand', isCorrect: false },
+      { id: 'b', text: 'Smaller, more frequent deliveries reduce lead time, storage needs, and expose problems faster', isCorrect: true },
+      { id: 'c', text: 'It keeps delivery trucks running more often, which is good for the economy', isCorrect: false },
+      { id: 'd', text: 'Large batches are illegal in most construction sites', isCorrect: false },
+    ],
+    explanation: 'Smaller batches flow faster through the system, reduce work-in-progress inventory, and make defects visible sooner. This is a core Lean principle: flow beats batch.',
+  },
+  {
+    id: 'jit-takt',
+    text: 'What role does "Takt Time" play in coordinating trade handoffs?',
+    options: [
+      { id: 'a', text: 'It sets the maximum number of hours workers can be on site', isCorrect: false },
+      { id: 'b', text: 'It defines the rhythm of production so all trades move at the same pace through zones', isCorrect: true },
+      { id: 'c', text: 'It calculates the total project cost per day', isCorrect: false },
+      { id: 'd', text: 'It measures how fast materials can be unloaded from trucks', isCorrect: false },
+    ],
+    explanation: 'Takt Time synchronizes the pace of all trades so that work flows continuously without pile-ups or starvation. When everyone moves to the same beat, handoffs become seamless and waiting is eliminated.',
+  },
+];
+
 export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComplete, chapter = 1 }) => {
   let QUESTIONS = CHAPTER_1_QUESTIONS;
   if (chapter === 2) QUESTIONS = CHAPTER_2_QUESTIONS;
   if (chapter === 3) QUESTIONS = CHAPTER_3_QUESTIONS;
+  if (chapter === 4) QUESTIONS = CHAPTER_4_QUESTIONS;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);

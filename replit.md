@@ -37,7 +37,7 @@ The project is a fullstack TypeScript application comprising a React frontend wi
 - **Chapter 1: The Kanban Chronicles:** Teaches WIP Limits, Pull Systems, and Flow Management through a 5-day simulation. Includes a tutorial, efficiency tracking, daily summaries with Lean lessons, and a reflection quiz. Features constraint banners and a Smart Advisor for contextual tips.
 - **Chapter 2: The Promise System (Last Planner System):** Teaches Should/Can/Will planning via a 6-day simulation. Features a Planning Room UI, constraint removal mechanics, PPC calculation, and a "Fragile/Risky Task System" to simulate overcommitment consequences. Includes an event system to introduce dynamic challenges.
 - **Chapter 3: The 5S Principles:** Teaches Sort, Set in Order, Shine, Standardize, and Sustain via the Workspace Depot interface across days 12-16. Each day maps to one of the 5S steps with daily Lean lessons.
-- **Chapter 4: Pull & JIT Systems (Case Study 1):** Airport terminal expansion scenario teaching Pull Systems, JIT delivery, Safety Buffers, and the Bullwhip Effect via the PullSystemDashboard.
+- **Chapter 4: Pull & JIT Systems (Case Study 1):** Airport terminal expansion scenario teaching Pull Systems, JIT delivery, Safety Buffers, and the Bullwhip Effect via the PullSystemDashboard. Includes a 5-question reflection quiz (Pull Systems, Bullwhip Effect, Safety Buffers, Batch Sizes, Takt Time) shown before chapter results.
 - **Performance Dashboard:** A `/dashboard` route provides a comprehensive overview of player performance, including efficiency, PPC, morale, and waste removed, with trend charts and a day-by-day breakdown.
 - **Leaderboard:** A database-backed `/leaderboard` tracks and displays player scores, filtered by chapter, with weighted scoring based on efficiency, PPC, and quiz results.
 - **PDF Export:** Chapter completion modals offer an "Export Report" button to generate a detailed PDF report of player performance, key decisions, and learnings using jsPDF.
@@ -78,6 +78,7 @@ All chapter completion modals include enriched visual metrics:
 ## Save/Load System
 
 - **Dual Persistence**: Saves to both localStorage (immediate) and PostgreSQL (cloud sync). Falls back to localStorage if server unreachable.
+- **Full State Serialization**: `buildSavePayload()` now includes ALL chapter-specific fields: Ch3 depot state (depotItems, depotZones, depotScore), Ch4 JIT state (bullwhipIndex, pullScore, inventoryTurns, jitOnTimeDelivery, buffers, materialsInventory, kanbanLimits, deliveries, pullMetrics), and case study fields (hoistSlots, pdi, reworkRate, trafficImpact, segmentBuffers).
 - **Save & Exit**: Always saves to localStorage before navigating home, even for anonymous users. Authenticated users also get cloud sync.
 - **Auto-Save**: Triggers silently at chapter completions, day transitions, and chapter starts. Silent saves bypass the auth modal.
 - **Load Priority**: Server first, then localStorage fallback if 404 or unreachable.

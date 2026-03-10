@@ -272,6 +272,23 @@ export default function Game() {
         dialogueIndex: state.dialogueIndex,
         customTasks: state.customTasks,
         taskModeSelected: state.taskModeSelected,
+        depotItems: state.depotItems,
+        depotZones: state.depotZones,
+        depotScore: state.depotScore,
+        bullwhipIndex: state.bullwhipIndex,
+        pullScore: state.pullScore,
+        inventoryTurns: state.inventoryTurns,
+        jitOnTimeDelivery: state.jitOnTimeDelivery,
+        buffers: state.buffers,
+        materialsInventory: state.materialsInventory,
+        kanbanLimits: state.kanbanLimits,
+        deliveries: state.deliveries,
+        pullMetrics: state.pullMetrics,
+        hoistSlots: state.hoistSlots,
+        pdi: state.pdi,
+        reworkRate: state.reworkRate,
+        trafficImpact: state.trafficImpact,
+        segmentBuffers: state.segmentBuffers,
       } as any,
       flags: state.flags,
       metrics: { ...state.lpi, ppcHistory: state.ppcHistory },
@@ -774,7 +791,7 @@ export default function Game() {
     }
 
     if (currentDay > 12 && chapter === 4) {
-      setShowChapterComplete(true);
+      setShowQuiz(true);
       return;
     }
 
