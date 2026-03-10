@@ -43,7 +43,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative w-full min-h-screen overflow-x-hidden bg-slate-900 flex flex-col items-center justify-center p-3 sm:p-6 font-sans">
+    <div className="relative w-full h-screen overflow-hidden bg-slate-900 flex flex-col items-center justify-center p-3 sm:p-6 font-sans">
 
       {/* Premium Twilight Industrial Ambient Background */}
       <div
@@ -131,7 +131,7 @@ export default function Home() {
       </div>
 
       {/* Main Content Container - Visual Novel Title Screen Layout */}
-      <div className="z-10 w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 relative min-h-0 pt-20 md:pt-24">
+      <div className="z-10 w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 relative">
 
         {/* Left Side: Title & Branding */}
         <motion.div
@@ -140,7 +140,7 @@ export default function Home() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="flex flex-col justify-center text-center md:text-left"
         >
-          <div className="bg-slate-900/40 backdrop-blur-md p-5 sm:p-8 md:p-12 rounded-2xl md:rounded-3xl border border-slate-700/50 shadow-2xl inline-block w-fit mx-auto md:mx-0">
+          <div className="bg-slate-900/40 backdrop-blur-md p-5 sm:p-8 md:p-10 rounded-2xl md:rounded-3xl border border-slate-700/50 shadow-2xl inline-block w-fit mx-auto md:mx-0">
             {/* Tagline pill */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/90 border border-slate-700/50 mb-6 shadow-md shadow-slate-900/50">
               <HardHat className="w-4 h-4 text-cyan-400" />
@@ -163,7 +163,7 @@ export default function Home() {
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-          className="w-full max-w-sm flex flex-col gap-4 self-center"
+          className="w-full max-w-sm flex flex-col gap-3 self-center"
         >
           {/* Primary Action */}
           <Link href="/chapters" className="w-full">
@@ -185,7 +185,7 @@ export default function Home() {
           </Link>
 
           {/* Main Menu Grid */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-2">
+          <div className="grid grid-cols-2 gap-3 mt-1">
             <Link href="/profile" className="w-full">
               <motion.button
                 variants={buttonVariants}
@@ -218,10 +218,10 @@ export default function Home() {
           </div>
 
           {/* Secondary Option Menu */}
-          <div className="flex flex-col gap-2 sm:gap-3 mt-2">
+          <div className="flex flex-col gap-2 mt-1">
             <button
               onClick={() => setShowCaseStudies(true)}
-              className="w-full group relative flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-300 font-bold uppercase tracking-widest text-xs hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all shadow-md"
+              className="w-full group relative flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-300 font-bold uppercase tracking-widest text-xs hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all shadow-md"
             >
               <span className="flex items-center gap-3">
                 <ExternalLink className="w-4 h-4 text-cyan-500 group-hover:text-cyan-400 transition-colors" />
@@ -232,7 +232,7 @@ export default function Home() {
             <button
               onClick={() => setShowLeanAI(true)}
               data-testid="button-lean-ai"
-              className="w-full group relative flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-slate-800/40 backdrop-blur-md border border-emerald-500/30 rounded-xl text-slate-300 font-bold uppercase tracking-widest text-xs hover:text-white hover:bg-emerald-900/30 hover:border-emerald-400/50 transition-all shadow-md"
+              className="w-full group relative flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-800/40 backdrop-blur-md border border-emerald-500/30 rounded-xl text-slate-300 font-bold uppercase tracking-widest text-xs hover:text-white hover:bg-emerald-900/30 hover:border-emerald-400/50 transition-all shadow-md"
             >
               <span className="flex items-center gap-3">
                 <Brain className="w-4 h-4 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
@@ -243,7 +243,7 @@ export default function Home() {
 
             <button
               onClick={() => setPendingFeature('multiplayer')}
-              className="w-full group relative flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-xs hover:text-slate-200 hover:bg-slate-800 hover:border-slate-600 transition-all shadow-md"
+              className="w-full group relative flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-xs hover:text-slate-200 hover:bg-slate-800 hover:border-slate-600 transition-all shadow-md"
             >
               <span className="flex items-center gap-3">
                 <Users className="w-4 h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
@@ -253,7 +253,7 @@ export default function Home() {
             </button>
 
             <Link href="/feedback" className="w-full">
-              <button className="w-full group relative flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-300 font-bold uppercase tracking-widest text-xs hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all shadow-md">
+              <button className="w-full group relative flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-300 font-bold uppercase tracking-widest text-xs hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all shadow-md">
                 <span className="flex items-center gap-3">
                   <MessageSquare className="w-4 h-4 text-cyan-500 group-hover:text-cyan-400 transition-colors" />
                   Feedback & Report
@@ -262,7 +262,7 @@ export default function Home() {
             </Link>
 
             <Link href="/credits" className="w-full">
-              <button className="w-full group relative flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-xs hover:text-slate-200 hover:bg-slate-800 hover:border-slate-600 transition-all shadow-md">
+              <button className="w-full group relative flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-xs hover:text-slate-200 hover:bg-slate-800 hover:border-slate-600 transition-all shadow-md">
                 <span className="flex items-center gap-3">
                   <Info className="w-4 h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
                   Credits
@@ -271,7 +271,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="mt-4 sm:mt-8 flex flex-col items-center gap-2">
+          <div className="mt-2 sm:mt-4 flex flex-col items-center gap-1">
             <p className="text-slate-500 hover:text-slate-400 text-[10px] font-bold uppercase tracking-widest text-center transition-colors">
               Made by <a href="https://www.linkedin.com/in/hemant-kumar-b2b512300" target="_blank" rel="noopener noreferrer" className="text-cyan-500 hover:text-cyan-400 transition-colors drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">Hemant Kumar</a>
             </p>
