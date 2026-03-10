@@ -156,11 +156,14 @@ export interface GameState {
   // Custom Task Actions
   customTasks: TaskType[];
   taskModeSelected: boolean;
+  taskMode: 'predefined' | 'custom';
   setTaskModeSelected: (val: boolean) => void;
+  setTaskMode: (mode: 'predefined' | 'custom') => void;
   addCustomTask: (task: TaskType) => void;
   editCustomTask: (id: string, updates: Partial<TaskType>) => void;
   deleteCustomTask: (id: string) => void;
   replaceTask: (existingTaskOriginalId: string, newTask: TaskType) => void;
+  clearBacklogForCustomTasks: () => void;
 
   // Tutorial Actions
   setTutorialStep: (step: number) => void;
@@ -364,6 +367,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         cumulativePotentialCapacity: 0,
         weeklyPlan: [],
         lives: 3,
+        taskModeSelected: false,
+        taskMode: 'predefined' as const,
         flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false, game_over: false }
       };
     }
@@ -400,6 +405,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         weeklyPlan: [],
         ppcHistory: state.ppcHistory,
         lives: finalLives,
+        taskModeSelected: false,
+        taskMode: 'predefined' as const,
         flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false, day_6_started: false, game_over: false }
       };
     }
@@ -1088,8 +1095,16 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // Custom Task CRUD
   taskModeSelected: false,
+  taskMode: 'predefined',
   setTaskModeSelected: (val) => set({ taskModeSelected: val }),
+  setTaskMode: (mode) => set({ taskMode: mode }),
   customTasks: loadCustomTasks(),
+
+  clearBacklogForCustomTasks: () => set((state) => ({
+    columns: state.columns.map(col =>
+      col.id === 'backlog' ? { ...col, tasks: [] } : col
+    ),
+  })),
 
   addCustomTask: (task) => set((state) => {
     const updated = [...state.customTasks, task];
@@ -1180,12 +1195,11 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // Gameplay Loop - Day 2+ Refill
   addDailyTasks: (count: number, currentDay?: number) => set((state) => {
-    // User Request: "Unique Only".
-    // Filter out tasks that are already present in ANY column.
-
     const existingIds = new Set(state.columns.flatMap(c => c.tasks.map(t => t.originalId)));
 
-    const newTasks: Task[] = CONSTRUCTION_TASKS
+    const taskPool = state.taskMode === 'custom' && state.customTasks.length > 0 ? state.customTasks : CONSTRUCTION_TASKS;
+
+    const newTasks: Task[] = taskPool
       .filter(t => !existingIds.has(t.id))
       .map(template => ({
         ...template,
@@ -1216,6 +1230,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     return {
       customTasks: restoredCustomTasks,
       taskModeSelected: ks.taskModeSelected ?? data.taskModeSelected ?? state.taskModeSelected,
+      taskMode: ks.taskMode ?? data.taskMode ?? state.taskMode,
       chapter: data.chapter ?? state.chapter,
       unlockedChapters: data.completedChapters
         ? [1, ...data.completedChapters.map((c: number) => c + 1)]

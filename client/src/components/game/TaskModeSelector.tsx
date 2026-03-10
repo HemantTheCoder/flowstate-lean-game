@@ -62,7 +62,8 @@ export const TaskModeSelector: React.FC<TaskModeSelectorProps> = ({ isOpen, onSe
     }
 
     function handleFinalize() {
-        // Add all custom tasks to the game board
+        const { clearBacklogForCustomTasks } = useGameStore.getState();
+        clearBacklogForCustomTasks();
         customTasks.forEach(task => {
             addCustomTask(task);
         });

@@ -272,6 +272,7 @@ export default function Game() {
         dialogueIndex: state.dialogueIndex,
         customTasks: state.customTasks,
         taskModeSelected: state.taskModeSelected,
+        taskMode: state.taskMode,
         depotItems: state.depotItems,
         depotZones: state.depotZones,
         depotScore: state.depotScore,
@@ -1332,8 +1333,9 @@ export default function Game() {
       )}
       {/* Task Mode Selector — shown once at start of a Kanban chapter (1 or 2) */}
       <TaskModeSelector
-        isOpen={chapter < 3 && day === 1 && !taskModeSelected && !flags.game_over}
+        isOpen={chapter < 3 && ((chapter === 1 && day === 1) || (chapter === 2 && day === 6)) && !taskModeSelected && !flags.game_over}
         onSelect={(mode) => {
+          useGameStore.getState().setTaskMode(mode);
           setTaskModeSelected(true);
         }}
       />
