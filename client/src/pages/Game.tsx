@@ -26,10 +26,11 @@ import { Chapter2CompleteModal } from '@/components/game/Chapter2CompleteModal';
 import { Chapter3CompleteModal } from '@/components/game/Chapter3CompleteModal';
 import { Chapter4CompleteModal } from '@/components/game/Chapter4CompleteModal';
 import { SettingsModal } from '@/components/game/SettingsModal';
+import { LeanAIModal } from '@/components/game/LeanAIModal';
 import { LoadingScreen } from '@/components/game/LoadingScreen';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
-import { LayoutDashboard, HardHat, Save, Settings, BookOpen, Package, Plane, AlertTriangle, Wrench, ArrowUpDown } from 'lucide-react';
+import { LayoutDashboard, HardHat, Save, Settings, BookOpen, Package, Plane, AlertTriangle, Wrench, ArrowUpDown, Brain } from 'lucide-react';
 import { GlossaryPanel } from '@/components/game/GlossaryPanel';
 import { ReflectionQuiz } from '@/components/game/ReflectionQuiz';
 import { useAuth } from '@/hooks/use-auth';
@@ -43,6 +44,7 @@ export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showLeanAI, setShowLeanAI] = useState(false);
   const [completedToday, setCompletedToday] = useState(0);
   const [showChapterComplete, setShowChapterComplete] = useState(false);
   const [showGlossary, setShowGlossary] = useState(false);
@@ -1260,6 +1262,11 @@ export default function Game() {
           onSaveAndExit={handleSaveAndExit}
         />
 
+        <LeanAIModal
+          isOpen={showLeanAI}
+          onClose={() => setShowLeanAI(false)}
+        />
+
         {/* Auth Modal */}
         <div className={showAuthModal ? "block" : "hidden"}>
           <AuthModal triggerOpen={showAuthModal} onOpenChange={setShowAuthModal} />
@@ -1420,6 +1427,22 @@ export default function Game() {
           setTaskModeSelected(true);
         }}
       />
+
+      {/* Floating Lean AI Button */}
+      <motion.button
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 2, type: "spring", stiffness: 300, damping: 20 }}
+        onClick={() => setShowLeanAI(true)}
+        data-testid="button-lean-ai-float"
+        className="fixed bottom-6 left-6 z-40 w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-lg shadow-emerald-500/30 flex items-center justify-center hover:scale-110 hover:shadow-emerald-500/50 active:scale-95 transition-all group"
+        title="Lean AI Assistant (Coming Soon)"
+      >
+        <Brain className="w-5 h-5 text-white" />
+        <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center">
+          <span className="text-[8px] font-black text-amber-900">!</span>
+        </span>
+      </motion.button>
     </div>
   );
 }

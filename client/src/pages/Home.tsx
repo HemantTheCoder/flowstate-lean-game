@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Trophy, User, Users, Settings, ExternalLink, HardHat, Info, MessageSquare, Terminal, LogOut, ChevronRight } from 'lucide-react';
+import { Play, Trophy, User, Users, Settings, ExternalLink, HardHat, Info, MessageSquare, Terminal, LogOut, ChevronRight, Brain } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 import { useAuth } from '@/hooks/use-auth';
 import { useLocation } from 'wouter';
@@ -9,6 +9,7 @@ import { useLocation } from 'wouter';
 import { ComingSoonModal } from '../components/game/ComingSoonModal';
 import { AuthModal } from '@/components/ui/AuthModal';
 import { CaseStudiesModal } from '@/components/game/CaseStudiesModal';
+import { LeanAIModal } from '@/components/game/LeanAIModal';
 
 const buttonVariants = {
   hidden: { opacity: 0, x: -20 },
@@ -29,6 +30,7 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [pendingFeature, setPendingFeature] = useState<'multiplayer' | null>(null);
   const [showCaseStudies, setShowCaseStudies] = useState(false);
+  const [showLeanAI, setShowLeanAI] = useState(false);
 
   useEffect(() => {
     soundManager.playBGM('menu', 0.3);
@@ -228,6 +230,18 @@ export default function Home() {
             </button>
 
             <button
+              onClick={() => setShowLeanAI(true)}
+              data-testid="button-lean-ai"
+              className="w-full group relative flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-slate-800/40 backdrop-blur-md border border-emerald-500/30 rounded-xl text-slate-300 font-bold uppercase tracking-widest text-xs hover:text-white hover:bg-emerald-900/30 hover:border-emerald-400/50 transition-all shadow-md"
+            >
+              <span className="flex items-center gap-3">
+                <Brain className="w-4 h-4 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
+                Lean AI
+              </span>
+              <span className="text-[9px] bg-emerald-500/20 px-2 py-0.5 rounded text-emerald-400 font-bold border border-emerald-500/30">COMING SOON</span>
+            </button>
+
+            <button
               onClick={() => setPendingFeature('multiplayer')}
               className="w-full group relative flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-xs hover:text-slate-200 hover:bg-slate-800 hover:border-slate-600 transition-all shadow-md"
             >
@@ -284,6 +298,11 @@ export default function Home() {
           />
         )}
       </AnimatePresence>
+
+      <LeanAIModal
+        isOpen={showLeanAI}
+        onClose={() => setShowLeanAI(false)}
+      />
     </div>
   );
 }
