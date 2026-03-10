@@ -1,16 +1,19 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { useGameStore } from '@/store/gameStore';
-import { motion } from 'framer-motion';
-import { Loader2, Trophy, Play, Calendar, LogOut, Award, BarChart3, Clock, ArrowLeft, Target, ShieldCheck, HardHat, Info, BookOpen, Sparkles, Medal } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Loader2, Trophy, Play, Calendar, LogOut, Award, BarChart3, Clock, ArrowLeft, Target, ShieldCheck, HardHat, Info, BookOpen, Sparkles, Medal, ScrollText } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { UserProfile } from '@shared/schema';
 import { format } from 'date-fns';
 import { BADGES } from '@/data/badges';
+import LeanCertification from '@/components/game/LeanCertification';
 
 export default function Profile() {
     const { user, logoutMutation, isLoading: isAuthLoading } = useAuth();
     const [, setLocation] = useLocation();
+    const [showCertification, setShowCertification] = useState(false);
     const { importState, ...localGameState } = useGameStore();
 
     const { data: profile, isLoading: isProfileLoading } = useQuery<UserProfile>({
@@ -264,6 +267,32 @@ export default function Profile() {
                             </div>
                         </div>
 
+                        <div className="bg-gradient-to-br from-indigo-500/5 to-cyan-500/5 backdrop-blur-2xl border border-indigo-500/20 shadow-xl rounded-3xl overflow-hidden">
+                            <div className="p-5 border-b border-indigo-500/10 bg-indigo-500/10">
+                                <h3 className="text-xs font-black text-indigo-300 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <ScrollText className="w-4 h-4" /> Lean Certification
+                                </h3>
+                            </div>
+                            <div className="p-6 text-center space-y-4">
+                                <div className="w-14 h-14 mx-auto bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/30">
+                                    <Award className="w-7 h-7 text-indigo-400" />
+                                </div>
+                                <div>
+                                    <p className="text-white font-bold text-sm tracking-tight mb-1">Combined Mastery Report</p>
+                                    <p className="text-slate-400 text-[11px] leading-relaxed">
+                                        View your mastery across Kanban, LPS, 5S, and JIT principles with your overall certification level.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setShowCertification(true)}
+                                    className="w-full py-3 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-xl text-indigo-400 font-black text-[10px] uppercase tracking-widest transition-all active:scale-95"
+                                    data-testid="button-view-certification"
+                                >
+                                    View Certification
+                                </button>
+                            </div>
+                        </div>
+
                         {/* Season Rewards Placeholder */}
                         <div className="bg-gradient-to-br from-amber-500/5 to-slate-800/60 backdrop-blur-2xl border border-amber-500/20 shadow-xl rounded-3xl overflow-hidden group">
                             <div className="p-5 border-b border-amber-500/10 bg-amber-500/10 flex items-center justify-between">
@@ -427,6 +456,16 @@ export default function Profile() {
                     </motion.div>
                 </div>
             </div>
+            <AnimatePresence>
+                {showCertification && (
+                    <LeanCertification
+                        scores={scores}
+                        localGameState={localGameState}
+                        playerName={displayUsername}
+                        onClose={() => setShowCertification(false)}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 }

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useGameStore, Column, Task } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import soundManager from '@/lib/soundManager';
-import { AlertTriangle, Gauge, Minus, Plus, Cloud, Sparkles, Flame, CloudRain, PackageX, Replace } from 'lucide-react';
+import { AlertTriangle, Gauge, Minus, Plus, Cloud, Sparkles, Flame, CloudRain, PackageX, Replace, ChevronLeft, ChevronRight, GripVertical } from 'lucide-react';
 import { TaskIconDisplay } from './TaskIconDisplay';
 import { CustomTaskModal } from './CustomTaskModal';
 import { LifeHearts } from './LifeHearts';
@@ -24,20 +24,20 @@ const WipSlider: React.FC<{ column: Column; onChangeWip: (id: string, limit: num
                 <div className="flex items-center gap-1">
                     <button
                         onClick={() => onChangeWip(column.id, Math.max(1, column.wipLimit - 1))}
-                        className="w-5 h-5 rounded bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors"
+                        className="w-8 h-8 md:w-5 md:h-5 rounded bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0"
                         data-testid={`button-wip-decrease-${column.id}`}
                     >
-                        <Minus className="w-3 h-3 text-slate-300" />
+                        <Minus className="w-4 h-4 md:w-3 md:h-3 text-slate-300" />
                     </button>
                     <span className={`text-sm font-black min-w-[20px] text-center ${isOverLimit ? 'text-red-500' : isAtLimit ? 'text-amber-500' : 'text-blue-400'}`}>
                         {column.wipLimit}
                     </span>
                     <button
                         onClick={() => onChangeWip(column.id, Math.min(6, column.wipLimit + 1))}
-                        className="w-5 h-5 rounded bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors"
+                        className="w-8 h-8 md:w-5 md:h-5 rounded bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0"
                         data-testid={`button-wip-increase-${column.id}`}
                     >
-                        <Plus className="w-3 h-3 text-slate-300" />
+                        <Plus className="w-4 h-4 md:w-3 md:h-3 text-slate-300" />
                     </button>
                 </div>
             </div>
@@ -195,10 +195,59 @@ const ConstraintBanner: React.FC<{ day: number; materials: number }> = ({ day, m
     return null;
 };
 
+const ScrollHint: React.FC<{ containerRef: React.RefObject<HTMLDivElement | null> }> = ({ containerRef }) => {
+    const [showLeft, setShowLeft] = useState(false);
+    const [showRight, setShowRight] = useState(true);
+
+    useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+        const check = () => {
+            setShowLeft(el.scrollLeft > 10);
+            setShowRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+        };
+        check();
+        el.addEventListener('scroll', check, { passive: true });
+        const ro = new ResizeObserver(check);
+        ro.observe(el);
+        return () => { el.removeEventListener('scroll', check); ro.disconnect(); };
+    }, [containerRef]);
+
+    return (
+        <>
+            <AnimatePresence>
+                {showLeft && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-slate-900/80 to-transparent z-20 pointer-events-none flex items-center justify-start pl-1 md:hidden"
+                    >
+                        <ChevronLeft className="w-5 h-5 text-slate-400 animate-pulse" />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <AnimatePresence>
+                {showRight && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-slate-900/80 to-transparent z-20 pointer-events-none flex items-center justify-end pr-1 md:hidden"
+                    >
+                        <ChevronRight className="w-5 h-5 text-slate-400 animate-pulse" />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </>
+    );
+};
+
 export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     const { columns, moveTask, setWipLimit, funds, materials, tutorialStep, setTutorialStep, day, audioSettings, chapter } = useGameStore();
     const [showCustomModal, setShowCustomModal] = useState(false);
     const [replaceTaskId, setReplaceTaskId] = useState<string | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const onDragEnd = (result: DropResult) => {
         const { source, destination, draggableId } = result;
@@ -294,7 +343,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                         </div>
                         <button
                             onClick={onClose}
-                            className={`px-4 md:px-6 py-1.5 md:py-2 rounded-xl font-bold transition-colors w-full md:w-auto text-sm md:text-base bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 border border-slate-600/50`}
+                            className={`px-4 md:px-6 py-2.5 md:py-2 rounded-xl font-bold transition-colors w-full md:w-auto text-sm md:text-base bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 border border-slate-600/50 min-h-[44px]`}
                             data-testid="button-close-kanban"
                         >
                             Close View
@@ -304,7 +353,9 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                     <ConstraintBanner day={day} materials={materials} />
 
                     <DragDropContext onDragEnd={onDragEnd}>
-                        <div className={`flex-1 flex flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-hidden bg-slate-900/60`}>
+                        <div className="flex-1 relative">
+                            <ScrollHint containerRef={scrollContainerRef} />
+                        <div ref={scrollContainerRef} className={`flex-1 flex flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-hidden bg-slate-900/60 scroll-smooth h-full`} style={{ WebkitOverflowScrolling: 'touch' }}>
                             {columns.map(col => {
                                 let highlightClass = "border-slate-700/50";
                                 let adviceText: string | null = null;
@@ -394,7 +445,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                             {...provided.draggableProps}
                                                                             {...provided.dragHandleProps}
                                                                             style={provided.draggableProps.style}
-                                                                            className={`relative bg-slate-800 p-3 rounded-2xl shadow-sm border border-slate-700/50 cursor-grab active:cursor-grabbing group ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-cyan-500/50 !bg-slate-700 z-50' : 'hover:shadow-lg transition-transform duration-200'} ${isWasteTask
+                                                                            className={`relative bg-slate-800 p-4 md:p-3 rounded-2xl shadow-sm border border-slate-700/50 cursor-grab active:cursor-grabbing group touch-manipulation ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-cyan-500/50 !bg-slate-700 z-50' : 'hover:shadow-lg transition-transform duration-200'} ${isWasteTask
                                                                                 ? 'border-red-500/50 bg-red-900/20'
                                                                                 : hasRedConstraints
                                                                                     ? 'border-red-500/50 bg-red-900/20'
@@ -409,6 +460,9 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                             <WasteTaskOverlay isWaste={isWasteTask} isInDone={isInDoneCol} />
 
                                                                             <div className="flex items-start gap-2">
+                                                                                <div className="flex items-center md:hidden self-stretch mr-1 text-slate-600" aria-hidden="true">
+                                                                                    <GripVertical className="w-4 h-4" />
+                                                                                </div>
                                                                                 {!isWasteTask && (
                                                                                     <TaskIconDisplay icon={task.icon} type={task.type} size="md" className="mt-0.5 shadow-md shadow-black/20" />
                                                                                 )}
@@ -449,10 +503,10 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                             {!isWasteTask && col.id === 'backlog' && (
                                                                                 <button
                                                                                     onClick={(e) => { e.stopPropagation(); setReplaceTaskId(task.originalId || task.id); setShowCustomModal(true); }}
-                                                                                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 bg-slate-700/90 border border-slate-600/50 rounded-lg flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/40"
+                                                                                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 md:w-6 md:h-6 min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 bg-slate-700/90 border border-slate-600/50 rounded-lg flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/40 touch-manipulation"
                                                                                     title="Replace with custom task"
                                                                                 >
-                                                                                    <Replace className="w-3 h-3 text-slate-400 hover:text-amber-400" />
+                                                                                    <Replace className="w-4 h-4 md:w-3 md:h-3 text-slate-400 hover:text-amber-400" />
                                                                                 </button>
                                                                             )}
                                                                         </div>
@@ -474,7 +528,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                     {col.id === 'backlog' && (
                                                         <button
                                                             onClick={() => { setReplaceTaskId(null); setShowCustomModal(true); }}
-                                                            className="w-full p-3 mt-1 rounded-2xl border-2 border-dashed border-slate-700/50 text-slate-500 hover:border-cyan-500/40 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all flex items-center justify-center gap-2 text-xs font-bold"
+                                                            className="w-full p-3 mt-1 rounded-2xl border-2 border-dashed border-slate-700/50 text-slate-500 hover:border-cyan-500/40 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all flex items-center justify-center gap-2 text-xs font-bold min-h-[44px] touch-manipulation"
                                                         >
                                                             <Plus className="w-4 h-4" />
                                                             Add Custom Task
@@ -486,6 +540,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                     </Droppable>
                                 );
                             })}
+                        </div>
                         </div>
                     </DragDropContext>
                 </div>
