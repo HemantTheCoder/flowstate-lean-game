@@ -29,7 +29,7 @@ import { SettingsModal } from '@/components/game/SettingsModal';
 import { LoadingScreen } from '@/components/game/LoadingScreen';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
-import { LayoutDashboard, HardHat, Save, Settings, BookOpen, Package } from 'lucide-react';
+import { LayoutDashboard, HardHat, Save, Settings, BookOpen, Package, Plane, AlertTriangle, Wrench, ArrowUpDown } from 'lucide-react';
 import { GlossaryPanel } from '@/components/game/GlossaryPanel';
 import { ReflectionQuiz } from '@/components/game/ReflectionQuiz';
 import { useAuth } from '@/hooks/use-auth';
@@ -79,6 +79,9 @@ export default function Game() {
   const taskModeSelected = useGameStore(s => s.taskModeSelected);
   const setTaskModeSelected = useGameStore(s => s.setTaskModeSelected);
   const gameOverReason = useGameStore(s => s.gameOverReason);
+  const pdi = useGameStore(s => s.pdi);
+  const hoistSlots = useGameStore(s => s.hoistSlots);
+  const reworkRate = useGameStore(s => s.reworkRate);
 
   // Phase Change Detection for Transition Screen
   const prevPhaseRef = React.useRef(phase);
@@ -353,13 +356,25 @@ export default function Game() {
           setFlag('case1_d2_decision', true);
           triggerCase1Day2Decision();
         }
+        if (day === 3 && !flags['ch4_d3_decision']) {
+          setFlag('ch4_d3_decision', true);
+          triggerChapter4Day3Decision();
+        }
         if (day === 4 && !flags['case1_d4_decision']) {
           setFlag('case1_d4_decision', true);
           triggerCase1Day4Decision();
         }
+        if (day === 5 && !flags['ch4_d5_decision']) {
+          setFlag('ch4_d5_decision', true);
+          triggerChapter4Day2Decision();
+        }
         if (day === 6 && !flags['case1_d6_decision']) {
           setFlag('case1_d6_decision', true);
           triggerCase1Day6Decision();
+        }
+        if (day === 8 && !flags['ch4_d8_decision']) {
+          setFlag('ch4_d8_decision', true);
+          triggerChapter4Day4Decision();
         }
         if (day === 9 && !flags['case1_d9_decision']) {
           setFlag('case1_d9_decision', true);
@@ -810,9 +825,7 @@ export default function Game() {
     }
 
     if (chapter === 4) {
-      if (currentDay === 2) triggerChapter4Day2Decision();
-      if (currentDay === 3) triggerChapter4Day3Decision();
-      if (currentDay === 4) triggerChapter4Day4Decision();
+      useGameStore.getState().receiveDeliveries(currentDay);
       return;
     }
 
@@ -1259,8 +1272,76 @@ export default function Game() {
         </AnimatePresence>
 
         {chapter === 4 && (
-          <div className="absolute inset-x-0 bottom-0 top-[80px] sm:top-[100px] pointer-events-auto bg-slate-950/80 z-20 backdrop-blur-sm overflow-hidden">
-            <PullSystemDashboard />
+          <div className="absolute inset-0 pointer-events-auto bg-slate-950/90 z-20 backdrop-blur-sm overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-4 py-2 bg-slate-900/95 border-b border-slate-700/50 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/50">
+                  <Plane className="w-4 h-4 text-cyan-400" />
+                  <span className="font-black text-white text-sm">Day {day}</span>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase">/ 12</span>
+                </div>
+                <div className="hidden sm:block bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/50">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase mr-1.5">Funds</span>
+                  <span className="font-mono font-bold text-emerald-400 text-sm">${funds.toLocaleString()}</span>
+                </div>
+                <div className="hidden sm:block bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/50">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase mr-1.5">PDI</span>
+                  <span className={`font-mono font-bold text-sm ${pdi > 40 ? 'text-red-400' : pdi > 20 ? 'text-amber-400' : 'text-emerald-400'}`}>{pdi}%</span>
+                </div>
+                <div className="hidden md:block bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/50">
+                  <ArrowUpDown className="w-3 h-3 text-indigo-400 inline mr-1" />
+                  <span className="text-[10px] text-slate-400 font-bold uppercase mr-1">Hoists</span>
+                  <span className="font-mono font-bold text-indigo-300 text-sm">{hoistSlots}</span>
+                </div>
+                {reworkRate > 0 && (
+                  <div className="hidden md:flex items-center gap-1 bg-red-900/30 px-3 py-1.5 rounded-xl border border-red-700/50">
+                    <Wrench className="w-3 h-3 text-red-400" />
+                    <span className="text-[10px] text-red-400 font-bold">{reworkRate}% Rework</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:block text-right mr-2 max-w-[200px]">
+                  <div className="text-[10px] text-cyan-400 font-bold leading-tight truncate">{getSmartObjective()}</div>
+                </div>
+                <button
+                  onClick={() => handleSave()}
+                  disabled={saveGame.isPending}
+                  className="bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 p-1.5 rounded-lg shadow-sm transition-all active:scale-95"
+                  title="Save Game"
+                  data-testid="button-save-ch4"
+                >
+                  {saveGame.isPending ? (
+                    <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4 text-slate-300" />
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    soundManager.playSFX('click', audioSettings.sfxVolume);
+                    setShowSettings(true);
+                  }}
+                  className="bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 p-1.5 rounded-lg shadow-sm transition-all active:scale-95"
+                  title="Settings"
+                  data-testid="button-settings-ch4"
+                >
+                  <Settings className="w-4 h-4 text-slate-300" />
+                </button>
+                <button
+                  onClick={handleEndDay}
+                  data-testid="button-end-day-ch4"
+                  className={`${day === 12 ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 ring-2 ring-amber-300/50' : 'bg-cyan-600 hover:bg-cyan-500'} text-white font-bold px-4 py-1.5 rounded-xl shadow-md transition-colors text-sm whitespace-nowrap`}
+                >
+                  {day === 12 ? 'Finish Chapter' : 'End Day'}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-hidden">
+              <PullSystemDashboard />
+            </div>
           </div>
         )}
         {chapter === 5 && <div className="absolute inset-0 pointer-events-auto bg-slate-950 z-20"><CoastalView objective={getSmartObjective()} /></div>}

@@ -19,7 +19,7 @@ export const PullSystemDashboard: React.FC = () => {
     // But since the user wants a 3-panel layout, we'll strive for a flexible grid.
 
     return (
-        <div className="w-full h-[calc(100vh-140px)] flex flex-col md:flex-row gap-4 p-4 font-sans text-slate-200">
+        <div className="w-full h-full flex flex-col md:flex-row gap-4 p-4 font-sans text-slate-200">
             {/* Desktop: 3 Columns. Mobile: Tabbed */}
 
             {/* Mobile Tab Selectors */}
