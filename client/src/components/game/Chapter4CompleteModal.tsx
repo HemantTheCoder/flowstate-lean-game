@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Award, Target, Brain, ArrowRight, ShieldCheck, Flame, Medal, Truck, BarChart3, Download } from 'lucide-react';
+import { Award, Target, Brain, ArrowRight, ShieldCheck, Flame, Medal, Truck, BarChart3, Download, Share2 } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
 import { AnimatedCounter, PerformanceGrade } from '@/components/game/AnimatedCounter';
 import soundManager from '@/lib/soundManager';
 import { apiRequest } from '@/lib/queryClient';
 import { exportChapterReport } from '@/lib/exportPDF';
+import ShareableCard from '@/components/game/ShareableCard';
 
 interface Chapter4CompleteModalProps {
     isOpen: boolean;
@@ -23,6 +24,7 @@ export const Chapter4CompleteModal: React.FC<Chapter4CompleteModalProps> = ({
     const playerName = useGameStore(s => s.playerName);
 
     const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+    const [showShareCard, setShowShareCard] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -68,6 +70,7 @@ export const Chapter4CompleteModal: React.FC<Chapter4CompleteModalProps> = ({
     const gradeInfo = getGrade(lpi.flowEfficiency);
 
     return (
+        <>
         <div className="absolute inset-0 z-[200] flex items-center justify-center bg-slate-950/90 backdrop-blur-md px-4 font-sans pointer-events-auto">
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -192,6 +195,13 @@ export const Chapter4CompleteModal: React.FC<Chapter4CompleteModalProps> = ({
                                 <Download className="w-4 h-4" /> Export Report
                             </button>
                             <button
+                                onClick={() => setShowShareCard(true)}
+                                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-cyan-500/30 bg-cyan-900/20 text-cyan-300 font-bold hover:bg-cyan-800/30 transition-colors shadow-md"
+                                data-testid="button-share-results"
+                            >
+                                <Share2 className="w-4 h-4" /> Share Results
+                            </button>
+                            <button
                                 onClick={() => window.location.href = '/leaderboard'}
                                 className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/50 text-slate-300 font-bold hover:bg-slate-700/50 transition-colors shadow-md"
                             >
@@ -224,5 +234,20 @@ export const Chapter4CompleteModal: React.FC<Chapter4CompleteModalProps> = ({
                 </div>
             </motion.div>
         </div>
+
+        <ShareableCard
+            isOpen={showShareCard}
+            onClose={() => setShowShareCard(false)}
+            data={{
+                playerName: playerName || 'Architect',
+                mode: 'chapter',
+                chapter: 4,
+                chapterTitle: 'Terminal T-Upgrade',
+                principle: 'Just-in-Time & Pull',
+                efficiency: lpi.flowEfficiency,
+                grade: lpi.flowEfficiency >= 90 ? 'S' : lpi.flowEfficiency >= 70 ? 'A' : lpi.flowEfficiency >= 50 ? 'B' : lpi.flowEfficiency >= 30 ? 'C' : 'D',
+            }}
+        />
+        </>
     );
 };

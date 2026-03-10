@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Award, Shield, Zap, LayoutList, Package, Truck, ArrowLeft, X } from 'lucide-react';
+import { Award, Shield, Zap, LayoutList, Package, Truck, ArrowLeft, X, Share2 } from 'lucide-react';
 import { LeaderboardEntry } from '@shared/schema';
+import ShareableCard from '@/components/game/ShareableCard';
 
 interface ChapterMastery {
   chapter: number;
@@ -48,6 +50,7 @@ interface LeanCertificationProps {
 }
 
 export default function LeanCertification({ scores, localGameState, playerName, onClose }: LeanCertificationProps) {
+  const [showShareCard, setShowShareCard] = useState(false);
   const chapterMasteries: ChapterMastery[] = CHAPTER_DEFS.map(def => {
     const scoreEntry = scores.find(s => s.chapter === def.chapter);
 
@@ -224,8 +227,34 @@ export default function LeanCertification({ scores, localGameState, playerName, 
               })}
             </div>
           </div>
+
+          <button
+            onClick={() => setShowShareCard(true)}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-cyan-500/30 bg-cyan-900/20 text-cyan-300 font-bold hover:bg-cyan-800/30 transition-colors shadow-md"
+            data-testid="button-share-certification"
+          >
+            <Share2 className="w-4 h-4" /> Share Certification
+          </button>
         </div>
       </motion.div>
+
+      <ShareableCard
+        isOpen={showShareCard}
+        onClose={() => setShowShareCard(false)}
+        data={{
+          playerName: playerName || 'Architect',
+          mode: 'certification',
+          certLevel,
+          avgMastery,
+          completedChapters: completedChapters.length,
+          chapterMasteries: chapterMasteries.map(c => ({
+            chapter: c.chapter,
+            principle: c.principle,
+            mastery: c.mastery,
+            completed: c.completed,
+          })),
+        }}
+      />
     </motion.div>
   );
 }

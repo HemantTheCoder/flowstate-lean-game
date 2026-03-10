@@ -4,9 +4,10 @@ import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
 import { apiRequest } from '@/lib/queryClient';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
-import { Play, CheckCircle2, AlertTriangle, TrendingUp, Target, Award, Lightbulb, ChevronRight, Zap, Users, Hammer, CloudRain, Shield, Download, Trophy } from 'lucide-react';
+import { Play, CheckCircle2, AlertTriangle, TrendingUp, Target, Award, Lightbulb, ChevronRight, Zap, Users, Hammer, CloudRain, Shield, Download, Trophy, Share2 } from 'lucide-react';
 import { exportChapterReport } from '@/lib/exportPDF';
 import { AnimatedCounter, PerformanceGrade } from '@/components/game/AnimatedCounter';
+import ShareableCard from '@/components/game/ShareableCard';
 
 interface DayBreakdown {
     day: number;
@@ -162,6 +163,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
     const [activeDay, setActiveDay] = useState<number | null>(null);
     const [showInsights, setShowInsights] = useState(false);
     const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+    const [showShareCard, setShowShareCard] = useState(false);
 
     const unlockBadge = useGameStore(s => s.unlockBadge);
 
@@ -312,6 +314,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
     }));
 
     return (
+        <>
         <AnimatePresence>
             {isOpen && (
                 <div className="absolute inset-0 z-[200] flex items-center justify-center bg-slate-950/90 backdrop-blur-md px-4 perspective-[1000px] pointer-events-auto">
@@ -656,6 +659,14 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 </button>
 
                                 <button
+                                    onClick={() => setShowShareCard(true)}
+                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-cyan-500/30 bg-cyan-900/20 text-cyan-300 font-bold hover:bg-cyan-800/30 transition-colors w-full shadow-md"
+                                    data-testid="button-share-results"
+                                >
+                                    <Share2 className="w-4 h-4" /> Share Results
+                                </button>
+
+                                <button
                                     onClick={() => window.location.href = '/leaderboard'}
                                     className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/50 text-slate-300 font-bold hover:bg-slate-700/50 transition-colors w-full shadow-md"
                                 >
@@ -689,5 +700,20 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                 </div>
             )}
         </AnimatePresence>
+
+        <ShareableCard
+            isOpen={showShareCard}
+            onClose={() => setShowShareCard(false)}
+            data={{
+                playerName: playerName || 'Architect',
+                mode: 'chapter',
+                chapter,
+                chapterTitle: chapter === 1 ? 'The Kanban Chronicles' : chapter === 2 ? 'The Promise System' : chapter === 3 ? 'The 5S Principles' : chapter === 4 ? 'Terminal T-Upgrade' : 'Coastal Link',
+                principle: chapter === 1 ? 'Kanban & Flow' : chapter === 2 ? 'Last Planner System' : chapter === 3 ? '5S Methodology' : chapter === 4 ? 'Just-in-Time & Pull' : 'Integration',
+                efficiency: finalEfficiency,
+                grade: finalEfficiency >= 90 ? 'S' : finalEfficiency >= 70 ? 'A' : finalEfficiency >= 50 ? 'B' : finalEfficiency >= 30 ? 'C' : 'D',
+            }}
+        />
+        </>
     );
 };

@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
 import { apiRequest } from '@/lib/queryClient';
-import { CheckCircle, XCircle, AlertTriangle, Award, TrendingUp, Users, Target, Lightbulb, BookOpen, ChevronDown, ChevronUp, Download, Trophy, BarChart3 } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Award, TrendingUp, Users, Target, Lightbulb, BookOpen, ChevronDown, ChevronUp, Download, Trophy, BarChart3, Share2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from 'recharts';
 import { AnimatedCounter, PerformanceGrade } from '@/components/game/AnimatedCounter';
 import { exportChapterReport } from '@/lib/exportPDF';
+import ShareableCard from '@/components/game/ShareableCard';
 
 interface Chapter2CompleteModalProps {
     isOpen: boolean;
@@ -69,6 +70,7 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
     const overcommitted = flags['overcommitment_accepted'];
 
     const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+    const [showShareCard, setShowShareCard] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -176,6 +178,7 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
     if (quizScore !== undefined && quizScore >= 5) badges.push({ name: 'LPS Scholar', icon: <BookOpen className="w-6 h-6" />, color: 'bg-purple-500' });
 
     return (
+        <>
         <AnimatePresence>
             {isOpen && (
                 <div className="absolute inset-0 z-[200] flex items-center justify-center bg-slate-950/90 backdrop-blur-md px-4 pointer-events-auto">
@@ -487,6 +490,14 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                 </button>
 
                                 <button
+                                    onClick={() => setShowShareCard(true)}
+                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-cyan-500/30 bg-cyan-900/20 text-cyan-300 font-bold hover:bg-cyan-800/30 transition-colors w-full shadow-md"
+                                    data-testid="button-share-results"
+                                >
+                                    <Share2 className="w-4 h-4" /> Share Results
+                                </button>
+
+                                <button
                                     onClick={() => window.location.href = '/leaderboard'}
                                     className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/50 text-slate-300 font-bold hover:bg-slate-700/50 transition-colors w-full shadow-md"
                                 >
@@ -520,5 +531,20 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                 </div>
             )}
         </AnimatePresence>
+
+        <ShareableCard
+            isOpen={showShareCard}
+            onClose={() => setShowShareCard(false)}
+            data={{
+                playerName: playerName || 'Architect',
+                mode: 'chapter',
+                chapter: 2,
+                chapterTitle: 'The Promise System',
+                principle: 'Last Planner System',
+                efficiency: ppc,
+                grade: ppc >= 90 ? 'S' : ppc >= 70 ? 'A' : ppc >= 50 ? 'B' : ppc >= 30 ? 'C' : 'D',
+            }}
+        />
+        </>
     );
 };
