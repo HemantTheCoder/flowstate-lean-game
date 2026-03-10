@@ -1262,11 +1262,6 @@ export default function Game() {
           onSaveAndExit={handleSaveAndExit}
         />
 
-        <LeanAIModal
-          isOpen={showLeanAI}
-          onClose={() => setShowLeanAI(false)}
-        />
-
         {/* Auth Modal */}
         <div className={showAuthModal ? "block" : "hidden"}>
           <AuthModal triggerOpen={showAuthModal} onOpenChange={setShowAuthModal} />
@@ -1426,6 +1421,12 @@ export default function Game() {
           useGameStore.getState().setTaskMode(mode);
           setTaskModeSelected(true);
         }}
+      />
+
+      {/* Lean AI Modal — root level for proper z-index */}
+      <LeanAIModal
+        isOpen={showLeanAI}
+        onClose={() => setShowLeanAI(false)}
       />
 
       {/* Floating Lean AI Button */}

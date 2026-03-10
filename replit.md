@@ -41,6 +41,8 @@ The project is a fullstack TypeScript application comprising a React frontend wi
 - **Performance Dashboard:** A `/dashboard` route provides a comprehensive overview of player performance, including efficiency, PPC, morale, and waste removed, with trend charts and a day-by-day breakdown.
 - **Leaderboard:** A database-backed `/leaderboard` tracks and displays player scores, filtered by chapter, with weighted scoring based on efficiency, PPC, and quiz results.
 - **PDF Export:** Chapter completion modals offer an "Export Report" button to generate a detailed PDF report of player performance, key decisions, and learnings using jsPDF.
+- **Lean AI Assistant (Coming Soon):** A planned AI-powered assistant accessible from the main menu and via a floating button during gameplay. Will answer questions about game mechanics, Lean Construction concepts, and real-world construction management. Modal preview shows planned capabilities including context-aware answers, lean knowledge base, interactive learning, and real-world applications. Component: `LeanAIModal.tsx`.
+- **Error Boundary:** Global React ErrorBoundary wraps the app in `main.tsx`, providing crash recovery with a user-friendly screen (Reload/Home buttons). Component: `ErrorBoundary.tsx`.
 
 **System Design Choices:**
 - **Modularity:** The project structure separates client, server, and shared logic, promoting maintainability.
