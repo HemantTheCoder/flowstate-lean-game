@@ -1,0 +1,309 @@
+Chapter 4 — Episode: Pull & JIT Systems
+Let Work Be Asked For
+
+Duration: 1 in-game week = 5 interactive days (same cadence as earlier chapters)
+
+Short narrative (opening cutscene)
+
+After cleaning the depot and earning trust with reliable plans, the client is ready to remove bulk laydown and save storage costs. Mira: “We have less space and more schedule pressure — can we bring only what’s needed, exactly when it’s needed?” Old Foreman grunts: “Sounds smart. But if the supplier coughs, we’ll cough too.” Your job: design pull signals and JIT delivery rules so trades get what they need, when they need it — without overstocking or creating chaos.
+
+Tone: pragmatic anime drama — enthusiastic mentor voice (Mira), skeptical but wise (Old Foreman), eager student (Isha), demanding client (Rao).
+
+Learning promise shown on start card:
+
+Understand Push vs Pull
+
+Build Kanban signaling across trades
+
+Configure JIT deliveries & buffers
+
+Reduce Bullwhip and respond to shocks
+
+Button: BEGIN DAY 1 PLANNING
+
+What the player sees (main screens / HUD)
+
+Primary scene: Middle-scale site (mall finishing) with depot map overlay.
+
+Main UI panels:
+
+Left: Pull Board (multi-region Kanban)
+Columns per zone/trade: Backlog → Lookahead → Ready → In-Progress → Done. Kanban cards are tokens you can place and limit.
+
+Center: Site Map / Staging View (isometric)
+Shows zones (ground laydown, floor / building zones), trucks, queue lengths.
+
+Right: JIT Scheduler & Inventory Panel
+For each material type: current on-site inventory, outstanding orders, safety buffer, recommended reorder point, delivery ETA.
+
+Top bar: Day X/5 | Budget | Morale | DPI/Flow Score | Bullwhip Index (live gauge)
+
+Bottom: Action buttons (Create Kanban rule, Schedule Delivery, Negotiate with Supplier, View Forecast)
+
+Hot areas: small tooltips/character guidance that change with actions.
+
+Core mechanics & teaching metaphors (brief)
+
+Pull Board: Players set Kanban limits and connect Kanban lanes to physical staging zones (cards travel visually from pull board to site). Limiting WIP is still used but now per trade/zone.
+
+JIT Scheduler: Player schedules deliveries (time window + quantity) from supplier to zones. Delivery lead times, truck capacity, and traffic affect ETA.
+
+Buffers: Player sets small buffers (safety stock) per material with trade-offs: more buffer reduces stockouts but increases inventory cost and space usage (5S penalty if too bulky).
+
+Dynamic Kanban rules: Conditional rules (e.g., if on-site < X and forecast demand high → auto-request) teach automation of pull.
+
+Bullwhip simulation: Orders amplify up the supply chain if forecasting is naive or if players overreact — this is measured by the Bullwhip Index.
+
+Mini-games: Quick configuration puzzles (set Kanban sizes, schedule a delivery under constraints), negotiation choices with suppliers, and an “emergency substitution” puzzle to manage a shock.
+
+Tutorial / Spotlight (Day 1 onboarding)
+
+Spotlight steps (must be completed in order; short, character-led):
+
+Highlight Push vs Pull — small animation showing push dumping inventory vs pull cards asking for work. Mira explains: “Pull asks. You don’t push.”
+
+Show Pull Board — create first Kanban card, place it into Lookahead.
+
+Show Kanban limit control — set WIP limit for a trade (drag slider). Tooltip: “Lower limits reduce queuing but may starve downstream.”
+
+JIT Scheduler — schedule a sample delivery (pick zone, quantity, window). Show ETA and cost.
+
+Buffer slider — set a small buffer and see immediate space/5S visual consequence.
+
+Run Day 1 execution (start day).
+
+Day-by-day play (5 days)
+
+General rule: Day 1 = main planning + tutorial; Days 2–4 = morning briefing + 1–2 decision points; Day 5 = inspection + final scoring (PPC + inventory metrics + bullwhip). Player can see live metrics and character reactions.
+
+Day 1 — Plan & Configure Pull (Planning Day)
+
+Player sets Kanban lanes for relevant trades (e.g., carpentry, finishing, electrical), sets WIP limits per lane, and maps them to staging zones.
+
+Player schedules first JIT deliveries for the week (quantities & windows) based on the Week Lookahead (Last Planner outputs from Chapter 2).
+
+Tutorial completes: player runs a simulation micro-step to see how kanban requests generate delivery orders.
+
+Outcome: initial Kanban cards move to site, trucks dispatch visually.
+
+Learning: Setting reasonable Kanban limits and matching delivery windows to consumption rate.
+
+Day 2 — Demand smoothing & small shocks
+
+Morning briefing: small demand spike for finishing trim (client requests early reveal). Forecast shows +20% variability.
+
+Player options:
+
+Increase Kanban limit (risk overstock)
+
+Increase buffer for trim (cost & space)
+
+Negotiate expedited supplier shipment (costly)
+
+Postpone non-critical tasks
+
+Event: supplier can offer expedited shipment at extra cost or suggest consolidation.
+
+Outcome teaches tradeoffs between cost, space, and on-time delivery.
+
+Mini-game: Quick “Kanban sizing” puzzle: pick the Kanban card count to satisfy target throughput while keeping WIP low.
+
+Day 3 — Bullwhip teaser: forecast vs realized demand
+
+Forecast indicates steady demand, but a downstream crew suddenly pulls more (simulates a local accelerating decision).
+
+If player overreacts (immediately orders large quantities upstream), the bullwhip index increases; downstream inventory spikes later causing larger waste.
+
+Player choices:
+
+Use smoothing rule: average rolling demand (recommended)
+
+Immediately reorder (aggressive)
+
+Use supplier consignment (if previously negotiated)
+
+Outcome: forces learning about smoothing and why small reactions upstream amplify variability.
+
+Teaching point: Implement demand smoothing (moving average) and order batching policies.
+
+Day 4 — Supplier disruption & substitution
+
+Randomized event: supplier delay or wrong SKU delivered. This mirrors the Chapter 2 emergency pipe repair but now tests JIT fragility.
+
+Player actions:
+
+Call substitute supplier (higher cost, longer lead time)
+
+Re-sequence tasks to reduce demand for missing item (use Last Planner knowledge)
+
+Use emergency buffer (if set earlier)
+
+Temporarily relax Kanban limits to take stock from other zones
+
+Mini-game: emergency substitution (choose compatible materials from inventory by matching properties) — a fast puzzle to keep gameplay lively.
+
+Learning: JIT requires contingency planning; small buffers for critical items, qualified substitute lists, and flexible sequencing help.
+
+Day 5 — Inspection, PPC & Bullwhip reveal
+
+Inspector/Client arrives.
+
+Game computes:
+
+PPC (from promises kept)
+
+Inventory Turns (how many times inventory cycled)
+
+Flow Efficiency
+
+Bullwhip Index (BI) = Var(orders_upstream) / Var(demand_downstream) (normalized)
+
+JIT Success Score (delivery timeliness)
+
+Final debrief: narrative reaction, heatmaps of inventory, timeline of order amplification, and recommended best-practices.
+
+Teaching outcome: Which policies worked, where bullwhip happened, and how to design better pull/JIT systems in future runs.
+
+Metrics & Scoring (how learning is measured)
+
+Primary metrics (live & final):
+
+PPC — Completed Promised / Total Promised (as always)
+
+Flow Efficiency (FE) — value-added time / total time
+
+Inventory Turns (IT) — consumption / average inventory (higher better)
+
+JIT On-time Delivery % (JIT%) — deliveries arriving within scheduled window
+
+Bullwhip Index (BI) — normalized variance ratio (lower better)
+
+Overall Pull Score (0–100):
+Example weighting: 0.30PPC + 0.25FE + 0.15JIT% + 0.15(100 - BI_norm) + 0.15*IT_norm
+
+Tiers: Bronze / Silver / Gold / Platinum thresholds similar to prior chapters.
+
+Visuals: Gauges, heatmaps, Sankey-like flow showing inventory movements.
+
+Formulas & algorithms (pseudocode) — useful for developers / instructors
+
+Simple reorder rule (Kanban → order quantity Q):
+
+ReorderPoint = ExpectedDailyUsage * LeadTime + SafetyStock
+OrderQuantity = KanbanCardSize (fixed) or EconomicBatch
+
+Safety stock (teaching formula, simplified):
+
+SafetyStock = z * σdemand * sqrt(LeadTime)
+
+(Explain z as service-level factor; keep z small in game for simplicity.)
+
+Bullwhip index (normalized for game):
+
+BI = Var(orders_upstream) / Var(demand_downstream)
+BI_norm = min(100, 100 * (BI / BI_baseline))
+
+(Baseline set from tutorial run.)
+
+JIT Scheduler pseudocode (for scheduling deliveries):
+
+for each material:
+  if onSite < ReorderPoint and not orderPending:
+    createDeliveryRequest(quantity=KanbanCardSize, window=earliestAvailableSlot)
+sendRequestsToSupplier()
+
+Demand smoothing example (teaching):
+
+SmoothedDemand = alpha * today + (1-alpha) * previous_smoothed
+alpha = 0.3 (default)
+Events & examples (teaching triggers)
+
+Supplier delay: lead time +1 day; tests buffer sizing
+
+Wrong SKU: requires substitution or rework
+
+Traffic jam: delivery ETA slips; JIT fails if no buffer
+
+Client rush: downstream demand spike; test smoothing vs overreaction
+
+Supplier price hike: tests cost tradeoffs (expedite vs buffer)
+
+Each event tied to character dialog and tradeoffs. Multiple-choice negotiation options produce different costs/lead times.
+
+Mini-games & learning interactives
+
+Kanban Sizing Puzzle — match throughput target with minimum Kanban cards while keeping WIP under limit. Visual feedback: queue lengths bounce.
+
+JIT Scheduler Tetris — fit truck deliveries into limited time windows (mini-Tetris style scheduling) under constraints (hoist, lane closures).
+
+Substitution Matching — pick compatible material properties when wrong SKU arrives (quick matching puzzle). Rewards correct substitutions.
+
+Demand Smoothing slider — interactively change smoothing parameter alpha and replay a 5-step simulated demand to see how orders amplify upstream.
+
+Each mini-game is short (10–60s), graded, and gives small bonuses (temporary morale, supplier goodwill) if done well.
+
+Tutorial checklist (player must complete / optional advanced tips)
+
+Must complete basic Kanban setup for at least two trades.
+
+Must schedule at least 2 JIT deliveries.
+
+Optional: negotiate supplier consignment contract for late-run mitigation.
+
+Advanced tip unlocked: “Use small buffers for critical items only; use smoothing to avoid bullwhip.”
+
+How Chapter 2 & 3 bonuses influence Chapter 4
+
+5S bonus — organized depot increases loading speed and reduces on-site retrieval time; this gives +10% JIT on-time performance by default (if 5S Platinum).
+
+Last Planner (PPC) bonus — if player kept promises in Chapter 2, suppliers will trust them more: slight reduction in supplier lead-time variance (less surprise).
+
+Skill Tree (if implemented) — skills unlocked (e.g., Negotiation skill reduces expedite cost).
+
+These links reinforce progression and make earlier investments meaningful.
+
+Debrief & reflection (end of Day 5)
+
+Visual: Sankey flow of material vs time; inventory heatmap; Kanban card movement timeline.
+
+Text: short (2–3 lines) character reactions + learning point.
+
+Reflection quiz (5 scenario-based MCQs) unlocks Chapter4CompleteModal. Example question:
+
+“A downstream crew unexpectedly doubles demand this morning. Best first response?” (Options: increase Kanban immediately / use smoothing rule / expedite large order / cancel other tasks). Correct answer: use smoothing rule / re-sequence non-critical tasks.
+
+Badges: Pull Architect, JIT Maestro, Bullwhip Tamer.
+
+Assets & UI pieces needed
+
+Pull Board visuals (multi-lane Kanban)
+
+Kanban card tokens + animation (draw → move → consume)
+
+Truck & delivery animations + ETA popups
+
+Heatmap & Sankey diagram visuals
+
+Mini-game assets (tiles, scheduler UI)
+
+Notification/negotiation dialog UI
+
+Audio: pull chime, truck horn, warning ping, success chime
+
+Accessibility & Instructor Mode
+
+Text narration for all tutorial steps
+
+Toggle to show hidden metrics: upstream order variance, demand variance, lead time distribution
+
+Exportable case report (CSV / PDF) with decision log, KPI timeline, and recommendation text
+
+Assessment & pedagogy notes (how this teaches)
+
+Concrete action + immediate feedback (set Kanban → see inventory movements) builds procedural knowledge.
+
+Mini-games give hands-on practice with the abstract concept of smoothing, buffers, and order batching.
+
+Events create teachable failures (JIT fragility) and reinforce the need for small, deliberate buffers and good communication.
+
+Debrief visuals (Sankey + heatmap) convert experience into explicit systems thinking.
