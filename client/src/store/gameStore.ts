@@ -472,7 +472,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         ...commonUpdates,
         day: 1,
         week: 1,
-        phase: 'action',
+        phase: 'planning',
         columns: INITIAL_COLUMNS,
         funds: 10000,
         materials: 500,
@@ -481,6 +481,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         reworkRate: 0,
         pullScore: 0,
         bullwhipIndex: 0,
+        inventoryTurns: 0,
+        jitOnTimeDelivery: 100,
         pullMetrics: [],
         materialsInventory: { timber: 30, pipes: 20, electrical: 20 },
         buffers: { timber: 0, pipes: 0, electrical: 0 },
@@ -731,7 +733,14 @@ export const useGameStore = create<GameState>((set, get) => ({
         dayInsight = "Final review day. How well did your JIT system perform?";
       }
 
-      // If we ran out of materials, tank efficiency
+      const onTimeCount = arriving.length;
+      const totalPendingBefore = state.deliveries.length;
+      const jitAccuracy = totalPendingBefore > 0 ? Math.round((onTimeCount / Math.max(1, totalPendingBefore)) * 100) : 100;
+
+      const totalStock = Object.values(currentInventory).reduce((sum, v) => sum + v, 0);
+      const totalDemand = demand > 0 ? demand : 10;
+      const dailyTurns = totalDemand / Math.max(1, totalStock);
+
       if (missingMaterials) {
         dailyEff = 50;
         adjustedCompleted = Math.floor(potentialCapacity / 2);
@@ -740,10 +749,15 @@ export const useGameStore = create<GameState>((set, get) => ({
         dailyEff = potentialCapacity > 0 ? Math.round((adjustedCompleted / potentialCapacity) * 100) : 0;
       }
 
+      const pullScoreGain = missingMaterials ? -5 : (dailyEff >= 80 ? 10 : 5);
+
       set(s => ({
         pullMetrics: [...s.pullMetrics, metric],
         materialsInventory: currentInventory,
-        deliveries: s.deliveries.filter(d => d.etaDay > nextDay) // clear arrived
+        deliveries: s.deliveries.filter(d => d.etaDay > nextDay),
+        pullScore: Math.max(0, Math.min(100, s.pullScore + pullScoreGain)),
+        inventoryTurns: Math.round(((s.inventoryTurns * (state.day - 1) + dailyTurns) / state.day) * 100) / 100,
+        jitOnTimeDelivery: Math.round(((s.jitOnTimeDelivery * (state.day - 1) + jitAccuracy) / state.day)),
       }));
 
     } else {

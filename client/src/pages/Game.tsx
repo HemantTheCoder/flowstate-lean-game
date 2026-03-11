@@ -443,6 +443,12 @@ export default function Game() {
     }
   }, [day, chapter, flags, startDialogue, setFlag]);
 
+  useEffect(() => {
+    if (chapter === 4 && phase === 'planning' && flags['chapter4_tutorial_seen'] && !currentDialogue) {
+      useGameStore.setState({ phase: 'action' });
+    }
+  }, [chapter, phase, flags, currentDialogue]);
+
   // Bankruptcy Check
   useEffect(() => {
     if (funds < 0 && !flags.game_over) {

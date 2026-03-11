@@ -503,6 +503,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 onClick={() => {
                                     completeTutorial();
                                     setFlag('chapter4_tutorial_seen', true);
+                                    useGameStore.setState({ phase: 'action' });
                                     soundManager.playSFX('success');
                                 }}
                                 className="bg-cyan-500 w-full py-2 rounded text-sm font-bold shadow-lg"
