@@ -407,7 +407,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         lives: finalLives,
         taskModeSelected: false,
         taskMode: 'predefined' as const,
-        flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false, day_6_started: false, game_over: false }
+        flags: { ...state.flags, chapter_intro_seen: false, character_cast_seen: false, ch2_day_6_started: false, game_over: false }
       };
     }
 
@@ -470,15 +470,27 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (chapter === 4) {
       return {
         ...commonUpdates,
-        day: 1, // Will be overridden by the custom case logic if needed, or 1 is fine
+        day: 1,
         week: 1,
-        phase: 'action', // Case 1 plays directly
-        columns: INITIAL_COLUMNS, // Fallback, not strictly used the same way
+        phase: 'action',
+        columns: INITIAL_COLUMNS,
         funds: 10000,
         materials: 500,
         hoistSlots: 3,
         pdi: 0,
         reworkRate: 0,
+        pullScore: 0,
+        bullwhipIndex: 0,
+        pullMetrics: [],
+        materialsInventory: { timber: 30, pipes: 20, electrical: 20 },
+        buffers: { timber: 0, pipes: 0, electrical: 0 },
+        kanbanLimits: { carpentry: 3, finish: 2, electrical: 2 },
+        deliveries: [],
+        dailyMetrics: [],
+        previousDoneCount: 0,
+        previousWasteCount: 0,
+        cumulativeTasksCompleted: 0,
+        cumulativePotentialCapacity: 0,
         lives: finalLives,
         tutorialStep: state.flags['chapter4_tutorial_seen'] ? 0 : 20,
         tutorialActive: !state.flags['chapter4_tutorial_seen'],
@@ -707,15 +719,16 @@ export const useGameStore = create<GameState>((set, get) => ({
         currentInventory[d.material] = (currentInventory[d.material] || 0) + d.amount;
       });
 
-      // Events
       if (state.day === 1) {
         dayInsight = "First Pull scheduling complete. Watch those buffers.";
       } else if (state.day === 2) {
-        dayInsight = "Demand spike handled.";
+        dayInsight = "Demand spike handled. Monitor inventory levels.";
       } else if (state.day === 3) {
         dayInsight = "Bullwhip test incoming. Smoothing saves costs.";
       } else if (state.day === 4) {
         dayInsight = "Supplier disruption! Those safety buffers were critical.";
+      } else if (state.day === 5) {
+        dayInsight = "Final review day. How well did your JIT system perform?";
       }
 
       // If we ran out of materials, tank efficiency

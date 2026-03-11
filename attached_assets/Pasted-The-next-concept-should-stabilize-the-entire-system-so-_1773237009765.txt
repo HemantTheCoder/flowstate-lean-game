@@ -1,0 +1,336 @@
+The next concept should stabilize the entire system so flow remains predictable.
+
+The best next concept is:
+
+Chapter 5 — Heijunka & Takt Time
+Level the Flow
+
+This is the natural next step in Lean after Pull/JIT.
+
+Kanban controls WIP
+Pull controls demand
+But Heijunka controls variability.
+
+Without it, demand spikes cause chaos and bullwhip.
+
+Chapter 5 Narrative
+
+Title card:
+
+Episode 5: Heijunka & Takt Time
+Level the Flow
+
+Story setup:
+
+The mall project is nearing completion.
+
+Pull systems are working, deliveries are timely, and crews are coordinated.
+
+But something is still wrong.
+
+Some days crews are overwhelmed.
+
+Other days they wait idle.
+
+Mira studies the schedule.
+
+“We fixed supply. Now we must fix rhythm.”
+
+Old Foreman nods.
+
+“Work should move like a heartbeat. Not like a thunderstorm.”
+
+Your challenge is to balance workload and create a steady production rhythm.
+
+Learning Goals
+
+Players learn:
+
+• What Takt Time is
+• How to match production pace with demand
+• How to level workload using Heijunka boxes
+• How to prevent crew overload and idle time
+• How leveling stabilizes Pull/JIT systems
+
+Core Gameplay Concept
+
+Instead of reacting to tasks randomly, the player now designs a production rhythm.
+
+Think of this as the tempo of the project.
+
+UI Design
+
+Main screen changes to something new again.
+
+Left panel
+
+Heijunka Box
+
+Grid layout:
+
+Day 1 | Day 2 | Day 3 | Day 4 | Day 5
+-------------------------------------
+Slot 1
+Slot 2
+Slot 3
+Slot 4
+
+Each slot represents a Takt cycle.
+
+Tasks are placed into slots.
+
+Center
+
+Construction Site View
+
+Shows crews working.
+
+Speed depends on rhythm stability.
+
+Right Panel
+
+Demand & Capacity
+
+Shows:
+
+Customer demand
+
+Crew capacity
+
+Current takt time
+
+Overload warnings
+
+Core Mechanic 1 — Calculate Takt Time
+
+Game shows demand.
+
+Example:
+
+Client needs:
+
+20 store interiors
+in 10 days
+
+Takt time:
+
+Available time / demand
+
+Example:
+
+480 minutes per day
+20 stores in 10 days
+Takt = 240 minutes per store
+
+Players set takt.
+
+Core Mechanic 2 — Heijunka Box
+
+Players distribute tasks across takt slots.
+
+Bad example:
+
+Day 1: ████████
+Day 2: █
+Day 3: ███████
+
+Good example:
+
+Day 1: ███
+Day 2: ███
+Day 3: ███
+Day 4: ███
+
+Level workload.
+
+Core Mechanic 3 — Crew Balance
+
+Each task requires resources.
+
+Example:
+
+Task	Crew Needed
+Electrical	2
+Finishing	3
+Painting	2
+
+Overload warning appears.
+
+Player redistributes tasks.
+
+Core Mechanic 4 — Rhythm Simulation
+
+Once schedule is built, simulation runs.
+
+If leveling is good:
+
+crews move smoothly
+
+deliveries match demand
+
+PPC stays high
+
+If bad:
+
+bottlenecks appear
+
+workers idle
+
+overtime penalties
+
+Day Structure (same as other chapters)
+Day 1 — Understanding Takt
+
+Tutorial calculates takt time.
+
+Player sets first rhythm.
+
+Day 2 — Demand spike
+
+Client asks for early store completion.
+
+Player must adjust Heijunka box.
+
+Day 3 — Crew shortage
+
+Two workers unavailable.
+
+Player rebalances workload.
+
+Day 4 — Delivery variability
+
+JIT delivery delayed.
+
+Player must absorb shock without breaking rhythm.
+
+Day 5 — Inspection
+
+Simulation runs.
+
+System stability evaluated.
+
+Metrics
+
+New metrics appear.
+
+Takt Stability Index
+
+Measures variation in workload.
+
+Crew Utilization
+Actual Work Time / Available Time
+Flow Stability
+
+Shows if rhythm maintained.
+
+Final Score
+30% PPC
+25% Flow Stability
+20% Crew Utilization
+15% Takt Stability
+10% Inventory
+End Chapter Visualization
+
+Beautiful graph:
+
+Workload Distribution
+Day 1 ███
+Day 2 ███
+Day 3 ███
+Day 4 ███
+Day 5 ███
+
+versus chaotic system.
+
+Reflection Quiz
+
+Example:
+
+Why is leveling important?
+
+Options:
+
+A. Reduce idle time
+B. Avoid overload
+C. Stabilize flow
+D. All of the above
+
+Achievements
+
+🏅 Rhythm Master
+Maintain takt stability >80%
+
+🏅 Leveling Architect
+No overload events
+
+Chapter 6 (Coming Soon)
+
+After Heijunka, the final Lean concept should be:
+
+Kaizen & Continuous Improvement
+
+Title:
+
+Episode 6: Kaizen
+Improve the System
+
+Chapter 6 Overview (Coming Soon)
+
+Story:
+
+The mall is now operational.
+
+But Lean thinking never stops.
+
+Your role becomes improving the system itself.
+
+Players analyze system data and redesign processes.
+
+Learning Goals
+
+• Identify waste (Muda)
+• Run improvement experiments
+• Implement PDCA cycles
+• Optimize the whole system
+
+Planned Gameplay
+
+Players:
+
+• Analyze data from previous chapters
+• Run improvement experiments
+• redesign workflow
+• remove bottlenecks
+
+Why This Is Perfect Final Chapter
+
+Because Lean ultimately means:
+
+Continuous improvement.
+
+Players become Lean architects, not just operators.
+
+Final Lean Learning Journey
+
+Your game now teaches the entire Lean system:
+
+1 Kanban → visualize work
+2 Last Planner → reliable commitments
+3 5S → stable workspace
+4 Pull & JIT → demand-based production
+5 Heijunka & Takt → stable rhythm
+6 Kaizen → continuous improvement
+
+This is almost the exact Toyota Production System logic.
+
+One More Big Suggestion
+
+At the very end of the game:
+
+Final Simulation Level
+
+Players manage the entire system:
+
+Kanban + LPS + 5S + JIT + Heijunka together.
+
+That becomes the capstone level.

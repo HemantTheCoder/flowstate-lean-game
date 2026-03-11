@@ -159,8 +159,8 @@ export const Chapter4CompleteModal: React.FC<Chapter4CompleteModalProps> = ({
                         <div className="grid grid-cols-3 gap-3">
                             <button
                                 onClick={() => {
-                                    const days = [17, 18, 19, 20, 21];
-                                    const phases = ['Pull Board Setup', 'JIT Scheduling', 'Demand Matching', 'Flow Optimization', 'System Integration'];
+                                    const days = [1, 2, 3, 4, 5];
+                                    const phases = ['Pull Board Setup', 'VIP Demand Spike', 'Bullwhip Warning', 'Truck Breakdown', 'Final Review'];
                                     exportChapterReport({
                                         playerName: playerName || 'Architect',
                                         chapter: 4,

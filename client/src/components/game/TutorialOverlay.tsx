@@ -56,9 +56,11 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
             if (tutorialStep === 8) targetId = 'lives-box';
             if (tutorialStep === 9) targetId = 'btn-save';
 
-            // Chapter 4 Target IDs
-            if (tutorialStep === 20) targetId = 'pull-board-title'; // Needs to exist in PullBoard UI
-            if (tutorialStep === 21) targetId = 'jit-scheduler-title'; // Needs to exist in JITScheduler UI
+            if (tutorialStep === 20) targetId = 'pull-board-title';
+            if (tutorialStep === 21) targetId = 'tutorial-wip-limits';
+            if (tutorialStep === 22) targetId = 'jit-scheduler-title';
+            if (tutorialStep === 23) targetId = 'tutorial-jit-scheduler';
+            if (tutorialStep === 24) targetId = 'button-end-day-ch4';
 
             if (targetId) {
                 const el = document.getElementById(targetId);
@@ -414,37 +416,96 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                 {tutorialStep === 20 && chapter === 4 && (
                     <div className="absolute z-[90] w-80 max-w-[calc(100vw-24px)] pointer-events-auto" style={clampToViewport({ top: 80, left: 80 }, 320, 260)}>
                         <div className="bg-indigo-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-indigo-400 relative">
-                            <h3 className="font-bold text-indigo-300 text-lg mb-2">Trade Pull Board</h3>
+                            <h3 className="font-bold text-indigo-300 text-lg mb-2">Welcome to Pull Systems</h3>
                             <p className="text-sm mb-3">
-                                You are now in a <b>Pull System</b>. You don't assign tasks. <br /><br />
-                                Instead, you set a <b>WIP Limit</b> (Work-in-Progress limit) for each trade. If there's capacity on site, the trade will automatically "pull" work downstream.
+                                You are now in a <b>Pull System</b>. Unlike Chapters 1-3, you don't drag tasks on a board.<br /><br />
+                                Instead, you manage <b>WIP Limits</b>, <b>material deliveries</b>, and <b>safety buffers</b> across three panels.
                             </p>
+                            <div className="text-[10px] text-indigo-300/70 mb-3 font-bold uppercase tracking-widest">Step 1 of 5</div>
                             <button
                                 onClick={() => setTutorialStep(21)}
                                 className="bg-indigo-500 w-full py-2 rounded text-sm font-bold shadow-lg"
                             >
-                                Next: JIT Deliveries
+                                Next: WIP Limits
                             </button>
                         </div>
                     </div>
                 )}
 
-                {/* Step 21: JIT Scheduler */}
                 {tutorialStep === 21 && chapter === 4 && (
-                    <div className="absolute z-[90] w-80 max-w-[calc(100vw-24px)] pointer-events-auto" style={clampToViewport({ top: 80, right: 370 }, 320, 260)}>
-                        <div className="bg-emerald-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-emerald-400 relative">
-                            <h3 className="font-bold text-emerald-300 text-lg mb-2">JIT Scheduler & Buffers</h3>
+                    <div className="absolute z-[90] w-80 max-w-[calc(100vw-24px)] pointer-events-auto" style={clampToViewport({ top: 200, left: 80 }, 320, 280)}>
+                        <div className="bg-indigo-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-indigo-400 relative">
+                            <h3 className="font-bold text-indigo-300 text-lg mb-2">Trade WIP Limits</h3>
                             <p className="text-sm mb-3">
-                                As trades pull work, they consume materials. You must order deliveries <b>Just-In-Time</b> to arrive before they run out!
-                                <br /><br />
-                                Set a <b>Safety Buffer</b> to ensure you always have a minimum stock, but watch out—large buffers hurt your "Flow" score due to overcrowding.
+                                Each trade (Carpentry, Finishing, Electrical) has a <b>WIP Limit</b> slider.<br /><br />
+                                <b>Low limits</b> = less congestion, better flow.<br />
+                                <b>High limits</b> = more work in progress, risk of overcrowding.
                             </p>
+                            <div className="text-[10px] text-indigo-300/70 mb-3 font-bold uppercase tracking-widest">Step 2 of 5</div>
+                            <button
+                                onClick={() => setTutorialStep(22)}
+                                className="bg-indigo-500 w-full py-2 rounded text-sm font-bold shadow-lg"
+                            >
+                                Next: JIT Scheduler
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {tutorialStep === 22 && chapter === 4 && (
+                    <div className="absolute z-[90] w-80 max-w-[calc(100vw-24px)] pointer-events-auto" style={clampToViewport({ top: 80, right: 370 }, 320, 280)}>
+                        <div className="bg-emerald-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-emerald-400 relative">
+                            <h3 className="font-bold text-emerald-300 text-lg mb-2">JIT Scheduler</h3>
+                            <p className="text-sm mb-3">
+                                As trades pull work, they consume materials. You must order deliveries <b>Just-In-Time</b> to arrive before they run out!<br /><br />
+                                Use the Scheduler panel to dispatch material trucks.
+                            </p>
+                            <div className="text-[10px] text-emerald-300/70 mb-3 font-bold uppercase tracking-widest">Step 3 of 5</div>
+                            <button
+                                onClick={() => setTutorialStep(23)}
+                                className="bg-emerald-500 w-full py-2 rounded text-sm font-bold shadow-lg"
+                            >
+                                Next: Safety Buffers
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {tutorialStep === 23 && chapter === 4 && (
+                    <div className="absolute z-[90] w-80 max-w-[calc(100vw-24px)] pointer-events-auto" style={clampToViewport({ top: 200, right: 370 }, 320, 280)}>
+                        <div className="bg-emerald-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-emerald-400 relative">
+                            <h3 className="font-bold text-emerald-300 text-lg mb-2">Safety Buffers</h3>
+                            <p className="text-sm mb-3">
+                                Set a <b>Safety Buffer</b> for each material to ensure you always have minimum stock on site.<br /><br />
+                                But watch out — large buffers waste money and space. Balance protection vs. lean inventory.
+                            </p>
+                            <div className="text-[10px] text-emerald-300/70 mb-3 font-bold uppercase tracking-widest">Step 4 of 5</div>
+                            <button
+                                onClick={() => setTutorialStep(24)}
+                                className="bg-emerald-500 w-full py-2 rounded text-sm font-bold shadow-lg"
+                            >
+                                Next: End Day
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {tutorialStep === 24 && chapter === 4 && (
+                    <div className="absolute z-[90] w-80 max-w-[calc(100vw-24px)] pointer-events-auto" style={clampToViewport({ top: 20, right: 30 }, 320, 260)}>
+                        <div className="bg-cyan-900 text-white px-5 py-4 rounded-xl shadow-2xl border-2 border-cyan-400 relative">
+                            <h3 className="font-bold text-cyan-300 text-lg mb-2">End Day</h3>
+                            <p className="text-sm mb-3">
+                                When you've set your WIP limits and scheduled deliveries, press <b>End Day</b> to advance.<br /><br />
+                                Deliveries arrive, materials get consumed, and you'll face decisions on Days 2-4. Good luck!
+                            </p>
+                            <div className="text-[10px] text-cyan-300/70 mb-3 font-bold uppercase tracking-widest">Step 5 of 5</div>
                             <button
                                 onClick={() => {
-                                    setTutorialStep(99);
+                                    completeTutorial();
+                                    setFlag('chapter4_tutorial_seen', true);
                                     soundManager.playSFX('success');
                                 }}
-                                className="bg-emerald-500 w-full py-2 rounded text-sm font-bold shadow-lg"
+                                className="bg-cyan-500 w-full py-2 rounded text-sm font-bold shadow-lg"
                             >
                                 Begin Day 1
                             </button>

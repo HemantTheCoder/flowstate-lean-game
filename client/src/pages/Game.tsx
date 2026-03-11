@@ -352,39 +352,18 @@ export default function Game() {
         triggerClientPressureDecision();
       }
 
-      // --- CASE STUDY 1 (CHAPTER 4) DECISION TRIGGERS ---
       if (chapter === 4) {
-        if (day === 2 && !flags['case1_d2_decision']) {
-          setFlag('case1_d2_decision', true);
-          triggerCase1Day2Decision();
+        if (day === 2 && !flags['ch4_d2_decision']) {
+          setFlag('ch4_d2_decision', true);
+          triggerChapter4Day2Decision();
         }
         if (day === 3 && !flags['ch4_d3_decision']) {
           setFlag('ch4_d3_decision', true);
           triggerChapter4Day3Decision();
         }
-        if (day === 4 && !flags['case1_d4_decision']) {
-          setFlag('case1_d4_decision', true);
-          triggerCase1Day4Decision();
-        }
-        if (day === 5 && !flags['ch4_d5_decision']) {
-          setFlag('ch4_d5_decision', true);
-          triggerChapter4Day2Decision();
-        }
-        if (day === 6 && !flags['case1_d6_decision']) {
-          setFlag('case1_d6_decision', true);
-          triggerCase1Day6Decision();
-        }
-        if (day === 8 && !flags['ch4_d8_decision']) {
-          setFlag('ch4_d8_decision', true);
+        if (day === 4 && !flags['ch4_d4_decision']) {
+          setFlag('ch4_d4_decision', true);
           triggerChapter4Day4Decision();
-        }
-        if (day === 9 && !flags['case1_d9_decision']) {
-          setFlag('case1_d9_decision', true);
-          triggerCase1Day9Decision();
-        }
-        if (day === 11 && !flags['case1_d11_decision']) {
-          setFlag('case1_d11_decision', true);
-          triggerCase1Day11Decision();
         }
       }
     }
@@ -401,7 +380,7 @@ export default function Game() {
             CASE_2_SCHEDULE;
     // Check if we have config for this day
     const dayConfig = currentSchedule.find(d => d.day === day);
-    const dayKey = `day_${day}_started`;
+    const dayKey = `ch${chapter}_day_${day}_started`;
 
     // Only block dialogue for Chapter 5's case tutorial now
     const tutorialPending = chapter === 5 && !flags['case2_tutorial_seen'];
@@ -410,13 +389,11 @@ export default function Game() {
       // 1. Play Dialogue
       let dialogue = dayConfig.dialogue;
 
-      // Day 5 Branching Logic
-      if (day === 5) {
+      if (day === 5 && chapter === 1) {
         const pushed = flags['decision_push_made'];
         const branch = pushed ? DAY_5_BAD : DAY_5_GOOD;
         dialogue = [...dialogue, ...branch];
 
-        // If Good Outcome, trigger Celebration Flag for Visuals AND Audio
         if (!pushed) {
           setTimeout(() => setFlag('celebration_triggered', true), 500);
         }
@@ -518,115 +495,6 @@ export default function Game() {
     setShowDecision(true);
   };
 
-  const triggerCase1Day2Decision = () => {
-    setDecisionProps({
-      title: "Broken Elevator (Vertical Limits)",
-      prompt: "One of the freight elevators' winch motors has burnt out, halving vertical capacity. Trucks are waiting downstairs.",
-      options: [
-        { id: 'pay', text: "Emergency Fix ($2k)", type: 'safe', description: "Pay expedited fee. Restores capacity immediately." },
-        { id: 'reroute', text: "Reroute Schedule (Risky)", type: 'risky', description: "Save money, but increase passenger disruption by 5%." }
-      ],
-      onSelect: (id: string) => {
-        if (id === 'pay') {
-          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 2000) }));
-          soundManager.playSFX('success');
-        } else {
-          useGameStore.setState(s => ({ pdi: Math.min(100, s.pdi + 5), hoistSlots: Math.max(1, s.hoistSlots - 1) }));
-          soundManager.playSFX('click');
-        }
-        setShowDecision(false);
-      }
-    });
-    setShowDecision(true);
-  };
-
-  const triggerCase1Day4Decision = () => {
-    setDecisionProps({
-      title: "Security Sweep",
-      prompt: "TSA is performing an unannounced audit of all access logs. Workers are stuck at the sterile boundary.",
-      options: [
-        { id: 'expedite', text: "Hire Expediter ($1k)", type: 'risky', description: "Pay administrative fee to fast-track our crews." },
-        { id: 'wait', text: "Accept Delay (Safe)", type: 'safe', description: "Focus only on WIP tasks inside. Lose 1 hoist slot today." }
-      ],
-      onSelect: (id: string) => {
-        if (id === 'expedite') {
-          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 1000) }));
-          soundManager.playSFX('click');
-        } else {
-          useGameStore.setState(s => ({ hoistSlots: Math.max(1, s.hoistSlots - 1) }));
-          soundManager.playSFX('success');
-        }
-        setShowDecision(false);
-      }
-    });
-    setShowDecision(true);
-  };
-
-  const triggerCase1Day6Decision = () => {
-    setDecisionProps({
-      title: "Supplier Mix-up",
-      prompt: "The HVAC supplier sent round duct fittings instead of rectangular ones. The crew is already hanging them!",
-      options: [
-        { id: 'rework', text: "Tear Down ($1.5k)", type: 'safe', description: "Stop the line and fix it now. Reduces rework rate by 5%." },
-        { id: 'patch', text: "Patch it Later", type: 'risky', description: "Keep hanging them. Adds 10% to Rework Rate risk." }
-      ],
-      onSelect: (id: string) => {
-        if (id === 'rework') {
-          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 1500), reworkRate: Math.max(0, s.reworkRate - 5) }));
-          soundManager.playSFX('success');
-        } else {
-          useGameStore.setState(s => ({ reworkRate: Math.min(100, s.reworkRate + 10) }));
-          soundManager.playSFX('click');
-        }
-        setShowDecision(false);
-      }
-    });
-    setShowDecision(true);
-  };
-
-  const triggerCase1Day9Decision = () => {
-    setDecisionProps({
-      title: "The VIP Surge",
-      prompt: "A massive conference hit town. Operations demands absolute silence in the terminal for the next 24 hours.",
-      options: [
-        { id: 'halt', text: "Halt All Noisy Work", type: 'safe', description: "Lose 1 Hoist Slot, protect PDI." },
-        { id: 'push', text: "Ignore Operations", type: 'risky', description: "Keep working at full speed. +15% PDI penalty." }
-      ],
-      onSelect: (id: string) => {
-        if (id === 'halt') {
-          useGameStore.setState(s => ({ hoistSlots: Math.max(1, s.hoistSlots - 1) }));
-          soundManager.playSFX('click');
-        } else {
-          useGameStore.setState(s => ({ pdi: Math.min(100, s.pdi + 15) }));
-          soundManager.playSFX('click');
-        }
-        setShowDecision(false);
-      }
-    });
-    setShowDecision(true);
-  };
-
-  const triggerCase1Day11Decision = () => {
-    setDecisionProps({
-      title: "Power Emergency",
-      prompt: "The temporary breaker panel blew, cutting power to the East side. We need an immediate workaround.",
-      options: [
-        { id: 'gen', text: "Rent Generator ($3k)", type: 'safe', description: "Keep power flowing, lose cash." },
-        { id: 'manual', text: "Manual Labour", type: 'risky', description: "Free, but exhausts the crew. +5% Rework Risk." }
-      ],
-      onSelect: (id: string) => {
-        if (id === 'gen') {
-          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 3000) }));
-          soundManager.playSFX('success');
-        } else {
-          useGameStore.setState(s => ({ reworkRate: Math.min(100, s.reworkRate + 5) }));
-          soundManager.playSFX('alert');
-        }
-        setShowDecision(false);
-      }
-    });
-    setShowDecision(true);
-  };
 
   const triggerPushDecision = () => {
     setDecisionProps({
@@ -713,7 +581,7 @@ export default function Game() {
         if (id === 'limit') {
           useGameStore.setState(s => ({
             funds: Math.max(0, s.funds - 500),
-            kanbanLimits: { ...s.kanbanLimits, 'carpentry': (s.kanbanLimits['carpentry'] || 4) + 2, 'finishing': (s.kanbanLimits['finishing'] || 4) + 2 }
+            kanbanLimits: { ...s.kanbanLimits, 'carpentry': (s.kanbanLimits['carpentry'] || 4) + 2, 'finish': (s.kanbanLimits['finish'] || 4) + 2 }
           }));
           soundManager.playSFX('success');
         } else if (id === 'expedite') {
@@ -763,10 +631,14 @@ export default function Game() {
         { id: 'sub', text: "Emergency Courier ($2k)", type: 'risky', description: "Expensive same-day delivery. Guaranteed materials." }
       ],
       onSelect: (id: string) => {
-        const state = useGameStore.getState();
         if (id === 'sub') {
-          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 2000) }));
-          state.orderMaterial('electrical', 30, state.day);
+          useGameStore.setState(s => ({
+            funds: Math.max(0, s.funds - 2000),
+            materialsInventory: {
+              ...s.materialsInventory,
+              electrical: (s.materialsInventory['electrical'] || 0) + 30
+            }
+          }));
           soundManager.playSFX('success');
         } else {
           soundManager.playSFX('click');
@@ -808,7 +680,7 @@ export default function Game() {
       return;
     }
 
-    if (currentDay > 12 && chapter === 4) {
+    if (currentDay > 5 && chapter === 4) {
       setShowQuiz(true);
       return;
     }
@@ -1139,9 +1011,9 @@ export default function Game() {
             <button
               onClick={handleEndDay}
               data-testid="button-end-day"
-              className={`${((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 12 && chapter === 4) || (day === 14 && chapter === 5)) ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-b-4 border-amber-700 ring-2 ring-amber-300/50' : 'bg-cyan-600 hover:bg-cyan-500 border-b-4 border-cyan-800'} text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') || getSmartObjective().includes('Project Complete') ? 'animate-bounce ring-4 ring-amber-400/50' : ''}`}
+              className={`${((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 5 && chapter === 4) || (day === 14 && chapter === 5)) ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-b-4 border-amber-700 ring-2 ring-amber-300/50' : 'bg-cyan-600 hover:bg-cyan-500 border-b-4 border-cyan-800'} text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') || getSmartObjective().includes('Project Complete') ? 'animate-bounce ring-4 ring-amber-400/50' : ''}`}
             >
-              {(((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 12 && chapter === 4) || (day === 14 && chapter === 5))) ? 'Finish Chapter' : 'End Day'}
+              {(((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 5 && chapter === 4) || (day === 14 && chapter === 5))) ? 'Finish Chapter' : 'End Day'}
             </button>
           </div>
 
@@ -1280,7 +1152,7 @@ export default function Game() {
                 <div className="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/50">
                   <Plane className="w-4 h-4 text-cyan-400" />
                   <span className="font-black text-white text-sm">Day {day}</span>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase">/ 12</span>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase">/ 5</span>
                 </div>
                 <div className="hidden sm:block bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/50">
                   <span className="text-[10px] text-slate-400 font-bold uppercase mr-1.5">Funds</span>
@@ -1334,9 +1206,9 @@ export default function Game() {
                 <button
                   onClick={handleEndDay}
                   data-testid="button-end-day-ch4"
-                  className={`${day === 12 ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 ring-2 ring-amber-300/50' : 'bg-cyan-600 hover:bg-cyan-500'} text-white font-bold px-4 py-1.5 rounded-xl shadow-md transition-colors text-sm whitespace-nowrap`}
+                  className={`${day === 5 ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 ring-2 ring-amber-300/50' : 'bg-cyan-600 hover:bg-cyan-500'} text-white font-bold px-4 py-1.5 rounded-xl shadow-md transition-colors text-sm whitespace-nowrap`}
                 >
-                  {day === 12 ? 'Finish Chapter' : 'End Day'}
+                  {day === 5 ? 'Finish Chapter' : 'End Day'}
                 </button>
               </div>
             </div>

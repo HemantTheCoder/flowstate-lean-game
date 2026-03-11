@@ -99,7 +99,7 @@ export function TerminalView({ objective }: { objective?: string }) {
                     <div className="flex items-center gap-1.5 px-2.5 border-r border-slate-700/50">
                         <Clock className="w-3.5 h-3.5 text-slate-400" />
                         <span className="text-xs font-black text-white">Day {day}</span>
-                        <span className="text-slate-600 text-[10px]">/12</span>
+                        <span className="text-slate-600 text-[10px]">/5</span>
                     </div>
                     {/* Hoist */}
                     <div className="flex items-center gap-1.5 px-2.5 border-r border-slate-700/50">
@@ -187,18 +187,18 @@ export function TerminalView({ objective }: { objective?: string }) {
                     <div className="shrink-0 px-4 py-2.5 border-t border-slate-700/40 bg-slate-900/30">
                         <div className="flex justify-between items-center mb-1.5">
                             <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Programme</span>
-                            <span className="text-[9px] text-purple-400 font-black">{Math.round((day / 12) * 100)}% Complete</span>
+                            <span className="text-[9px] text-purple-400 font-black">{Math.round((day / 5) * 100)}% Complete</span>
                         </div>
                         <div className="relative h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                             <motion.div
                                 className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-600 to-indigo-400 rounded-full"
                                 initial={{ width: 0 }}
-                                animate={{ width: `${(day / 12) * 100}%` }}
+                                animate={{ width: `${(day / 5) * 100}%` }}
                                 transition={{ duration: 0.5 }}
                             />
                         </div>
                         <div className="flex justify-between mt-1">
-                            {[1, 4, 7, 10, 12].map(d => (
+                            {[1, 2, 3, 4, 5].map(d => (
                                 <span key={d} className={`text-[8px] font-bold ${day >= d ? 'text-purple-400' : 'text-slate-600'}`}>D{d}</span>
                             ))}
                         </div>

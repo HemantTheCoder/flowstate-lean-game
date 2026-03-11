@@ -24,7 +24,7 @@ const CS1_STEPS: TutorialStep[] = [
     {
         icon: <Building2 className="w-8 h-8" />,
         title: "Welcome to Terminal T-Upgrade",
-        body: "You are the Flow Architect for a midfield terminal expansion. Your job is to sequence construction work across 3 levels, use hoists efficiently, and minimize passenger disruption over 12 simulated days.",
+        body: "You are the Flow Architect for a midfield terminal expansion. Your job is to manage Pull systems and JIT deliveries, use hoists efficiently, and minimize passenger disruption over 5 days.",
         color: "purple"
     },
     {
@@ -44,7 +44,7 @@ const CS1_STEPS: TutorialStep[] = [
     {
         icon: <Clock className="w-8 h-8" />,
         title: "End Day & Day Timeline",
-        body: "Click End Day when you have made your decisions for the day. The timeline bar at the bottom shows your progress across the 12-day programme.\n\nThe goal: reach Day 12 with PDI under 20% and Rework Rate under 10%.",
+        body: "Click End Day when you have made your decisions for the day. The timeline bar at the bottom shows your progress across the 5-day programme.\n\nThe goal: reach Day 5 with PDI under 20% and Rework Rate under 10%.",
         tip: "⏱️ Don't rush! Each decision carries over to the next day. Plan ahead.",
         color: "violet"
     },
