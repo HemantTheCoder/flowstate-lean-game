@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGameStore } from '@/store/gameStore';
+import { useGameStore, formatCurrency } from '@/store/gameStore';
 import soundManager from '@/lib/soundManager';
 import { apiRequest } from '@/lib/queryClient';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
@@ -158,8 +158,11 @@ const KanbanBadge: React.FC<{ tier: { label: string; color: string } }> = ({ tie
     );
 };
 
+import { CONSTRUCTION_TASKS } from '@/data/tasks';
+import { Badge } from '@/components/ui/badge';
+
 export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => void; onContinue: () => void; quizScore?: number }> = ({ isOpen, onClose, onContinue, quizScore }) => {
-    const { funds, lpi, dailyMetrics, flags, cumulativeTasksCompleted, cumulativePotentialCapacity, playerName, chapter } = useGameStore();
+    const { funds, currency, lpi, dailyMetrics, flags, cumulativeTasksCompleted, cumulativePotentialCapacity, playerName, chapter } = useGameStore();
     const [activeDay, setActiveDay] = useState<number | null>(null);
     const [showInsights, setShowInsights] = useState(false);
     const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -309,7 +312,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
 
     const chartData = (dailyMetrics as DayBreakdown[]).map(m => ({
         ...m,
-        dayLabel: `Day ${m.day}`,
+        dayLabel: `Month ${m.day}`,
         fill: m.efficiency >= 80 ? '#22c55e' : m.efficiency >= 50 ? '#3b82f6' : '#f59e0b'
     }));
 
@@ -465,6 +468,66 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
+                            </div>
+
+                            <div className="bg-slate-800/40 rounded-2xl border border-slate-700/50 overflow-hidden shadow-inner mt-6">
+                                <div className="p-4 border-b border-slate-700/50 bg-slate-900/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                    <h3 className="text-slate-200 font-bold text-sm uppercase flex items-center gap-2">
+                                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                                        Final Project Delivery Report
+                                    </h3>
+                                    <div className="flex items-center gap-2 text-xs font-bold px-3 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg">
+                                        Total Cost Avoidance: {formatCurrency(CONSTRUCTION_TASKS.reduce((acc, t) => acc + (t.costToStart || 0) * 0.13, 0), currency)}
+                                    </div>
+                                </div>
+                                <div className="p-0 overflow-x-auto custom-scrollbar-thin">
+                                    <table className="w-full text-left border-collapse min-w-[600px]">
+                                        <thead className="bg-slate-800/80 text-slate-400 text-[10px] uppercase tracking-widest font-bold">
+                                            <tr>
+                                                <th className="px-4 py-3 border-b border-slate-700/50">Task Scope</th>
+                                                <th className="px-4 py-3 border-b border-slate-700/50 text-right">Planned Cost</th>
+                                                <th className="px-4 py-3 border-b border-slate-700/50 text-right">Final Cost</th>
+                                                <th className="px-4 py-3 border-b border-slate-700/50 text-center">Outcome</th>
+                                                <th className="px-4 py-3 border-b border-slate-700/50 text-right">Improvement</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-700/50">
+                                            {CONSTRUCTION_TASKS.slice(0, 5).map((task) => {
+                                                const plannedCost = task.costToStart || 0;
+                                                const finalCost = plannedCost * 1.02; // Minor variance post-Kanban
+                                                const preKanbanCost = plannedCost * 1.15; // 15% overrun
+                                                const saved = preKanbanCost - finalCost;
+                                                
+                                                return (
+                                                <tr key={task.id} className="bg-slate-900/20 hover:bg-slate-800/50 transition-colors">
+                                                    <td className="px-4 py-3">
+                                                        <div className="text-sm font-semibold text-slate-200">{task.title}</div>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right text-xs font-mono text-slate-400">
+                                                        {formatCurrency(plannedCost, currency)}
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <span className="text-xs font-mono font-bold text-emerald-400">
+                                                            {formatCurrency(finalCost, currency)}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wider">On-Time</span>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <span className="text-xs font-bold text-emerald-400 flex items-center justify-end gap-1">
+                                                            <TrendingUp className="w-3 h-3" />
+                                                            {formatCurrency(saved, currency)}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            )})}
+                                        </tbody>
+                                    </table>
+                                    <div className="p-3 bg-slate-800/30 text-[11px] text-center text-slate-400 italic">
+                                        Showing sample critical tasks. Kanban flow control prevented the standard 15% industry cost overruns and 1 month timeline delays, establishing stable Just-In-Time delivery.
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-5 gap-2">

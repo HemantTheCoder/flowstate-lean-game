@@ -3,6 +3,7 @@ import type { Server } from "http";
 import { storage } from "./storage.js";
 import { api } from "../shared/routes.js";
 import { z } from "zod";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export function registerRoutes(app: Express) {
   console.log(`[Server] Environment: ${process.env.NODE_ENV}`);
@@ -296,6 +297,57 @@ export function registerRoutes(app: Express) {
     } catch (error) {
       console.error("[API] Fetch User Save Error:", error);
       res.status(500).json({ message: "Failed to fetch user save state" });
+    }
+  });
+
+  // --- LEAN AI CHAT ---
+  app.post("/api/chat", async (req, res) => {
+    try {
+      const { message, history, gameState } = req.body;
+      
+      if (!process.env.GEMINI_API_KEY) {
+        return res.status(500).json({ error: "Gemini API key is missing. Please add it to your .env file." });
+      }
+
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash",
+        systemInstruction: `You are the 'Lean AI Advisor' for the game FlowState, a serious game teaching Lean Construction and Kanban principles.
+Your goal is to answer the player's questions in a friendly, concise, and helpful manner, acting as an expert in Work-In-Progress (WIP) limits, Pull planning, Percent Plan Complete (PPC), and construction efficiency.
+
+Current Game State Context:
+- Day: ${gameState?.day || 'Unknown'}
+- Chapter: ${gameState?.chapter || 'Unknown'}
+- Funds Available: $${gameState?.funds || 0}
+- WIP Limit for 'Doing' Column: ${gameState?.columns?.find((c: any) => c.id === 'doing')?.wipLimit || 'No Limit'}
+- Tasks currently in Progress: ${gameState?.columns?.find((c: any) => c.id === 'doing')?.tasks?.length || 0}
+- Tasks ready to start: ${gameState?.columns?.find((c: any) => c.id === 'ready' || c.id === 'backlog')?.tasks?.length || 0}
+
+Game Rules Refresher:
+- Starting a task immediately deducts an Activation Cost from funds.
+- Finishing a task (moving to 'Done') grants Revenue/Reward. 
+- Overfilling the 'Doing' column causes a Traffic Jam (exceeding WIP) which slows progress and drains daily overhead funds without producing revenue.
+- PPC (Efficiency) is measured strictly by tasks Finished vs Tasks Planned.
+
+Instructions:
+1. Respond directly to the player's query based on this context. 
+2. Make sure you answer the question accurately according to Lean Principles. 
+3. Keep responses under 2-3 paragraphs.
+4. Use markdown to bold key terms.`
+      });
+
+      const chat = model.startChat({
+        history: history || [],
+      });
+
+      const result = await chat.sendMessage(message);
+      const response = await result.response;
+      const text = response.text();
+
+      res.json({ text });
+    } catch (error: any) {
+      console.error("[API] Chat Error details:", error);
+      res.status(500).json({ error: `Failed to generate AI response: ${error?.message || 'Unknown error'}` });
     }
   });
 

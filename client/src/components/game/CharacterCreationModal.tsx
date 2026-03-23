@@ -24,6 +24,8 @@ export const CharacterCreationModal: React.FC = () => {
 
     const [step, setStep] = useState<Step>('choice');
     const [name, setName] = useState('');
+    const [designation, setDesignation] = useState('Lean Champion');
+    const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
     const [gender, setGender] = useState<'male' | 'female'>('male');
     const [avatarLoaded, setAvatarLoaded] = useState(false);
 
@@ -43,18 +45,19 @@ export const CharacterCreationModal: React.FC = () => {
     const savedDay = (gameState as any)?.kanbanState?.day ?? (gameState as any)?.day ?? 1;
     const savedBadges = (gameState as any)?.unlockedBadges?.length ?? 0;
     const savedLpi = (gameState as any)?.lpi;
+    const savedCurrency = (gameState as any)?.currency as 'INR' | 'USD' | undefined;
 
     const hasExistingProfile = !!user && !!savedName;
 
     const handleResumeProfile = () => {
         if (!savedName) return;
-        setPlayerProfile(savedName, savedGender ?? 'male');
+        setPlayerProfile(savedName, savedGender ?? 'male', 'Lean Champion', savedCurrency ?? 'INR');
         setFlag('character_created', true);
     };
 
     const handleConfirm = () => {
         if (!name.trim()) return;
-        setPlayerProfile(name, gender);
+        setPlayerProfile(name, gender, designation, currency);
         setFlag('character_created', true);
     };
 
@@ -276,6 +279,49 @@ export const CharacterCreationModal: React.FC = () => {
                                     placeholder="Enter Name..."
                                     autoFocus
                                 />
+                            </motion.div>
+
+                            <motion.div
+                                initial={{ x: -15, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.25 }}
+                                className="space-y-3"
+                            >
+                                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.8)]" />
+                                    Select Designation
+                                </label>
+                                <select
+                                    value={designation}
+                                    onChange={(e) => setDesignation(e.target.value)}
+                                    className="w-full bg-slate-950/50 border border-slate-700/50 focus:border-emerald-500 rounded-xl px-4 py-3 text-white text-base md:text-lg font-bold outline-none cursor-pointer placeholder-slate-600 transition-all shadow-inner focus:shadow-[0_0_20px_rgba(16,185,129,0.1)] appearance-none"
+                                >
+                                    <option value="Lean Champion">Lean Champion</option>
+                                    <option value="Civil Engineer">Civil Engineer</option>
+                                    <option value="Site Supervisor">Site Supervisor</option>
+                                    <option value="Project Manager">Project Manager</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </motion.div>
+
+                            <motion.div
+                                initial={{ x: -15, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.27 }}
+                                className="space-y-3"
+                            >
+                                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_5px_rgba(234,179,8,0.8)]" />
+                                    Project Currency
+                                </label>
+                                <select
+                                    value={currency}
+                                    onChange={(e) => setCurrency(e.target.value as 'INR' | 'USD')}
+                                    className="w-full bg-slate-950/50 border border-slate-700/50 focus:border-yellow-500 rounded-xl px-4 py-3 text-white text-base md:text-lg font-bold outline-none cursor-pointer placeholder-slate-600 transition-all shadow-inner focus:shadow-[0_0_20px_rgba(234,179,8,0.1)] appearance-none"
+                                >
+                                    <option value="INR">Rupees (₹)</option>
+                                    <option value="USD">Dollars ($)</option>
+                                </select>
                             </motion.div>
 
                             <motion.div

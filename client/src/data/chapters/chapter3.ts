@@ -15,8 +15,8 @@ export const CHAPTER_3_SCHEDULE: DayConfig[] = [
             { character: 'Advisor', text: "Today, we Sort. If it's broken or useless, it goes to the Red Tag Area.", emotion: 'happy' }
         ],
         briefing: {
-            objective: "Red Tag the Waste.",
-            action: "Open the Depot. Drag all 'Trash' and 'Broken' items to the Red Tag Area (Zone-Trash)."
+            objective: "Filter the Waste.",
+            action: "Open the Depot. Separate the value from the junk by dragging all 'Trash' and 'Broken' items to the Red Tag Area (Zone-Trash)."
         }
     },
     {
@@ -33,7 +33,7 @@ export const CHAPTER_3_SCHEDULE: DayConfig[] = [
         ],
         briefing: {
             objective: "Organize the Depot.",
-            action: "Drag 'Tools' to the Shadow Board and 'Materials' to the Requisition Zone."
+            action: "A place for everything! Drag 'Tools' to the Shadow Board and 'Materials' to the designated Requisition Zone."
         }
     },
     {
@@ -48,7 +48,7 @@ export const CHAPTER_3_SCHEDULE: DayConfig[] = [
         ],
         briefing: {
             objective: "Clean the Workplace.",
-            action: "Identify hazards (oil spills, trip wires) on the depot floor and click them to clean them up."
+            action: "Cleaning is inspection! Identify hazards like oil spills or trip wires on the depot floor and click them to clear the path."
         }
     },
     {
@@ -65,7 +65,7 @@ export const CHAPTER_3_SCHEDULE: DayConfig[] = [
         ],
         briefing: {
             objective: "Process New Delivery.",
-            action: "A new shipment has arrived on the unassigned floor. Use your 5S standards to Sort the trash, Clean any leaks, and Set the new materials in order."
+            action: "A new shipment arrived. Don't let the mess return! Sort the junk, clean any leaks, and set the materials in their proper zones immediately."
         }
     },
     {
@@ -81,7 +81,7 @@ export const CHAPTER_3_SCHEDULE: DayConfig[] = [
         ],
         briefing: {
             objective: "Final 5S Audit.",
-            action: "Perform a final check. Your organization score will determine your Chapter 3 grade. Click 'Finish Chapter' when ready."
+            action: "The final test! Perform a walkthrough to ensure everything is in its place. Your organization score determines your grade and Chapter bonus."
         }
     }
 ];

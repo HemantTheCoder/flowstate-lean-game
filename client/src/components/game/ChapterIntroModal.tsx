@@ -18,13 +18,13 @@ export const ChapterIntroModal: React.FC = () => {
     // Content could be dynamic based on 'chapter' number later.
     const content = {
         1: {
-            title: "The Jam at Juniper Pier",
-            subtitle: "Chapter 1: Flow vs. Chaos",
-            description: "You are the new Lean Engineer. The project is behind schedule, over budget, and chaotic. Site Supervisor Rajiv wants to 'Push' harder, but that only creates waste.",
+            title: "The Jam at Sunrise Tower",
+            subtitle: "Chapter 1: The Construction Chaos",
+            description: "You are the new Project Lead. The site is currently behind schedule, over budget, and completely chaotic. Everyone is starting new tasks but nothing is actually getting finished. Your job is to organize the chaos, and your Efficiency is strictly measured by how much work is actually completed compared to what can be completed.",
             objectives: [
-                "MISSION: Stabilize the project before the Client Inspector arrives on Day 5.",
-                "LEARN: Manage WIP Limits to stop 'Starvation' and 'Bottlenecks'.",
-                "MASTER: The difference between 'Pushing' work and 'Pulling' value."
+                "MISSION: Stabilize the project before the Client Inspector arrives in Month 5.",
+                "LEARN: Manage your budget. Starting work costs money; you only get paid when it is Finished.",
+                "MASTER: The golden rule of construction: Finishing one thing completely is far better than starting five things at once."
             ]
         },
         2: {

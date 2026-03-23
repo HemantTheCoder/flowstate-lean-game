@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useGameStore, Task, ConstraintType } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, CheckCircle, Package, Users, FileCheck, Cloud, ArrowRight, Briefcase, Target, Lock, Calendar, ClipboardCheck, Wrench, HandshakeIcon, Play, BarChart3, Sun, ShieldAlert, Eye, Ban, Save } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Package, Users, FileCheck, Cloud, ArrowRight, Briefcase, Target, Lock, Calendar, ClipboardCheck, Wrench, HandshakeIcon, Play, BarChart3, Sun, ShieldAlert, Eye, Ban, Save, MapPin } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 import { TaskIconDisplay } from './TaskIconDisplay';
 
 const constraintConfig: Record<ConstraintType, { icon: React.ReactNode, label: string, color: string, action: string, cost: string }> = {
-    material: { icon: <Package className="w-4 h-4" />, label: 'Material', color: 'red', action: 'Call Supplier', cost: '$200' },
+    material: { icon: <Package className="w-4 h-4" />, label: 'Material', color: 'red', action: 'Call Supplier', cost: '₹200' },
+    space: { icon: <MapPin className="w-4 h-4" />, label: 'Space', color: 'amber', action: 'Clear Zone', cost: '₹100' },
     crew: { icon: <Users className="w-4 h-4" />, label: 'Crew', color: 'orange', action: 'Reassign Crew', cost: '-5% Morale' },
-    approval: { icon: <FileCheck className="w-4 h-4" />, label: 'Approval', color: 'purple', action: 'Expedite Approval', cost: '$50' },
+    approval: { icon: <FileCheck className="w-4 h-4" />, label: 'Approval', color: 'purple', action: 'Expedite Approval', cost: '₹50' },
     weather: { icon: <Cloud className="w-4 h-4" />, label: 'Weather', color: 'blue', action: 'Wait for Clear', cost: 'Time' }
 };
 
@@ -322,7 +323,9 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                 <div className="h-12 flex items-center px-6 gap-4 bg-slate-900/50 border-b border-slate-700/50">
                     <div className={`flex items-center gap-2 px-3 py-1 rounded-full border bg-slate-800/50 ${colorClassMap[dayObjective.color]?.border || 'border-cyan-500/50'}`}>
                         <span className={`${dayObjective.color === 'orange' ? 'text-orange-400' : dayObjective.color === 'purple' ? 'text-purple-400' : dayObjective.color === 'green' ? 'text-emerald-400' : dayObjective.color === 'amber' ? 'text-amber-400' : 'text-cyan-400'}`}>{dayObjective.icon}</span>
-                        <span className="text-white font-bold text-sm">Day {day}</span>
+                        <span className="text-white font-bold text-sm">
+                            {useGameStore.getState().chapter === 1 ? 'Month' : 'Day'} {day}
+                        </span>
                     </div>
                     <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -595,7 +598,7 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                     <p className="text-[10px] text-slate-400">
                                         {canCommit
                                             ? `${readyTasksCount} Sound (GREEN)${riskyCount > 0 ? ` + ${riskyCount} Risky (YELLOW)` : ''} - Click Start Week to commit`
-                                            : `Commitment unlocks on Day 9 (currently Day ${day})`
+                                            : `Commitment unlocks on Month 9 (currently Month ${day})`
                                         }
                                     </p>
                                 </div>
@@ -698,14 +701,10 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-2 text-sm">
-                                        <div className="bg-slate-800/80 p-2 rounded-xl border border-slate-700/50">
-                                            <span className="text-[10px] text-slate-500 uppercase block font-bold">Cost</span>
-                                            <span className="font-mono font-bold text-slate-300">${selectedTask.cost}</span>
-                                        </div>
-                                        <div className="bg-emerald-900/20 p-2 rounded-xl border border-emerald-500/30">
-                                            <span className="text-[10px] text-emerald-500 uppercase block font-bold">Revenue</span>
-                                            <span className="font-mono font-bold text-emerald-400">+${selectedTask.reward}</span>
+                                    <div className="text-sm">
+                                        <div className="bg-slate-800/80 p-2 rounded-xl border border-slate-700/50 block">
+                                            <span className="text-[10px] text-slate-500 uppercase block font-bold">Cost to Start</span>
+                                            <span className="font-mono font-bold text-slate-300">-{useGameStore.getState().currency === 'INR' ? '₹' : '$'}{(selectedTask.costToStart || selectedTask.cost).toLocaleString()}</span>
                                         </div>
                                     </div>
 
@@ -841,7 +840,7 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                     data-testid="button-force-commit-risky"
                                 >
                                     <span className="font-bold text-amber-400 text-sm">Include Risky Tasks (Overcommit)</span>
-                                    <p className="text-xs text-amber-500 mt-1">Commit {readyTasksCount + riskyCount} tasks total. {riskyCount} may fail. Higher risk, higher reward.</p>
+                                    <p className="text-xs text-amber-500 mt-1">Commit {readyTasksCount + riskyCount} tasks total. {riskyCount} may fail. Higher risk of failure.</p>
                                 </button>
                                 <button
                                     onClick={() => handleForceCommitConfirm(false)}

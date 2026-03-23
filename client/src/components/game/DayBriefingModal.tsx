@@ -38,7 +38,7 @@ export const DayBriefingModal: React.FC = () => {
             >
                 <div className="flex justify-between items-center border-b border-slate-800 p-4 md:p-6 shrink-0 bg-slate-900/50">
                     <div>
-                        <h2 className="text-xs md:text-sm font-bold text-blue-400 uppercase tracking-wider">Day {day} Briefing</h2>
+                        <h2 className="text-xs md:text-sm font-bold text-blue-400 uppercase tracking-wider">{chapter === 1 ? 'Month' : 'Day'} {day} Briefing</h2>
                         <h1 className="text-xl md:text-2xl font-black text-white">{dayConfig.title}</h1>
                     </div>
                     <div className="text-xl md:text-2xl font-black text-blue-400">BRIEF</div>

@@ -263,7 +263,6 @@ export const TaskModeSelector: React.FC<TaskModeSelectorProps> = ({ isOpen, onSe
                                                     <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-1">{task.description}</p>
                                                     <div className="flex items-center gap-2 mt-1">
                                                         <span className="text-[9px] font-mono text-slate-500">{task.type}</span>
-                                                        <span className="text-[9px] text-emerald-400">+${task.reward}</span>
                                                         <span className="text-[9px] text-red-400">-${task.cost}</span>
                                                     </div>
                                                 </div>

@@ -93,7 +93,7 @@ export default function Profile() {
     const displayUsername = user?.username || localGameState.playerName || 'Guest Engineer';
 
     return (
-        <div className="min-h-screen bg-slate-900 p-4 md:p-8 font-sans relative overflow-x-hidden text-slate-200">
+        <div className="h-screen bg-slate-900 p-4 md:p-4 font-sans relative overflow-hidden text-slate-200 flex flex-col">
 
             {/* Premium Twilight Industrial Ambient Background */}
             <div className="fixed inset-0 pointer-events-none z-0">
@@ -110,35 +110,30 @@ export default function Profile() {
                 <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-15 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
             </div>
 
-            <div className="max-w-6xl mx-auto space-y-8 relative z-10">
+            <div className="max-w-6xl w-full mx-auto flex flex-col h-full space-y-4 relative z-10 min-h-0">
 
                 {/* Header Section */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col md:flex-row items-start md:items-center justify-between bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-6 md:p-8 rounded-3xl shadow-[0_0_50px_rgba(34,211,238,0.1)] gap-6 relative overflow-hidden"
+                    className="flex flex-col md:flex-row items-start md:items-center justify-between bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-4 md:p-5 rounded-3xl shadow-[0_0_50px_rgba(34,211,238,0.1)] gap-4 relative overflow-hidden"
                 >
-                    <div className="flex items-center gap-6">
-                        <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 flex flex-col items-center justify-center text-cyan-400 text-4xl font-black border border-cyan-500/30 rounded-full shrink-0 shadow-inner">
+                    <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 md:w-16 md:h-16 bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 flex flex-col items-center justify-center text-cyan-400 text-3xl font-black border border-cyan-500/30 rounded-full shrink-0 shadow-inner">
                             {displayUsername.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                            <div className="flex items-center gap-3 mb-1">
-                                <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">{displayUsername}</h1>
+                            <div className="flex items-center gap-3 mb-0.5">
+                                <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">{displayUsername}</h1>
                                 {user?.role === 'admin' && (
-                                    <span className="bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-amber-500/30 flex items-center gap-1">
-                                        <ShieldCheck className="w-3 h-3" /> Root Admin
-                                    </span>
-                                )}
-                                {!user && (
-                                    <span className="bg-slate-500/20 text-slate-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-slate-500/30">
-                                        Local Profile
+                                    <span className="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest border border-amber-500/30 flex items-center gap-1">
+                                        <ShieldCheck className="w-2.5 h-2.5" /> Root Admin
                                     </span>
                                 )}
                             </div>
-                            <p className="text-slate-400 flex items-center gap-2 mt-2 text-xs md:text-sm font-light">
-                                <Calendar className="w-4 h-4 text-slate-500" />
-                                Lean Architect since {format(joinDate, 'MMMM yyyy')}
+                            <p className="text-slate-400 flex items-center gap-2 text-[10px] md:text-xs font-light">
+                                <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                                Specialist since {format(joinDate, 'MMMM yyyy')}
                             </p>
                         </div>
                     </div>
@@ -153,46 +148,41 @@ export default function Profile() {
                         {user ? (
                             <button
                                 onClick={handleLogout}
-                                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl transition-colors text-xs font-bold uppercase tracking-widest text-red-400"
+                                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl transition-colors text-[10px] font-bold uppercase tracking-widest text-red-400"
                             >
-                                <LogOut className="w-4 h-4" />
+                                <LogOut className="w-3.5 h-3.5" />
                                 Log Out
                             </button>
                         ) : (
                             <button
                                 onClick={() => setLocation('/auth')}
-                                className="flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-cyan-600/20 to-indigo-600/20 hover:from-cyan-600/30 hover:to-indigo-600/30 border border-cyan-500/30 hover:border-cyan-400 rounded-2xl transition-all text-xs font-black uppercase tracking-[0.2em] text-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.1)] group"
+                                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-cyan-600/20 to-indigo-600/20 hover:from-cyan-600/30 hover:to-indigo-600/30 border border-cyan-500/30 hover:border-cyan-400 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest text-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.1)] group"
                             >
-                                <motion.div
-                                    animate={{ rotate: [0, 10, -10, 0] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                >
-                                    <Sparkles className="w-4 h-4 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
-                                </motion.div>
+                                <Sparkles className="w-3.5 h-3.5 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
                                 Create Account to Auto-Save
                             </button>
                         )}
                     </div>
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 flex-1 min-h-0 min-w-0">
 
                     {/* Left Column: Stats & Resume */}
-                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="md:col-span-5 space-y-8">
+                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="md:col-span-5 space-y-4 overflow-y-auto pr-2 pb-4 scrollbar-thin scrollbar-thumb-slate-700">
 
                         {/* Current Game Card */}
                         <div className="bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 shadow-2xl rounded-3xl overflow-hidden relative">
                             {/* Glowing orb behind active project section */}
                             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/20 blur-3xl rounded-full" />
 
-                            <div className="bg-slate-900/50 p-5 border-b border-slate-700/50 relative flex justify-between items-center">
-                                <h3 className="relative z-10 flex items-center gap-2 text-white font-bold uppercase tracking-widest text-xs">
-                                    <Play className="w-4 h-4 fill-current text-cyan-400" />
+                            <div className="bg-slate-900/50 p-4 border-b border-slate-700/50 relative flex justify-between items-center">
+                                <h3 className="relative z-10 flex items-center gap-2 text-white font-bold uppercase tracking-widest text-[10px]">
+                                    <Play className="w-3.5 h-3.5 fill-current text-cyan-400" />
                                     Active Project
                                 </h3>
-                                {displayState && <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />}
+                                {displayState && <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
                             </div>
-                            <div className="p-8">
+                            <div className="p-6">
                                 {displayState ? (
                                     <div className="space-y-6">
                                         <div>
@@ -200,12 +190,12 @@ export default function Profile() {
                                             <p className="text-3xl font-black text-white uppercase drop-shadow-md">
                                                 {(displayState as any)?.chapter > 3 ? `Case Study ${(displayState as any)?.chapter - 3}` : `Episode ${(displayState as any)?.chapter}`}
                                             </p>
-                                            <p className="text-sm text-cyan-400 mt-1 font-bold">Sim Day {displayState.day}</p>
+                                            <p className="text-sm text-cyan-400 mt-1 font-bold">Sim Month {displayState.day}</p>
                                         </div>
                                         <div className="space-y-4 p-5 bg-slate-900/50 rounded-2xl border border-slate-700/50">
                                             <div className="flex justify-between items-center text-sm">
                                                 <span className="text-slate-400 tracking-wide font-bold">Funds</span>
-                                                <span className="font-bold text-emerald-400">${((displayState as any).funds || (displayState as any).resources?.budget || 0).toLocaleString()}</span>
+                                                <span className="font-bold text-emerald-400">₹{((displayState as any).funds || (displayState as any).resources?.budget || 0).toLocaleString()}</span>
                                             </div>
                                             <div className="flex justify-between items-center text-sm">
                                                 <span className="text-slate-400 tracking-wide font-bold">Engineer</span>
@@ -349,7 +339,7 @@ export default function Profile() {
                     </motion.div>
 
                     {/* Right Column: Badges & History */}
-                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="md:col-span-7 space-y-8">
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="md:col-span-7 space-y-4 overflow-y-auto pr-2 pb-4 scrollbar-thin scrollbar-thumb-slate-700">
 
                         {/* Achievements Section */}
                         <div className="bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-6 md:p-8 rounded-3xl shadow-xl">

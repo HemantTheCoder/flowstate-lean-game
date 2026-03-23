@@ -30,7 +30,7 @@ import { LeanAIModal } from '@/components/game/LeanAIModal';
 import { LoadingScreen } from '@/components/game/LoadingScreen';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
-import { LayoutDashboard, HardHat, Save, Settings, BookOpen, Package, Plane, AlertTriangle, Wrench, ArrowUpDown, Brain } from 'lucide-react';
+import { LayoutDashboard, HardHat, Save, Settings, BookOpen, Package, Plane, AlertTriangle, Wrench, ArrowUpDown, Brain, Target, ClipboardList } from 'lucide-react';
 import { GlossaryPanel } from '@/components/game/GlossaryPanel';
 import { ReflectionQuiz } from '@/components/game/ReflectionQuiz';
 import { useAuth } from '@/hooks/use-auth';
@@ -39,6 +39,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LifeHearts } from '@/components/game/LifeHearts';
 import { GameOverOverlay } from '@/components/game/GameOverOverlay';
 import { TaskModeSelector } from '@/components/game/TaskModeSelector';
+import { ProjectStatusSheet } from '@/components/game/ProjectStatusSheet';
 
 export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
@@ -55,6 +56,7 @@ export default function Game() {
   // Decision State
   const [showDecision, setShowDecision] = useState(false);
   const [decisionProps, setDecisionProps] = useState<any>(null);
+  const [showProjectSheet, setShowProjectSheet] = useState(false);
 
   // State Selectors (Split to prevent unnecessary re-renders)
   const startDialogue = useGameStore(s => s.startDialogue);
@@ -96,22 +98,25 @@ export default function Game() {
   }, [phase]);
 
 
-  const { saveGame, gameState, isLoading: isServerLoading } = useGame();
-  const [_, navigate] = useLocation();
-  const { toast } = useToast();
-
   // 1. Hydrate Store from Server on Load
   const hydratedRef = React.useRef(false);
+  const { saveGame, gameState, isLoading: isServerLoading } = useGame();
+  console.log("[Game] Render. gameState present?", !!gameState, "hydrated?", hydratedRef.current);
+  const [_, navigate] = useLocation();
+  const { toast } = useToast();
   useEffect(() => {
     if (gameState && !hydratedRef.current) {
+      console.log("[Game] Hydration Effect running...");
       if (useGameStore.getState().bypassHydration) {
         // User manually selected a chapter, ignore server state, clear flag, and overwrite save with fresh chapter state
+        console.log("[Game] Bypassing hydration, trigger initial cloud save...");
         useGameStore.getState().setBypassHydration(false);
         setFlag('hydrated', true);
         hydratedRef.current = true;
         handleSave(true); // Save the freshly started chapter to cloud
       } else {
         // Normal resume from server
+        console.log("[Game] Normal hydration from gameState", (gameState as any).id);
         importState(gameState);
         setFlag('hydrated', true);
         hydratedRef.current = true;
@@ -461,15 +466,23 @@ export default function Game() {
 
   // Tutorial Logic
   useEffect(() => {
-    // Step 1 -> 2 (Open Kanban)
-    if (showKanban && tutorialStep === 1) {
+    // Step 1: User opens project sheet
+    if (showProjectSheet && tutorialStep === 1) {
+      setTutorialStep(1.2);
+    }
+    // Step 1.2: Closing Project Sheet goes to Kanban prompt
+    if (!showProjectSheet && tutorialStep === 1.2) {
+      setTutorialStep(1.5);
+    }
+    // Step 1.5 -> 2 (Open Kanban)
+    if (showKanban && (tutorialStep === 1 || tutorialStep === 1.5)) {
       setTutorialStep(2);
     }
     // Step 6: Close Kanban to show Advisor Spotlight (after WIP slider step)
     if (tutorialStep === 6 && showKanban) {
       setShowKanban(false);
     }
-  }, [showKanban, tutorialStep, setTutorialStep]);
+  }, [showKanban, showProjectSheet, tutorialStep, setTutorialStep]);
 
   const triggerRetryDecision = () => {
     setDecisionProps({
@@ -496,6 +509,117 @@ export default function Game() {
             flags: { ...useGameStore.getState().flags, game_over: true }
           });
         }
+      }
+    });
+    setShowDecision(true);
+  };
+
+
+  const triggerCase1Day2Decision = () => {
+    setDecisionProps({
+      title: "Broken Elevator (Vertical Limits)",
+      prompt: "One of the freight elevators' winch motors has burnt out, halving vertical capacity. Trucks are waiting downstairs.",
+      options: [
+        { id: 'pay', text: "Emergency Fix (₹2k)", type: 'safe', description: "Pay expedited fee. Restores capacity immediately." },
+        { id: 'reroute', text: "Reroute Schedule (Risky)", type: 'risky', description: "Save money, but increase passenger disruption by 5%." }
+      ],
+      onSelect: (id: string) => {
+        if (id === 'pay') {
+          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 2000) }));
+          soundManager.playSFX('success');
+        } else {
+          useGameStore.setState(s => ({ pdi: Math.min(100, s.pdi + 5), hoistSlots: Math.max(1, s.hoistSlots - 1) }));
+          soundManager.playSFX('click');
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
+
+  const triggerCase1Day4Decision = () => {
+    setDecisionProps({
+      title: "Security Sweep",
+      prompt: "TSA is performing an unannounced audit of all access logs. Workers are stuck at the sterile boundary.",
+      options: [
+        { id: 'expedite', text: "Hire Expediter (₹1k)", type: 'risky', description: "Pay administrative fee to fast-track our crews." },
+        { id: 'wait', text: "Accept Delay (Safe)", type: 'safe', description: "Focus only on WIP tasks inside. Lose 1 hoist slot today." }
+      ],
+      onSelect: (id: string) => {
+        if (id === 'expedite') {
+          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 1000) }));
+          soundManager.playSFX('click');
+        } else {
+          useGameStore.setState(s => ({ hoistSlots: Math.max(1, s.hoistSlots - 1) }));
+          soundManager.playSFX('success');
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
+
+  const triggerCase1Day6Decision = () => {
+    setDecisionProps({
+      title: "Supplier Mix-up",
+      prompt: "The HVAC supplier sent round duct fittings instead of rectangular ones. The crew is already hanging them!",
+      options: [
+        { id: 'rework', text: "Tear Down (₹1.5k)", type: 'safe', description: "Stop the line and fix it now. Reduces rework rate by 5%." },
+        { id: 'patch', text: "Patch it Later", type: 'risky', description: "Keep hanging them. Adds 10% to Rework Rate risk." }
+      ],
+      onSelect: (id: string) => {
+        if (id === 'rework') {
+          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 1500), reworkRate: Math.max(0, s.reworkRate - 5) }));
+          soundManager.playSFX('success');
+        } else {
+          useGameStore.setState(s => ({ reworkRate: Math.min(100, s.reworkRate + 10) }));
+          soundManager.playSFX('click');
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
+
+  const triggerCase1Day9Decision = () => {
+    setDecisionProps({
+      title: "The VIP Surge",
+      prompt: "A massive conference hit town. Operations demands absolute silence in the terminal for the next 24 hours.",
+      options: [
+        { id: 'halt', text: "Halt All Noisy Work", type: 'safe', description: "Lose 1 Hoist Slot, protect PDI." },
+        { id: 'push', text: "Ignore Operations", type: 'risky', description: "Keep working at full speed. +15% PDI penalty." }
+      ],
+      onSelect: (id: string) => {
+        if (id === 'halt') {
+          useGameStore.setState(s => ({ hoistSlots: Math.max(1, s.hoistSlots - 1) }));
+          soundManager.playSFX('click');
+        } else {
+          useGameStore.setState(s => ({ pdi: Math.min(100, s.pdi + 15) }));
+          soundManager.playSFX('click');
+        }
+        setShowDecision(false);
+      }
+    });
+    setShowDecision(true);
+  };
+
+  const triggerCase1Day11Decision = () => {
+    setDecisionProps({
+      title: "Power Emergency",
+      prompt: "The temporary breaker panel blew, cutting power to the East side. We need an immediate workaround.",
+      options: [
+        { id: 'gen', text: "Rent Generator (₹3k)", type: 'safe', description: "Keep power flowing, lose cash." },
+        { id: 'manual', text: "Manual Labour", type: 'risky', description: "Free, but exhausts the crew. +5% Rework Risk." }
+      ],
+      onSelect: (id: string) => {
+        if (id === 'gen') {
+          useGameStore.setState(s => ({ funds: Math.max(0, s.funds - 3000) }));
+          soundManager.playSFX('success');
+        } else {
+          useGameStore.setState(s => ({ reworkRate: Math.min(100, s.reworkRate + 5) }));
+          soundManager.playSFX('alert');
+        }
+        setShowDecision(false);
       }
     });
     setShowDecision(true);
@@ -546,7 +670,7 @@ export default function Game() {
           useGameStore.setState({
             weeklyPlan: [...state.weeklyPlan, extraTaskId],
             columns: state.columns.map(col =>
-              col.id === 'ready' ? {
+              col.id === 'backlog' ? {
                 ...col,
                 tasks: [...col.tasks, {
                   id: extraTaskId,
@@ -555,7 +679,7 @@ export default function Game() {
                   type: 'Structural' as const,
                   cost: 100,
                   reward: 2000,
-                  status: 'ready' as const,
+                  status: 'backlog' as const,
                   difficulty: 4,
                   constraints: ['material', 'crew'] as any[]
                 }]
@@ -578,8 +702,8 @@ export default function Game() {
       title: "VIP Demand Spike",
       prompt: "The client wants the VIP lounge finished early. Finish materials demand is doubling for the next 48 hours.",
       options: [
-        { id: 'limit', text: "Rush Setup ($500)", type: 'safe', description: "Increase Carpentry & Finishing limits. Faster flow, small cost." },
-        { id: 'expedite', text: "Expedite Log ($1k)", type: 'risky', description: "Order immediate delivery of extra materials. High cost, prevents stockout." },
+        { id: 'limit', text: "Rush Setup (₹500)", type: 'safe', description: "Increase Carpentry & Finishing limits. Faster flow, small cost." },
+        { id: 'expedite', text: "Expedite Log (₹1k)", type: 'risky', description: "Order immediate delivery of extra materials. High cost, prevents stockout." },
         { id: 'nothing', text: "Hold the Line", type: 'risky', description: "Risk running out of materials. Zero cost today." }
       ],
       onSelect: (id: string) => {
@@ -634,7 +758,7 @@ export default function Game() {
       prompt: "A major delivery is stuck on the highway. 24-hour delay. Your JIT system is at breaking point!",
       options: [
         { id: 'buffer', text: "Rely on Buffer", type: 'safe', description: "Use existing safety stock. Zero cost if you planned well." },
-        { id: 'sub', text: "Emergency Courier ($2k)", type: 'risky', description: "Expensive same-day delivery. Guaranteed materials." }
+        { id: 'sub', text: "Emergency Courier (₹2k)", type: 'risky', description: "Expensive same-day delivery. Guaranteed materials." }
       ],
       onSelect: (id: string) => {
         if (id === 'sub') {
@@ -725,16 +849,14 @@ export default function Game() {
     const state = useGameStore.getState();
     const cols = state.columns;
     const doing = cols.find(c => c.id === 'doing');
-    const ready = cols.find(c => c.id === 'ready');
     const backlog = cols.find(c => c.id === 'backlog');
-
     const doingCount = doing?.tasks.length || 0;
-    const readyCount = ready?.tasks.length || 0;
     const backlogCount = backlog?.tasks.length || 0;
+    const readyCount = 0; // Deprecated
     const doingLimit = doing?.wipLimit || 3;
 
     // Define helper variables early for use in checks
-    const allPending = [...(backlog?.tasks || []), ...(ready?.tasks || [])];
+    const allPending = [...(backlog?.tasks || [])];
     const canPlayAny = allPending.some(t => {
       const isAffordable = state.materials >= t.cost;
       const isRainBlocked = day === 3 && t.type === 'Structural';
@@ -747,18 +869,18 @@ export default function Game() {
 
       if (day === 6) {
         if (isPlanning) {
-          const lookaheadCount = ready?.tasks.length || 0;
-          if (lookaheadCount < 3) return "Day 6: Pull 4-6 tasks from Master Schedule to Lookahead. You cannot fix constraints yet - just review what's available.";
-          if (lookaheadCount < 6) return "Good start! Pull a few more tasks to give yourself options. Constraints are hidden today - you'll discover them tomorrow.";
-          return "Lookahead is filling up! End Day when you've pulled enough tasks to plan around.";
+          const lookaheadCount = backlog?.tasks.length || 0;
+          if (lookaheadCount < 3) return "Day 6: Review 4-6 tasks in the Master Schedule. You cannot fix constraints yet - just see what's available.";
+          if (lookaheadCount < 6) return "Good start! Constraints are hidden today - you'll discover them tomorrow.";
+          return "Schedule is filling up! End Day when you're ready.";
         }
         return "Planning Room is open. Review your Master Schedule and Lookahead.";
       }
       if (day === 7) {
         if (isPlanning) {
-          const blockedTasks = ready?.tasks.filter(t => (t.constraints?.length || 0) > 0) || [];
+          const blockedTasks = backlog?.tasks.filter(t => (t.constraints?.length || 0) > 0) || [];
           const allInspected = blockedTasks.every(t => state.flags[`inspected_${t.id}`]);
-          if (blockedTasks.length > 0 && !allInspected) return "Day 7: Click each RED task in Lookahead to DISCOVER its constraints. You must inspect all blocked tasks before moving on.";
+          if (blockedTasks.length > 0 && !allInspected) return "Day 7: Click each RED task in Backlog to DISCOVER its constraints. You must inspect all blocked tasks before moving on.";
           if (allInspected) return "All constraints discovered! You now understand what's blocking your tasks. End Day to start fixing them tomorrow.";
           return "No blocked tasks found. You can End Day and move to the Make Ready phase.";
         }
@@ -766,18 +888,18 @@ export default function Game() {
       }
       if (day === 8) {
         if (isPlanning) {
-          const greenCount = ready?.tasks.filter(t => (t.constraints?.length || 0) === 0).length || 0;
-          const totalInLookahead = ready?.tasks.length || 0;
+          const greenCount = backlog?.tasks.filter(t => (t.constraints?.length || 0) === 0).length || 0;
+          const totalInLookahead = backlog?.tasks.length || 0;
           if (greenCount < 2) return "Day 8: Make Ready! Click 'Fix' on constraints to turn RED tasks GREEN. Each fix costs budget or morale - choose wisely!";
-          if (greenCount < totalInLookahead) return `${greenCount}/${totalInLookahead} tasks are Sound. Keep fixing or pull new tasks. You can also End Day.`;
+          if (greenCount < totalInLookahead) return `${greenCount}/${totalInLookahead} tasks are Sound. Keep fixing constraints. You can also End Day.`;
           return "All tasks are Sound! You're ready for tomorrow's commitment. End Day.";
         }
         return "Make Ready: Remove blockers so tasks can flow.";
       }
       if (day === 9) {
         if (isPlanning) {
-          const greenCount = ready?.tasks.filter(t => (t.constraints?.length || 0) === 0).length || 0;
-          if (greenCount === 0) return "Day 9: You need GREEN tasks to commit! Fix remaining constraints or pull easier tasks.";
+          const greenCount = backlog?.tasks.filter(t => (t.constraints?.length || 0) === 0).length || 0;
+          if (greenCount === 0) return "Day 9: You need GREEN tasks to commit! Fix remaining constraints or choose easier tasks.";
           return `Day 9: ${greenCount} Sound tasks ready. Click 'Start Week' to COMMIT your promises. Only promise what you CAN deliver!`;
         }
         return "Commitment Day: Lock in your Weekly Work Plan.";
@@ -919,7 +1041,7 @@ export default function Game() {
       if (!hasIndoor && doingCount === 0) {
         return "Rain has stopped all viable work. Click 'End Day'. Lean Tip: keep a backlog of indoor tasks for weather days.";
       }
-      const hasStructuralReady = ready?.tasks.some(t => t.type === 'Structural');
+      const hasStructuralReady = backlog?.tasks.some(t => t.type === 'Structural');
       if (hasStructuralReady) {
         return "MONSOON: Structural tasks are BLOCKED by rain. Lean Response: pivot to Interior/Systems work. Adaptation beats idle time.";
       }
@@ -992,7 +1114,13 @@ export default function Game() {
   }
 
   return (
-    <div className={`w-full h-screen relative overflow-hidden transition-colors duration-1000 bg-slate-950/60`}>
+    <div 
+      className={`w-full h-screen relative overflow-hidden transition-colors duration-1000 bg-slate-950/60`}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        setShowLeanAI(true);
+      }}
+    >
       {/* 1. Phaser Layer (Background) */}
       <GameCanvas />
 
@@ -1006,10 +1134,13 @@ export default function Game() {
           className={`flex flex-col md:flex-row justify-between items-start pointer-events-auto gap-4 w-full md:w-auto ${chapter >= 4 ? 'hidden' : ''}`}
         >
           <div className="flex gap-4 w-full md:w-auto">
-            <div id="smart-advisor-box" className="bg-slate-800/80 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border border-slate-700/50 w-full md:min-w-[300px] md:w-auto flex-1">
-              <h3 className="font-bold text-slate-300 text-sm md:text-base">Week {week} | Day {day}</h3>
-              <div className="text-xs md:text-sm text-slate-400 font-medium">Current Focus:</div>
-              <div className="text-xs md:text-sm text-cyan-400 animate-pulse font-bold mt-1 leading-tight">
+            <div id="smart-advisor-box" className="bg-slate-900/95 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-[0_0_30px_rgba(6,182,212,0.15)] border-2 border-cyan-500/40 w-full md:min-w-[350px] md:w-auto flex-1 transform transition-transform animate-pulse-slow">
+              <div className="flex items-center gap-2 mb-1">
+                <Target className="w-5 h-5 text-cyan-400" />
+                <h3 className="font-black text-white text-base md:text-lg tracking-wider">CORE OBJECTIVE</h3>
+                <span className="text-xs font-bold text-slate-400 ml-auto">Week {week} | Month {day}</span>
+              </div>
+              <div className="text-sm md:text-base text-cyan-300 font-bold mt-2 leading-snug drop-shadow-md bg-cyan-950/50 p-2 rounded-lg border border-cyan-900/50">
                 {getSmartObjective()}
               </div>
             </div>
@@ -1026,7 +1157,7 @@ export default function Game() {
           <div id="stats-box" className="bg-slate-800/80 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border border-slate-700/50 flex gap-4 md:gap-6 w-full md:w-auto justify-around">
             <div className="text-center">
               <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Funds</div>
-              <div className="font-mono font-bold text-emerald-400 text-sm md:text-base">${funds}</div>
+              <div className="font-mono font-bold text-emerald-400 text-sm md:text-base">₹{funds}</div>
             </div>
 
             {chapter === 3 ? (
@@ -1093,15 +1224,7 @@ export default function Game() {
                 </div>
                 <span className="text-[9px] sm:text-xs font-bold text-slate-400">{chapter === 3 ? 'Depot' : 'Kanban'}</span>
               </button>
-              <button
-                onClick={() => setShowKanban(false)}
-                className="flex flex-col items-center gap-0.5 sm:gap-1 group"
-              >
-                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors border border-purple-500/30">
-                  <HardHat className="w-4 h-4 sm:w-6 sm:h-6" />
-                </div>
-                <span className="text-[9px] sm:text-xs font-bold text-slate-400">Site</span>
-              </button>
+
               <button
                 onClick={() => setShowGlossary(true)}
                 className="flex flex-col items-center gap-0.5 sm:gap-1 group"
@@ -1111,6 +1234,16 @@ export default function Game() {
                   <BookOpen className="w-4 h-4 sm:w-6 sm:h-6" />
                 </div>
                 <span className="text-[9px] sm:text-xs font-bold text-slate-400">Glossary</span>
+              </button>
+              <button
+                id="btn-project-sheet"
+                onClick={() => setShowProjectSheet(true)}
+                className="flex flex-col items-center gap-0.5 sm:gap-1 group"
+              >
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors border border-blue-500/30">
+                  <ClipboardList className="w-4 h-4 sm:w-6 sm:h-6" />
+                </div>
+                <span className="text-[9px] sm:text-xs font-bold text-slate-400">Project</span>
               </button>
             </div>
           </div>
@@ -1234,6 +1367,7 @@ export default function Game() {
       </div>
 
       <GlossaryPanel isOpen={showGlossary} onClose={() => setShowGlossary(false)} />
+      <ProjectStatusSheet isOpen={showProjectSheet} onClose={() => setShowProjectSheet(false)} />
       <ReflectionQuiz isOpen={showQuiz} onComplete={handleQuizComplete} chapter={chapter} />
 
       <TransitionScreen
@@ -1301,27 +1435,7 @@ export default function Game() {
         }}
       />
 
-      {/* Lean AI Modal — root level for proper z-index */}
-      <LeanAIModal
-        isOpen={showLeanAI}
-        onClose={() => setShowLeanAI(false)}
-      />
 
-      {/* Floating Lean AI Button */}
-      <motion.button
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 2, type: "spring", stiffness: 300, damping: 20 }}
-        onClick={() => setShowLeanAI(true)}
-        data-testid="button-lean-ai-float"
-        className="fixed bottom-6 left-6 z-40 w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-lg shadow-emerald-500/30 flex items-center justify-center hover:scale-110 hover:shadow-emerald-500/50 active:scale-95 transition-all group"
-        title="Lean AI Assistant (Coming Soon)"
-      >
-        <Brain className="w-5 h-5 text-white" />
-        <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center">
-          <span className="text-[8px] font-black text-amber-900">!</span>
-        </span>
-      </motion.button>
     </div>
   );
 }

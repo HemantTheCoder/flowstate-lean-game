@@ -1,93 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { useGameStore, Column, Task } from '@/store/gameStore';
+import { useGameStore, Column, Task, formatCurrency } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import soundManager from '@/lib/soundManager';
-import { AlertTriangle, Gauge, Minus, Plus, Cloud, Sparkles, Flame, CloudRain, PackageX, Replace, ChevronLeft, ChevronRight, GripVertical } from 'lucide-react';
+import { AlertTriangle, Gauge, Minus, Plus, Cloud, Sparkles, Flame, CloudRain, PackageX, Replace, ChevronLeft, ChevronRight, GripVertical, Package, Info, CheckCircle2 } from 'lucide-react';
 import { TaskIconDisplay } from './TaskIconDisplay';
 import { CustomTaskModal } from './CustomTaskModal';
 import { LifeHearts } from './LifeHearts';
-
-const WipSlider: React.FC<{ column: Column; onChangeWip: (id: string, limit: number) => void }> = ({ column, onChangeWip }) => {
-    const currentCount = column.tasks.length;
-    const isOverLimit = currentCount > column.wipLimit;
-    const isAtLimit = currentCount >= column.wipLimit;
-    const fillPercent = column.wipLimit > 0 ? Math.min(100, (currentCount / column.wipLimit) * 100) : 0;
-
-    return (
-        <div className="mt-2 space-y-1.5">
-            <div className="flex items-center justify-between gap-2">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                    <Gauge className="w-3 h-3" /> WIP Limit
-                </span>
-                <div className="flex items-center gap-1">
-                    <button
-                        onClick={() => onChangeWip(column.id, Math.max(1, column.wipLimit - 1))}
-                        className="w-8 h-8 md:w-5 md:h-5 rounded bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0"
-                        data-testid={`button-wip-decrease-${column.id}`}
-                    >
-                        <Minus className="w-4 h-4 md:w-3 md:h-3 text-slate-300" />
-                    </button>
-                    <span className={`text-sm font-black min-w-[20px] text-center ${isOverLimit ? 'text-red-500' : isAtLimit ? 'text-amber-500' : 'text-blue-400'}`}>
-                        {column.wipLimit}
-                    </span>
-                    <button
-                        onClick={() => onChangeWip(column.id, Math.min(6, column.wipLimit + 1))}
-                        className="w-8 h-8 md:w-5 md:h-5 rounded bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0"
-                        data-testid={`button-wip-increase-${column.id}`}
-                    >
-                        <Plus className="w-4 h-4 md:w-3 md:h-3 text-slate-300" />
-                    </button>
-                </div>
-            </div>
-            <div className="relative h-2 bg-slate-700/50 rounded-full overflow-hidden border border-slate-600/30">
-                <motion.div
-                    className={`h-full rounded-full transition-colors ${isOverLimit ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : isAtLimit ? 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.5)]' : 'bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.5)]'
-                        }`}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${fillPercent}%` }}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
-            </div>
-            <AnimatePresence>
-                {isOverLimit && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="text-[9px] text-red-600 font-bold flex items-center gap-1"
-                    >
-                        <AlertTriangle className="w-3 h-3" /> Over capacity! Workers slowing down.
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
-    );
-};
+import { LeanAiChat } from './LeanAiChat';
 
 const CongestionCloud: React.FC<{ intensity: number }> = ({ intensity }) => {
     if (intensity <= 0) return null;
     return (
-        <div className="absolute -top-3 -right-3 pointer-events-none z-20">
+        <div className="absolute -top-4 -right-4 pointer-events-none z-20">
             {Array.from({ length: Math.min(intensity, 3) }).map((_, i) => (
                 <motion.div
                     key={i}
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{
                         opacity: [0.3, 0.6, 0.3],
-                        scale: [0.8, 1.1, 0.8],
-                        y: [0, -4, 0],
+                        scale: [0.8, 1.2, 0.8],
+                        y: [0, -6, 0],
                     }}
                     transition={{
-                        duration: 2 + i * 0.5,
+                        duration: 2.5 + i * 0.5,
                         repeat: Infinity,
-                        delay: i * 0.3,
+                        delay: i * 0.4,
                     }}
                     className="absolute"
-                    style={{ right: i * 10, top: i * 2 }}
+                    style={{ right: i * 12, top: i * 3 }}
                 >
-                    <Cloud className="w-5 h-5 text-red-400/60" />
+                    <Cloud className="w-6 h-6 text-red-400/50 filter blur-[1px]" />
                 </motion.div>
             ))}
         </div>
@@ -98,15 +42,15 @@ const BottleneckPulse: React.FC<{ isBottleneck: boolean }> = ({ isBottleneck }) 
     if (!isBottleneck) return null;
     return (
         <motion.div
-            className="absolute inset-0 rounded-2xl pointer-events-none z-10"
+            className="absolute inset-0 rounded-3xl pointer-events-none z-10"
             animate={{
                 boxShadow: [
                     '0 0 0 0 rgba(239, 68, 68, 0)',
-                    '0 0 0 6px rgba(239, 68, 68, 0.2)',
+                    '0 0 0 8px rgba(239, 68, 68, 0.15)',
                     '0 0 0 0 rgba(239, 68, 68, 0)',
                 ],
             }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+            transition={{ duration: 2, repeat: Infinity }}
         />
     );
 };
@@ -120,7 +64,7 @@ const WasteTaskOverlay: React.FC<{ isWaste: boolean; isInDone: boolean }> = ({ i
                 <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="absolute inset-0 rounded-xl"
+                    className="absolute inset-0 rounded-2xl"
                 >
                     {[...Array(3)].map((_, i) => (
                         <motion.div
@@ -129,13 +73,13 @@ const WasteTaskOverlay: React.FC<{ isWaste: boolean; isInDone: boolean }> = ({ i
                             initial={{ opacity: 0, y: 0 }}
                             animate={{
                                 opacity: [0, 1, 0],
-                                y: [-5, -20],
-                                x: [-10 + i * 10, -15 + i * 15],
+                                y: [-5, -25],
+                                x: [-12 + i * 12, -18 + i * 18],
                             }}
-                            transition={{ duration: 1.2, delay: i * 0.2, repeat: Infinity, repeatDelay: 2 }}
-                            style={{ left: `${20 + i * 25}%`, top: '20%' }}
+                            transition={{ duration: 1.5, delay: i * 0.3, repeat: Infinity, repeatDelay: 2.5 }}
+                            style={{ left: `${25 + i * 25}%`, top: '15%' }}
                         >
-                            <Sparkles className="w-4 h-4 text-yellow-400" />
+                            <Sparkles className="w-5 h-5 text-yellow-400/80 drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]" />
                         </motion.div>
                     ))}
                 </motion.div>
@@ -146,16 +90,16 @@ const WasteTaskOverlay: React.FC<{ isWaste: boolean; isInDone: boolean }> = ({ i
     return (
         <div className="absolute inset-0 pointer-events-none z-10">
             <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-orange-500/10 rounded-xl"
-                animate={{ opacity: [0.3, 0.6, 0.3] }}
-                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute inset-0 bg-gradient-to-br from-red-500/15 to-orange-500/10 rounded-2xl"
+                animate={{ opacity: [0.2, 0.5, 0.2] }}
+                transition={{ duration: 3, repeat: Infinity }}
             />
             <motion.div
-                className="absolute top-1 right-1"
-                animate={{ rotate: [0, 5, -5, 0], scale: [1, 1.1, 1] }}
-                transition={{ duration: 1, repeat: Infinity }}
+                className="absolute top-2 right-2"
+                animate={{ rotate: [0, 8, -8, 0], scale: [1, 1.2, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
             >
-                <Flame className="w-4 h-4 text-orange-500/70" />
+                <Flame className="w-5 h-5 text-orange-500/60 drop-shadow-[0_0_5px_rgba(249,115,22,0.5)]" />
             </motion.div>
         </div>
     );
@@ -165,14 +109,19 @@ const ConstraintBanner: React.FC<{ day: number; materials: number }> = ({ day, m
     if (day === 2 && materials <= 0) {
         return (
             <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mx-4 mt-3 mb-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-3 rounded-xl flex items-center gap-3 shadow-lg"
+                initial={{ opacity: 0, y: -20, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                className="mx-4 md:mx-8 mt-4 mb-2 bg-slate-900/60 backdrop-blur-xl border border-amber-500/30 p-4 rounded-2xl flex items-center gap-4 shadow-[0_10px_30px_-10px_rgba(245,158,11,0.2)]"
             >
-                <PackageX className="w-6 h-6 flex-shrink-0" />
-                <div>
-                    <div className="font-black text-sm uppercase tracking-wide">Material Shortage</div>
-                    <div className="text-xs text-amber-100">Concrete delivery delayed. Only zero-cost tasks (Management/Prep) can enter Doing. Adapt your workflow!</div>
+                <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center border border-amber-500/30 shadow-inner">
+                    <PackageX className="w-7 h-7 text-amber-500" />
+                </div>
+                <div className="flex-1">
+                    <div className="font-black text-sm uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                        Material Shortage Detected
+                        <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-[10px] border border-amber-500/30 animate-pulse">Critical</span>
+                    </div>
+                    <div className="text-xs text-slate-300 font-medium leading-relaxed mt-1">Concrete delivery delayed. Only zero-cost tasks (Management/Prep) can enter Doing. Adapt your workflow!</div>
                 </div>
             </motion.div>
         );
@@ -180,14 +129,19 @@ const ConstraintBanner: React.FC<{ day: number; materials: number }> = ({ day, m
     if (day === 3) {
         return (
             <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mx-4 mt-3 mb-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-3 rounded-xl flex items-center gap-3 shadow-lg"
+                initial={{ opacity: 0, y: -20, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                className="mx-4 md:mx-8 mt-4 mb-2 bg-slate-900/60 backdrop-blur-xl border border-blue-500/30 p-4 rounded-2xl flex items-center gap-4 shadow-[0_10px_30px_-10px_rgba(59,130,246,0.2)]"
             >
-                <CloudRain className="w-6 h-6 flex-shrink-0" />
-                <div>
-                    <div className="font-black text-sm uppercase tracking-wide">Monsoon Warning</div>
-                    <div className="text-xs text-blue-100">Heavy rain blocks all Structural work. Only Interior, Systems, and Management tasks can enter Doing.</div>
+                <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center border border-blue-500/30 shadow-inner">
+                    <CloudRain className="w-7 h-7 text-blue-400" />
+                </div>
+                <div className="flex-1">
+                    <div className="font-black text-sm uppercase tracking-wider text-blue-400 flex items-center gap-2">
+                        Monsoon Season Alert
+                        <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-[10px] border border-blue-500/30 animate-pulse">Safety Sync</span>
+                    </div>
+                    <div className="text-xs text-slate-300 font-medium leading-relaxed mt-1">Heavy rain blocks all Structural work. Only Interior, Systems, and Management tasks can enter Doing.</div>
                 </div>
             </motion.div>
         );
@@ -203,8 +157,8 @@ const ScrollHint: React.FC<{ containerRef: React.RefObject<HTMLDivElement | null
         const el = containerRef.current;
         if (!el) return;
         const check = () => {
-            setShowLeft(el.scrollLeft > 10);
-            setShowRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+            setShowLeft(el.scrollLeft > 15);
+            setShowRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 15);
         };
         check();
         el.addEventListener('scroll', check, { passive: true });
@@ -221,9 +175,9 @@ const ScrollHint: React.FC<{ containerRef: React.RefObject<HTMLDivElement | null
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-slate-900/80 to-transparent z-20 pointer-events-none flex items-center justify-start pl-1 md:hidden"
+                        className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-slate-950/90 to-transparent z-20 pointer-events-none flex items-center justify-start pl-3 hidden md:flex"
                     >
-                        <ChevronLeft className="w-5 h-5 text-slate-400 animate-pulse" />
+                        <ChevronLeft className="w-6 h-6 text-slate-500/50 animate-pulse" />
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -233,9 +187,9 @@ const ScrollHint: React.FC<{ containerRef: React.RefObject<HTMLDivElement | null
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-slate-900/80 to-transparent z-20 pointer-events-none flex items-center justify-end pr-1 md:hidden"
+                        className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-slate-950/90 to-transparent z-20 pointer-events-none flex items-center justify-end pr-3 hidden md:flex"
                     >
-                        <ChevronRight className="w-5 h-5 text-slate-400 animate-pulse" />
+                        <ChevronRight className="w-6 h-6 text-slate-500/50 animate-pulse" />
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -244,21 +198,17 @@ const ScrollHint: React.FC<{ containerRef: React.RefObject<HTMLDivElement | null
 };
 
 export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-    const { columns, moveTask, setWipLimit, funds, materials, tutorialStep, setTutorialStep, day, audioSettings, chapter } = useGameStore();
+    const { columns, moveTask, funds, materials, tutorialStep, setTutorialStep, day, audioSettings, chapter } = useGameStore();
     const [showCustomModal, setShowCustomModal] = useState(false);
     const [replaceTaskId, setReplaceTaskId] = useState<string | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const onDragEnd = (result: DropResult) => {
         const { source, destination, draggableId } = result;
-
-        if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) {
-            return;
-        }
+        if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) return;
 
         const sourceColId = source.droppableId;
         const destColId = destination.droppableId;
-
         const sourceCol = columns.find(c => c.id === sourceColId);
         const task = sourceCol?.tasks.find(t => t.id === draggableId);
 
@@ -266,281 +216,258 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
         if (day === 3 && task.type === 'Structural' && destColId === 'doing' && sourceColId !== 'doing') {
             soundManager.playSFX('alert', audioSettings.sfxVolume);
-            alert("ENVIRONMENTAL VARIATION DETECTED!\n\nPrecipitation exceeds safety thresholds for structural work. Continuing would compromise quality and safety standards.\n\nLEAN RESPONSE: Pivot to interior fit-out or MEP systems in the Ready column to maintain throughput.");
             return;
         }
 
         if (destColId === 'doing' && sourceColId !== 'doing' && materials < task.cost) {
             soundManager.playSFX('alert', audioSettings.sfxVolume);
-            const isDay2 = day === 2;
-            const reason = isDay2 ? "Logistics failure: Concrete delivery delayed" : "Resource constraint detected.";
-
-            alert(`RESOURCE CONSTRAINT!\n\n${reason}\nAvailable Materials: ${materials} units. Required: ${task.cost} units.\n\nLEAN RESPONSE: Identify non-material dependent tasks (Management/Prep) to minimize idle time waste.`);
-            return;
-        }
-
-        const flowOrder = ['backlog', 'ready', 'doing', 'done'];
-        const sourceIndex = flowOrder.indexOf(sourceColId);
-        const destIndex = flowOrder.indexOf(destColId);
-
-        if (Math.abs(destIndex - sourceIndex) !== 1) {
-            soundManager.playSFX('alert', audioSettings.sfxVolume);
-            alert("INVALID MOVE!\n\nYou must follow the flow:\nBacklog > Ready > Doing > Done\n\nYou cannot skip steps!");
             return;
         }
 
         const success = moveTask(draggableId, sourceColId, destColId);
-
         if (success) {
             if (destColId === 'done') {
                 soundManager.playSFX('money', audioSettings.sfxVolume);
             } else {
                 soundManager.playSFX('click', audioSettings.sfxVolume);
             }
-
-            if (tutorialStep === 2 && sourceColId === 'backlog' && destColId === 'ready') setTutorialStep(3);
-            if (tutorialStep === 3 && sourceColId === 'ready' && destColId === 'doing') setTutorialStep(4);
+            if (tutorialStep === 2 && sourceColId === 'backlog' && destColId === 'doing') setTutorialStep(4);
             if (tutorialStep === 4 && sourceColId === 'doing' && destColId === 'done') setTutorialStep(5);
         } else {
             soundManager.playSFX('alert', audioSettings.sfxVolume);
-            alert("Cannot move task! Check WIP limits or project constraints.");
         }
     };
-
-    const doingCol = columns.find(c => c.id === 'doing');
-    const doingCongestion = doingCol ? Math.max(0, doingCol.tasks.length - doingCol.wipLimit) : 0;
 
     return (
         <>
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-2 md:p-8"
-                onClick={(e) => {
-                    if (e.target === e.currentTarget) onClose();
-                }}
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 120 }}
+                className="fixed inset-4 md:inset-8 z-[60] flex items-center justify-center bg-slate-950/85 backdrop-blur-2xl border border-white/10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] pointer-events-none"
             >
-                <div className={`w-full h-full max-w-6xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto bg-slate-800/95 backdrop-blur-md border border-slate-700/50`}>
-
-                    <div className={`p-4 md:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center z-10 gap-2 md:gap-4 bg-slate-900/50 border-b border-slate-700/50`}>
-                        <div>
-                            <h2 className={`text-xl md:text-3xl font-black flex items-center gap-2 text-white`}>
-                                {chapter > 1 ? 'Week 2 Execution Board' : 'Project Kanban Board'}
-                            </h2>
-                            <p className={`text-xs mt-1 text-slate-400`}>
-                                {chapter > 1 ? 'Execute your committed Weekly Work Plan' : 'Drag tasks through the flow. Keep WIP under control.'}
-                            </p>
-                            <div className="flex gap-2 md:gap-4 mt-1 md:mt-2 items-center">
-                                <LifeHearts />
-                                <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-lg font-mono font-bold border text-[10px] md:text-sm bg-slate-800/50 text-cyan-400 border-cyan-500/30`}>
-                                    Funds: ${funds}
-                                </div>
-                                <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-lg font-mono font-bold border text-[10px] md:text-sm bg-slate-800/50 text-amber-400 border-amber-500/30`}>
-                                    Materials: {materials}
+                <div className="absolute inset-0 pointer-events-auto" onClick={onClose} />
+                
+                <div className="w-full h-full max-w-[1700px] flex flex-col pointer-events-auto relative z-10 mx-auto overflow-hidden">
+                    
+                    {/* Header Section */}
+                    <div className="px-6 py-4 md:px-10 md:py-6 flex flex-col md:flex-row justify-between items-start md:items-center shrink-0 gap-4 bg-gradient-to-b from-slate-950/40 to-transparent">
+                        <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-3">
+                                <h2 className="text-2xl md:text-4xl font-black text-white tracking-tighter drop-shadow-md">
+                                    {chapter > 1 ? 'Weekly Execution' : 'Project Flux Board'}
+                                </h2>
+                                <div className="px-2 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[10px] uppercase font-black tracking-widest text-cyan-400">
+                                    Active Simulation
                                 </div>
                             </div>
+                            <p className="text-sm font-medium text-slate-400/80 max-w-xl">
+                                {chapter > 1 ? 'Execute your committed Weekly Work Plan to ensure smooth site flow and zero downtime.' : 'Drag tasks through the construction flow. Maintain continuous throughput to avoid overhead waste.'}
+                            </p>
                         </div>
-                        <button
-                            onClick={onClose}
-                            className={`px-4 md:px-6 py-2.5 md:py-2 rounded-xl font-bold transition-colors w-full md:w-auto text-sm md:text-base bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 border border-slate-600/50 min-h-[44px]`}
-                            data-testid="button-close-kanban"
-                        >
-                            Close View
-                        </button>
+
+                        <div className="flex flex-wrap items-center gap-3 md:gap-6 bg-slate-900/40 backdrop-blur-md p-2 rounded-2xl border border-slate-700/30">
+                            <div className="flex -space-x-1">
+                                <LifeHearts />
+                            </div>
+                            <div className="h-8 w-px bg-slate-700/50 hidden md:block" />
+                            <div className="flex items-center gap-4 px-2">
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Available Funds</span>
+                                    <span className="text-lg font-black text-cyan-400 font-mono tracking-tight leading-none">
+                                        {formatCurrency(funds, useGameStore.getState().currency)}
+                                    </span>
+                                </div>
+                                <div className="flex flex-col border-l border-slate-700/50 pl-4">
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Site Materials</span>
+                                    <span className="text-lg font-black text-amber-500 font-mono tracking-tight leading-none">
+                                        {materials.toLocaleString()} <span className="text-[10px] text-slate-600">UNITS</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/50 shadow-lg active:scale-95 shadow-black/20"
+                            >
+                                Close Management
+                            </button>
+                        </div>
                     </div>
 
                     <ConstraintBanner day={day} materials={materials} />
 
+                    {/* Board Content */}
                     <DragDropContext onDragEnd={onDragEnd}>
-                        <div className="flex-1 relative min-h-0">
+                        <div className="flex-1 relative min-h-0 px-4 md:px-8 pb-8">
                             <ScrollHint containerRef={scrollContainerRef} />
-                        <div ref={scrollContainerRef} className={`flex flex-row gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto overflow-y-auto bg-slate-900/60 scroll-smooth absolute inset-0`} style={{ WebkitOverflowScrolling: 'touch' }}>
-                            {columns.map(col => {
-                                let highlightClass = "border-slate-700/50";
-                                let adviceText: string | null = null;
+                            <div 
+                                ref={scrollContainerRef} 
+                                className="flex flex-row gap-6 h-full overflow-x-auto overflow-y-hidden pb-4 pt-2 snap-x snap-mandatory no-scrollbar"
+                            >
+                                {columns.map(col => {
+                                    const isOverWip = col.id === 'doing' && col.tasks.length > col.wipLimit;
+                                    const isAtWip = col.id === 'doing' && col.tasks.length >= col.wipLimit;
+                                    const isBottleneck = isOverWip || isAtWip;
+                                    const isBlurred = day > 5 && col.id === 'backlog';
+                                    const congestion = col.id === 'doing' ? Math.max(0, col.tasks.length - col.wipLimit) : 0;
 
-                                let displayTitle = col.title;
-                                if (day > 5) {
-                                    if (col.id === 'backlog') displayTitle = "Master Plan (Locked)";
-                                    if (col.id === 'ready') displayTitle = "Weekly Plan (Committed)";
-                                }
-
-                                const isOverWip = col.id === 'doing' && col.tasks.length > col.wipLimit;
-                                const isAtWip = col.id === 'doing' && col.tasks.length >= col.wipLimit;
-                                const isBottleneck = isOverWip || isAtWip;
-
-                                if (isOverWip) {
-                                    highlightClass = "border-red-500/50 ring-2 ring-red-500/20";
-                                    adviceText = "Bottleneck! Workers are overloaded.";
-                                } else if (isAtWip) {
-                                    highlightClass = "border-amber-500/50 ring-2 ring-amber-500/20";
-                                    adviceText = "At WIP limit. Finish before pulling more.";
-                                }
-
-                                if (col.id === 'ready' && col.tasks.length === 0) {
-                                    highlightClass = "border-orange-500/50 ring-2 ring-orange-500/20";
-                                    adviceText = "Starved! No tasks ready.";
-                                }
-
-                                const isBlurred = day > 5 && col.id === 'backlog';
-                                const congestion = col.id === 'doing' ? Math.max(0, col.tasks.length - col.wipLimit) : 0;
-
-                                return (
-                                    <Droppable key={col.id} droppableId={col.id} isDropDisabled={isBlurred}>
-                                        {(provided, snapshot) => (
-                                            <div
-                                                id={`col-${col.id}`}
-                                                className={`min-w-[280px] md:w-[320px] flex flex-col self-stretch bg-slate-800/60 rounded-3xl border transition-all relative ${highlightClass} ${snapshot.isDraggingOver ? 'bg-cyan-900/20 border-cyan-500/50' : ''} overflow-visible shrink-0 ${isBlurred ? 'opacity-50 grayscale' : ''}`}
-                                            >
-                                                <BottleneckPulse isBottleneck={isBottleneck} />
-                                                {col.id === 'doing' && <CongestionCloud intensity={congestion} />}
-
-                                                <div className={`${col.id === 'done' ? 'bg-emerald-900/20' : 'bg-slate-800/80'} p-4 border-b border-slate-700/50 rounded-t-3xl backdrop-blur-sm`}>
-                                                    <div className="flex justify-between items-center mb-1">
-                                                        <h3 className="font-bold text-slate-200">{displayTitle}</h3>
-                                                        {col.wipLimit > 0 && (
-                                                            <div className="flex items-center gap-2">
-                                                                <span className={`text-xs font-bold px-2 py-1 rounded-full ${isOverWip ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30' : isAtWip ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-slate-700/50 text-slate-300 border border-slate-600/50'}`}>
-                                                                    {col.tasks.length} / {col.wipLimit}
-                                                                </span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    <AnimatePresence>
-                                                        {adviceText && (
-                                                            <motion.div
-                                                                initial={{ opacity: 0, height: 0 }}
-                                                                animate={{ opacity: 1, height: 'auto' }}
-                                                                exit={{ opacity: 0, height: 0 }}
-                                                                className={`text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 ${isOverWip ? 'text-red-500' : 'text-amber-600'}`}
-                                                            >
-                                                                <AlertTriangle className="w-3 h-3" /> {adviceText}
-                                                            </motion.div>
-                                                        )}
-                                                    </AnimatePresence>
-
-                                                    {col.id === 'doing' && chapter <= 1 && (
-                                                        <WipSlider column={col} onChangeWip={setWipLimit} />
-                                                    )}
-                                                </div>
-
+                                    return (
+                                        <Droppable key={col.id} droppableId={col.id} isDropDisabled={isBlurred}>
+                                            {(provided, snapshot) => (
                                                 <div
-                                                    {...provided.droppableProps}
-                                                    ref={provided.innerRef}
-                                                    className="flex-1 bg-slate-900/40 p-3 flex flex-col gap-3 overflow-y-auto rounded-b-3xl min-h-[150px]"
+                                                    id={`col-${col.id}`}
+                                                    className={`w-[320px] md:w-[420px] shrink-0 flex flex-col h-full snap-start transition-all duration-300 relative group`}
                                                 >
-                                                    {col.tasks.map((task, index) => {
-                                                        const hasRedConstraints = chapter > 1 && (task.constraints?.length || 0) > 0;
-                                                        const isWasteTask = task.id.includes('waste') || task.title === 'REWORK';
-                                                        const isInDoneCol = col.id === 'done';
+                                                    {/* Column Frame */}
+                                                    <div className={`flex flex-col h-full bg-slate-900/40 backdrop-blur-md rounded-[28px] border-2 transition-all duration-500 relative overflow-hidden ${
+                                                        snapshot.isDraggingOver ? 'bg-cyan-500/5 border-cyan-500/40 shadow-[0_0_30px_rgba(6,182,212,0.1)]' : 
+                                                        isBottleneck ? 'border-red-500/20' : 'border-slate-800/40'
+                                                    } ${isBlurred ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
+                                                        
+                                                        {/* Header */}
+                                                        <div className={`px-6 py-5 shrink-0 border-b border-white/5 flex items-center justify-between ${
+                                                            col.id === 'done' ? 'bg-emerald-500/5' : 
+                                                            col.id === 'doing' ? 'bg-cyan-500/5' : ''
+                                                        }`}>
+                                                            <div className="flex items-center gap-3">
+                                                                <div className={`w-2 h-6 rounded-full ${
+                                                                    col.id === 'done' ? 'bg-emerald-500' : 
+                                                                    col.id === 'doing' ? 'bg-cyan-500' : 'bg-slate-500'
+                                                                }`} />
+                                                                <h3 className="font-black text-lg uppercase tracking-wider text-slate-100 italic">
+                                                                    {day > 5 && col.id === 'backlog' ? 'Master Plan' : col.title}
+                                                                </h3>
+                                                            </div>
+                                                            <div className="bg-slate-800/50 px-2.5 py-1 rounded-lg border border-slate-700/50 text-xs font-black font-mono text-slate-400">
+                                                                {col.tasks.length}
+                                                            </div>
+                                                        </div>
 
-                                                        return (
-                                                            <Draggable key={task.id} draggableId={task.id} index={index}>
-                                                                {(provided, snapshot) => {
-                                                                    const child = (
-                                                                        <div
-                                                                            ref={provided.innerRef}
-                                                                            {...provided.draggableProps}
-                                                                            {...provided.dragHandleProps}
-                                                                            style={provided.draggableProps.style}
-                                                                            className={`relative bg-slate-800 p-4 md:p-3 rounded-2xl shadow-sm border border-slate-700/50 cursor-grab active:cursor-grabbing group touch-manipulation ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-cyan-500/50 !bg-slate-700 z-50' : 'hover:shadow-lg transition-transform duration-200'} ${isWasteTask
-                                                                                ? 'border-red-500/50 bg-red-900/20'
-                                                                                : hasRedConstraints
-                                                                                    ? 'border-red-500/50 bg-red-900/20'
-                                                                                    : task.type === 'Structural' ? 'border-l-4 border-l-cyan-500'
-                                                                                        : task.type === 'Systems' ? 'border-l-4 border-l-emerald-500'
-                                                                                            : task.type === 'Interior' ? 'border-l-4 border-l-amber-500'
-                                                                                                : task.type === 'Management' ? 'border-l-4 border-l-purple-500'
-                                                                                                    : 'border-l-4 border-l-cyan-400'
-                                                                                } ${isOverWip && col.id === 'doing' && !snapshot.isDragging ? 'opacity-80' : ''
-                                                                                }`}
-                                                                        >
-                                                                            <WasteTaskOverlay isWaste={isWasteTask} isInDone={isInDoneCol} />
-
-                                                                            <div className="flex items-start gap-2">
-                                                                                <div className="flex items-center md:hidden self-stretch mr-1 text-slate-600" aria-hidden="true">
-                                                                                    <GripVertical className="w-4 h-4" />
-                                                                                </div>
-                                                                                {!isWasteTask && (
-                                                                                    <TaskIconDisplay icon={task.icon} type={task.type} size="md" className="mt-0.5 shadow-md shadow-black/20" />
-                                                                                )}
-                                                                                <div className="flex-1 min-w-0">
-                                                                                    <div className="flex justify-between items-start">
-                                                                                        <h4 className={`font-bold group-hover:text-cyan-400 transition-colors text-sm md:text-base flex-1 ${isWasteTask ? 'text-red-400' : 'text-slate-200'}`}>
-                                                                                            {task.title}
-                                                                                        </h4>
-                                                                                        {hasRedConstraints && <span className="text-[10px] font-black text-red-400 bg-red-500/20 px-1.5 py-0.5 rounded animate-pulse" title="Blocked by Constraints">BLOCKED</span>}
-                                                                                        {isWasteTask && !isInDoneCol && (
-                                                                                            <span className="text-[9px] font-black text-red-400 bg-red-500/20 px-1.5 py-0.5 rounded animate-pulse">WASTE</span>
-                                                                                        )}
-                                                                                    </div>
-                                                                                    <p className="text-[10px] md:text-xs text-slate-400 line-clamp-2 mt-1">{task.description}</p>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            {chapter > 1 && task.constraints?.map(c => (
-                                                                                <span key={c} className="inline-block bg-red-500/20 text-red-300 text-[9px] px-1 py-0.5 rounded mr-1 mt-1 font-bold border border-red-500/30 uppercase">
-                                                                                    Blocked: {c}
-                                                                                </span>
-                                                                            ))}
-
-                                                                            <div className="mt-2 flex flex-wrap gap-1 md:gap-2 text-[10px] font-mono font-bold">
-                                                                                <span className={`px-1.5 py-0.5 rounded-full border ${task.type === 'Structural' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' :
-                                                                                    task.type === 'Systems' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
-                                                                                        task.type === 'Interior' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
-                                                                                            task.type === 'Management' ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' :
-                                                                                                'bg-sky-500/20 text-sky-400 border-sky-500/30'
-                                                                                    }`}>
-                                                                                    {task.type}
-                                                                                </span>
-                                                                                <span className="text-slate-400 bg-slate-700/50 border border-slate-600/50 px-1.5 py-0.5 rounded-full">-{task.cost}</span>
-                                                                                <span className="text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 px-1.5 py-0.5 rounded-full">+${task.reward}</span>
-                                                                            </div>
-
-                                                                            {/* Replace button (hover) */}
-                                                                            {!isWasteTask && col.id === 'backlog' && (
-                                                                                <button
-                                                                                    onClick={(e) => { e.stopPropagation(); setReplaceTaskId(task.originalId || task.id); setShowCustomModal(true); }}
-                                                                                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 md:w-6 md:h-6 min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 bg-slate-700/90 border border-slate-600/50 rounded-lg flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/40 touch-manipulation"
-                                                                                    title="Replace with custom task"
-                                                                                >
-                                                                                    <Replace className="w-4 h-4 md:w-3 md:h-3 text-slate-400 hover:text-amber-400" />
-                                                                                </button>
-                                                                            )}
-                                                                        </div>
-                                                                    );
-
-                                                                    const usePortal = snapshot.isDragging || snapshot.isDropAnimating;
-
-                                                                    if (usePortal) {
-                                                                        return createPortal(child, document.body);
-                                                                    }
-                                                                    return child;
-                                                                }}
-                                                            </Draggable>
-                                                        );
-                                                    })}
-                                                    {provided.placeholder}
-
-                                                    {/* Add Custom Task button at bottom of backlog */}
-                                                    {col.id === 'backlog' && (
-                                                        <button
-                                                            onClick={() => { setReplaceTaskId(null); setShowCustomModal(true); }}
-                                                            className="w-full p-3 mt-1 rounded-2xl border-2 border-dashed border-slate-700/50 text-slate-500 hover:border-cyan-500/40 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all flex items-center justify-center gap-2 text-xs font-bold min-h-[44px] touch-manipulation"
+                                                        {/* Task Area */}
+                                                        <div
+                                                            {...provided.droppableProps}
+                                                            ref={provided.innerRef}
+                                                            className="flex-1 p-4 flex flex-col gap-4 overflow-y-auto custom-scrollbar-thin"
                                                         >
-                                                            <Plus className="w-4 h-4" />
-                                                            Add Custom Task
-                                                        </button>
-                                                    )}
+                                                            {col.tasks.map((task, index) => {
+                                                                const isWaste = task.id.includes('waste') || task.title === 'REWORK';
+                                                                const isDone = col.id === 'done';
+                                                                const isDoing = col.id === 'doing';
+                                                                const hasConstraints = chapter > 1 && (task.constraints?.length || 0) > 0;
+
+                                                                return (
+                                                                    <Draggable key={task.id} draggableId={task.id} index={index}>
+                                                                        {(provided, snapshot) => {
+                                                                            const child = (
+                                                                                <div
+                                                                                    ref={provided.innerRef}
+                                                                                    {...provided.draggableProps}
+                                                                                    {...provided.dragHandleProps}
+                                                                                    style={provided.draggableProps.style}
+                                                                                    className={`group relative bg-slate-800/80 backdrop-blur-xl p-5 rounded-2xl border transition-all duration-300 ${
+                                                                                        snapshot.isDragging 
+                                                                                            ? 'bg-slate-700 border-cyan-400 shadow-[0_25px_60px_-15px_rgba(0,0,0,1)] ring-4 ring-cyan-500/20 z-50 scale-[1.05] cursor-grabbing' 
+                                                                                            : 'border-slate-700/50 hover:border-slate-500 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-1'
+                                                                                    } ${isWaste ? 'border-red-900/50' : ''}`}
+                                                                                >
+                                                                                    <WasteTaskOverlay isWaste={isWaste} isInDone={isDone} />
+                                                                                    <BottleneckPulse isBottleneck={isBottleneck && isDoing && index === 0} />
+                                                                                    
+                                                                                    <div className="flex items-start gap-4">
+                                                                                        <div className="shrink-0 mt-1">
+                                                                                            <TaskIconDisplay 
+                                                                                                icon={task.icon} 
+                                                                                                type={task.type} 
+                                                                                                size="md" 
+                                                                                                className={`shadow-lg drop-shadow-[0_0_10px_rgba(0,0,0,0.3)] transition-transform duration-300 group-hover:scale-110 ${isDone ? 'opacity-50 grayscale' : ''}`} 
+                                                                                            />
+                                                                                        </div>
+                                                                                        <div className="flex-1 min-w-0">
+                                                                                            <div className="flex justify-between items-start gap-2">
+                                                                                                <h4 className={`text-base font-black tracking-tight leading-snug transition-colors truncate ${
+                                                                                                    isWaste ? 'text-red-400' : 
+                                                                                                    isDone ? 'text-slate-500 line-through' :
+                                                                                                    'text-slate-100 group-hover:text-cyan-400'
+                                                                                                }`}>
+                                                                                                    {task.title}
+                                                                                                </h4>
+                                                                                                {hasConstraints && <div className="shrink-0 w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]" />}
+                                                                                                {isDone && <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />}
+                                                                                            </div>
+                                                                                            <p className={`text-xs mt-1.5 font-medium leading-relaxed line-clamp-2 transition-opacity ${isDone ? 'opacity-30' : 'text-slate-400/90'}`}>
+                                                                                                {task.description}
+                                                                                            </p>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    {/* Tags & Meta */}
+                                                                                    <div className="mt-4 flex flex-col gap-2">
+                                                                                        {task.materialsRequired && task.materialsRequired.length > 0 && (
+                                                                                            <div className="flex flex-col gap-1 w-full bg-slate-900/50 rounded-lg p-2 border border-slate-700/50">
+                                                                                                {task.materialsRequired.map((m, i) => (
+                                                                                                    <div key={i} className="flex items-center gap-2 text-[10px]">
+                                                                                                        <Package className="w-3.5 h-3.5 text-amber-500" />
+                                                                                                        <span className="text-slate-400">Material Required:</span>
+                                                                                                        <span className="font-bold text-amber-400">{m.amount} {m.name}</span>
+                                                                                                    </div>
+                                                                                                ))}
+                                                                                            </div>
+                                                                                        )}
+                                                                                        <div className="flex flex-wrap gap-2 items-center">
+                                                                                            <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border ${
+                                                                                                task.type === 'Structural' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
+                                                                                                task.type === 'Systems' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                                                                                task.type === 'Interior' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                                                                                task.type === 'Management' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                                                                                                'bg-slate-700/30 text-slate-400 border-slate-700/50'
+                                                                                            }`}>
+                                                                                                {task.type}
+                                                                                            </span>
+                                                                                            <div className="flex items-center gap-1 bg-slate-900/40 rounded-lg px-2 py-1 border border-slate-700/30 text-[9px] font-black font-mono">
+                                                                                                <span className="text-red-400">-{useGameStore.getState().currency === 'INR' ? '₹' : '$'}{(task.costToStart || task.cost).toLocaleString()}</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    {/* Replace Button */}
+                                                                                    {!isWaste && col.id === 'backlog' && (
+                                                                                        <button
+                                                                                            onClick={(e) => { e.stopPropagation(); setReplaceTaskId(task.originalId || task.id); setShowCustomModal(true); }}
+                                                                                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all p-2 bg-slate-700/90 hover:bg-cyan-500/20 border border-slate-600/50 rounded-xl hover:border-cyan-500/40"
+                                                                                        >
+                                                                                            <Replace className="w-3.5 h-3.5 text-slate-400 hover:text-cyan-400" />
+                                                                                        </button>
+                                                                                    )}
+                                                                                </div>
+                                                                            );
+                                                                            return snapshot.isDragging ? createPortal(child, document.body) : child;
+                                                                        }}
+                                                                    </Draggable>
+                                                                );
+                                                            })}
+                                                            {provided.placeholder}
+                                                            
+                                                            {col.id === 'backlog' && (
+                                                                <button
+                                                                    onClick={() => { setReplaceTaskId(null); setShowCustomModal(true); }}
+                                                                    className="w-full py-6 mt-2 flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-700/40 text-slate-500 hover:border-cyan-500/40 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all group"
+                                                                >
+                                                                    <div className="p-2 rounded-full bg-slate-800 border border-slate-700 group-hover:bg-cyan-500/20 group-hover:border-cyan-500/40 transition-colors">
+                                                                        <Plus className="w-5 h-5" />
+                                                                    </div>
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest">Inject Custom Order</span>
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="h-6 shrink-0" /> {/* Spacer */}
                                                 </div>
-                                            </div>
-                                        )}
-                                    </Droppable>
-                                );
-                            })}
-                        </div>
+                                            )}
+                                        </Droppable>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </DragDropContext>
                 </div>
@@ -551,6 +478,8 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 onClose={() => { setShowCustomModal(false); setReplaceTaskId(null); }}
                 replaceTaskId={replaceTaskId}
             />
+
+            <LeanAiChat />
         </>
     );
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowDown, ChevronRight, Ban, ArrowRight, Gauge } from 'lucide-react';
+import { ArrowDown, ChevronRight, Ban, ArrowRight, Gauge, ClipboardList } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 
 const TOOLTIP_MARGIN = 12;
@@ -46,7 +46,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
 
         const updateSpotlight = () => {
             let targetId = '';
-            if (tutorialStep === 0 || tutorialStep === 1) targetId = 'btn-kanban';
+            if (tutorialStep === 0 || tutorialStep === 1) targetId = 'btn-project-sheet';
+            if (tutorialStep === 1.2) targetId = 'btn-close-project-sheet';
+            if (tutorialStep === 1.5) targetId = 'btn-kanban';
             if (tutorialStep === 2) targetId = 'col-backlog';
             if (tutorialStep === 3) targetId = 'col-ready';
             if (tutorialStep === 4) targetId = 'col-doing';
@@ -112,24 +114,52 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
 
             <AnimatePresence>
 
-                {/* Step 1: Open Board */}
+                {/* Step 1: Open Project Sheet */}
                 {tutorialStep === 1 && !showKanban && spotlightPos && (
                     <motion.div
                         initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
-                        style={clampToViewport({ top: spotlightPos.y + 20, left: spotlightPos.x - 320 }, 360, 80)}
-                        className="absolute flex items-center gap-4"
+                        style={clampToViewport({ top: spotlightPos.y - 100, left: spotlightPos.x - 120 }, 320, 100)}
+                        className="absolute flex flex-col items-center gap-2 z-[90] pointer-events-none"
                     >
-                        <div className="bg-blue-600 px-4 py-2 rounded-xl text-lg shadow-xl text-right">
-                            Click the Chart <br /> to open Kanban!
+                        <div className="bg-blue-600 px-4 py-2 rounded-xl text-sm shadow-xl text-center font-bold border-2 border-white pointer-events-auto">
+                            Check the <b>Project Status</b><br />before starting work!
                         </div>
-                        <ArrowRight className="w-10 h-10 text-blue-400 animate-bounce-horizontal" />
+                        <ArrowDown className="w-8 h-8 text-blue-400 animate-bounce" />
+                    </motion.div>
+                )}
+
+                {/* Step 1.2: Close Project Sheet (Reading) */}
+                {tutorialStep === 1.2 && spotlightPos && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                        style={clampToViewport({ top: spotlightPos.y - 120, left: spotlightPos.x }, 320, 120)}
+                        className="absolute z-[90] w-72 pointer-events-none"
+                    >
+                        <div className="bg-blue-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
+                            <p className="font-bold text-lg mb-1 flex items-center gap-2"><ClipboardList className="w-5 h-5" /> Project Sheet</p>
+                            <p className="text-sm font-medium">Review your tasks, tracking <b>costs and overruns</b> (in red). You can also see the core materials required.<br/><br/>Close this window when done.</p>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Step 1.5: Open Kanban */}
+                {tutorialStep === 1.5 && !showKanban && spotlightPos && (
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
+                        style={clampToViewport({ top: spotlightPos.y + 20, left: spotlightPos.x - 320 }, 360, 80)}
+                        className="absolute flex items-center gap-4 z-[90] pointer-events-none"
+                    >
+                        <div className="bg-cyan-600 px-4 py-2 rounded-xl text-lg shadow-xl text-right font-bold border-2 border-white pointer-events-auto">
+                            Click here to open<br />the <b>Construction Site!</b>
+                        </div>
+                        <ArrowRight className="w-10 h-10 text-cyan-400 animate-bounce-horizontal" />
                     </motion.div>
                 )}
 
                 {/* Board Open - Guidance (Steps 2-4) */}
                 {showKanban && spotlightPos && (
                     <>
-                        {/* Step 2: Backlog -> Ready */}
+                        {/* Step 2: Backlog -> In Progress */}
                         {tutorialStep === 2 && (
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
@@ -140,13 +170,13 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                     <ArrowDown className="w-12 h-12 text-orange-400 animate-bounce" />
                                 </div>
                                 <div className="bg-orange-500 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
-                                    <p className="font-bold text-lg">Step 1: PULL</p>
-                                    <p className="text-sm"><b>Drag</b> a task from here to <b>Ready</b>.</p>
+                                    <p className="font-bold text-lg">Step 1: DISPATCH</p>
+                                    <p className="text-sm"><b>Drag</b> a task from the Backlog to <b>In Progress</b> to start building it.</p>
                                 </div>
                             </motion.div>
                         )}
 
-                        {/* Step 3: Ready -> Doing */}
+                        {/* Step 3: Parallel Logic */}
                         {tutorialStep === 3 && (
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
@@ -157,8 +187,8 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                     <ArrowDown className="w-12 h-12 text-purple-400 animate-bounce" />
                                 </div>
                                 <div className="bg-purple-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
-                                    <p className="font-bold text-lg">Step 2: START</p>
-                                    <p className="text-sm"><b>Drag</b> it to <b>Doing</b> to start work. <br />(Commits Materials)</p>
+                                    <p className="font-bold text-lg">Step 2: PARALLEL WORK</p>
+                                    <p className="text-sm">Construction is messy! You can <b>drag multiple tasks</b> here to work on them at the same time.</p>
                                 </div>
                             </motion.div>
                         )}
@@ -174,15 +204,15 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                     <ArrowDown className="w-12 h-12 text-green-400 animate-bounce" />
                                 </div>
                                 <div className="bg-green-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
-                                    <p className="font-bold text-lg">Step 3: FINISH</p>
-                                    <p className="text-sm"><b>Drag</b> it to <b>Done</b> to get Paid! <br />(Value Added)</p>
+                                    <p className="font-bold text-lg">Step 3: HANDOVER</p>
+                                    <p className="text-sm"><b>Drag</b> finished works to <b>Completed</b> to advance the schedule! <br />(Increases Efficiency)</p>
                                 </div>
                             </motion.div>
                         )}
                     </>
                 )}
 
-                {/* Step 5: WIP Slider Explanation - centered on screen */}
+                {/* Step 5: Cost & Constraints - centered on screen */}
                 {tutorialStep === 5 && showKanban && (
                     <div className="absolute inset-0 flex items-center justify-center z-[90] pointer-events-none">
                         <motion.div
@@ -191,24 +221,21 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         >
                             <div className="bg-slate-900 text-slate-200 px-5 py-4 rounded-xl shadow-2xl border-4 border-cyan-500 relative">
                                 <h3 className="font-black text-cyan-400 text-lg mb-1 flex items-center gap-2">
-                                    <Gauge className="w-5 h-5" /> WIP Limit Slider
+                                    <Gauge className="w-5 h-5" /> Managing Chaos (Lean 101)
                                 </h3>
                                 <ul className="text-sm font-medium mb-3 space-y-2 leading-snug text-slate-300">
                                     <li>
-                                        Use the <b>+/-</b> buttons on the Doing column to set your <b>Work-In-Progress limit</b>.
+                                        In real life, <b>multiple crews</b> work at the same time. You decide how many!
                                     </li>
                                     <li>
-                                        <b>Lower WIP</b> = fewer tasks at once, but faster flow and higher <span className="text-green-600 font-bold">Morale</span>.
+                                        But beware: Every time you start a task, you <b>deduct money (Activation Cost)</b> and consume physical materials!
                                     </li>
                                     <li>
-                                        <b>Higher WIP</b> = more tasks at once, but risk overloading workers. <span className="text-red-500 font-bold">Morale drops -5</span> if you exceed it!
-                                    </li>
-                                    <li>
-                                        Your <b>Flow Efficiency</b> is measured against this limit &mdash; it defines how many tasks you <i>could</i> complete each day.
+                                        <b>Don't start everything at once.</b> Construction is not sequential; you <i>should</i> work in parallel! However, if you exceed your crew's <b>WIP Limit (Work-In-Progress)</b>, flow stalls and you'll run out of money before finishing. Your <b>Efficiency score</b> measures finishing things, not just starting them!
                                     </li>
                                 </ul>
                                 <div className="bg-cyan-900/30 border border-cyan-500/30 rounded-lg px-3 py-2 text-xs text-cyan-300 mb-3">
-                                    <b>Lean Principle:</b> Limiting WIP prevents congestion and helps work flow smoothly &mdash; just like limiting cars on a highway reduces traffic jams.
+                                    <b>The Secret:</b> Focus on finishing what you start! Accumulating unfinished tasks drives up your overhead and destroys your efficiency score!
                                 </div>
                                 <button
                                     onClick={() => setTutorialStep(6)}
@@ -256,9 +283,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                             <div className="absolute -top-3 left-6 w-6 h-6 bg-slate-900 border-t-4 border-l-4 border-green-500 transform rotate-45"></div>
                             <h3 className="font-black text-green-400 text-lg mb-1">Project Health</h3>
                             <ul className="text-sm font-medium mb-3 space-y-2 text-slate-300">
-                                <li><b>Funds</b>: You earn money when tasks reach <b>Done</b>. Each day costs $250 overhead. Don't run out!</li>
-                                <li><b>Morale</b>: Stays high with steady flow. <span className="text-red-400">Drops</span> if you exceed WIP limits or push workers. <span className="text-green-400">Rises</span> when you complete tasks within limits.</li>
-                                <li><b>Efficiency</b>: Tasks completed vs. what was possible (set by your WIP limit). Higher WIP limit = higher bar to reach!</li>
+                                <li><b>Funds</b>: You only earn money when tasks reach <b>Completed</b>. Each month you pay massive overheads. Don't run out!</li>
+                                <li><b>Morale</b>: Happy workers build faster. <span className="text-red-400">Drops</span> if you abuse them or bankrupt the site.</li>
+                                <li><b>Efficiency</b>: Measures how smoothly you are handing over work areas without delays.</li>
                             </ul>
                             <button
                                 onClick={() => setTutorialStep(8)}

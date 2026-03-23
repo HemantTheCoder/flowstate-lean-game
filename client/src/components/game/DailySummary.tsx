@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useGameStore } from '@/store/gameStore';
+import { useGameStore, formatCurrency } from '@/store/gameStore';
 import { motion } from 'framer-motion';
 import { TrendingUp, BookOpen, Lightbulb } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
@@ -98,7 +98,25 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
     const day = useGameStore(s => s.day);
     const chapter = useGameStore(s => s.chapter);
     const funds = useGameStore(s => s.funds);
+    const currency = useGameStore(s => s.currency);
     const dailyMetrics = useGameStore(s => s.dailyMetrics) ?? [];
+    const columns = useGameStore(s => s.columns);
+    
+    // Derived state - computed during render, stable because columns is selected
+    const allTasks = columns.flatMap(c => c.tasks);
+    const doneTasksList = columns.find(c => c.id === 'done')?.tasks || [];
+    const hasWeights = allTasks.some(t => t.completionWeight);
+
+    let percentComplete = 0;
+    if (hasWeights) {
+        const totalWeight = allTasks.reduce((acc, t) => acc + (t.completionWeight || 0), 0);
+        const doneWeight = doneTasksList.reduce((acc, t) => acc + (t.completionWeight || 0), 0);
+        percentComplete = totalWeight > 0 ? Math.round((doneWeight / totalWeight) * 100) : 0;
+    } else {
+        const doneCount = doneTasksList.length;
+        const totalCount = allTasks.length;
+        percentComplete = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+    }
 
     useEffect(() => {
         if (isOpen) {
@@ -125,7 +143,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                 className="bg-slate-900 w-full max-w-md max-h-[90vh] rounded-3xl shadow-[0_0_40px_rgba(59,130,246,0.15)] overflow-hidden border border-slate-700/50 flex flex-col"
             >
                 <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-900 p-6 text-center shrink-0 border-b border-blue-500/30">
-                    <h2 className="text-3xl font-black text-white uppercase tracking-wider">Day {displayDay} Complete</h2>
+                    <h2 className="text-3xl font-black text-white uppercase tracking-wider">{chapter === 1 ? 'Month' : 'Day'} {displayDay} Complete</h2>
                     <p className="text-blue-200 font-medium mt-1">Site Report</p>
                 </div>
 
@@ -136,13 +154,14 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-blue-900/20 rounded-xl p-3 border border-blue-500/30 text-center">
+                        <div className="bg-blue-900/20 rounded-xl p-3 border border-blue-500/30 text-center flex flex-col justify-center">
                             <div className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Daily Efficiency</div>
                             <div className={`text-2xl font-black ${dailyEfficiency >= 80 ? 'text-green-400' : dailyEfficiency >= 50 ? 'text-blue-400' : 'text-orange-400'}`}>
                                 {dailyEfficiency}%
                             </div>
+                            <div className="text-[9px] text-blue-500 font-bold mt-1 uppercase tracking-widest">(Done vs Planned)</div>
                         </div>
-                        <div className="bg-emerald-900/20 rounded-xl p-3 border border-emerald-500/30 text-center">
+                        <div className="bg-emerald-900/20 rounded-xl p-3 border border-emerald-500/30 text-center flex flex-col justify-center">
                             <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider flex items-center justify-center gap-1">
                                 <TrendingUp className="w-3 h-3" /> Cumulative
                             </div>
@@ -204,14 +223,48 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
 
                     <div className="bg-red-900/20 p-3 rounded-xl border border-red-500/30">
                         <div className="flex justify-between items-center mb-1">
-                            <span className="text-red-400 font-bold text-sm">Daily Overhead</span>
-                            <span className="text-red-400 font-mono font-bold">-$250</span>
+                            <span className="text-red-400 font-bold text-sm">Site Overhead</span>
+                            <span className="text-red-400 font-mono font-bold">-{formatCurrency(250000, currency)}</span>
                         </div>
-                        <p className="text-xs text-red-500">Salaries, Equipment, Rent.</p>
+                        <p className="text-xs text-red-500">Salaries, Equipment Rental, Daily Setup.</p>
                     </div>
 
-                    <div className={`text-center font-bold text-sm ${funds < 0 ? 'text-red-400' : 'text-slate-400'}`}>
-                        Current Funds: <span className="font-mono text-slate-200">${funds}</span>
+                    {/* NEW: Explicit Efficiency Explanation for Any Background */}
+                    <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700/50 text-xs text-slate-300 leading-relaxed">
+                        <span className="text-blue-400 font-bold">What is Efficiency?</span><br />
+                        It measures exactly how much work was <span className="text-green-400 font-bold">completed</span> compared to how much could possibly be completed today. A high percentage means your construction flow is highly reliable and predictable!
+                    </div>
+
+                    {/* NEW: Excel Style Overrun Tracker */}
+                    <div className="bg-slate-800 rounded-xl border border-slate-600 overflow-hidden shadow-inner font-sans mt-2">
+                        <div className="bg-slate-700/50 px-3 py-1.5 border-b border-slate-600 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 rounded bg-green-600 flex flex-col items-center justify-center">
+                                    <span className="text-[10px] text-white font-serif font-black leading-none">X</span>
+                                </div>
+                                <span className="text-xs text-slate-200 font-bold tracking-wider uppercase">Project Tracker.xlsx</span>
+                            </div>
+                            <span className="text-xs text-cyan-400 font-mono font-bold">{percentComplete}% Complete</span>
+                        </div>
+                        <div className="grid grid-cols-3 text-[10px] font-bold text-slate-400 bg-slate-800 border-b border-slate-700 text-center divide-x divide-slate-700">
+                            <div className="py-1.5 bg-slate-700/30">METRIC</div>
+                            <div className="py-1.5 bg-slate-700/30">PLANNED</div>
+                            <div className="py-1.5 bg-slate-700/30">ACTUAL (OVERRUN)</div>
+                        </div>
+                        <div className="grid grid-cols-3 text-xs text-slate-300 font-mono bg-slate-900 text-center divide-x divide-slate-800 border-b border-slate-800">
+                            <div className="py-2 flex items-center justify-center font-sans font-medium text-slate-300">Time ({chapter === 1 ? 'Months' : 'Days'})</div>
+                            <div className="py-2 text-slate-500">{chapter === 1 ? 5 : chapter === 2 ? 11 : 16}</div>
+                            <div className={`py-2 font-bold ${displayDay > (chapter === 1 ? 5 : chapter === 2 ? 11 : 16) ? 'text-red-400' : 'text-emerald-400'}`}>
+                                {displayDay} {displayDay > (chapter === 1 ? 5 : chapter === 2 ? 11 : 16) && `(+${displayDay - (chapter === 1 ? 5 : chapter === 2 ? 11 : 16)})`}
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-3 text-xs text-slate-300 font-mono bg-slate-900 text-center divide-x divide-slate-800">
+                            <div className="py-2 flex items-center justify-center font-sans font-medium text-slate-300">Budget</div>
+                            <div className="py-2 text-slate-500">{formatCurrency((chapter === 1 ? 5 : chapter === 2 ? 11 : 16) * 3000000, currency)}</div>
+                            <div className={`py-2 font-bold ${funds < (chapter === 1 ? 5 : chapter === 2 ? 11 : 16) * 3000000 ? 'text-red-400' : 'text-emerald-400'}`}>
+                                {formatCurrency(funds, currency)} {funds < (chapter === 1 ? 5 : chapter === 2 ? 11 : 16) * 3000000 && `(${formatCurrency(funds - (chapter === 1 ? 5 : chapter === 2 ? 11 : 16) * 3000000, currency)})`}
+                            </div>
+                        </div>
                     </div>
 
                     {lesson && (
@@ -234,7 +287,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                         data-testid="button-next-day"
                         className="w-full bg-blue-600 border border-blue-500/50 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-500 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_4px_20px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2"
                     >
-                        {(displayDay >= 5 && chapter === 1) || (displayDay >= 11 && chapter === 2) || (displayDay >= 16 && chapter === 3) ? 'View Results' : `Start Day ${displayDay + 1}`}
+                        {(displayDay >= 5 && chapter === 1) || (displayDay >= 11 && chapter === 2) || (displayDay >= 16 && chapter === 3) ? 'View Results' : `Start ${chapter === 1 ? 'Month' : 'Day'} ${displayDay + 1}`}
                     </button>
                 </div>
             </motion.div>

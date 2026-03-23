@@ -13,14 +13,14 @@ export const CHAPTER_1_MID: DialogueLine[] = [
     { character: 'Architect', text: "Stop! Look at the 'Doing' column. It's full.", emotion: 'stressed' },
     { character: 'Rao', text: "So? Start another task! I have idle men!", emotion: 'angry' },
     { character: 'Architect', text: "No. If you start more, you spread resources thin. Mistakes happen. Accidents happen.", emotion: 'neutral' },
-    { character: 'Architect', text: "This is Little's Law: The more things you have in progress, the slower everything gets.", emotion: 'neutral' },
-    { character: 'Architect', text: "Focus on moving a card to 'Done' first. Clear the bottleneck.", emotion: 'happy' }
+    { character: 'Architect', text: "This is Little's Law: A rule that says the more 'Work-In-Progress' you have, the longer it takes for ANY single task to finish.", emotion: 'neutral' },
+    { character: 'Architect', text: "Focus on moving a card to 'Done' first. Think of it like clearing a traffic jam.", emotion: 'happy' }
 ];
 
 export const CHAPTER_1_END: DialogueLine[] = [
     { character: 'Rao', text: "Okay... I admit. The site is calmer. And we actually got paid for the foundation today.", emotion: 'happy' },
     { character: 'Mira', text: "I can see exactly what material is needed for tomorrow because the 'Ready' column shows it.", emotion: 'happy' },
-    { character: 'Architect', text: "That is Transparency. But we are just reacting.", emotion: 'neutral' },
-    { character: 'Architect', text: "To really master Lean, we need Reliability. We need the 'Last Planner System'.", emotion: 'neutral' },
+    { character: 'Architect', text: "That is Transparency — everyone can see the work. But we are still just reacting to problems.", emotion: 'neutral' },
+    { character: 'Architect', text: "To really master Lean, we need Reliability. We need the 'Last Planner System' to stop problems before they start.", emotion: 'neutral' },
     { character: 'Architect', text: "Tomorrow, we stop guessing. We start Planning.", emotion: 'happy' }
 ];

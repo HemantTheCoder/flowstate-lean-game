@@ -44,7 +44,6 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
     const [description, setDescription] = useState('');
     const [type, setType] = useState<typeof TASK_TYPES[number]>('Structural');
     const [cost, setCost] = useState(50);
-    const [reward, setReward] = useState(1500);
     const [difficulty, setDifficulty] = useState(3);
     const [leanTip, setLeanTip] = useState('');
     const [constraints, setConstraints] = useState<Set<'material' | 'crew' | 'approval' | 'weather'>>(new Set());
@@ -65,7 +64,6 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
             setDescription(editTask.description);
             setType(editTask.type);
             setCost(editTask.cost);
-            setReward(editTask.reward);
             setDifficulty(editTask.difficulty);
             setLeanTip(editTask.leanTip || '');
             setConstraints(new Set(editTask.constraints || []));
@@ -79,7 +77,6 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
         setDescription('');
         setType('Structural');
         setCost(50);
-        setReward(1500);
         setDifficulty(3);
         setLeanTip('');
         setConstraints(new Set());
@@ -92,7 +89,6 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
         if (title.length > 50) errs.title = 'Title too long (max 50 chars)';
         if (!description.trim()) errs.description = 'Description is required';
         if (cost < 0) errs.cost = 'Cost cannot be negative';
-        if (reward < 0) errs.reward = 'Reward cannot be negative';
         if (difficulty < 1 || difficulty > 5) errs.difficulty = 'Difficulty must be 1-5';
         setErrors(errs);
         return Object.keys(errs).length === 0;
@@ -107,7 +103,7 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
             description: description.trim(),
             type,
             cost,
-            reward,
+            reward: 0,
             difficulty,
             leanTip: leanTip.trim() || undefined,
             constraints: constraints.size > 0 ? Array.from(constraints) : undefined,
@@ -299,18 +295,6 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
                                 </div>
                                 <div>
                                     <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
-                                        Reward
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={reward}
-                                        onChange={(e) => setReward(Number(e.target.value))}
-                                        min={0}
-                                        className={`w-full px-3 py-2 bg-slate-800/80 border rounded-xl text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 ${errors.reward ? 'border-red-500/50' : 'border-slate-700/50'}`}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
                                         Difficulty
                                     </label>
                                     <div className="flex items-center gap-1 mt-1">
@@ -378,8 +362,6 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
                                         <h4 className="font-bold text-sm text-slate-200">{title || 'Task Title'}</h4>
                                         <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-2">{description || 'Task description...'}</p>
                                         <div className="flex items-center gap-2 mt-1.5">
-                                            <span className="text-[9px] font-mono text-slate-500">{type}</span>
-                                            <span className="text-[9px] text-emerald-400">+${reward}</span>
                                             <span className="text-[9px] text-red-400">-${cost}</span>
                                             {Array.from(constraints).map(c => (
                                                 <span key={c} className="text-[9px] bg-red-500/20 text-red-300 px-1 rounded">{c}</span>

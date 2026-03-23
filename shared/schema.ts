@@ -16,8 +16,10 @@ export const gameStates = pgTable("game_states", {
   id: serial("id").primaryKey(),
   sessionId: text("session_id").notNull(), // Identify player by simple token/session
   userId: integer("user_id").references(() => users.id), // Link to registered user
-  playerName: text("player_name").default("Architect"),
+  playerName: text("player_name").default("Lean Champion"),
   playerGender: text("player_gender").default("male"),
+  designation: text("designation").default("Lean Champion"),
+  currency: text("currency").default("INR"),
   chapter: integer("chapter").default(1),
   day: integer("day").default(1),
   week: integer("week").default(1),
@@ -93,6 +95,8 @@ export const insertGameStateSchema = createInsertSchema(gameStates, {
   badgeDates: z.record(z.string()).optional(),
   flags: z.record(z.boolean()),
   playerGender: z.enum(['male', 'female']).optional(),
+  designation: z.string().optional(),
+  currency: z.enum(['INR', 'USD']).optional(),
   lives: z.number().default(3).optional(),
 }).omit({
   id: true,

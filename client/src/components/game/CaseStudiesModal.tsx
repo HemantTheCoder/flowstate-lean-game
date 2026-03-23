@@ -91,7 +91,7 @@ export function CaseStudiesModal({ isOpen, onClose }: CaseStudiesModalProps) {
             if (flags['character_created'] || hasExistingProfile) {
                 // Profile exists — resume it (set it in store if not already set) then launch
                 if (hasExistingProfile && !flags['character_created']) {
-                    setPlayerProfile(savedName!, savedGender ?? 'male');
+                    setPlayerProfile(savedName!, savedGender ?? 'male', 'Lean Champion');
                     setFlag('character_created', true);
                 }
                 launchCase(storeChapterId);
@@ -109,7 +109,7 @@ export function CaseStudiesModal({ isOpen, onClose }: CaseStudiesModalProps) {
 
     const handleProfileConfirm = () => {
         if (!name.trim() || pendingCaseId === null) return;
-        setPlayerProfile(name, gender);
+        setPlayerProfile(name, gender, 'Lean Champion');
         setFlag('character_created', true);
         launchCase(pendingCaseId);
     };

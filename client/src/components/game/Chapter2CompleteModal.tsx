@@ -230,7 +230,7 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                                 </h4>
                                 <div className="h-44">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={dailyMetrics.filter(m => m.day >= 6 && m.day <= 11).map(m => ({ dayLabel: `Day ${m.day}`, efficiency: m.efficiency, day: m.day }))}>
+                                        <BarChart data={dailyMetrics.filter(m => m.day >= 6 && m.day <= 11).map(m => ({ dayLabel: `Month ${m.day}`, efficiency: m.efficiency, day: m.day }))}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                                             <XAxis dataKey="dayLabel" tick={{ fill: '#94a3b8', fontSize: 12 }} />
                                             <YAxis domain={[0, 100]} tick={{ fill: '#94a3b8', fontSize: 12 }} tickFormatter={(v: number) => `${v}%`} />

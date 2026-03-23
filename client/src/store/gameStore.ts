@@ -25,7 +25,7 @@ export interface DepotZone {
   capacity: number;
 }
 
-export type ConstraintType = 'material' | 'crew' | 'approval' | 'weather'; // red icon if present
+export type ConstraintType = 'material' | 'crew' | 'approval' | 'weather' | 'space'; // red icon if present
 export type GamePhase = 'planning' | 'action' | 'review';
 
 export interface Task extends TaskType {
@@ -58,7 +58,9 @@ export interface GameState {
   // Player Profile
   playerName: string;
   playerGender: 'male' | 'female';
-  setPlayerProfile: (name: string, gender: 'male' | 'female') => void;
+  designation: string;
+  currency: 'INR' | 'USD';
+  setPlayerProfile: (name: string, gender: 'male' | 'female', designation: string, currency: 'INR' | 'USD') => void;
   lives: number;
   gameOverReason: string | null;
   loseLife: (reason: string) => void;
@@ -232,10 +234,17 @@ const INITIAL_COLUMNS: Column[] = [
     tasks: CONSTRUCTION_TASKS.map(t => ({ ...t, id: uuidv4(), status: 'backlog', originalId: t.id })),
     wipLimit: 0
   },
-  { id: 'ready', title: 'Ready', tasks: [], wipLimit: 3 },
-  { id: 'doing', title: 'Doing', tasks: [], wipLimit: 2 },
-  { id: 'done', title: 'Done', tasks: [], wipLimit: 0 },
+  { id: 'doing', title: 'In Progress', tasks: [], wipLimit: 0 },
+  { id: 'done', title: 'Completed', tasks: [], wipLimit: 0 },
 ];
+
+export const formatCurrency = (amount: number, currency: 'INR' | 'USD' = 'INR') => {
+    if (currency === 'USD') {
+        const usdAmount = amount / 83; // Approx conversion
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(usdAmount);
+    }
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
+};
 
 export const useGameStore = create<GameState>((set, get) => ({
   chapter: 1,
@@ -246,9 +255,11 @@ export const useGameStore = create<GameState>((set, get) => ({
   unlockedBadges: [],
   badgeDates: {},
 
-  playerName: 'Engineer',
+  playerName: 'Lean Champion',
   playerGender: 'male',
-  setPlayerProfile: (name, gender) => set({ playerName: name, playerGender: gender }),
+  designation: 'Lean Champion',
+  currency: 'INR',
+  setPlayerProfile: (name, gender, designation, currency) => set({ playerName: name, playerGender: gender, designation, currency }),
   lives: 3,
   gameOverReason: null,
   loseLife: (reason) => {
@@ -294,8 +305,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   columns: INITIAL_COLUMNS,
-  funds: 2500,
-  materials: 300,
+  funds: 5000000, // 50 Lakhs starting funds
+  materials: 1000,
 
   // Chapter 3 State Defaults
   depotItems: [],
@@ -359,7 +370,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         week: 1,
         phase: 'action',
         columns: INITIAL_COLUMNS,
-        funds: 2500,
+        funds: 15000000,
         materials: 300,
         dailyMetrics: [],
         previousDoneCount: 0,
@@ -384,9 +395,8 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       const chapter2Columns: Column[] = [
         { id: 'backlog', title: 'Master Schedule', tasks: chapter2Tasks, wipLimit: 0 },
-        { id: 'ready', title: 'Lookahead', tasks: [], wipLimit: 8 },
-        { id: 'doing', title: 'Doing', tasks: [], wipLimit: 4 },
-        { id: 'done', title: 'Done', tasks: [], wipLimit: 0 },
+        { id: 'doing', title: 'In Progress', tasks: [], wipLimit: 4 },
+        { id: 'done', title: 'Completed', tasks: [], wipLimit: 0 },
       ];
 
       return {
@@ -395,7 +405,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         week: 2,
         phase: 'planning',
         columns: chapter2Columns,
-        funds: 3500,
+        funds: 25000000,
         materials: 500,
         dailyMetrics: [],
         previousDoneCount: 0,
@@ -419,11 +429,10 @@ export const useGameStore = create<GameState>((set, get) => ({
         phase: 'planning',
         columns: [
           { id: 'backlog', title: 'Master Schedule', tasks: [], wipLimit: 0 },
-          { id: 'ready', title: 'Lookahead', tasks: [], wipLimit: 5 },
-          { id: 'doing', title: 'Doing', tasks: [], wipLimit: 2 },
-          { id: 'done', title: 'Done', tasks: [], wipLimit: 0 },
+          { id: 'doing', title: 'In Progress', tasks: [], wipLimit: 2 },
+          { id: 'done', title: 'Completed', tasks: [], wipLimit: 0 },
         ],
-        funds: 5000,
+        funds: 40000000,
         materials: 1000,
         depotItems: [
           // Row 1
@@ -549,11 +558,10 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   advanceDay: () => set((state) => {
     const nextDay = state.day + 1;
-    const dailyCost = 250; // Daily Overhead
+    const dailyCost = 250000; // Daily Overhead (2.5 Lakhs)
 
-    // 1. Calculate WIP Compliance
-    const violatingCols = state.columns.filter(c => c.wipLimit > 0 && c.tasks.length > c.wipLimit);
-    const compliance = violatingCols.length > 0 ? 50 : 100;
+    // 1. Calculate WIP Compliance (Removed penalty for parallel task support)
+    const compliance = 100; 
 
     // 2. Calculate actual tasks completed TODAY (delta from previous day)
     const doneTasks = state.columns.find(c => c.id === 'done')?.tasks || [];
@@ -576,16 +584,15 @@ export const useGameStore = create<GameState>((set, get) => ({
     // 3. Calculate POTENTIAL capacity for today
     // Based on: WIP limit in Doing column + constraints
     const doingCol = state.columns.find(c => c.id === 'doing');
-    const doingLimit = doingCol?.wipLimit || 2;
+    const doingLimit = Math.max(doingCol?.wipLimit || 0, 5); // Minimum capacity of 5 for parallel tasks
     const doingTasks = doingCol?.tasks || [];
-    const readyTasks = state.columns.find(c => c.id === 'ready')?.tasks || [];
     const backlogTasks = state.columns.find(c => c.id === 'backlog')?.tasks || [];
 
     // Non-waste tasks still in Doing (could have been finished)
     const doingNonWaste = doingTasks.filter(t => !t.id?.startsWith('waste-') && t.title !== 'REWORK').length;
 
     // Total tasks available across the pipeline (remaining + already completed today)
-    const totalAvailableNonWaste = readyTasks.length + backlogTasks.length + doingNonWaste + valueAddingCompleted;
+    const totalAvailableNonWaste = backlogTasks.length + doingNonWaste + valueAddingCompleted;
 
     // Base potential: WIP limit, but capped by total available tasks
     let potentialCapacity = Math.min(doingLimit, totalAvailableNonWaste);
@@ -593,19 +600,17 @@ export const useGameStore = create<GameState>((set, get) => ({
     // Day 2: Material shortage - only 0-cost tasks can ENTER Doing
     // But tasks already in Doing (from prior day) can still finish
     if (state.day === 2) {
-      const zeroCostReady = readyTasks.filter(t => t.cost === 0).length;
       const zeroCostBacklog = backlogTasks.filter(t => t.cost === 0).length;
       // Available = tasks already in pipeline (doing + completed today) + constrained new entries
-      const availableForDay2 = doingNonWaste + valueAddingCompleted + zeroCostReady + zeroCostBacklog;
+      const availableForDay2 = doingNonWaste + valueAddingCompleted + zeroCostBacklog;
       potentialCapacity = Math.min(doingLimit, availableForDay2);
     }
 
     // Day 3: Weather blocks Structural - only non-structural can ENTER Doing
     // Tasks already in Doing can still finish regardless of type
     if (state.day === 3) {
-      const nonStructuralReady = readyTasks.filter(t => t.type !== 'Structural').length;
       const nonStructuralBacklog = backlogTasks.filter(t => t.type !== 'Structural').length;
-      const availableForDay3 = doingNonWaste + valueAddingCompleted + nonStructuralReady + nonStructuralBacklog;
+      const availableForDay3 = doingNonWaste + valueAddingCompleted + nonStructuralBacklog;
       potentialCapacity = Math.min(doingLimit, availableForDay3);
     }
 
@@ -1004,10 +1009,13 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     if (!sourceCol || !destCol || sourceColId === destColId) return false;
 
-    // 1. Check WIP Limit (Only for Ready and Doing)
-    if ((destColId === 'ready' || destColId === 'doing') && destCol.tasks.length >= destCol.wipLimit) {
-      return false; // WIP Violation
+    // 1. WIP Limit Warning (Removed hard block for parallel tasks)
+    // We can still track it for metrics, but we don't return false here
+    /* 
+    if ((destColId === 'doing') && destCol.wipLimit > 0 && destCol.tasks.length >= destCol.wipLimit) {
+      return false; 
     }
+    */
 
     const taskIndex = sourceCol.tasks.findIndex(t => t.id === taskId);
     if (taskIndex === -1) return false;
@@ -1022,12 +1030,17 @@ export const useGameStore = create<GameState>((set, get) => ({
       if (state.materials < task.cost) {
         return false;
       }
+      if (task.costToStart && state.funds < task.costToStart) {
+        return false; // Not enough ₹ to start task
+      }
       newMaterials -= task.cost;
+      if (task.costToStart) newFunds -= task.costToStart;
     }
 
     // Moving FROM DOING to anything else (except Done) refunds materials (Undo logic)
     if (sourceColId === 'doing' && destColId !== 'doing' && destColId !== 'done') {
       newMaterials += task.cost;
+      if (task.costToStart) newFunds += task.costToStart;
     }
 
     // Fragile task failure check (30% chance of failure when completing)
@@ -1054,15 +1067,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     }
 
-    // Moving TO DONE rewards Funds (unless already coming from Done)
-    if (destColId === 'done' && sourceColId !== 'done') {
-      newFunds += task.reward;
-    }
-
-    // Moving FROM DONE to anything else (Undo logic) removes funds
-    if (sourceColId === 'done' && destColId !== 'done') {
-      newFunds = Math.max(0, newFunds - task.reward);
-    }
+    // Tasks no longer incrementally reward the player in this budget-based model.
 
     set({
       materials: newMaterials,
@@ -1350,8 +1355,8 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // Chapter 2 Actions
   removeConstraint: (taskId, constraint) => set((state) => {
-    const costs = { material: 200, crew: 0, approval: 50, weather: 0 };
-    const cost = costs[constraint] || 0;
+    const costs: Record<ConstraintType, number> = { material: 200, space: 100, crew: 0, approval: 50, weather: 0 };
+    const cost = costs[constraint];
 
     if (state.funds < cost) return {};
 

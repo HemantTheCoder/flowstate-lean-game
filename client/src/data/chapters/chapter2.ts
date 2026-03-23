@@ -7,8 +7,8 @@ export const CHAPTER_2_INTRO: DialogueLine[] = [
     { character: 'Isha', text: "I have prepared the full schedule, sir. Every task has a start date and end date.", emotion: 'happy' },
     { character: 'Mira', text: "A schedule is not a promise, Isha. I've seen a hundred beautiful schedules collapse on site.", emotion: 'neutral' },
     { character: 'Old Foreman', text: "She's right. Promises break faster than concrete around here. I've been on sites where the plan said 'done in March' and we finished in August.", emotion: 'neutral' },
-    { character: 'Engineer', text: "That's why we need the Last Planner System. It teaches us to commit only to what we CAN do - not what we SHOULD do.", emotion: 'neutral' },
-    { character: 'Advisor', text: "Think of it this way: A schedule is a wish. A plan is a guess. But a COMMITMENT is a promise backed by proof that you CAN deliver.", emotion: 'happy' },
+    { character: 'Engineer', text: "That's why we need the Last Planner System. It's a way to ensure we only commit to what we CAN do — not just what the schedule says we SHOULD do.", emotion: 'neutral' },
+    { character: 'Advisor', text: "Think of it this way: A schedule is a wish. A plan is a guess. But a COMMITMENT is a reliable promise backed by proof that you're ready.", emotion: 'happy' },
     { character: 'Client', text: "Then show me this system. The Riverside Market Mall soft opening is in two weeks. Don't disappoint me.", emotion: 'stressed' }
 ];
 
@@ -16,7 +16,7 @@ export const WEEK_2_SCHEDULE: DayConfig[] = [
     {
         day: 6,
         title: "The Planning Room",
-        description: "You enter the Planning Room for the first time. Here, promises are made—or broken.",
+        description: "Welcome to the Planning Room. This is where we stop guessing and start making 'Reliable Promises' about what we can actually finish this week.",
         lesson: "Concept: Should, Can, Will — The Three Levels of Planning.",
         dialogue: [
             { character: 'Advisor', text: "Welcome to the Planning Room. This is the heart of the Last Planner System.", emotion: 'happy' },
@@ -30,56 +30,56 @@ export const WEEK_2_SCHEDULE: DayConfig[] = [
         event: 'tutorial_start',
         briefing: {
             objective: "Learn the Planning Room.",
-            action: "Pull 3-4 tasks from Master Schedule into the Lookahead Window. Identify which have constraints (red icons)."
+            action: "Drag 3-4 tasks from the Master Schedule (The Goal) into the Lookahead Window (The Preparation). Identify which have Constraints (Red Blockers)."
         }
     },
     {
         day: 7,
         title: "Constraint Discovery",
-        description: "Anil reveals that half the planned tasks have hidden blockers.",
+        description: "The Foreman found hidden problems. Many tasks we wanted to do are 'Blocked' because drawings are missing or materials haven't arrived.",
         lesson: "Concept: Constraints — The reasons tasks fail.",
         dialogue: [
             { character: 'Old Foreman', text: "Morning, Engineer. I spent last night reviewing your Lookahead plan.", emotion: 'neutral' },
             { character: 'Old Foreman', text: "Half these tasks ain't ready. Missing structural drawings. Steel delivery stuck at the port. Crew double-booked with the parking lot job.", emotion: 'angry' },
             { character: 'Isha', text: "But the Master Schedule says they should happen this week! We'll fall behind!", emotion: 'stressed' },
-            { character: 'Engineer', text: "The schedule says SHOULD, Isha. Today we find out what we actually CAN do.", emotion: 'neutral' },
-            { character: 'Advisor', text: "This is the most important step in LPS: Constraint Analysis. Every task that fails has a reason. Find the reason BEFORE it fails, not after.", emotion: 'neutral' },
+            { character: 'Engineer', text: "The schedule says SHOULD, Isha. Today we use our 'Lookahead' to find out what we actually CAN do.", emotion: 'neutral' },
+            { character: 'Advisor', text: "This is the core of the system: 'Constraint Analysis' — finding the hidden reasons (like missing drawings or material) why a task might fail before it even starts.", emotion: 'neutral' },
             { character: 'Advisor', text: "Click on each RED task in your Lookahead. Read the constraint. Understanding WHY something is blocked is the first step to making it ready.", emotion: 'happy' }
         ],
         event: 'constraints_visible',
         briefing: {
             objective: "Identify All Constraints.",
-            action: "Click on each red task in the Lookahead. Note the constraint type (Material, Crew, Approval). Do NOT try to fix them yet."
+            action: "Click on each Red Task in the Lookahead. These are blocked by missing materials, crews, or approvals. Note the blocker type for each, but don't spend budget yet."
         }
     },
     {
         day: 8,
         title: "Making Work Ready",
-        description: "Time to remove constraints and prepare tasks for commitment.",
+        description: "We need to clear the path. By spending some time and budget now to 'Fix' these blockers, we ensure the work flows smoothly when it hits the site.",
         lesson: "Concept: Make Ready — The art of removing blockers before they cause failure.",
         dialogue: [
             { character: 'Client', text: "I want to see progress! Why isn't the steel framework going up?", emotion: 'angry' },
             { character: 'Isha', text: "We are 'Making Ready', sir. Ensuring the work can flow without interruption when we start.", emotion: 'neutral' },
             { character: 'Client', text: "Making ready? That sounds like an excuse for delay!", emotion: 'angry' },
             { character: 'Engineer', text: "Preventing failure is not delay, sir. It is reliability. Starting work that isn't ready wastes MORE time than preparing properly.", emotion: 'neutral' },
-            { character: 'Mira', text: "Remember last month? We started the waterproofing before the membrane arrived. Crew stood idle for two days. That cost us $3,000.", emotion: 'stressed' },
+            { character: 'Mira', text: "Remember last month? We started the waterproofing before the membrane arrived. Crew stood idle for two days. That cost us ₹3,000.", emotion: 'stressed' },
             { character: 'Advisor', text: "The Make Ready process is your secret weapon. Click 'Fix' on each constraint. Call the supplier. Reassign the crew. Expedite the approval. Each fix has a cost - choose wisely.", emotion: 'happy' },
             { character: 'Old Foreman', text: "Turn those reds to green, Engineer. Only then can we make honest promises.", emotion: 'neutral' }
         ],
         briefing: {
             objective: "Remove Constraints.",
-            action: "Use the Inspector panel to remove at least 2 constraints. Watch your Budget and Morale—each fix has a cost."
+            action: "Use the Inspector panel to 'Fix' and remove at least 2 constraints. Every fix costs money or morale—spend your budget wisely to clear the path."
         }
     },
     {
         day: 9,
         title: "The Weekly Promise",
-        description: "Rajiv demands a commitment. The Client adds pressure. What will you promise?",
+        description: "The pressure is on. Rajiv and the Client want big promises, but you must only commit to what is 'Ready' (Green) to protect our reliability.",
         lesson: "Concept: Weekly Work Plan — Only promise what you CAN deliver.",
         dialogue: [
             { character: 'Rao', text: "Enough planning! I need a commitment. What WILL be done by Friday? Give me a number!", emotion: 'angry' },
-            { character: 'Mira', text: "Only commit what's green, Engineer. Every red task you promise will hurt our PPC when it fails.", emotion: 'stressed' },
-            { character: 'Engineer', text: "PPC - Percent Plan Complete. It measures how many promises we KEEP, not how many we MAKE.", emotion: 'neutral' },
+            { character: 'Mira', text: "Only commit what's green, Engineer. Every 'Blocked' task you promise will hurt our PPC (Percent Plan Complete) when it inevitably fails.", emotion: 'stressed' },
+            { character: 'Engineer', text: "PPC is simply our reliability score. It measures how many promises we actually KEPT this week.", emotion: 'neutral' },
             { character: 'Client', text: "Wait. Can you also finish the cafe roofing this week? The investors are visiting Friday. I need to show them something impressive.", emotion: 'neutral' },
             { character: 'Isha', text: "That was scheduled for next week, sir. We haven't checked its constraints yet...", emotion: 'stressed' },
             { character: 'Client', text: "I'm asking if you CAN. It would mean a lot to the project's future funding.", emotion: 'neutral' },
@@ -89,13 +89,13 @@ export const WEEK_2_SCHEDULE: DayConfig[] = [
         event: 'client_pressure',
         briefing: {
             objective: "Make Your Commitment.",
-            action: "Move GREEN tasks to the Weekly Work Plan. The Client is asking for extra work—accepting adds risk. Declining is safer but may affect trust."
+            action: "Move Green (Ready) tasks to your Weekly Work Plan. The Client is pushing for an extra task—it's risky! Only promise what you are SURE you can finish."
         }
     },
     {
         day: 10,
         title: "Execution Day",
-        description: "Your commitments are locked. Now the work must flow.",
+        description: "The plan is set and the crews are moving. Since we properly cleared the blockers yesterday, today should be about smooth execution and kept promises.",
         lesson: "Concept: Reliable Promises — Execution reveals the truth of your planning.",
         dialogue: [
             { character: 'Old Foreman', text: "The crew knows exactly what to do today. Materials are staged. Drawings are posted. No confusion.", emotion: 'happy' },
@@ -107,13 +107,13 @@ export const WEEK_2_SCHEDULE: DayConfig[] = [
         event: 'recovery',
         briefing: {
             objective: "Execute Your Plan.",
-            action: "Work through the Kanban board. Complete as many promised tasks as possible. Any task that fails will hurt your PPC."
+            action: "Work through the Kanban site. Since you 'Made Ready' properly, focus on finishing every task you promised. A kept promise is a win for the team!"
         }
     },
     {
         day: 11,
         title: "The PPC Review",
-        description: "The Inspector arrives. Your Percent Plan Complete will be calculated.",
+        description: "The Inspector returns to check our 'PPC'—our score for kept promises. Did we do what we said we would, or did we over-promise and under-deliver?",
         lesson: "Concept: PPC (Percent Plan Complete) — The measure of promise reliability.",
         dialogue: [
             { character: 'Inspector', text: "Let me see your Weekly Work Plan... and compare it to what was actually completed.", emotion: 'neutral' },
@@ -125,7 +125,7 @@ export const WEEK_2_SCHEDULE: DayConfig[] = [
         event: 'inspection',
         briefing: {
             objective: "Review Your Performance.",
-            action: "Your PPC is calculated. 80%+ is excellent. Below 50% damages trust. Learn from what failed."
+            action: "Your reliability score (PPC) is calculated by comparing your promises to your results. Aim for 80%+. Learn from the tasks that failed."
         }
     }
 ];
@@ -134,7 +134,7 @@ export const PPC_GOOD: DialogueLine[] = [
     { character: 'Inspector', text: "Impressive. You promised carefully and delivered reliably. This is exactly what the Last Planner System is designed to achieve.", emotion: 'happy' },
     { character: 'Old Foreman', text: "The crew is proud. When the plan is honest, the work flows. No scrambling, no excuses.", emotion: 'happy' },
     { character: 'Mira', text: "High PPC means every trade on site can trust our schedule. Electricians know the walls will be ready. Plumbers know the trenches will be dug.", emotion: 'happy' },
-    { character: 'Client', text: "This is professional reliability. I can plan the investor tour with confidence now. Proceed to the next phase.", emotion: 'happy' },
+    { character: 'Client', text: "This is professional reliability. I can plan the investor tour with confidence now. Proceed to the next phase—I've authorized a ₹10,000 performance bonus for your lean results.", emotion: 'happy' },
     { character: 'Advisor', text: "You've grasped the core of Last Planner: Promise only what you CAN deliver. Every kept promise builds trust. Every broken promise destroys it.", emotion: 'happy' }
 ];
 
@@ -157,5 +157,5 @@ export const CHAPTER_2_END: DialogueLine[] = [
     { character: 'Old Foreman', text: "The crew trusts the plan now. When we say something WILL be done, it gets done. That's the power of honest promises.", emotion: 'happy' },
     { character: 'Mira', text: "Our PPC is improving. But the site still has too much clutter. Workers waste time searching for tools and materials.", emotion: 'stressed' },
     { character: 'Isha', text: "I measured it - crews spend 30% of their time just LOOKING for things. That's pure waste.", emotion: 'stressed' },
-    { character: 'Advisor', text: "Excellent observation. Next, we tackle workplace organization. Chapter 3 introduces 5S - Sort, Set in Order, Shine, Standardize, Sustain.", emotion: 'happy' }
+    { character: 'Advisor', text: "Excellent observation. Next, we tackle workplace organization using '5S' — a method to Sort, Set in Order, and Shine the site so work can flow without searching.", emotion: 'happy' }
 ];

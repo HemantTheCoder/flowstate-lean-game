@@ -23,7 +23,7 @@ export const DialogueBox: React.FC = () => {
 
     // Replace Placeholders
     const processedText = line.text
-        .replace(/Engineer/g, playerName)
+        .replace(/Engineer|Architect|Lean Champion/g, playerName)
         .replace(/{promised}/g, promised.toString())
         .replace(/{completed}/g, completed.toString())
         .replace(/{ppc}/g, ppc.toString());

@@ -85,7 +85,13 @@ export function useGame() {
       }
     },
     onSuccess: (data) => {
-      queryClient.setQueryData([api.game.load.path, sessionId], data);
+      const current = queryClient.getQueryData([api.game.load.path, sessionId]);
+      const isEqual = isStateEqual(current, data);
+      console.log("[useGame] saveGame onSuccess. Equal to cache?", isEqual);
+      if (!isEqual) {
+        console.log("[useGame] Updating cache...");
+        queryClient.setQueryData([api.game.load.path, sessionId], data);
+      }
     },
     onError: (error) => {
       // Should rarely happen now since we catch fetch errors.
@@ -118,7 +124,10 @@ export function useGame() {
       }
     },
     onSuccess: (data) => {
-      queryClient.setQueryData([api.game.load.path, sessionId], data);
+      const current = queryClient.getQueryData([api.game.load.path, sessionId]);
+      if (!isStateEqual(current, data)) {
+        queryClient.setQueryData([api.game.load.path, sessionId], data);
+      }
     }
   });
 
@@ -147,4 +156,54 @@ export function useGame() {
     updateGame,
     resetGame
   };
+}
+
+// Deepish equality check for game states to prevent re-render loops
+function isStateEqual(a: any, b: any) {
+  if (!a || !b) {
+    console.log("[isStateEqual] One is null/undefined", !!a, !!b);
+    return a === b;
+  }
+  // Compare core fields that usually stay stable
+  if (a.chapter !== b.chapter) {
+    console.log("[isStateEqual] chapter mismatch", a.chapter, b.chapter);
+    return false;
+  }
+  if (a.day !== b.day) {
+    console.log("[isStateEqual] day mismatch", a.day, b.day);
+    return false;
+  }
+  if (a.playerName !== b.playerName) {
+    console.log("[isStateEqual] playerName mismatch", a.playerName, b.playerName);
+    return false;
+  }
+  
+  // Serialize just the state identifying parts to see if its different enough to warrant re-render
+  try {
+    const ka = JSON.stringify(a.kanbanState);
+    const kb = JSON.stringify(b.kanbanState);
+    if (ka !== kb) {
+       console.log("[isStateEqual] kanbanState mismatch");
+       // Find first difference for debugging
+       const o1 = a.kanbanState || {};
+       const o2 = b.kanbanState || {};
+       const keys = Array.from(new Set([...Object.keys(o1), ...Object.keys(o2)]));
+       for (const k of keys) {
+         if (JSON.stringify(o1[k]) !== JSON.stringify(o2[k])) {
+           console.log(`[isStateEqual] First key diff in kanbanState: "${k}"`, o1[k], "vs", o2[k]);
+           break;
+         }
+       }
+       return false;
+    }
+    const fa = JSON.stringify(a.flags);
+    const fb = JSON.stringify(b.flags);
+    if (fa !== fb) {
+       console.log("[isStateEqual] flags mismatch");
+       return false;
+    }
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
