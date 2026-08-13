@@ -7,13 +7,15 @@ import { KanbanBoard } from '@/components/game/KanbanBoard';
 import { DialogueBox } from '@/components/game/DialogueBox';
 import { TutorialOverlay } from '@/components/game/TutorialOverlay';
 import { DailySummary } from '@/components/game/DailySummary';
-import { useGameStore } from '@/store/gameStore';
+import { useGameStore, formatCurrency } from '@/store/gameStore';
 import { WEEK_1_SCHEDULE, DAY_5_GOOD, DAY_5_BAD } from '@/data/chapters/chapter1';
 import { WEEK_2_SCHEDULE } from '@/data/chapters/chapter2';
 import { CHAPTER_3_SCHEDULE } from '@/data/chapters/chapter3';
+import { GAME_CONSTANTS } from '@/config/constants';
 import { DecisionModal } from '@/components/game/DecisionModal';
 import { TransitionScreen } from '@/components/game/TransitionScreen';
 import { ChapterIntroModal } from '@/components/game/ChapterIntroModal';
+import { MasterPlanModal } from '@/components/game/MasterPlanModal';
 import { CharacterCastModal } from '@/components/game/CharacterCastModal';
 import { DayBriefingModal } from '@/components/game/DayBriefingModal';
 import { WorkspaceDepot } from '@/components/game/WorkspaceDepot';
@@ -74,6 +76,7 @@ export default function Game() {
   const playerGender = useGameStore(s => s.playerGender);
   const funds = useGameStore(s => s.funds);
   const materials = useGameStore(s => s.materials);
+  const currency = useGameStore(s => s.currency);
   const columns = useGameStore(s => s.columns);
   const lpi = useGameStore(s => s.lpi);
   const phase = useGameStore(s => s.phase);
@@ -1138,7 +1141,7 @@ export default function Game() {
               <div className="flex items-center gap-2 mb-1">
                 <Target className="w-5 h-5 text-cyan-400" />
                 <h3 className="font-black text-white text-base md:text-lg tracking-wider">CORE OBJECTIVE</h3>
-                <span className="text-xs font-bold text-slate-400 ml-auto">Week {week} | Month {day}</span>
+                <span className="text-xs font-bold text-slate-400 ml-auto">Week {week} | {GAME_CONSTANTS.TIME_UNIT} {day}</span>
               </div>
               <div className="text-sm md:text-base text-cyan-300 font-bold mt-2 leading-snug drop-shadow-md bg-cyan-950/50 p-2 rounded-lg border border-cyan-900/50">
                 {getSmartObjective()}
@@ -1156,8 +1159,13 @@ export default function Game() {
 
           <div id="stats-box" className="bg-slate-800/80 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border border-slate-700/50 flex gap-4 md:gap-6 w-full md:w-auto justify-around">
             <div className="text-center">
-              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Funds</div>
-              <div className="font-mono font-bold text-emerald-400 text-sm md:text-base">₹{funds}</div>
+              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Budget (Baseline)</div>
+              <div className="font-mono font-bold text-emerald-400 text-sm md:text-base">{formatCurrency(funds, currency)}</div>
+            </div>
+
+            <div className="text-center px-4 border-l border-slate-700/50">
+              <div className="text-[10px] md:text-xs font-bold text-blue-400 uppercase">% Complete</div>
+              <div className="font-mono font-black text-blue-400 text-sm md:text-base">{Math.round(useGameStore.getState().earnedValue)}%</div>
             </div>
 
             {chapter === 3 ? (
@@ -1172,6 +1180,14 @@ export default function Game() {
               </div>
             )}
 
+            <button
+              id="btn-project-sheet"
+              onClick={() => setShowProjectSheet(true)}
+              className="bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 p-1.5 sm:p-2 rounded-lg shadow-sm transition-all active:scale-95"
+              title="Project Status Sheet"
+            >
+              <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
+            </button>
             <button
               id="btn-save"
               onClick={() => handleSave()}
@@ -1277,6 +1293,7 @@ export default function Game() {
         <div className={showAuthModal ? "block" : "hidden"}>
           <AuthModal triggerOpen={showAuthModal} onOpenChange={setShowAuthModal} />
         </div>
+        <MasterPlanModal />
 
         {/* Modals & Screens */}
         <AnimatePresence>

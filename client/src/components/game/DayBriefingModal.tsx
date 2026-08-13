@@ -5,6 +5,7 @@ import { WEEK_2_SCHEDULE } from '@/data/chapters/chapter2';
 import { CHAPTER_3_SCHEDULE } from '@/data/chapters/chapter3';
 import { motion, AnimatePresence } from 'framer-motion';
 import soundManager from '@/lib/soundManager';
+import { GAME_CONSTANTS } from '@/config/constants';
 
 export const DayBriefingModal: React.FC = () => {
     const { day, chapter, flags, setFlag } = useGameStore();
@@ -38,7 +39,7 @@ export const DayBriefingModal: React.FC = () => {
             >
                 <div className="flex justify-between items-center border-b border-slate-800 p-4 md:p-6 shrink-0 bg-slate-900/50">
                     <div>
-                        <h2 className="text-xs md:text-sm font-bold text-blue-400 uppercase tracking-wider">{chapter === 1 ? 'Month' : 'Day'} {day} Briefing</h2>
+                        <h2 className="text-xs md:text-sm font-bold text-blue-400 uppercase tracking-wider">{GAME_CONSTANTS.TIME_UNIT} {day} Briefing</h2>
                         <h1 className="text-xl md:text-2xl font-black text-white">{dayConfig.title}</h1>
                     </div>
                     <div className="text-xl md:text-2xl font-black text-blue-400">BRIEF</div>

@@ -190,6 +190,24 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                   </div>
                 </div>
 
+                <div className="p-4 bg-slate-800/50 rounded-xl mb-4 border border-slate-700/50 shrink-0">
+                  <p className="text-sm text-slate-300 italic mb-3">Earned Value Management: Earned Value (EV) = % of planned work actually completed, valued in ₹.</p>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700 text-center">
+                       <div className="text-[10px] text-slate-400 uppercase font-bold">Planned Value (PV)</div>
+                       <div className="text-lg font-mono font-bold text-slate-200">{formatCurrency(15000000, currency)}</div>
+                    </div>
+                    <div className="bg-cyan-950/20 p-3 rounded-lg border border-cyan-800/50 text-center shadow-[0_0_15px_rgba(6,182,212,0.1)]">
+                       <div className="text-[10px] text-cyan-400 uppercase font-bold">Earned Value (EV)</div>
+                       <div className="text-lg font-mono font-black text-cyan-400">{formatCurrency(15000000 * (useGameStore.getState().earnedValue / 100), currency)}</div>
+                    </div>
+                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700 text-center">
+                       <div className="text-[10px] text-slate-400 uppercase font-bold">Actual Cost (AC)</div>
+                       <div className="text-lg font-mono font-bold text-slate-200">{formatCurrency(15000000 - funds, currency)}</div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex-1 border border-white/5 rounded-2xl overflow-hidden bg-slate-900/50 backdrop-blur-sm">
                   <ScrollArea className="h-full">
                     <table className="w-full text-left border-collapse">
@@ -198,8 +216,8 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                           <th className="px-4 py-3 border-b border-white/5">#</th>
                           <th className="px-4 py-3 border-b border-white/5">Task Name & Materials</th>
                           <th className="px-4 py-3 border-b border-white/5">Category</th>
-                          <th className="px-4 py-3 border-b border-white/5 text-right w-32">Planned Cost</th>
-                          <th className="px-4 py-3 border-b border-white/5 text-right w-32">Actual Cost (Est.)</th>
+                          <th className="px-4 py-3 border-b border-white/5 text-right w-32">Planned Value (PV)</th>
+                          <th className="px-4 py-3 border-b border-white/5 text-right w-32">Actual Cost (AC)</th>
                           <th className="px-4 py-3 border-b border-white/5 text-center">Month (Plan vs Act)</th>
                           <th className="px-4 py-3 border-b border-white/5 text-center">Status</th>
                         </tr>

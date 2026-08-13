@@ -198,7 +198,7 @@ const ScrollHint: React.FC<{ containerRef: React.RefObject<HTMLDivElement | null
 };
 
 export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-    const { columns, moveTask, funds, materials, tutorialStep, setTutorialStep, day, audioSettings, chapter } = useGameStore();
+    const { columns, moveTask, funds, materials, tutorialStep, setTutorialStep, day, audioSettings, chapter, currency } = useGameStore();
     const [showCustomModal, setShowCustomModal] = useState(false);
     const [replaceTaskId, setReplaceTaskId] = useState<string | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -339,8 +339,24 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                     {day > 5 && col.id === 'backlog' ? 'Master Plan' : col.title}
                                                                 </h3>
                                                             </div>
-                                                            <div className="bg-slate-800/50 px-2.5 py-1 rounded-lg border border-slate-700/50 text-xs font-black font-mono text-slate-400">
-                                                                {col.tasks.length}
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="bg-slate-800/50 px-2.5 py-1 rounded-lg border border-slate-700/50 text-xs font-black font-mono text-slate-400">
+                                                                    {col.tasks.length}
+                                                                </div>
+                                                                {col.id === 'doing' && col.wipLimit > 0 && (
+                                                                    <div className="flex flex-col items-end gap-0.5">
+                                                                        <div className={`px-2.5 py-1 rounded-lg border text-xs font-black font-mono ${
+                                                                            col.tasks.length >= col.wipLimit
+                                                                                ? 'bg-red-500/20 border-red-500/50 text-red-400'
+                                                                                : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400'
+                                                                        }`}>
+                                                                            WIP {col.tasks.length}/{col.wipLimit}
+                                                                        </div>
+                                                                        {col.tasks.length < col.wipLimit && (
+                                                                            <span className="text-[9px] text-cyan-400/80 font-bold uppercase tracking-wider">Parallel tasks permitted</span>
+                                                                        )}
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
 
@@ -368,8 +384,10 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                     className={`group relative bg-slate-800/80 backdrop-blur-xl p-5 rounded-2xl border transition-all duration-300 ${
                                                                                         snapshot.isDragging 
                                                                                             ? 'bg-slate-700 border-cyan-400 shadow-[0_25px_60px_-15px_rgba(0,0,0,1)] ring-4 ring-cyan-500/20 z-50 scale-[1.05] cursor-grabbing' 
+                                                                                            : isDone ? 'border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-500/60 hover:shadow-xl hover:-translate-y-1'
+                                                                                            : isDoing ? 'border-red-500/30 bg-red-950/10 hover:border-red-500/60 hover:shadow-xl hover:-translate-y-1'
                                                                                             : 'border-slate-700/50 hover:border-slate-500 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-1'
-                                                                                    } ${isWaste ? 'border-red-900/50' : ''}`}
+                                                                                    } ${isWaste ? 'border-red-900/50 bg-red-950/40' : ''}`}
                                                                                 >
                                                                                     <WasteTaskOverlay isWaste={isWaste} isInDone={isDone} />
                                                                                     <BottleneckPulse isBottleneck={isBottleneck && isDoing && index === 0} />
@@ -394,6 +412,11 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                                 </h4>
                                                                                                 {hasConstraints && <div className="shrink-0 w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]" />}
                                                                                                 {isDone && <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />}
+                                                                                                {chapter === 1 && day === 1 && tutorialStep <= 3 && col.id === 'backlog' && index === 0 && (
+                                                                                                    <div className="shrink-0 px-2 py-0.5 bg-amber-500 text-amber-950 text-[10px] font-black rounded-full animate-bounce shadow-[0_0_10px_rgba(245,158,11,0.5)]">
+                                                                                                        DRAG ME
+                                                                                                    </div>
+                                                                                                )}
                                                                                             </div>
                                                                                             <p className={`text-xs mt-1.5 font-medium leading-relaxed line-clamp-2 transition-opacity ${isDone ? 'opacity-30' : 'text-slate-400/90'}`}>
                                                                                                 {task.description}
@@ -425,7 +448,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                                 {task.type}
                                                                                             </span>
                                                                                             <div className="flex items-center gap-1 bg-slate-900/40 rounded-lg px-2 py-1 border border-slate-700/30 text-[9px] font-black font-mono">
-                                                                                                <span className="text-red-400">-{useGameStore.getState().currency === 'INR' ? '₹' : '$'}{(task.costToStart || task.cost).toLocaleString()}</span>
+                                                                                                <span className="text-red-400">-{formatCurrency(task.costToStart || task.cost || 0, currency)}</span>
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>

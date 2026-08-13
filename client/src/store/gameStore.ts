@@ -114,6 +114,9 @@ export interface GameState {
   funds: number;
   materials: number;
 
+  // EVM: Earned Value tracking (% completion weight accumulated on task done)
+  earnedValue: number; // 0-100 cumulative completion %
+
   // Flags
   flags: Record<string, boolean>;
 
@@ -230,11 +233,11 @@ export interface GameState {
 const INITIAL_COLUMNS: Column[] = [
   {
     id: 'backlog',
-    title: 'Backlog',
+    title: 'To-Do List',
     tasks: CONSTRUCTION_TASKS.map(t => ({ ...t, id: uuidv4(), status: 'backlog', originalId: t.id })),
     wipLimit: 0
   },
-  { id: 'doing', title: 'In Progress', tasks: [], wipLimit: 0 },
+  { id: 'doing', title: 'In Progress', tasks: [], wipLimit: 3 },
   { id: 'done', title: 'Completed', tasks: [], wipLimit: 0 },
 ];
 
@@ -307,6 +310,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   columns: INITIAL_COLUMNS,
   funds: 5000000, // 50 Lakhs starting funds
   materials: 1000,
+  earnedValue: 0,
 
   // Chapter 3 State Defaults
   depotItems: [],
@@ -372,6 +376,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         columns: INITIAL_COLUMNS,
         funds: 15000000,
         materials: 300,
+        earnedValue: 0,
         dailyMetrics: [],
         previousDoneCount: 0,
         previousWasteCount: 0,
@@ -1009,13 +1014,10 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     if (!sourceCol || !destCol || sourceColId === destColId) return false;
 
-    // 1. WIP Limit Warning (Removed hard block for parallel tasks)
-    // We can still track it for metrics, but we don't return false here
-    /* 
-    if ((destColId === 'doing') && destCol.wipLimit > 0 && destCol.tasks.length >= destCol.wipLimit) {
-      return false; 
+    // 1. WIP Limit — Hard Block (teaching tool: limit full = cannot drag)
+    if (destColId === 'doing' && sourceColId !== 'doing' && destCol.wipLimit > 0 && destCol.tasks.length >= destCol.wipLimit) {
+      return false; // Blocked — WIP limit reached. Alert sound played by caller.
     }
-    */
 
     const taskIndex = sourceCol.tasks.findIndex(t => t.id === taskId);
     if (taskIndex === -1) return false;
@@ -1067,11 +1069,19 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     }
 
-    // Tasks no longer incrementally reward the player in this budget-based model.
+    // EVM: When a task is completed, increment earnedValue by its completion weight.
+    // Budget only flows down (via costToStart on move-to-doing + daily overhead).
+    // earnedValue tracks % completion for Planned Value vs Earned Value analysis.
+    let newEarnedValue = state.earnedValue;
+    if (destColId === 'done' && sourceColId !== 'done') {
+      const weight = (task as any).completionWeight || 0;
+      newEarnedValue = Math.min(100, newEarnedValue + weight);
+    }
 
     set({
       materials: newMaterials,
       funds: newFunds,
+      earnedValue: newEarnedValue,
       columns: state.columns.map(col => {
         if (col.id === sourceColId) {
           return { ...col, tasks: col.tasks.filter(t => t.id !== taskId) };
@@ -1277,6 +1287,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       playerGender: ks.playerGender ?? data.playerGender ?? state.playerGender,
       funds: data.resources?.budget ?? state.funds,
       materials: data.resources?.materials ?? data.materials ?? state.materials,
+      earnedValue: ks.earnedValue ?? data.earnedValue ?? state.earnedValue,
       flags: data.flags ?? state.flags,
       columns: ks.columns ?? state.columns,
       lpi: data.metrics ?? state.lpi,

@@ -2,6 +2,7 @@ import React from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import soundManager from '@/lib/soundManager';
+import { GAME_CONSTANTS } from '@/config/constants';
 
 export const ChapterIntroModal: React.FC = () => {
     const { flags, setFlag, chapter } = useGameStore();
@@ -18,7 +19,7 @@ export const ChapterIntroModal: React.FC = () => {
     // Content could be dynamic based on 'chapter' number later.
     const content = {
         1: {
-            title: "The Jam at Sunrise Tower",
+            title: `The Jam at ${GAME_CONSTANTS.CHAPTER_1_PROJECT}`,
             subtitle: "Chapter 1: The Construction Chaos",
             description: "You are the new Project Lead. The site is currently behind schedule, over budget, and completely chaotic. Everyone is starting new tasks but nothing is actually getting finished. Your job is to organize the chaos, and your Efficiency is strictly measured by how much work is actually completed compared to what can be completed.",
             objectives: [

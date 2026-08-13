@@ -1,15 +1,16 @@
 import { DayConfig } from './types';
 import { DialogueLine } from '@/store/gameStore';
+import { GAME_CONSTANTS } from '@/config/constants';
 export type { DayConfig } from './types';
 
 export const WEEK_1_SCHEDULE: DayConfig[] = [
     {
         day: 1,
-        title: "The Jam at Sunrise Tower",
+        title: `The Jam at ${GAME_CONSTANTS.CHAPTER_1_PROJECT}`,
         description: "The site is a total mess. Everyone is busy starting new things, but nothing is getting finished. This 'traffic jam' of tasks is slowing us down to a crawl.",
         lesson: "Concept: Kanban & Work In Progress (WIP) Limits.",
         dialogue: [
-            { character: 'Mira', text: "Welcome to the construction site of Sunrise Tower, Lean Champion. The project is behind schedule. We have two weeks until the grand opening.", emotion: 'stressed' },
+            { character: 'Mira', text: `Welcome to the construction site of ${GAME_CONSTANTS.CHAPTER_1_PROJECT}, Lean Champion. The project is behind schedule. We have two weeks until the ${GAME_CONSTANTS.CHAPTER_1_MILESTONE}.`, emotion: 'stressed' },
             { character: 'Rao', text: "My teams are working at 100% capacity! Look at the number of active work fronts!", emotion: 'angry' },
             { character: 'Engineer', text: "Excessive active fronts lead to congestion, Rajiv. We need to focus on handover and throughput (how many tasks we finish), not just activity.", emotion: 'neutral' },
             { character: 'Engineer', text: "We will implement a Kanban system to limit our WIP — Work In Progress. This restricts how many things we start at once so we don't stall the site.", emotion: 'happy' }

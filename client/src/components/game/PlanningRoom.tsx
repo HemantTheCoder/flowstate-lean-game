@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, CheckCircle, Package, Users, FileCheck, Cloud, ArrowRight, Briefcase, Target, Lock, Calendar, ClipboardCheck, Wrench, HandshakeIcon, Play, BarChart3, Sun, ShieldAlert, Eye, Ban, Save, MapPin } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 import { TaskIconDisplay } from './TaskIconDisplay';
+import { GAME_CONSTANTS } from '@/config/constants';
 
 const constraintConfig: Record<ConstraintType, { icon: React.ReactNode, label: string, color: string, action: string, cost: string }> = {
     material: { icon: <Package className="w-4 h-4" />, label: 'Material', color: 'red', action: 'Call Supplier', cost: '₹200' },
@@ -93,7 +94,13 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
     const readyTasksCount = lookaheadTasks.filter(t => (t.constraints?.length || 0) === 0).length;
     const constrainedCount = lookaheadTasks.filter(t => (t.constraints?.length || 0) > 0).length;
 
-    const dayObjective = DAY_OBJECTIVES[day] || DAY_OBJECTIVES[6];
+    const dayObjective = DAY_OBJECTIVES[day] || {
+        icon: <Target className="w-4 h-4" />,
+        title: "Planning Phase",
+        objective: "Review the plan and prepare for execution.",
+        action: "Make ready",
+        color: "slate"
+    };
 
     const canPullTasks = day >= 6;
     const canInspectConstraints = day >= 7;
@@ -324,7 +331,7 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                     <div className={`flex items-center gap-2 px-3 py-1 rounded-full border bg-slate-800/50 ${colorClassMap[dayObjective.color]?.border || 'border-cyan-500/50'}`}>
                         <span className={`${dayObjective.color === 'orange' ? 'text-orange-400' : dayObjective.color === 'purple' ? 'text-purple-400' : dayObjective.color === 'green' ? 'text-emerald-400' : dayObjective.color === 'amber' ? 'text-amber-400' : 'text-cyan-400'}`}>{dayObjective.icon}</span>
                         <span className="text-white font-bold text-sm">
-                            {useGameStore.getState().chapter === 1 ? 'Month' : 'Day'} {day}
+                            {GAME_CONSTANTS.TIME_UNIT} {day}
                         </span>
                     </div>
                     <div className="flex-1">
