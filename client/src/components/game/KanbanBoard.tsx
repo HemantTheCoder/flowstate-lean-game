@@ -4,11 +4,12 @@ import { useGameStore, Column, Task, formatCurrency } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import soundManager from '@/lib/soundManager';
-import { AlertTriangle, Gauge, Minus, Plus, Cloud, Sparkles, Flame, CloudRain, PackageX, Replace, ChevronLeft, ChevronRight, GripVertical, Package, Info, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, Gauge, Minus, Plus, Cloud, Sparkles, Flame, CloudRain, PackageX, Replace, ChevronLeft, ChevronRight, GripVertical, Package, Info, CheckCircle2, Droplets, Cuboid, Hammer, Zap } from 'lucide-react';
 import { TaskIconDisplay } from './TaskIconDisplay';
 import { CustomTaskModal } from './CustomTaskModal';
 import { LifeHearts } from './LifeHearts';
 import { LeanAiChat } from './LeanAiChat';
+import { useToast } from '@/hooks/use-toast';
 
 const CongestionCloud: React.FC<{ intensity: number }> = ({ intensity }) => {
     if (intensity <= 0) return null;
@@ -202,6 +203,8 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     const [showCustomModal, setShowCustomModal] = useState(false);
     const [replaceTaskId, setReplaceTaskId] = useState<string | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [wipBlockedColId, setWipBlockedColId] = useState<string | null>(null);
+    const { toast } = useToast();
 
     const onDragEnd = (result: DropResult) => {
         const { source, destination, draggableId } = result;
@@ -235,6 +238,12 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             if (tutorialStep === 4 && sourceColId === 'doing' && destColId === 'done') setTutorialStep(5);
         } else {
             soundManager.playSFX('alert', audioSettings.sfxVolume);
+            const destCol = columns.find(c => c.id === destColId);
+            if (destCol && destCol.wipLimit > 0 && destCol.tasks.length >= destCol.wipLimit) {
+                toast({ title: 'WIP Limit Reached!', description: 'Cannot pull task. Finish active work first.', variant: 'destructive' });
+                setWipBlockedColId(destColId);
+                setTimeout(() => setWipBlockedColId(null), 500);
+            }
         }
     };
 
@@ -245,7 +254,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 120 }}
-                className="fixed inset-4 md:inset-8 z-[60] flex items-center justify-center bg-slate-950/85 backdrop-blur-2xl border border-white/10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] pointer-events-none"
+                className="fixed inset-4 md:inset-8 z-[60] flex items-center justify-center bg-slate-950/85 backdrop-blur-2xl border border-white/10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] pointer-events-none blueprint-bg"
             >
                 <div className="absolute inset-0 pointer-events-auto" onClick={onClose} />
                 
@@ -317,12 +326,12 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                             {(provided, snapshot) => (
                                                 <div
                                                     id={`col-${col.id}`}
-                                                    className={`w-[320px] md:w-[420px] shrink-0 flex flex-col h-full snap-start transition-all duration-300 relative group`}
+                                                    className={`w-[320px] md:w-[420px] shrink-0 flex flex-col h-full snap-start transition-all duration-300 relative group ${wipBlockedColId === col.id ? 'animate-shake' : ''}`}
                                                 >
                                                     {/* Column Frame */}
-                                                    <div className={`flex flex-col h-full bg-slate-900/40 backdrop-blur-md rounded-[28px] border-2 transition-all duration-500 relative overflow-hidden ${
+                                                    <div className={`flex flex-col h-full bg-slate-900/60 backdrop-blur-md rounded-[28px] border-2 transition-all duration-500 relative overflow-hidden ${
                                                         snapshot.isDraggingOver ? 'bg-cyan-500/5 border-cyan-500/40 shadow-[0_0_30px_rgba(6,182,212,0.1)]' : 
-                                                        isBottleneck ? 'border-red-500/20' : 'border-slate-800/40'
+                                                        isBottleneck ? 'border-red-500/40' : 'border-slate-800/60'
                                                     } ${isBlurred ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
                                                         
                                                         {/* Header */}
@@ -371,6 +380,11 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                 const isDone = col.id === 'done';
                                                                 const isDoing = col.id === 'doing';
                                                                 const hasConstraints = chapter > 1 && (task.constraints?.length || 0) > 0;
+                                                                
+                                                                const pMonth = (task.stepNumber || 1) <= 5 ? 1 : (task.stepNumber || 1) <= 10 ? 2 : (task.stepNumber || 1) <= 15 ? 3 : 4;
+                                                                const isDelayed = chapter === 1 && (task.stepNumber || 1) > 2 ? day > (pMonth + 1) : day > pMonth;
+                                                                const isAtRisk = isDoing && isDelayed;
+                                                                const isOnTrack = isDoing && !isDelayed;
 
                                                                 return (
                                                                     <Draggable key={task.id} draggableId={task.id} index={index}>
@@ -381,11 +395,12 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                     {...provided.draggableProps}
                                                                                     {...provided.dragHandleProps}
                                                                                     style={provided.draggableProps.style}
-                                                                                    className={`group relative bg-slate-800/80 backdrop-blur-xl p-5 rounded-2xl border transition-all duration-300 ${
+                                                                                    className={`group relative bg-slate-800/90 backdrop-blur-xl p-5 rounded-2xl border transition-all duration-300 ${
                                                                                         snapshot.isDragging 
                                                                                             ? 'bg-slate-700 border-cyan-400 shadow-[0_25px_60px_-15px_rgba(0,0,0,1)] ring-4 ring-cyan-500/20 z-50 scale-[1.05] cursor-grabbing' 
                                                                                             : isDone ? 'border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-500/60 hover:shadow-xl hover:-translate-y-1'
-                                                                                            : isDoing ? 'border-red-500/30 bg-red-950/10 hover:border-red-500/60 hover:shadow-xl hover:-translate-y-1'
+                                                                                            : isAtRisk ? 'border-red-500/50 bg-red-950/20 shadow-[0_0_15px_rgba(239,68,68,0.15)] hover:border-red-500/80 hover:-translate-y-1'
+                                                                                            : isOnTrack ? 'border-cyan-500/30 bg-cyan-950/20 hover:border-cyan-500/60 hover:shadow-xl hover:-translate-y-1'
                                                                                             : 'border-slate-700/50 hover:border-slate-500 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-1'
                                                                                     } ${isWaste ? 'border-red-900/50 bg-red-950/40' : ''}`}
                                                                                 >
@@ -428,13 +443,21 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                     <div className="mt-4 flex flex-col gap-2">
                                                                                         {task.materialsRequired && task.materialsRequired.length > 0 && (
                                                                                             <div className="flex flex-col gap-1 w-full bg-slate-900/50 rounded-lg p-2 border border-slate-700/50">
-                                                                                                {task.materialsRequired.map((m, i) => (
+                                                                                                {task.materialsRequired.map((m, i) => {
+                                                                                                    let MatIcon = Package;
+                                                                                                    if (m.name.includes('Concrete') || m.name.includes('Water') || m.name.includes('Chemicals') || m.name.includes('Paint')) MatIcon = Droplets;
+                                                                                                    else if (m.name.includes('Bricks') || m.name.includes('Tiles') || m.name.includes('Sand')) MatIcon = Cuboid;
+                                                                                                    else if (m.name.includes('Steel') || m.name.includes('Wood')) MatIcon = Hammer;
+                                                                                                    else if (m.name.includes('Wiring') || m.name.includes('Electrical')) MatIcon = Zap;
+                                                                                                    
+                                                                                                    return (
                                                                                                     <div key={i} className="flex items-center gap-2 text-[10px]">
-                                                                                                        <Package className="w-3.5 h-3.5 text-amber-500" />
-                                                                                                        <span className="text-slate-400">Material Required:</span>
+                                                                                                        <MatIcon className="w-3.5 h-3.5 text-amber-500" />
+                                                                                                        <span className="text-slate-400">Req:</span>
                                                                                                         <span className="font-bold text-amber-400">{m.amount} {m.name}</span>
                                                                                                     </div>
-                                                                                                ))}
+                                                                                                    );
+                                                                                                })}
                                                                                             </div>
                                                                                         )}
                                                                                         <div className="flex flex-wrap gap-2 items-center">
