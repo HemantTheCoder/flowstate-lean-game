@@ -789,6 +789,14 @@ export default function Game() {
     advanceDay();
     handleSave(true);
     soundManager.playSFX('phase_change', audioSettings.sfxVolume);
+    
+    // Day Transition Flavor Text
+    if (todaysCompleted > 0) {
+      toast({ title: '🧑‍💼 Lean Champion', description: 'Good pacing today. Consistent flow is better than chaotic speed.', duration: 5000 });
+    } else {
+      toast({ title: '🧑‍💼 Lean Champion', description: 'Tough day. Let\'s look at the bottlenecks tomorrow.', duration: 5000 });
+    }
+
     setShowSummary(true);
   };
 

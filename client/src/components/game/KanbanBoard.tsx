@@ -233,6 +233,17 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             setTimeout(() => setDroppedTaskId(null), 300);
             if (destColId === 'done') {
                 soundManager.playSFX('money', audioSettings.sfxVolume);
+                
+                // Deterministic Milestone Flavors
+                if (task.id === 'task-4') {
+                    toast({ title: '👷 Foreman', description: 'Foundation poured! The site is officially taking shape.', duration: 5000 });
+                } else if (task.id === 'task-9') {
+                    toast({ title: '👷 Site Manager', description: 'Columns are up. Good pace. Keep the flow steady.', duration: 5000 });
+                } else if (task.id === 'task-13') {
+                    toast({ title: '👔 Client', description: 'Roofing complete! We are dry inside. Excellent work.', duration: 5000 });
+                } else if (task.id === 'task-21') {
+                    toast({ title: '📋 Inspector', description: 'Finishes look clean. Quality is holding up.', duration: 5000 });
+                }
             } else {
                 soundManager.playSFX('click', audioSettings.sfxVolume);
             }
@@ -242,7 +253,13 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             soundManager.playSFX('alert', audioSettings.sfxVolume);
             const destCol = columns.find(c => c.id === destColId);
             if (destCol && destCol.wipLimit > 0 && destCol.tasks.length >= destCol.wipLimit) {
-                toast({ title: 'WIP Limit Reached!', description: 'Cannot pull task. Finish active work first.', variant: 'destructive' });
+                const wipFlavors = [
+                    "Where are you going to put that? Finish your active work first!",
+                    "A blocked system creates waste. Clear the active tasks first.",
+                    "We don't have the space or hands for this right now. Clear the board!"
+                ];
+                const flavor = wipFlavors[Math.floor(Math.random() * wipFlavors.length)];
+                toast({ title: 'WIP Limit Reached!', description: flavor, variant: 'destructive', duration: 4000 });
                 setWipBlockedColId(destColId);
                 setTimeout(() => setWipBlockedColId(null), 500);
             }
