@@ -28,7 +28,6 @@ import { Chapter2CompleteModal } from '@/components/game/Chapter2CompleteModal';
 import { Chapter3CompleteModal } from '@/components/game/Chapter3CompleteModal';
 import { Chapter4CompleteModal } from '@/components/game/Chapter4CompleteModal';
 import { SettingsModal } from '@/components/game/SettingsModal';
-import { LeanAIModal } from '@/components/game/LeanAIModal';
 import { LoadingScreen } from '@/components/game/LoadingScreen';
 import { useGame } from '@/hooks/use-game';
 import soundManager from '@/lib/soundManager';
@@ -47,7 +46,6 @@ export default function Game() {
   const [showKanban, setShowKanban] = React.useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showLeanAI, setShowLeanAI] = useState(false);
   const [completedToday, setCompletedToday] = useState(0);
   const [showChapterComplete, setShowChapterComplete] = useState(false);
   const [showGlossary, setShowGlossary] = useState(false);
@@ -1118,13 +1116,7 @@ export default function Game() {
   }
 
   return (
-    <div 
-      className={`w-full h-screen min-h-[100dvh] relative overflow-hidden transition-colors duration-1000 bg-slate-950/60`}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        setShowLeanAI(true);
-      }}
-    >
+    <div className={`w-full h-screen min-h-[100dvh] relative overflow-hidden transition-colors duration-1000 bg-slate-950/60`}>
       {/* 1. Phaser Layer (Background) */}
       <GameCanvas />
 

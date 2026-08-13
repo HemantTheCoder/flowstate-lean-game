@@ -8,7 +8,6 @@ import { AlertTriangle, Gauge, Minus, Plus, Cloud, Sparkles, Flame, CloudRain, P
 import { TaskIconDisplay } from './TaskIconDisplay';
 import { CustomTaskModal } from './CustomTaskModal';
 import { LifeHearts } from './LifeHearts';
-import { LeanAiChat } from './LeanAiChat';
 import { useToast } from '@/hooks/use-toast';
 
 const CongestionCloud: React.FC<{ intensity: number }> = ({ intensity }) => {
@@ -528,8 +527,6 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 onClose={() => { setShowCustomModal(false); setReplaceTaskId(null); }}
                 replaceTaskId={replaceTaskId}
             />
-
-            <LeanAiChat />
         </>
     );
 };
