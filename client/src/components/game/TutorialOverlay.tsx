@@ -97,7 +97,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
     }, [tutorialStep, tutorialActive, showKanban]);
 
 
-    if (!tutorialActive || tutorialStep === 0) return null;
+    if (!tutorialActive || tutorialStep === 0 || (chapter === 1 && day === 1 && !flags['master_plan_seen'])) return null;
 
     const getMaskPath = () => {
         if (!spotlightPos) return `M0 0 h${window.innerWidth} v${window.innerHeight} h-${window.innerWidth} z`;
