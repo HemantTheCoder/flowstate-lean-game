@@ -6,7 +6,11 @@
 
 @layer base {
   html, body, #root {
-    @apply h-[100dvh] w-[100dvw] overflow-hidden m-0 p-0;
+    height: 100vh;
+    height: 100dvh;
+    width: 100vw;
+    width: 100dvw;
+    @apply overflow-hidden m-0 p-0;
   }
 }
 

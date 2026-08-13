@@ -1118,7 +1118,7 @@ export default function Game() {
 
   return (
     <div 
-      className={`w-full h-[100dvh] relative overflow-hidden transition-colors duration-1000 bg-slate-950/60`}
+      className={`w-full h-screen min-h-[100dvh] relative overflow-hidden transition-colors duration-1000 bg-slate-950/60`}
       onContextMenu={(e) => {
         e.preventDefault();
         setShowLeanAI(true);
