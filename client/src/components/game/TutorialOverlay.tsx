@@ -187,8 +187,8 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                     <ArrowDown className="w-12 h-12 text-purple-400 animate-bounce" />
                                 </div>
                                 <div className="bg-purple-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
-                                    <p className="font-bold text-lg">Step 2: PARALLEL WORK</p>
-                                    <p className="text-sm">Construction is messy! You can <b>drag multiple tasks</b> here to work on them at the same time.</p>
+                                    <p className="font-bold text-lg">Step 2: CREW CAPACITY</p>
+                                    <p className="text-sm">This board represents one crew's capacity. Real sites run many crews in parallel — but each crew shouldn't juggle more than a few active tasks at once, or quality and speed both suffer.</p>
                                 </div>
                             </motion.div>
                         )}

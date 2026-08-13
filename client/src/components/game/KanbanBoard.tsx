@@ -381,7 +381,12 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                             WIP {col.tasks.length}/{col.wipLimit}
                                                                         </div>
                                                                         {col.tasks.length < col.wipLimit && (
-                                                                            <span className="text-[9px] text-cyan-400/80 font-bold uppercase tracking-wider">Parallel tasks permitted</span>
+                                                                            <span 
+                                                                                className="text-[9px] text-cyan-400/80 font-bold uppercase tracking-wider cursor-help border-b border-dashed border-cyan-400/30 pb-0.5"
+                                                                                title="This board represents one crew's capacity. Real sites run many crews in parallel — but each crew shouldn't juggle more than a few active tasks at once, or quality and speed both suffer."
+                                                                            >
+                                                                                Parallel tasks permitted
+                                                                            </span>
                                                                         )}
                                                                     </div>
                                                                 )}
