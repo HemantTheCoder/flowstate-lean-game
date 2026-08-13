@@ -399,7 +399,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                         snapshot.isDragging 
                                                                                             ? 'bg-slate-700 border-cyan-400 shadow-[0_25px_60px_-15px_rgba(0,0,0,1)] ring-4 ring-cyan-500/20 z-50 scale-[1.05] cursor-grabbing' 
                                                                                             : isDone ? 'border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-500/60 hover:shadow-xl hover:-translate-y-1'
-                                                                                            : isAtRisk ? 'border-red-500/50 bg-red-950/20 shadow-[0_0_15px_rgba(239,68,68,0.15)] hover:border-red-500/80 hover:-translate-y-1'
+                                                                                            : isAtRisk ? 'border-amber-500/50 bg-amber-950/20 shadow-[0_0_15px_rgba(245,158,11,0.15)] hover:border-amber-500/80 hover:-translate-y-1'
                                                                                             : isOnTrack ? 'border-cyan-500/30 bg-cyan-950/20 hover:border-cyan-500/60 hover:shadow-xl hover:-translate-y-1'
                                                                                             : 'border-slate-700/50 hover:border-slate-500 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-1'
                                                                                     } ${isWaste ? 'border-red-900/50 bg-red-950/40' : ''}`}

@@ -1130,88 +1130,84 @@ export default function Game() {
       {/* 2. UI Overlay Layer (HUD, Dialogues, Windows) */}
       <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-4">
 
-        {/* Top Bar: Resources & Stats */}
+        {/* Top Bar: Resources & Stats - Cohesive Instrument Panel */}
         <motion.div
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className={`flex flex-col md:flex-row justify-between items-start pointer-events-auto gap-4 w-full md:w-auto ${chapter >= 4 ? 'hidden' : ''}`}
+          className={`flex flex-col md:flex-row items-stretch pointer-events-auto w-full max-w-6xl mx-auto bg-slate-900/95 backdrop-blur-xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border-2 border-slate-700/50 overflow-hidden ${chapter >= 4 ? 'hidden' : ''}`}
         >
-          <div className="flex gap-4 w-full md:w-auto">
-            <div id="smart-advisor-box" className="bg-slate-900/95 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-[0_0_30px_rgba(6,182,212,0.15)] border-2 border-cyan-500/40 w-full md:min-w-[350px] md:w-auto flex-1 transform transition-transform animate-pulse-slow">
-              <div className="flex items-center gap-2 mb-1">
-                <Target className="w-5 h-5 text-cyan-400" />
-                <h3 className="font-black text-white text-base md:text-lg tracking-wider">CORE OBJECTIVE</h3>
-                <span className="text-xs font-bold text-slate-400 ml-auto">Week {week} | {GAME_CONSTANTS.TIME_UNIT} {day}</span>
-              </div>
-              <div className="text-sm md:text-base text-cyan-300 font-bold mt-2 leading-snug drop-shadow-md bg-cyan-950/50 p-2 rounded-lg border border-cyan-900/50">
-                {getSmartObjective()}
-              </div>
+          {/* Objective Section */}
+          <div className="flex-1 p-3 md:p-4 border-b md:border-b-0 md:border-r border-slate-700/50 bg-slate-800/40 flex flex-col justify-center">
+            <div className="flex items-center gap-2 mb-1">
+              <Target className="w-4 h-4 text-cyan-500" />
+              <h3 className="font-bold text-slate-400 text-[10px] md:text-xs tracking-widest uppercase">Active Objective</h3>
+              <span className="text-[10px] md:text-xs font-bold text-cyan-400 ml-auto bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-900/50">
+                Week {week} | {GAME_CONSTANTS.TIME_UNIT} {day}
+              </span>
             </div>
-
-            <button
-              onClick={handleEndDay}
-              data-testid="button-end-day"
-              className={`${((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 5 && chapter === 4) || (day === 14 && chapter === 5)) ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-b-4 border-amber-700 ring-2 ring-amber-300/50' : 'bg-cyan-600 hover:bg-cyan-500 border-b-4 border-cyan-800'} text-white font-bold px-3 py-2 md:px-4 rounded-xl shadow-md transition-colors h-fit self-center text-sm md:text-base whitespace-nowrap ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') || getSmartObjective().includes('Project Complete') ? 'animate-bounce ring-4 ring-amber-400/50' : ''}`}
-            >
-              {(((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 5 && chapter === 4) || (day === 14 && chapter === 5))) ? 'Finish Chapter' : 'End Day'}
-            </button>
+            <div className="text-sm md:text-base text-slate-100 font-bold leading-snug">
+              {getSmartObjective()}
+            </div>
           </div>
 
-          <div id="stats-box" className="bg-slate-800/80 backdrop-blur-md p-3 md:p-4 rounded-xl shadow-md border border-slate-700/50 flex gap-4 md:gap-6 w-full md:w-auto justify-around">
+          {/* Stats & Actions Section */}
+          <div className="flex items-center justify-between md:justify-end p-2 md:p-4 gap-3 md:gap-6 bg-slate-950/60">
             <div className="text-center">
-              <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Budget (Baseline)</div>
+              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Budget</div>
               <div className="font-mono font-bold text-emerald-400 text-sm md:text-base">{formatCurrency(funds, currency)}</div>
             </div>
-
-            <div className="text-center px-4 border-l border-slate-700/50">
-              <div className="text-[10px] md:text-xs font-bold text-blue-400 uppercase">% Complete</div>
-              <div className="font-mono font-black text-blue-400 text-sm md:text-base">{Math.round(useGameStore.getState().earnedValue)}%</div>
+            
+            <div className="w-px h-8 bg-slate-700/50 hidden md:block"></div>
+            
+            <div className="text-center">
+              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">% Complete</div>
+              <div className="font-mono font-bold text-cyan-400 text-sm md:text-base">{Math.round(useGameStore.getState().earnedValue)}%</div>
             </div>
+            
+            <div className="w-px h-8 bg-slate-700/50 hidden md:block"></div>
+            
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setShowProjectSheet(true)}
+                className="bg-slate-800 hover:bg-slate-700 border border-slate-600 p-2 rounded-md shadow-sm transition-all"
+                title="Project Status Sheet"
+              >
+                <ClipboardList className="w-5 h-5 text-cyan-400" />
+              </button>
 
-            {chapter === 3 ? (
-              <div className="text-center px-4 border-l border-slate-700/50">
-                <div className="text-[10px] md:text-xs font-bold text-amber-500 uppercase">5S Audit</div>
-                <div className="font-mono font-black text-amber-400 text-sm md:text-base">{depotScore}%</div>
-              </div>
-            ) : (
-              <div className="text-center px-4 border-l border-slate-700/50">
-                <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Morale</div>
-                <div className="font-mono font-bold text-emerald-400 text-sm md:text-base">{lpi.teamMorale}%</div>
-              </div>
-            )}
+              <button
+                id="btn-save"
+                onClick={() => handleSave()}
+                disabled={saveGame.isPending}
+                className="bg-slate-800 hover:bg-slate-700 border border-slate-600 p-2 rounded-md shadow-sm transition-all"
+                title="Save Game"
+              >
+                {saveGame.isPending ? (
+                  <div className="w-5 h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Save className="w-5 h-5 text-slate-300" />
+                )}
+              </button>
 
-            <button
-              id="btn-project-sheet"
-              onClick={() => setShowProjectSheet(true)}
-              className="bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 p-1.5 sm:p-2 rounded-lg shadow-sm transition-all active:scale-95"
-              title="Project Status Sheet"
-            >
-              <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
-            </button>
-            <button
-              id="btn-save"
-              onClick={() => handleSave()}
-              disabled={saveGame.isPending}
-              className="bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 p-1.5 sm:p-2 rounded-lg shadow-sm transition-all active:scale-95"
-              title="Save Game"
-            >
-              {saveGame.isPending ? (
-                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <Save className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
-              )}
-            </button>
-            <button
-              id="btn-settings"
-              onClick={() => {
-                soundManager.playSFX('click', audioSettings.sfxVolume);
-                setShowSettings(true);
-              }}
-              className="bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 p-1.5 sm:p-2 rounded-lg shadow-sm transition-all active:scale-95 pointer-events-auto"
-              title="Settings"
-            >
-              <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
-            </button>
+              <button
+                id="btn-settings"
+                onClick={() => {
+                  soundManager.playSFX('click', audioSettings.sfxVolume);
+                  setShowSettings(true);
+                }}
+                className="bg-slate-800 hover:bg-slate-700 border border-slate-600 p-2 rounded-md shadow-sm transition-all pointer-events-auto"
+                title="Settings"
+              >
+                <Settings className="w-5 h-5 text-slate-300" />
+              </button>
+
+              <button
+                onClick={handleEndDay}
+                className={`bg-yellow-500 hover:bg-yellow-400 text-yellow-950 font-black px-4 py-2 rounded-md shadow-md uppercase tracking-wider text-[10px] md:text-xs transition-all ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') || getSmartObjective().includes('Project Complete') ? 'animate-pulse ring-2 ring-yellow-400 ring-offset-2 ring-offset-slate-900' : ''}`}
+              >
+                {(((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 5 && chapter === 4) || (day === 14 && chapter === 5))) ? 'Finish Chapter' : 'End Day'}
+              </button>
+            </div>
           </div>
         </motion.div>
 
