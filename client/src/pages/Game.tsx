@@ -790,6 +790,7 @@ export default function Game() {
     setCompletedToday(Math.max(0, todaysCompleted));
     advanceDay();
     handleSave(true);
+    soundManager.playSFX('phase_change', audioSettings.sfxVolume);
     setShowSummary(true);
   };
 

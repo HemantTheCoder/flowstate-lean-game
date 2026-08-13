@@ -204,6 +204,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     const [replaceTaskId, setReplaceTaskId] = useState<string | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [wipBlockedColId, setWipBlockedColId] = useState<string | null>(null);
+    const [droppedTaskId, setDroppedTaskId] = useState<string | null>(null);
     const { toast } = useToast();
 
     const onDragEnd = (result: DropResult) => {
@@ -229,6 +230,8 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
         const success = moveTask(draggableId, sourceColId, destColId);
         if (success) {
+            setDroppedTaskId(draggableId);
+            setTimeout(() => setDroppedTaskId(null), 300);
             if (destColId === 'done') {
                 soundManager.playSFX('money', audioSettings.sfxVolume);
             } else {
@@ -385,6 +388,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                 const isDelayed = chapter === 1 && (task.stepNumber || 1) > 2 ? day > (pMonth + 1) : day > pMonth;
                                                                 const isAtRisk = isDoing && isDelayed;
                                                                 const isOnTrack = isDoing && !isDelayed;
+                                                                const isJustDropped = droppedTaskId === task.id;
 
                                                                 return (
                                                                     <Draggable key={task.id} draggableId={task.id} index={index}>
@@ -402,7 +406,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                             : isAtRisk ? 'border-amber-500/50 bg-amber-950/20 shadow-[0_0_15px_rgba(245,158,11,0.15)] hover:border-amber-500/80 hover:-translate-y-1'
                                                                                             : isOnTrack ? 'border-cyan-500/30 bg-cyan-950/20 hover:border-cyan-500/60 hover:shadow-xl hover:-translate-y-1'
                                                                                             : 'border-slate-700/50 hover:border-slate-500 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-1'
-                                                                                    } ${isWaste ? 'border-red-900/50 bg-red-950/40' : ''}`}
+                                                                                    } ${isWaste ? 'border-red-900/50 bg-red-950/40' : ''} ${isJustDropped ? 'animate-card-snap' : ''}`}
                                                                                 >
                                                                                     <WasteTaskOverlay isWaste={isWaste} isInDone={isDone} />
                                                                                     <BottleneckPulse isBottleneck={isBottleneck && isDoing && index === 0} />
