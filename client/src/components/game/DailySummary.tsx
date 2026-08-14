@@ -142,9 +142,40 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                 animate={{ scale: 1, opacity: 1 }}
                 className="bg-slate-900 w-full max-w-md max-h-[90vh] rounded-3xl shadow-[0_0_40px_rgba(59,130,246,0.15)] overflow-hidden border border-slate-700/50 flex flex-col"
             >
-                <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-900 p-6 text-center shrink-0 border-b border-blue-500/30">
-                    <h2 className="text-3xl font-black text-white uppercase tracking-wider">{chapter === 1 ? 'Month' : 'Day'} {displayDay} Complete</h2>
-                    <p className="text-blue-200 font-medium mt-1">Site Report</p>
+                <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-900 p-6 text-center shrink-0 border-b border-blue-500/30 relative overflow-hidden">
+                    {/* NEW: Confetti/Streak Animation */}
+                    {dailyEfficiency >= 80 && (
+                        <>
+                            {Array.from({ length: 12 }).map((_, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
+                                    animate={{ 
+                                        opacity: [0, 1, 0], 
+                                        x: Math.sin(i * 30) * 150, 
+                                        y: Math.cos(i * 30) * 100 - 20,
+                                        scale: [0, (i % 3) * 0.5 + 0.5, 0],
+                                        rotate: i * 45
+                                    }}
+                                    transition={{ duration: 1.5 + (i % 2), ease: "easeOut" }}
+                                    className={`absolute left-1/2 top-1/2 w-3 h-3 rounded-sm pointer-events-none z-0 ${i % 2 === 0 ? 'bg-yellow-400' : 'bg-cyan-400'}`}
+                                />
+                            ))}
+                            <motion.div 
+                                initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                                animate={{ opacity: [0, 1, 1, 0], scale: [0.5, 1.2, 1, 0.9], y: [20, -10, 0, -20] }}
+                                transition={{ duration: 2.5, ease: "easeOut" }}
+                                className="absolute inset-0 pointer-events-none flex items-center justify-center z-10"
+                            >
+                                <div className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black text-xl uppercase tracking-widest px-4 py-1.5 rounded-full shadow-[0_0_30px_rgba(234,179,8,0.5)] border-2 border-yellow-300 transform -rotate-6">
+                                    🔥 Flow Streak!
+                                </div>
+                            </motion.div>
+                        </>
+                    )}
+
+                    <h2 className="text-3xl font-black text-white uppercase tracking-wider relative z-20">{chapter === 1 ? 'Month' : 'Day'} {displayDay} Complete</h2>
+                    <p className="text-blue-200 font-medium mt-1 relative z-20">Site Report</p>
                 </div>
 
                 <div className="p-6 space-y-4 overflow-y-auto flex-1">

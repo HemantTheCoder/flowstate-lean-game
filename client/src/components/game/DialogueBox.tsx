@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
@@ -27,6 +27,40 @@ export const DialogueBox: React.FC = () => {
         .replace(/{promised}/g, promised.toString())
         .replace(/{completed}/g, completed.toString())
         .replace(/{ppc}/g, ppc.toString());
+
+    // Typewriter State
+    const [displayedText, setDisplayedText] = useState('');
+    const [isTyping, setIsTyping] = useState(true);
+
+    useEffect(() => {
+        setDisplayedText('');
+        setIsTyping(true);
+        let currentText = '';
+        let charIndex = 0;
+        
+        const interval = setInterval(() => {
+            if (charIndex < processedText.length) {
+                currentText += processedText[charIndex];
+                setDisplayedText(currentText);
+                charIndex++;
+            } else {
+                setIsTyping(false);
+                clearInterval(interval);
+            }
+        }, 20); // Fast typing speed
+
+        return () => clearInterval(interval);
+    }, [processedText, dialogueIndex]);
+
+    const handleClick = () => {
+        if (isTyping) {
+            setDisplayedText(processedText);
+            setIsTyping(false);
+        } else {
+            soundManager.playSFX('typing', 0.6);
+            advanceDialogue();
+        }
+    };
 
     // Logic to determine character side (Left/Right) or Color based on name
     const isPlayer = line.character === 'Engineer' || line.character === 'Architect';
@@ -100,11 +134,13 @@ export const DialogueBox: React.FC = () => {
                     {/* Text Box Container */}
                     <div
                         className="relative bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-[0_0_30px_rgba(30,58,138,0.3)] border border-slate-700/50 p-4 sm:p-6 md:p-8 cursor-pointer z-10 min-h-[120px] sm:min-h-[160px] flex flex-col justify-center"
-                        onClick={() => {
-                            soundManager.playSFX('typing', 0.6);
-                            advanceDialogue();
-                        }}
+                        onClick={handleClick}
                     >
+                        {/* Progress Counter */}
+                        <div className="absolute -top-3 right-6 bg-slate-800 text-slate-400 text-[10px] font-bold px-2 py-0.5 rounded-t-md border-x border-t border-slate-700/50 uppercase tracking-widest">
+                            {dialogueIndex + 1} / {currentDialogue.length}
+                        </div>
+
                         {/* Character Name Tag */}
                         <div className={`absolute -top-4 sm:-top-5 left-4 sm:left-8 px-3 sm:px-6 py-1 sm:py-2 rounded-xl text-white font-black text-sm sm:text-base md:text-lg shadow-lg transform -rotate-1 ${bgColor}`}>
                             {displayName.toUpperCase()}
@@ -112,13 +148,15 @@ export const DialogueBox: React.FC = () => {
 
                         {/* Text Content */}
                         <div className="text-base sm:text-lg md:text-2xl text-slate-200 font-medium leading-relaxed font-sans mt-2">
-                            <LeanTooltipText text={processedText} />
+                            <LeanTooltipText text={displayedText} />
                         </div>
 
                         {/* Continue Indicator */}
-                        <div className="absolute bottom-2 sm:bottom-4 right-4 sm:right-6 text-slate-400 text-xs sm:text-sm animate-pulse font-bold tracking-widest uppercase flex items-center gap-1">
-                            Next <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                        </div>
+                        {!isTyping && (
+                            <div className="absolute bottom-2 sm:bottom-4 right-4 sm:right-6 text-slate-400 text-xs sm:text-sm animate-pulse font-bold tracking-widest uppercase flex items-center gap-1">
+                                Next <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                            </div>
+                        )}
                     </div>
                 </div>
             </motion.div>

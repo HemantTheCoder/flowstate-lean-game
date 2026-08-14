@@ -31,6 +31,22 @@ export default function Home() {
   const [pendingFeature, setPendingFeature] = useState<'multiplayer' | null>(null);
   const [showCaseStudies, setShowCaseStudies] = useState(false);
   const [showLeanAI, setShowLeanAI] = useState(false);
+  const [tipIndex, setTipIndex] = useState(0);
+
+  const LEAN_TIPS = [
+    "Lean Tip: Finishing beats starting.",
+    "Lean Tip: Identify the bottleneck before optimizing.",
+    "Lean Tip: Unused inventory is wasted cash.",
+    "Lean Tip: Small batches flow faster.",
+    "Lean Tip: Respect the WIP limit to reduce chaos."
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTipIndex(prev => (prev + 1) % LEAN_TIPS.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     soundManager.playBGM('menu', 0.3);
@@ -130,6 +146,14 @@ export default function Home() {
         )}
       </div>
 
+      {/* v1.0 BETA Badge */}
+      <div className="absolute bottom-6 left-6 z-50">
+        <div className="bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700/50 flex items-center gap-2 shadow-xl">
+          <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">v1.0 BETA</span>
+        </div>
+      </div>
+
       {/* Main Content Container - Visual Novel Title Screen Layout */}
       <div className="z-10 w-full max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 relative">
 
@@ -147,10 +171,21 @@ export default function Home() {
               <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">A Lean Construction Story</span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-indigo-100 to-indigo-400 tracking-tight mb-2 drop-shadow-[0_0_30px_rgba(99,102,241,0.4)]">
+            <motion.h1 
+              initial={{ opacity: 0, filter: "blur(10px)", scale: 1.1 }}
+              animate={{ 
+                opacity: 1, 
+                filter: "blur(0px)",
+                scale: 1,
+                x: [0, -5, 5, -2, 2, 0],
+                skewX: [0, -10, 10, -5, 5, 0]
+              }}
+              transition={{ duration: 0.8, ease: "easeOut", times: [0, 0.2, 0.4, 0.6, 0.8, 1] }}
+              className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-indigo-100 to-indigo-400 tracking-tight mb-2 drop-shadow-[0_0_30px_rgba(99,102,241,0.4)]"
+            >
               FLOW
               <span className="block text-2xl sm:text-4xl md:text-6xl lg:text-7xl mt-[-6px] sm:mt-[-10px] text-cyan-400 opacity-100 drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]">STATE</span>
-            </h1>
+            </motion.h1>
 
             <p className="text-sm sm:text-lg md:text-xl text-slate-300 font-bold mb-4 tracking-widest uppercase mt-4 max-w-lg mx-auto md:mx-0 drop-shadow-md">
               Master the Flow. Eliminate the Waste.
@@ -183,6 +218,22 @@ export default function Home() {
               </span>
             </motion.button>
           </Link>
+
+          {/* Rotating Lean Tip Pill */}
+          <div className="flex justify-center h-6 overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={tipIndex}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="text-[10px] font-bold text-cyan-400/80 tracking-widest uppercase"
+              >
+                {LEAN_TIPS[tipIndex]}
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
           {/* Main Menu Grid */}
           <div className="grid grid-cols-2 gap-3 mt-1">

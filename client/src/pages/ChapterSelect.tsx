@@ -12,6 +12,7 @@ export interface ChapterDef {
     description: string;
     isLocked: boolean;
     theme: string;
+    playtime?: string;
     isComingSoon?: boolean;
 }
 
@@ -21,28 +22,32 @@ const CHAPTERS: ChapterDef[] = [
         title: "Episode 1: The Basics of Flow",
         description: "Learn the fundamentals of Lean Construction by completing simple tasks efficiently.",
         isLocked: false, // Always unlocked
-        theme: "blue"
+        theme: "blue",
+        playtime: "~15 min"
     },
     {
         id: 1,
         title: "Episode 2: The Last Planner",
         description: "Experience the Last Planner System. Manage promises, handle constraints, and track PPC.",
         isLocked: true, // Will be dynamically checked
-        theme: "emerald"
+        theme: "emerald",
+        playtime: "~25 min"
     },
     {
         id: 2,
         title: "Episode 3: The 5S Principles",
         description: "Organize the chaotic depot. Sort, Set in order, Shine, Standardize, and Sustain.",
         isLocked: true,
-        theme: "amber"
+        theme: "amber",
+        playtime: "~20 min"
     },
     {
         id: 3,
         title: "Episode 4: Pull & JIT Systems",
         description: "Master Pull Systems and JIT (Just-in-Time) delivery to eliminate overproduction waste.",
         isLocked: true,
-        theme: "purple"
+        theme: "purple",
+        playtime: "~30 min"
     }
 ];
 
@@ -85,7 +90,7 @@ export default function ChapterSelect() {
     const [showUpcomingModal, setShowUpcomingModal] = useState(false);
 
     // Get unlocked chapters from state
-    const { unlockedChapters, setChapter } = useGameStore();
+    const { unlockedChapters, setChapter, chapter: activeChapter, day: currentDay } = useGameStore();
 
     useEffect(() => {
         soundManager.playBGM('menu', 0.3);
@@ -210,9 +215,16 @@ export default function ChapterSelect() {
                                 <div className="relative z-10 flex flex-col h-full">
                                     <div className="flex justify-between items-start mb-6">
                                         <div>
-                                            <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 bg-black/40 border ${theme.border} ${theme.color}`}>
-                                                Episode 0{index + 1}
-                                            </span>
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-black/40 border ${theme.border} ${theme.color}`}>
+                                                    Episode 0{index + 1}
+                                                </span>
+                                                {chapter.playtime && (
+                                                    <span className="flex items-center gap-1 text-[10px] font-bold text-slate-400 bg-black/20 px-2 py-1 rounded-md border border-slate-700/50">
+                                                        <Timer className="w-3 h-3" /> {chapter.playtime}
+                                                    </span>
+                                                )}
+                                            </div>
                                             <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight drop-shadow-md">
                                                 {chapter.title}
                                             </h2>
@@ -229,9 +241,38 @@ export default function ChapterSelect() {
                                         )}
                                     </div>
 
-                                    <p className="text-slate-300 font-light text-base md:text-lg leading-relaxed mb-8 flex-1 opacity-90">
+                                    <p className="text-slate-300 font-light text-base md:text-lg leading-relaxed mb-6 flex-1 opacity-90">
                                         {chapter.description}
                                     </p>
+
+                                    {/* Progress Bar */}
+                                    {!isEffectivelyLocked && !chapter.isComingSoon && (
+                                        <div className="mb-6">
+                                            {(() => {
+                                                let progress = 0;
+                                                const maxUnlocked = Math.max(...unlockedChapters);
+                                                if (storeChapterId < maxUnlocked) {
+                                                    progress = 100; // Completed
+                                                } else if (storeChapterId === activeChapter) {
+                                                    // Estimate progress based on current day vs typical 5-day chapter length
+                                                    // Day starts at 1, 6, 12, etc depending on chapter. 
+                                                    // A simple proxy: we know the player has started it.
+                                                    // We can cap it between 10% and 90% for a "started" chapter.
+                                                    const dayOffset = ((currentDay - 1) % 5) + 1; 
+                                                    progress = Math.min(90, Math.max(10, (dayOffset / 5) * 100));
+                                                }
+
+                                                return (
+                                                    <div className="w-full bg-slate-900/50 rounded-full h-1.5 overflow-hidden border border-slate-700/50">
+                                                        <div 
+                                                            className={`h-full ${progress === 100 ? theme.button : 'bg-slate-400'} transition-all duration-1000`} 
+                                                            style={{ width: `${progress}%` }} 
+                                                        />
+                                                    </div>
+                                                );
+                                            })()}
+                                        </div>
+                                    )}
 
                                     <div className="pt-6 border-t border-white/10 flex justify-between items-center relative">
                                         {chapter.isComingSoon ? (

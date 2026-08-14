@@ -412,6 +412,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         columns: chapter2Columns,
         funds: 25000000,
         materials: 500,
+        earnedValue: 22.7, // 5 / 22 tasks completed
         dailyMetrics: [],
         previousDoneCount: 0,
         previousWasteCount: 0,
@@ -439,6 +440,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         ],
         funds: 40000000,
         materials: 1000,
+        earnedValue: 54.5, // 12 / 22 tasks completed
         depotItems: [
           // Row 1
           { id: 'd-1', type: 'tool', name: 'Power Drill', idealZoneId: 'zone-tools', currentZoneId: 'unassigned' },
@@ -490,6 +492,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         columns: INITIAL_COLUMNS,
         funds: 10000,
         materials: 500,
+        earnedValue: 77.2, // 17 / 22 tasks completed
         hoistSlots: 3,
         pdi: 0,
         reworkRate: 0,
@@ -523,6 +526,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         columns: INITIAL_COLUMNS,
         funds: 20000,
         materials: 1000,
+        earnedValue: 100, // Project Complete Baseline
         trafficImpact: 0,
         segmentBuffers: {
           's1': 0, 's2': 0, 's3': 0, 's4': 0, 's5': 0, 's6': 0, 's7': 0, 's8': 0
