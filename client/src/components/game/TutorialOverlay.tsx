@@ -36,7 +36,7 @@ interface Props {
 }
 
 export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
-    const { chapter, tutorialStep, tutorialActive, completeTutorial, setTutorialStep, setFlag } = useGameStore();
+    const { chapter, day, flags, tutorialStep, tutorialActive, completeTutorial, setTutorialStep, setFlag } = useGameStore();
     const [spotlightPos, setSpotlightPos] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
 
     useEffect(() => {
