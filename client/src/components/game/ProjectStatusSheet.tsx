@@ -73,6 +73,23 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
     return <Badge variant="outline" className="text-slate-400 border-slate-700">Planned</Badge>;
   };
 
+  // Calculate Planned Value (PV) time-phased by current day/month
+  const PV = CONSTRUCTION_TASKS.reduce((acc, task, idx) => {
+    const pMonth = getPlannedMonth(idx + 1);
+    if (pMonth <= day) {
+      return acc + (task.costToStart || 0);
+    }
+    return acc;
+  }, 0);
+
+  // Calculate Earned Value (EV) as BCWP (sum of planned costs of completed tasks)
+  const EV = doneTasks.reduce((acc, task) => {
+    const origTask = CONSTRUCTION_TASKS.find(t => t.id === (task.originalId || task.id));
+    return acc + (origTask?.costToStart || 0);
+  }, 0);
+
+  const AC = 15000000 - funds;
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -195,15 +212,15 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                   <div className="grid grid-cols-3 gap-4">
                     <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700 text-center">
                        <div className="text-[10px] text-slate-400 uppercase font-bold">Planned Value (PV)</div>
-                       <div className="text-lg font-mono font-bold text-slate-200">{formatCurrency(15000000, currency)}</div>
+                       <div className="text-lg font-mono font-bold text-slate-200">{formatCurrency(PV, currency)}</div>
                     </div>
                     <div className="bg-cyan-950/20 p-3 rounded-lg border border-cyan-800/50 text-center shadow-[0_0_15px_rgba(6,182,212,0.1)]">
                        <div className="text-[10px] text-cyan-400 uppercase font-bold">Earned Value (EV)</div>
-                       <div className="text-lg font-mono font-black text-cyan-400">{formatCurrency(15000000 * (useGameStore.getState().earnedValue / 100), currency)}</div>
+                       <div className="text-lg font-mono font-black text-cyan-400">{formatCurrency(EV, currency)}</div>
                     </div>
                     <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700 text-center">
                        <div className="text-[10px] text-slate-400 uppercase font-bold">Actual Cost (AC)</div>
-                       <div className="text-lg font-mono font-bold text-slate-200">{formatCurrency(15000000 - funds, currency)}</div>
+                       <div className="text-lg font-mono font-bold text-slate-200">{formatCurrency(AC, currency)}</div>
                     </div>
                   </div>
                 </div>

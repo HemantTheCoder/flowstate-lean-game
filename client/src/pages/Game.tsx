@@ -98,6 +98,32 @@ export default function Game() {
     prevPhaseRef.current = phase;
   }, [phase]);
 
+  // Dev shortcut for screenshot capture (development only)
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      (window as any).__dev_jumpToMilestone = () => {
+        const store = useGameStore.getState();
+        const allTasks = store.columns.flatMap(c => c.tasks).sort((a, b) => (a.stepNumber || 0) - (b.stepNumber || 0));
+        
+        if (allTasks.length < 4) return;
+        
+        const doneTasks = allTasks.slice(0, 3);
+        const doingTask = allTasks[3]; // task-4 (Foundation poured - triggers milestone toast)
+        const backlogTasks = allTasks.slice(4);
+        
+        useGameStore.setState({
+           columns: [
+             { id: 'backlog', title: 'Backlog', tasks: backlogTasks },
+             { id: 'ready', title: 'Ready', tasks: [] },
+             { id: 'doing', title: 'Doing', tasks: [doingTask] },
+             { id: 'done', title: 'Done', tasks: doneTasks }
+           ]
+        });
+        console.log("Jumped state: task-4 is now in Doing. Drag to Done to trigger milestone toast.");
+      };
+    }
+  }, []);
+
 
   // 1. Hydrate Store from Server on Load
   const hydratedRef = React.useRef(false);
