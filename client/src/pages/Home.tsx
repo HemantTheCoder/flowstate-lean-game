@@ -323,9 +323,7 @@ export default function Home() {
           </div>
 
           <div className="mt-2 sm:mt-4 flex flex-col items-center gap-1">
-            <p className="text-slate-500 hover:text-slate-400 text-[10px] font-bold uppercase tracking-widest text-center transition-colors">
-              Made by <a href="https://www.linkedin.com/in/hemant-kumar-b2b512300" target="_blank" rel="noopener noreferrer" className="text-cyan-500 hover:text-cyan-400 transition-colors drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">Hemant Kumar</a>
-            </p>
+
             <Link href="/dev" className="group flex items-center gap-1 opacity-20 hover:opacity-100 transition-opacity">
               <Terminal className="w-3 h-3 text-slate-500 group-hover:text-cyan-400" />
               <span className="text-[8px] uppercase tracking-widest text-slate-500 group-hover:text-cyan-400 font-bold">Dev Console</span>
