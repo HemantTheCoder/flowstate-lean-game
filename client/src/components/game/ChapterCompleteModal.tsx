@@ -1,13 +1,15 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore, formatCurrency } from '@/store/gameStore';
+import { GAME_CONSTANTS } from '@/config/constants';
 import soundManager from '@/lib/soundManager';
 import { apiRequest } from '@/lib/queryClient';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
-import { Play, CheckCircle2, AlertTriangle, TrendingUp, Target, Award, Lightbulb, ChevronRight, Zap, Users, Hammer, CloudRain, Shield, Download, Trophy, Share2 } from 'lucide-react';
+import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
+import { Play, CheckCircle2, AlertTriangle, TrendingUp, Target, Award, Lightbulb, ChevronRight, Zap, Users, Shield, Download, Trophy, Share2, Activity, TrendingDown } from 'lucide-react';
 import { exportChapterReport } from '@/lib/exportPDF';
 import { AnimatedCounter, PerformanceGrade } from '@/components/game/AnimatedCounter';
 import ShareableCard from '@/components/game/ShareableCard';
+import { CONSTRUCTION_TASKS } from '@/data/tasks';
 
 interface DayBreakdown {
     day: number;
@@ -158,9 +160,6 @@ const KanbanBadge: React.FC<{ tier: { label: string; color: string } }> = ({ tie
     );
 };
 
-import { CONSTRUCTION_TASKS } from '@/data/tasks';
-import { Badge } from '@/components/ui/badge';
-
 export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => void; onContinue: () => void; quizScore?: number }> = ({ isOpen, onClose, onContinue, quizScore }) => {
     const { funds, currency, lpi, dailyMetrics, flags, cumulativeTasksCompleted, cumulativePotentialCapacity, playerName, chapter } = useGameStore();
     const [activeDay, setActiveDay] = useState<number | null>(null);
@@ -188,13 +187,11 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
             soundManager.playSFX('success', 0.8);
             const timer = setTimeout(() => setShowInsights(true), 1500);
 
-            // Achievements
             unlockBadge('flow_master');
             if (finalEfficiency >= 80) unlockBadge('efficiency_expert');
             if (!pushed && flags['decision_pull_enforced']) unlockBadge('lean_thinker');
             unlockBadge('first_day');
 
-            // Auto-submit score to update Career Stats & Leaderboard
             handleSubmitScore();
 
             return () => clearTimeout(timer);
@@ -241,7 +238,6 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
 
     const getImprovementSuggestions = () => {
         const suggestions: { icon: any; text: string; priority: 'high' | 'medium' | 'low' }[] = [];
-
         const metrics = dailyMetrics as DayBreakdown[];
 
         metrics.forEach((m) => {
@@ -249,21 +245,21 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                 if (m.day === 1) {
                     suggestions.push({
                         icon: Target,
-                        text: 'Day 1: Complete tasks up to WIP limit for maximum throughput',
+                        text: `${GAME_CONSTANTS.TIME_UNIT} 1: Complete tasks up to WIP limit for maximum throughput`,
                         priority: 'high'
                     });
                 }
                 if (m.day === 2) {
                     suggestions.push({
                         icon: Zap,
-                        text: 'Day 2: When materials run out, pivot to zero-cost tasks',
+                        text: `${GAME_CONSTANTS.TIME_UNIT} 2: When materials run out, pivot to zero-cost tasks`,
                         priority: 'high'
                     });
                 }
                 if (m.day === 3) {
                     suggestions.push({
                         icon: AlertTriangle,
-                        text: 'Day 3: Rain blocks structural work - adapt with indoor tasks',
+                        text: `${GAME_CONSTANTS.TIME_UNIT} 3: Rain blocks structural work - adapt with indoor tasks`,
                         priority: 'medium'
                     });
                 }
@@ -273,7 +269,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
         if (pushed) {
             suggestions.push({
                 icon: Lightbulb,
-                text: 'Day 4: Choosing Pull over Push avoids creating rework waste',
+                text: `${GAME_CONSTANTS.TIME_UNIT} 4: Choosing Pull over Push avoids creating rework waste`,
                 priority: 'high'
             });
         }
@@ -297,11 +293,11 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
 
         metrics.forEach((m) => {
             if (m.efficiency >= 80) {
-                if (m.day === 1) successes.push('Mastered WIP limits on Day 1');
-                if (m.day === 2) successes.push('Adapted to material constraints');
-                if (m.day === 3) successes.push('Handled weather variation');
-                if (m.day === 4 && !pushed) successes.push('Made the right Pull decision');
-                if (m.day === 5) successes.push('Passed inspection with clean flow');
+                if (m.day === 1) successes.push(`Mastered WIP limits on ${GAME_CONSTANTS.TIME_UNIT} 1`);
+                if (m.day === 2) successes.push(`Adapted to material constraints on ${GAME_CONSTANTS.TIME_UNIT} 2`);
+                if (m.day === 3) successes.push(`Handled weather variation on ${GAME_CONSTANTS.TIME_UNIT} 3`);
+                if (m.day === 4 && !pushed) successes.push(`Made the right Pull decision on ${GAME_CONSTANTS.TIME_UNIT} 4`);
+                if (m.day === 5) successes.push(`Passed inspection with clean flow on ${GAME_CONSTANTS.TIME_UNIT} 5`);
             }
         });
 
@@ -312,7 +308,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
 
     const chartData = (dailyMetrics as DayBreakdown[]).map(m => ({
         ...m,
-        dayLabel: `Month ${m.day}`,
+        dayLabel: `${GAME_CONSTANTS.TIME_UNIT} ${m.day}`,
         fill: m.efficiency >= 80 ? '#22c55e' : m.efficiency >= 50 ? '#3b82f6' : '#f59e0b'
     }));
 
@@ -328,7 +324,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                         transition={{ type: "spring", bounce: 0.5 }}
                         className="bg-slate-900 w-full max-w-3xl max-h-[95vh] rounded-3xl shadow-[0_0_50px_rgba(34,197,94,0.15)] overflow-hidden border border-green-500/30 relative flex flex-col"
                     >
-                        <div className="bg-gradient-to-r from-green-400 to-emerald-600 px-6 py-8 flex flex-col items-center justify-center relative overflow-hidden">
+                        <div className="bg-gradient-to-r from-green-400 to-emerald-600 px-6 py-8 flex flex-col items-center justify-center relative overflow-hidden shrink-0">
                             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-30"></div>
                             <motion.div
                                 initial={{ scale: 0 }}
@@ -464,7 +460,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                             exit={{ opacity: 0 }}
                                             className="mt-3 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg text-sm text-blue-300"
                                         >
-                                            <strong>Day {activeDay}:</strong> {chartData.find(d => d.day === activeDay)?.insight}
+                                            <strong>{GAME_CONSTANTS.TIME_UNIT} {activeDay}:</strong> {chartData.find(d => d.day === activeDay)?.insight}
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
@@ -494,8 +490,8 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         <tbody className="divide-y divide-slate-700/50">
                                             {CONSTRUCTION_TASKS.slice(0, 5).map((task) => {
                                                 const plannedCost = task.costToStart || 0;
-                                                const finalCost = plannedCost * 1.02; // Minor variance post-Kanban
-                                                const preKanbanCost = plannedCost * 1.15; // 15% overrun
+                                                const finalCost = plannedCost * 1.02;
+                                                const preKanbanCost = plannedCost * 1.15;
                                                 const saved = preKanbanCost - finalCost;
                                                 
                                                 return (
@@ -547,7 +543,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         onClick={() => setActiveDay(activeDay === day.day ? null : day.day)}
                                         data-testid={`card-day-${day.day}`}
                                     >
-                                        <div className="text-[10px] font-bold text-slate-400 uppercase">Day {day.day}</div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase">{GAME_CONSTANTS.TIME_UNIT} {day.day}</div>
                                         <div className={`text-xl font-black ${day.efficiency >= 80 ? 'text-green-400' :
                                             day.efficiency >= 50 ? 'text-blue-400' : 'text-orange-400'
                                             }`}>
@@ -693,9 +689,9 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         const metrics = dailyMetrics as DayBreakdown[];
                                         const keyDecisions: { label: string; outcome: 'good' | 'bad' }[] = [];
                                         if (pushed) {
-                                            keyDecisions.push({ label: 'Chose to Push work on Day 4 (created rework waste)', outcome: 'bad' });
+                                            keyDecisions.push({ label: `Chose to Push work on ${GAME_CONSTANTS.TIME_UNIT} 4 (created rework waste)`, outcome: 'bad' });
                                         } else if (flags['decision_pull_made']) {
-                                            keyDecisions.push({ label: 'Chose Pull over Push on Day 4 (avoided waste)', outcome: 'good' });
+                                            keyDecisions.push({ label: `Chose Pull over Push on ${GAME_CONSTANTS.TIME_UNIT} 4 (avoided waste)`, outcome: 'good' });
                                         }
                                         exportChapterReport({
                                             playerName,

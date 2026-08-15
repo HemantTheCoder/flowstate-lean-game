@@ -8,6 +8,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { AnimatedCounter, PerformanceGrade } from '@/components/game/AnimatedCounter';
 import { exportChapterReport } from '@/lib/exportPDF';
 import ShareableCard from '@/components/game/ShareableCard';
+import { GAME_CONSTANTS } from '@/config/constants';
 
 interface Chapter2CompleteModalProps {
     isOpen: boolean;
@@ -42,7 +43,7 @@ const DAY_INSIGHTS: Record<number, { title: string; concept: string; lesson: str
         example: "Top-performing sites protect their commitments. When a client asks for extra work, they negotiate timelines rather than overcommitting."
     },
     10: {
-        title: "Execution Day",
+        title: `Execution ${GAME_CONSTANTS.TIME_UNIT}`,
         concept: "Promise Keeping",
         lesson: "You executed your plan. Sound tasks flow smoothly; unready tasks create chaos.",
         example: "When Make Ready is done well, crews spend 70%+ of their time on value-adding work instead of searching, waiting, or improvising."
@@ -187,10 +188,10 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.5, opacity: 0 }}
                         transition={{ type: "spring", bounce: 0.4 }}
-                        className="bg-slate-900 border border-slate-700/50 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden relative"
+                        className="bg-slate-900 border border-slate-700/50 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden relative flex flex-col"
                     >
-                        <div className={`bg-gradient-to-r ${getPPCBg()} h-32 flex flex-col items-center justify-center relative overflow-hidden`}>
-                            <h1 className="text-4xl font-black text-white z-10 drop-shadow-lg text-center">
+                        <div className={`bg-gradient-to-r ${getPPCBg()} h-32 flex flex-col items-center justify-center relative overflow-hidden shrink-0`}>
+                            <h1 className="text-4xl font-black text-white z-10 drop-shadow-lg text-center shrink-0">
                                 Chapter 2 Complete
                             </h1>
                             <p className="text-white/80 font-bold tracking-widest uppercase mt-1">{tier.title}</p>
@@ -226,11 +227,11 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
 
                             <div className="bg-slate-800/40 rounded-2xl border border-slate-700/50 p-4" data-testid="chart-ppc-daily">
                                 <h4 className="font-bold text-slate-300 text-sm uppercase mb-3 flex items-center gap-2">
-                                    <BarChart3 className="w-4 h-4" /> Commitment Reliability by Day
+                                    <BarChart3 className="w-4 h-4" /> Commitment Reliability by {GAME_CONSTANTS.TIME_UNIT}
                                 </h4>
                                 <div className="h-44">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={dailyMetrics.filter(m => m.day >= 6 && m.day <= 11).map(m => ({ dayLabel: `Month ${m.day}`, efficiency: m.efficiency, day: m.day }))}>
+                                        <BarChart data={dailyMetrics.filter(m => m.day >= 6 && m.day <= 11).map(m => ({ dayLabel: `${GAME_CONSTANTS.TIME_UNIT} ${m.day}`, efficiency: m.efficiency, day: m.day }))}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                                             <XAxis dataKey="dayLabel" tick={{ fill: '#94a3b8', fontSize: 12 }} />
                                             <YAxis domain={[0, 100]} tick={{ fill: '#94a3b8', fontSize: 12 }} tickFormatter={(v: number) => `${v}%`} />
@@ -341,7 +342,7 @@ export const Chapter2CompleteModal: React.FC<Chapter2CompleteModalProps> = ({ is
 
                             <div className="space-y-2">
                                 <h4 className="font-bold text-slate-300 text-sm uppercase flex items-center gap-2">
-                                    <BookOpen className="w-4 h-4" /> Day-by-Day Breakdown
+                                    <BookOpen className="w-4 h-4" /> {GAME_CONSTANTS.TIME_UNIT}-by-{GAME_CONSTANTS.TIME_UNIT} Breakdown
                                 </h4>
                                 {[6, 7, 8, 9, 10, 11].map(d => {
                                     const insight = DAY_INSIGHTS[d];

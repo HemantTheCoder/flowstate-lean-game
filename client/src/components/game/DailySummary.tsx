@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { TrendingUp, BookOpen, Lightbulb } from 'lucide-react';
 import soundManager from '@/lib/soundManager';
 import { ResponsiveContainer, AreaChart, Area, ReferenceLine } from 'recharts';
+import { GAME_CONSTANTS } from '@/config/constants';
 
 interface Props {
     isOpen: boolean;
@@ -102,7 +103,6 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
     const dailyMetrics = useGameStore(s => s.dailyMetrics) ?? [];
     const columns = useGameStore(s => s.columns);
     
-    // Derived state - computed during render, stable because columns is selected
     const allTasks = columns.flatMap(c => c.tasks);
     const doneTasksList = columns.find(c => c.id === 'done')?.tasks || [];
     const hasWeights = allTasks.some(t => t.completionWeight);
@@ -143,7 +143,6 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                 className="bg-slate-900 w-full max-w-md max-h-[90vh] rounded-3xl shadow-[0_0_40px_rgba(59,130,246,0.15)] overflow-hidden border border-slate-700/50 flex flex-col"
             >
                 <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-900 p-6 text-center shrink-0 border-b border-blue-500/30 relative overflow-hidden">
-                    {/* NEW: Confetti/Streak Animation */}
                     {dailyEfficiency >= 80 && (
                         <>
                             {Array.from({ length: 12 }).map((_, i) => (
@@ -174,7 +173,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                         </>
                     )}
 
-                    <h2 className="text-3xl font-black text-white uppercase tracking-wider relative z-20">{chapter === 1 ? 'Month' : 'Day'} {displayDay} Complete</h2>
+                    <h2 className="text-3xl font-black text-white uppercase tracking-wider relative z-20">{GAME_CONSTANTS.TIME_UNIT} {displayDay} Complete</h2>
                     <p className="text-blue-200 font-medium mt-1 relative z-20">Site Report</p>
                 </div>
 
@@ -260,13 +259,11 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                         <p className="text-xs text-red-500">Salaries, Equipment Rental, Daily Setup.</p>
                     </div>
 
-                    {/* NEW: Explicit Efficiency Explanation for Any Background */}
                     <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700/50 text-xs text-slate-300 leading-relaxed">
                         <span className="text-blue-400 font-bold">What is Efficiency?</span><br />
                         It measures exactly how much work was <span className="text-green-400 font-bold">completed</span> compared to how much could possibly be completed today. A high percentage means your construction flow is highly reliable and predictable!
                     </div>
 
-                    {/* NEW: Excel Style Overrun Tracker */}
                     <div className="bg-slate-800 rounded-xl border border-slate-600 overflow-hidden shadow-inner font-sans mt-2">
                         <div className="bg-slate-700/50 px-3 py-1.5 border-b border-slate-600 flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -283,7 +280,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                             <div className="py-1.5 bg-slate-700/30">ACTUAL (OVERRUN)</div>
                         </div>
                         <div className="grid grid-cols-3 text-xs text-slate-300 font-mono bg-slate-900 text-center divide-x divide-slate-800 border-b border-slate-800">
-                            <div className="py-2 flex items-center justify-center font-sans font-medium text-slate-300">Time ({chapter === 1 ? 'Months' : 'Days'})</div>
+                            <div className="py-2 flex items-center justify-center font-sans font-medium text-slate-300">Time ({GAME_CONSTANTS.TIME_UNIT}s)</div>
                             <div className="py-2 text-slate-500">{chapter === 1 ? 5 : chapter === 2 ? 11 : 16}</div>
                             <div className={`py-2 font-bold ${displayDay > (chapter === 1 ? 5 : chapter === 2 ? 11 : 16) ? 'text-red-400' : 'text-emerald-400'}`}>
                                 {displayDay} {displayDay > (chapter === 1 ? 5 : chapter === 2 ? 11 : 16) && `(+${displayDay - (chapter === 1 ? 5 : chapter === 2 ? 11 : 16)})`}
@@ -318,7 +315,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                         data-testid="button-next-day"
                         className="w-full bg-blue-600 border border-blue-500/50 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-500 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_4px_20px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2"
                     >
-                        {(displayDay >= 5 && chapter === 1) || (displayDay >= 11 && chapter === 2) || (displayDay >= 16 && chapter === 3) ? 'View Results' : `Start ${chapter === 1 ? 'Month' : 'Day'} ${displayDay + 1}`}
+                        {(displayDay >= 5 && chapter === 1) || (displayDay >= 11 && chapter === 2) || (displayDay >= 16 && chapter === 3) ? 'View Results' : `Start ${GAME_CONSTANTS.TIME_UNIT} ${displayDay + 1}`}
                     </button>
                 </div>
             </motion.div>
