@@ -6,12 +6,10 @@ import soundManager from '@/lib/soundManager';
 import { LeanTooltipText } from './LeanTooltip';
 import { CHARACTERS } from '@/data/characters';
 
-export const DialogueBox: React.FC = () => {
+const DialogueBoxInner: React.FC = () => {
     const { currentDialogue, dialogueIndex, advanceDialogue, playerName, playerGender, weeklyPlan, columns, lpi } = useGameStore();
 
-    if (!currentDialogue) return null;
-
-    const line = currentDialogue[dialogueIndex];
+    const line = currentDialogue![dialogueIndex];
 
     // Calculate Dynamic Stats for Text Replacement
     const promised = weeklyPlan.length;
@@ -163,4 +161,10 @@ export const DialogueBox: React.FC = () => {
             </motion.div>
         </AnimatePresence>
     );
+};
+
+export const DialogueBox: React.FC = () => {
+    const currentDialogue = useGameStore(s => s.currentDialogue);
+    if (!currentDialogue) return null;
+    return <DialogueBoxInner />;
 };
