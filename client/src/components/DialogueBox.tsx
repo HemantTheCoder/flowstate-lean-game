@@ -45,7 +45,8 @@ export function DialogueBox({ dialogue, onNext }: DialogueBoxProps) {
     return () => clearInterval(interval);
   }, [dialogue]);
 
-  const handleSkip = () => {
+  const handleSkip = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     if (isTyping) {
       setVisibleText(dialogue.text);
       setIsTyping(false);

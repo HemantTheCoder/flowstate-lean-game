@@ -52,7 +52,8 @@ export const DialogueBox: React.FC = () => {
         return () => clearInterval(interval);
     }, [processedText, dialogueIndex]);
 
-    const handleClick = () => {
+    const handleClick = (e?: React.MouseEvent) => {
+        if (e) e.stopPropagation();
         if (isTyping) {
             setDisplayedText(processedText);
             setIsTyping(false);
