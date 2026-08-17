@@ -10,7 +10,7 @@ export const LeanAIModal: React.FC<LeanAIModalProps> = ({ isOpen, onClose }) => 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[350] flex items-center justify-center bg-[#0A0B1A]/80 backdrop-blur-md p-4 pointer-events-auto overflow-hidden">
+        <div className="fixed inset-0 z-[350] flex items-center justify-center bg-[#0A0B1A]/60 backdrop-blur-sm p-4 pointer-events-auto overflow-hidden">
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}

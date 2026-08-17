@@ -31,7 +31,7 @@ export const DayBriefingModal: React.FC = () => {
     };
 
     return (
-        <div className="absolute inset-0 z-[80] flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-4 pointer-events-auto">
+        <div className="absolute inset-0 z-[80] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 pointer-events-auto">
             <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}

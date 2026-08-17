@@ -82,7 +82,7 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
 
     return (
         <>
-        <div className="absolute inset-0 z-[200] flex items-center justify-center bg-slate-950/90 backdrop-blur-md px-4 font-sans pointer-events-auto">
+        <div className="absolute inset-0 z-[200] flex items-center justify-center bg-slate-950/65 backdrop-blur-sm px-4 font-sans pointer-events-auto">
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}

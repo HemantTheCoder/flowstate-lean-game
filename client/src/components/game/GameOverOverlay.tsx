@@ -22,7 +22,7 @@ export function GameOverOverlay({ reason, chapter }: GameOverOverlayProps) {
     };
 
     return (
-        <div className="absolute inset-0 z-[200] flex items-center justify-center bg-slate-950/90 backdrop-blur-xl p-4 sm:p-6 font-sans">
+        <div className="absolute inset-0 z-[200] flex items-center justify-center bg-slate-950/75 backdrop-blur-md p-4 sm:p-6 font-sans">
             <motion.div
                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}

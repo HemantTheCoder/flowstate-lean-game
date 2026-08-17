@@ -12,7 +12,7 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void; onS
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="absolute inset-0 z-[100] flex items-center justify-center bg-[#050812]/80 backdrop-blur-xl p-4 pointer-events-auto font-sans">
+                <div className="absolute inset-0 z-[100] flex items-center justify-center bg-[#050812]/60 backdrop-blur-sm p-4 pointer-events-auto font-sans">
                     <motion.div
                         initial={{ scale: 0.95, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}

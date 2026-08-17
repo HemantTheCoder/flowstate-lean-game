@@ -136,7 +136,7 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
     const lesson = LEAN_LESSONS[displayDay];
 
     return (
-        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 pointer-events-auto">
+        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-950/65 backdrop-blur-sm p-4 pointer-events-auto">
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}

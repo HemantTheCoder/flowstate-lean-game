@@ -23,7 +23,7 @@ export const MasterPlanModal: React.FC = () => {
   return (
     <AnimatePresence>
       <motion.div 
-        className="fixed inset-0 z-[90] flex items-center justify-center p-4 md:p-6 bg-slate-950/90 backdrop-blur-md pointer-events-auto"
+        className="fixed inset-0 z-[90] flex items-center justify-center p-4 md:p-6 bg-slate-950/65 backdrop-blur-sm pointer-events-auto"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
