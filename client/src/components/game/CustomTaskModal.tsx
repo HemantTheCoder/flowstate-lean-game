@@ -224,7 +224,7 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
                                     placeholder="e.g., Install Solar Panels"
-                                    className={`w-full px-3 py-2.5 bg-slate-800/80 border rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all ${errors.title ? 'border-red-500/50' : 'border-slate-700/50'}`}
+                                    className={`w-full px-3 py-2.5 bg-slate-800/80 border rounded-xl text-base md:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all ${errors.title ? 'border-red-500/50' : 'border-slate-700/50'}`}
                                     maxLength={50}
                                 />
                                 {errors.title && <p className="text-xs text-red-400 mt-1">{errors.title}</p>}
@@ -241,7 +241,7 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
                                     onChange={(e) => setDescription(e.target.value)}
                                     placeholder="Describe what this construction task involves..."
                                     rows={3}
-                                    className={`w-full px-3 py-2.5 bg-slate-800/80 border rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all resize-none ${errors.description ? 'border-red-500/50' : 'border-slate-700/50'}`}
+                                    className={`w-full px-3 py-2.5 bg-slate-800/80 border rounded-xl text-base md:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all resize-none ${errors.description ? 'border-red-500/50' : 'border-slate-700/50'}`}
                                 />
                                 {errors.description && <p className="text-xs text-red-400 mt-1">{errors.description}</p>}
                             </div>
@@ -289,7 +289,7 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
                                         value={cost}
                                         onChange={(e) => setCost(Number(e.target.value))}
                                         min={0}
-                                        className={`w-full px-3 py-2 bg-slate-800/80 border rounded-xl text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 ${errors.cost ? 'border-red-500/50' : 'border-slate-700/50'}`}
+                                        className={`w-full px-3 py-2 bg-slate-800/80 border rounded-xl text-base md:text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 ${errors.cost ? 'border-red-500/50' : 'border-slate-700/50'}`}
                                     />
                                     {errors.cost && <p className="text-[10px] text-red-400 mt-1">{errors.cost}</p>}
                                 </div>
@@ -346,7 +346,7 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
                                     value={leanTip}
                                     onChange={(e) => setLeanTip(e.target.value)}
                                     placeholder="e.g., Pull-based scheduling reduces installation waste"
-                                    className="w-full px-3 py-2.5 bg-slate-800/80 border border-slate-700/50 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+                                    className="w-full px-3 py-2.5 bg-slate-800/80 border border-slate-700/50 rounded-xl text-base md:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
                                 />
                                 <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
                                     <Sparkles className="w-3 h-3" /> Educational tip shown when this task is completed

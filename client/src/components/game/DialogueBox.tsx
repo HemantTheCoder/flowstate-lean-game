@@ -106,7 +106,8 @@ const DialogueBoxInner: React.FC = () => {
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 50, opacity: 0 }}
-                className="absolute bottom-4 left-4 right-4 md:left-20 md:right-20 z-50 pointer-events-auto flex items-end justify-center"
+                className="absolute left-4 right-4 md:left-20 md:right-20 z-50 pointer-events-auto flex items-end justify-center"
+                style={{ bottom: 'max(1rem, env(safe-area-inset-bottom))' }}
             >
                 {/* Character Portrait (Left or Right based on speaker?) 
                  For now, let's keep it simple: Image pops up behind the text box

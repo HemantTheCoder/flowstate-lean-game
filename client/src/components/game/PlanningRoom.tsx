@@ -318,7 +318,7 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                 End Day
                             </button>
                             {getEndDayTooltip() && !canEndDay() && (
-                                <div className="invisible group-hover:visible absolute top-full right-0 mt-2 w-64 p-3 bg-slate-900 text-slate-300 text-xs rounded-xl shadow-2xl z-50 border border-slate-700/50">
+                                <div className="visible md:invisible md:group-hover:visible absolute top-full right-0 mt-2 w-64 p-3 bg-slate-900 text-slate-300 text-xs rounded-xl shadow-2xl z-50 border border-slate-700/50">
                                     {getEndDayTooltip()}
                                 </div>
                             )}

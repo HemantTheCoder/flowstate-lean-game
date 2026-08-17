@@ -117,12 +117,30 @@ function TermSpan({ segment }: TermSpanProps) {
     setHovered(false);
   }, []);
 
+  const handleTap = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setHovered((prev) => !prev);
+  }, []);
+
+  // Dismiss on outside tap (mobile has no mouseleave)
+  useEffect(() => {
+    if (!hovered) return;
+    const handleOutside = (e: MouseEvent) => {
+      if (spanRef.current && !spanRef.current.contains(e.target as Node)) {
+        setHovered(false);
+      }
+    };
+    document.addEventListener('click', handleOutside);
+    return () => document.removeEventListener('click', handleOutside);
+  }, [hovered]);
+
   return (
     <>
       <span
         ref={spanRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onClick={handleTap}
         data-testid={`tooltip-term-${segment.term?.term}`}
         className="border-b border-dotted border-blue-400/60 cursor-help"
       >

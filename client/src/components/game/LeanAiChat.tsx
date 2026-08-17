@@ -175,8 +175,8 @@ export const LeanAiChat: React.FC = () => {
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="bg-slate-900 border border-slate-700/50 shadow-2xl rounded-2xl w-80 sm:w-96 overflow-hidden mb-4 pointer-events-auto flex flex-col"
-                        style={{ height: '400px', maxHeight: '70vh' }}
+                        className="bg-slate-900 border border-slate-700/50 shadow-2xl rounded-2xl w-80 sm:w-96 max-w-[calc(100vw-2rem)] overflow-hidden mb-4 pointer-events-auto flex flex-col"
+                        style={{ height: '400px', maxHeight: '70dvh' }}
                     >
                         {/* Header */}
                         <div className="bg-gradient-to-r from-blue-900 to-indigo-900 p-3 flex items-center justify-between border-b border-blue-500/30">

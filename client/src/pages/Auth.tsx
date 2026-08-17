@@ -171,7 +171,7 @@ export default function AuthPage() {
                                                     <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Architect Username</Label>
                                                     <Input
                                                         placeholder="Enter username"
-                                                        className="bg-slate-950 border-slate-800 focus:border-cyan-500/50 h-14 rounded-xl text-white placeholder:text-slate-700 px-5 text-sm transition-all"
+                                                        className="bg-slate-950 border-slate-800 focus:border-cyan-500/50 h-14 rounded-xl text-white placeholder:text-slate-700 px-5 text-base md:text-sm transition-all"
                                                         value={username}
                                                         onChange={(e) => setUsername(e.target.value)}
                                                         required
@@ -182,7 +182,7 @@ export default function AuthPage() {
                                                     <Input
                                                         type="password"
                                                         placeholder="••••••••"
-                                                        className="bg-slate-950 border-slate-800 focus:border-cyan-500/50 h-14 rounded-xl text-white placeholder:text-slate-700 px-5 text-sm transition-all"
+                                                        className="bg-slate-950 border-slate-800 focus:border-cyan-500/50 h-14 rounded-xl text-white placeholder:text-slate-700 px-5 text-base md:text-sm transition-all"
                                                         value={password}
                                                         onChange={(e) => setPassword(e.target.value)}
                                                         required
@@ -212,7 +212,7 @@ export default function AuthPage() {
                                                     <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">New Architect Code</Label>
                                                     <Input
                                                         placeholder="Create username"
-                                                        className="bg-slate-950 border-slate-800 focus:border-indigo-500/50 h-14 rounded-xl text-white placeholder:text-slate-700 px-5 text-sm transition-all"
+                                                        className="bg-slate-950 border-slate-800 focus:border-indigo-500/50 h-14 rounded-xl text-white placeholder:text-slate-700 px-5 text-base md:text-sm transition-all"
                                                         value={username}
                                                         onChange={(e) => setUsername(e.target.value)}
                                                         required
@@ -223,7 +223,7 @@ export default function AuthPage() {
                                                     <Input
                                                         type="password"
                                                         placeholder="Choose password"
-                                                        className="bg-slate-950 border-slate-800 focus:border-indigo-500/50 h-14 rounded-xl text-white placeholder:text-slate-700 px-5 text-sm transition-all"
+                                                        className="bg-slate-950 border-slate-800 focus:border-indigo-500/50 h-14 rounded-xl text-white placeholder:text-slate-700 px-5 text-base md:text-sm transition-all"
                                                         value={password}
                                                         onChange={(e) => setPassword(e.target.value)}
                                                         required

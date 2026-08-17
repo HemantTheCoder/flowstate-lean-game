@@ -1242,7 +1242,8 @@ export default function Game() {
         <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className={`flex justify-center pointer-events-auto pb-2 sm:pb-4 ${chapter >= 4 ? 'hidden' : ''}`}
+          className={`flex justify-center pointer-events-auto ${chapter >= 4 ? 'hidden' : ''}`}
+          style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}
         >
           {/* Stats Bar */}
           <div className="flex items-center gap-3 sm:gap-6 bg-slate-900/60 backdrop-blur-md px-4 sm:px-6 py-3 rounded-2xl border border-white/5 shadow-2xl">

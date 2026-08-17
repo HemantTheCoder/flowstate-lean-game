@@ -98,7 +98,7 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="w-full max-w-6xl h-[90vh] bg-slate-900/90 border border-slate-700/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col glass-panel"
+            className="w-full max-w-6xl h-[90dvh] bg-slate-900/90 border border-slate-700/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col glass-panel"
           >
             {/* Header */}
             <div className="p-6 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10">

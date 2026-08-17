@@ -505,9 +505,9 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                     {!isWaste && col.id === 'backlog' && (
                                                                                         <button
                                                                                             onClick={(e) => { e.stopPropagation(); setReplaceTaskId(task.originalId || task.id); setShowCustomModal(true); }}
-                                                                                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all p-2 bg-slate-700/90 hover:bg-cyan-500/20 border border-slate-600/50 rounded-xl hover:border-cyan-500/40"
+                                                                                            className="absolute top-2 right-2 min-w-[36px] min-h-[36px] flex items-center justify-center opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-all p-2 bg-slate-700/90 hover:bg-cyan-500/20 border border-slate-600/50 rounded-xl hover:border-cyan-500/40 touch-manipulation"
                                                                                         >
-                                                                                            <Replace className="w-3.5 h-3.5 text-slate-400 hover:text-cyan-400" />
+                                                                                            <Replace className="w-4 h-4 text-slate-400 hover:text-cyan-400" />
                                                                                         </button>
                                                                                     )}
                                                                                 </div>
