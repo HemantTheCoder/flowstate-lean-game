@@ -1161,7 +1161,7 @@ export default function Game() {
         <motion.div
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className={`flex flex-col md:flex-row items-stretch pointer-events-auto w-full max-w-6xl mx-auto bg-slate-900/95 backdrop-blur-xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border-2 border-slate-700/50 overflow-hidden ${chapter >= 4 ? 'hidden' : ''}`}
+          className={`flex flex-col md:flex-row items-stretch pointer-events-auto w-full max-w-6xl mx-auto metal-panel backdrop-blur-xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border-2 border-slate-700/50 overflow-hidden hud-corners text-cyan-500/40 ${chapter >= 4 ? 'hidden' : ''}`}
         >
           {/* Objective Section */}
           <div className="flex-1 p-3 md:p-4 border-b md:border-b-0 md:border-r border-slate-700/50 bg-slate-800/40 flex flex-col justify-center">
@@ -1196,7 +1196,7 @@ export default function Game() {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setShowProjectSheet(true)}
-                className="bg-slate-800 hover:bg-slate-700 border border-slate-600 p-2 rounded-md shadow-sm transition-all"
+                className="min-w-[40px] min-h-[40px] flex items-center justify-center bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-md shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_4px_rgba(0,0,0,0.4)] transition-all"
                 title="Project Status Sheet"
               >
                 <ClipboardList className="w-5 h-5 text-cyan-400" />
@@ -1206,7 +1206,7 @@ export default function Game() {
                 id="btn-save"
                 onClick={() => handleSave()}
                 disabled={saveGame.isPending}
-                className="bg-slate-800 hover:bg-slate-700 border border-slate-600 p-2 rounded-md shadow-sm transition-all"
+                className="min-w-[40px] min-h-[40px] flex items-center justify-center bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-md shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_4px_rgba(0,0,0,0.4)] transition-all"
                 title="Save Game"
               >
                 {saveGame.isPending ? (
@@ -1222,7 +1222,7 @@ export default function Game() {
                   soundManager.playSFX('click', audioSettings.sfxVolume);
                   setShowSettings(true);
                 }}
-                className="bg-slate-800 hover:bg-slate-700 border border-slate-600 p-2 rounded-md shadow-sm transition-all pointer-events-auto"
+                className="min-w-[40px] min-h-[40px] flex items-center justify-center bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-md shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_2px_4px_rgba(0,0,0,0.4)] transition-all pointer-events-auto"
                 title="Settings"
               >
                 <Settings className="w-5 h-5 text-slate-300" />
@@ -1230,7 +1230,7 @@ export default function Game() {
 
               <button
                 onClick={handleEndDay}
-                className={`bg-yellow-500 hover:bg-yellow-400 text-yellow-950 font-black px-4 py-2 rounded-md shadow-md uppercase tracking-wider text-[10px] md:text-xs transition-all ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') || getSmartObjective().includes('Project Complete') ? 'animate-pulse ring-2 ring-yellow-400 ring-offset-2 ring-offset-slate-900' : ''}`}
+                className={`min-h-[40px] bg-yellow-500 hover:bg-yellow-400 text-yellow-950 font-black px-4 py-2 rounded-md shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-2px_0_rgba(0,0,0,0.15),0_2px_6px_rgba(0,0,0,0.4)] uppercase tracking-wider text-[10px] md:text-xs transition-all ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') || getSmartObjective().includes('Project Complete') ? 'animate-pulse ring-2 ring-yellow-400 ring-offset-2 ring-offset-slate-900' : ''}`}
               >
                 {(((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 5 && chapter === 4) || (day === 14 && chapter === 5))) ? 'Finish Chapter' : 'End Day'}
               </button>
@@ -1246,7 +1246,7 @@ export default function Game() {
           style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}
         >
           {/* Stats Bar */}
-          <div className="flex items-center gap-3 sm:gap-6 bg-slate-900/60 backdrop-blur-md px-4 sm:px-6 py-3 rounded-2xl border border-white/5 shadow-2xl">
+          <div className="flex items-center gap-3 sm:gap-6 metal-panel backdrop-blur-md px-4 sm:px-6 py-3 rounded-2xl border border-white/5 shadow-2xl hud-corners text-cyan-500/30">
             <div id="lives-box">
               <LifeHearts />
             </div>
@@ -1257,10 +1257,10 @@ export default function Game() {
                 onClick={() => setShowKanban(true)}
                 className="flex flex-col items-center gap-0.5 sm:gap-1 group"
               >
-                <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center transition-colors
+                <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center transition-colors shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]
                   ${chapter === 3 ? 'bg-amber-500/20 text-amber-400 group-hover:bg-amber-500 group-hover:text-white border border-amber-500/30' : 'bg-cyan-500/20 text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white border border-cyan-500/30'}
                 `}>
-                  {chapter === 3 ? <Package className="w-4 h-4 sm:w-6 sm:h-6" /> : <LayoutDashboard className="w-4 h-4 sm:w-6 sm:h-6" />}
+                  {chapter === 3 ? <Package className="w-5 h-5 sm:w-6 sm:h-6" /> : <LayoutDashboard className="w-5 h-5 sm:w-6 sm:h-6" />}
                 </div>
                 <span className="text-[9px] sm:text-xs font-bold text-slate-400">{chapter === 3 ? 'Depot' : 'Kanban'}</span>
               </button>
@@ -1270,8 +1270,8 @@ export default function Game() {
                 className="flex flex-col items-center gap-0.5 sm:gap-1 group"
                 data-testid="button-glossary"
               >
-                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors border border-emerald-500/30">
-                  <BookOpen className="w-4 h-4 sm:w-6 sm:h-6" />
+                <div className="w-11 h-11 sm:w-12 sm:h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors border border-emerald-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                  <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <span className="text-[9px] sm:text-xs font-bold text-slate-400">Glossary</span>
               </button>
@@ -1280,8 +1280,8 @@ export default function Game() {
                 onClick={() => setShowProjectSheet(true)}
                 className="flex flex-col items-center gap-0.5 sm:gap-1 group"
               >
-                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors border border-blue-500/30">
-                  <ClipboardList className="w-4 h-4 sm:w-6 sm:h-6" />
+                <div className="w-11 h-11 sm:w-12 sm:h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors border border-blue-500/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                  <ClipboardList className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <span className="text-[9px] sm:text-xs font-bold text-slate-400">Project</span>
               </button>

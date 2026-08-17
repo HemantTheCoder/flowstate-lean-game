@@ -273,7 +273,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 120 }}
-                className="fixed inset-4 md:inset-8 z-[60] flex items-center justify-center bg-slate-950/85 backdrop-blur-2xl border border-white/10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] pointer-events-none blueprint-bg"
+                className="fixed inset-4 md:inset-8 z-[60] flex items-center justify-center bg-slate-950/85 backdrop-blur-2xl border border-white/10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] pointer-events-none blueprint-bg hud-corners text-cyan-500/30"
             >
                 <div className="absolute inset-0 pointer-events-auto" onClick={onClose} />
                 
@@ -295,7 +295,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                             </p>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-3 md:gap-6 bg-slate-900/40 backdrop-blur-md p-2 rounded-2xl border border-slate-700/30">
+                        <div className="flex flex-wrap items-center gap-3 md:gap-6 metal-panel backdrop-blur-md p-2 rounded-2xl border border-slate-700/30">
                             <div className="flex -space-x-1">
                                 <LifeHearts />
                             </div>
@@ -348,8 +348,8 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                     className={`w-[320px] md:w-[420px] shrink-0 flex flex-col h-full snap-start transition-all duration-300 relative group ${wipBlockedColId === col.id ? 'animate-shake' : ''}`}
                                                 >
                                                     {/* Column Frame */}
-                                                    <div className={`flex flex-col h-full bg-slate-900/60 backdrop-blur-md rounded-[28px] border-2 transition-all duration-500 relative overflow-hidden ${
-                                                        snapshot.isDraggingOver ? 'bg-cyan-500/5 border-cyan-500/40 shadow-[0_0_30px_rgba(6,182,212,0.1)]' : 
+                                                    <div className={`flex flex-col h-full bg-slate-900/60 backdrop-blur-md rounded-[28px] border-2 transition-all duration-500 relative overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_10px_30px_-10px_rgba(0,0,0,0.6)] ${
+                                                        snapshot.isDraggingOver ? 'bg-cyan-500/5 border-cyan-500/40 shadow-[0_0_30px_rgba(6,182,212,0.1)]' :
                                                         isBottleneck ? 'border-red-500/40' : 'border-slate-800/60'
                                                     } ${isBlurred ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
                                                         
@@ -420,9 +420,9 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                     {...provided.draggableProps}
                                                                                     {...provided.dragHandleProps}
                                                                                     style={provided.draggableProps.style}
-                                                                                    className={`group relative bg-slate-800/90 backdrop-blur-xl p-5 rounded-2xl border transition-all duration-300 ${
-                                                                                        snapshot.isDragging 
-                                                                                            ? 'bg-slate-700 border-cyan-400 shadow-[0_25px_60px_-15px_rgba(0,0,0,1)] ring-4 ring-cyan-500/20 z-50 scale-[1.05] cursor-grabbing' 
+                                                                                    className={`group relative bg-slate-800/90 backdrop-blur-xl p-5 rounded-2xl border transition-all duration-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_4px_10px_-4px_rgba(0,0,0,0.5)] ${
+                                                                                        snapshot.isDragging
+                                                                                            ? 'bg-slate-700 border-cyan-400 shadow-[0_25px_60px_-15px_rgba(0,0,0,1)] ring-4 ring-cyan-500/20 z-50 scale-[1.05] cursor-grabbing'
                                                                                             : isDone ? 'border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-500/60 hover:shadow-xl hover:-translate-y-1'
                                                                                             : isAtRisk ? 'border-amber-500/50 bg-amber-950/20 shadow-[0_0_15px_rgba(245,158,11,0.15)] hover:border-amber-500/80 hover:-translate-y-1'
                                                                                             : isOnTrack ? 'border-cyan-500/30 bg-cyan-950/20 hover:border-cyan-500/60 hover:shadow-xl hover:-translate-y-1'

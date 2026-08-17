@@ -119,7 +119,7 @@ export default function ChapterSelect() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-200 p-6 md:p-10 relative overflow-x-hidden font-sans">
+        <div className="min-h-screen bg-slate-900 text-slate-200 p-6 md:p-10 relative overflow-x-hidden font-sans vignette film-grain">
             {/* Character Creation for New Players */}
             <CharacterCreationModal />
 
@@ -181,16 +181,17 @@ export default function ChapterSelect() {
                             border: 'border-slate-700/50',
                             bg: 'bg-slate-800/60',
                             glow: 'rgba(255,255,255,0)',
-                            button: 'bg-slate-700'
+                            button: 'bg-slate-700',
+                            corner: 'text-slate-600/0'
                         };
 
                         if (!isEffectivelyLocked) {
-                            if (chapter.id === 0) theme = { color: 'text-cyan-400', border: 'border-cyan-500/40', bg: 'bg-slate-800/80', glow: 'rgba(34,211,238,0.25)', button: 'bg-cyan-600' };
-                            else if (chapter.id === 1) theme = { color: 'text-emerald-400', border: 'border-emerald-500/40', bg: 'bg-slate-800/80', glow: 'rgba(16,185,129,0.25)', button: 'bg-emerald-600' };
-                            else if (chapter.id === 2) theme = { color: 'text-amber-400', border: 'border-amber-500/40', bg: 'bg-slate-800/80', glow: 'rgba(245,158,11,0.25)', button: 'bg-amber-600' };
-                            else if (chapter.id === 3) theme = { color: 'text-purple-400', border: 'border-purple-500/40', bg: 'bg-slate-800/80', glow: 'rgba(168,85,247,0.25)', button: 'bg-purple-600' };
+                            if (chapter.id === 0) theme = { color: 'text-cyan-400', border: 'border-cyan-500/40', bg: 'bg-slate-800/80', glow: 'rgba(34,211,238,0.25)', button: 'bg-cyan-600', corner: 'text-cyan-500/60' };
+                            else if (chapter.id === 1) theme = { color: 'text-emerald-400', border: 'border-emerald-500/40', bg: 'bg-slate-800/80', glow: 'rgba(16,185,129,0.25)', button: 'bg-emerald-600', corner: 'text-emerald-500/60' };
+                            else if (chapter.id === 2) theme = { color: 'text-amber-400', border: 'border-amber-500/40', bg: 'bg-slate-800/80', glow: 'rgba(245,158,11,0.25)', button: 'bg-amber-600', corner: 'text-amber-500/60' };
+                            else if (chapter.id === 3) theme = { color: 'text-purple-400', border: 'border-purple-500/40', bg: 'bg-slate-800/80', glow: 'rgba(168,85,247,0.25)', button: 'bg-purple-600', corner: 'text-purple-500/60' };
                         } else if (chapter.isComingSoon) {
-                            theme = { color: 'text-cyan-400', border: 'border-cyan-500/40', bg: 'bg-slate-800/60', glow: 'rgba(34,211,238,0.15)', button: 'bg-cyan-900/60' };
+                            theme = { color: 'text-cyan-400', border: 'border-cyan-500/40', bg: 'bg-slate-800/60', glow: 'rgba(34,211,238,0.15)', button: 'bg-cyan-900/60', corner: 'text-cyan-500/40' };
                         }
 
                         return (
@@ -203,7 +204,7 @@ export default function ChapterSelect() {
                                 onMouseLeave={() => setHoveredChapter(null)}
                                 onClick={() => handleSelectChapter(chapter.id, isEffectivelyLocked, chapter.isComingSoon)}
                                 data-testid={`chapter-card-${chapter.id}`}
-                                className={`group relative p-8 backdrop-blur-xl border-2 rounded-3xl flex flex-col justify-between transition-all duration-500 cursor-pointer overflow-hidden ${theme.bg} ${theme.border} ${isEffectivelyLocked && !chapter.isComingSoon ? 'opacity-60 hover:opacity-100' : ''}`}
+                                className={`group relative p-8 metal-panel backdrop-blur-xl border-2 rounded-3xl flex flex-col justify-between transition-all duration-500 cursor-pointer overflow-hidden hud-corners ${theme.bg} ${theme.border} ${theme.corner} ${isEffectivelyLocked && !chapter.isComingSoon ? 'opacity-70 hover:opacity-100 grayscale-[0.4] hover:grayscale-0' : ''}`}
                                 style={{
                                     boxShadow: isHovered && (!isEffectivelyLocked || chapter.isComingSoon) ? `0 20px 40px -10px ${theme.glow}` : '0 10px 30px -10px rgba(0,0,0,0.5)'
                                 }}
@@ -211,6 +212,16 @@ export default function ChapterSelect() {
                                 {/* Internal Animated Gradient Glow */}
                                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
                                     style={{ background: `radial-gradient(circle at 50% 120%, ${theme.glow} 0%, transparent 70%)` }} />
+
+                                {/* Hazard-stripe overlay for locked episodes — reads as "restricted" at a glance */}
+                                {isEffectivelyLocked && !chapter.isComingSoon && (
+                                    <div
+                                        className="absolute top-0 left-0 right-0 h-2 opacity-70 pointer-events-none"
+                                        style={{
+                                            backgroundImage: 'repeating-linear-gradient(45deg, #000 0px, #000 8px, #eab308 8px, #eab308 16px)'
+                                        }}
+                                    />
+                                )}
 
                                 <div className="relative z-10 flex flex-col h-full">
                                     <div className="flex justify-between items-start mb-6">
@@ -284,7 +295,7 @@ export default function ChapterSelect() {
                                                 <Lock className="w-4 h-4" /> Locked Episode
                                             </span>
                                         ) : (
-                                            <span className="flex items-center gap-2 text-white font-bold uppercase tracking-wider text-xs bg-white/10 px-4 py-2 rounded-full border border-white/20 group-hover:bg-white/20 transition-all">
+                                            <span className={`flex items-center gap-2 text-white font-black uppercase tracking-wider text-xs px-5 py-2.5 rounded-full border border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_4px_12px_-4px_rgba(0,0,0,0.5)] group-hover:brightness-110 group-hover:-translate-y-0.5 transition-all ${theme.button}`}>
                                                 Play Episode <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
                                             </span>
                                         )}

@@ -25,6 +25,8 @@ const buttonVariants = {
   tap: { scale: 0.97 }
 };
 
+const DUST_MOTES = Array.from({ length: 14 }, (_, i) => i);
+
 export default function Home() {
   const { user, logoutMutation } = useAuth();
   const [, setLocation] = useLocation();
@@ -59,7 +61,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-slate-900 flex flex-col items-center justify-center p-3 sm:p-6 font-sans">
+    <div className="relative w-full h-screen overflow-hidden bg-slate-900 flex flex-col items-center justify-center p-3 sm:p-6 font-sans vignette film-grain">
 
       {/* Premium Twilight Industrial Ambient Background */}
       <div
@@ -92,6 +94,27 @@ export default function Home() {
           className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-15 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"
         />
         <div className="absolute top-0 right-0 w-[200%] h-[200%] rotate-45 bg-gradient-to-t from-transparent via-cyan-500/[0.03] to-transparent transform -translate-x-[50%] -translate-y-[50%]" />
+
+        {/* Drifting construction dust, catching the ambient light like a real site at dusk */}
+        {DUST_MOTES.map((i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full bg-amber-200/40"
+            style={{
+              left: `${(i * 37) % 100}%`,
+              width: i % 3 === 0 ? 3 : 2,
+              height: i % 3 === 0 ? 3 : 2,
+            }}
+            initial={{ y: '110%', opacity: 0 }}
+            animate={{ y: '-10%', opacity: [0, 0.6, 0.6, 0] }}
+            transition={{
+              duration: 14 + (i % 5) * 3,
+              repeat: Infinity,
+              delay: i * 1.3,
+              ease: 'linear',
+            }}
+          />
+        ))}
       </div>
 
       <div className="absolute top-6 right-6 z-50">
@@ -148,8 +171,8 @@ export default function Home() {
 
       {/* v1.0 BETA Badge */}
       <div className="absolute bottom-6 left-6 z-50">
-        <div className="bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700/50 flex items-center gap-2 shadow-xl">
-          <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+        <div className="metal-panel px-3 py-1.5 rounded-lg border border-slate-700/50 flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
           <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">v1.0 BETA</span>
         </div>
       </div>
@@ -164,7 +187,7 @@ export default function Home() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="flex flex-col justify-center text-center md:text-left"
         >
-          <div className="bg-slate-900/40 backdrop-blur-md p-5 sm:p-8 md:p-10 rounded-2xl md:rounded-3xl border border-slate-700/50 shadow-2xl inline-block w-fit mx-auto md:mx-0">
+          <div className="bg-slate-900/40 backdrop-blur-md p-5 sm:p-8 md:p-10 rounded-2xl md:rounded-3xl border border-slate-700/50 shadow-2xl inline-block w-fit mx-auto md:mx-0 hud-corners text-cyan-500/50">
             {/* Tagline pill */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/90 border border-slate-700/50 mb-6 shadow-md shadow-slate-900/50">
               <HardHat className="w-4 h-4 text-cyan-400" />
@@ -209,7 +232,7 @@ export default function Home() {
               whileHover="hover"
               whileTap="tap"
               data-testid="button-play"
-              className="w-full relative px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-cyan-600 to-indigo-600 rounded-2xl flex items-center justify-between text-white font-black text-lg sm:text-xl uppercase tracking-wider shadow-[0_8px_30px_rgba(99,102,241,0.3)] hover:shadow-[0_12px_40px_rgba(34,211,238,0.4)] overflow-hidden group border border-cyan-400/30"
+              className="w-full relative px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-cyan-600 to-indigo-600 rounded-2xl flex items-center justify-between text-white font-black text-lg sm:text-xl uppercase tracking-wider shadow-[0_8px_30px_rgba(99,102,241,0.3),inset_0_1px_0_rgba(255,255,255,0.25),inset_0_-3px_0_rgba(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgba(34,211,238,0.5),inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-3px_0_rgba(0,0,0,0.2)] overflow-hidden group border border-cyan-400/40 hud-corners text-white/50"
             >
               <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-[200%] transition-transform duration-700 ease-out z-0" />
               <span className="relative z-10 flex items-center gap-3 drop-shadow-md">

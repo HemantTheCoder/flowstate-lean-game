@@ -21,6 +21,82 @@
   .safe-pt {
     padding-top: env(safe-area-inset-top, 0px);
   }
+
+  /* Cinematic edge darkening — draws the eye to center content like a film frame */
+  .vignette {
+    position: relative;
+  }
+  .vignette::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.5) 100%);
+  }
+
+  /* Subtle animated grain — breaks up flat gradients so panels read as physical surfaces */
+  .film-grain {
+    position: relative;
+    isolation: isolate;
+  }
+  .film-grain::before {
+    content: '';
+    position: absolute;
+    inset: -100%;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain-shift 1.5s steps(4) infinite;
+  }
+
+  /* Sci-fi/strategy-game corner brackets. Set `color` (e.g. text-cyan-500/60) to tint. */
+  .hud-corners {
+    position: relative;
+  }
+  .hud-corners::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(to right, currentColor 2px, transparent 2px) top left / 16px 16px no-repeat,
+      linear-gradient(to bottom, currentColor 2px, transparent 2px) top left / 16px 16px no-repeat,
+      linear-gradient(to left, currentColor 2px, transparent 2px) top right / 16px 16px no-repeat,
+      linear-gradient(to bottom, currentColor 2px, transparent 2px) top right / 16px 16px no-repeat,
+      linear-gradient(to right, currentColor 2px, transparent 2px) bottom left / 16px 16px no-repeat,
+      linear-gradient(to top, currentColor 2px, transparent 2px) bottom left / 16px 16px no-repeat,
+      linear-gradient(to left, currentColor 2px, transparent 2px) bottom right / 16px 16px no-repeat,
+      linear-gradient(to top, currentColor 2px, transparent 2px) bottom right / 16px 16px no-repeat;
+  }
+
+  /* Brushed-metal instrument panel: subtle sheen + inset bevel so panels feel physical, not flat */
+  .metal-panel {
+    background-image:
+      linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 35%),
+      linear-gradient(rgba(15,23,42,0.97), rgba(2,6,23,0.98));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.07),
+      inset 0 -1px 0 rgba(0,0,0,0.5),
+      0 12px 32px -12px rgba(0,0,0,0.7);
+  }
+
+  /* Riveted bolt accent — small industrial detail for panel corners */
+  .rivet {
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.5), rgba(0,0,0,0.6) 70%);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.6);
+  }
+}
+
+@keyframes grain-shift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-2%, 2%); }
+  50% { transform: translate(2%, -2%); }
+  75% { transform: translate(-1%, -1%); }
+  100% { transform: translate(0, 0); }
 }
 
 :root {
@@ -63,10 +139,27 @@
     @apply bg-background text-foreground antialiased selection:bg-primary/30;
     font-family: var(--font-body);
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     @apply font-bold text-foreground/90;
+  }
+
+  /* Tactile press feedback on every button, even ones with no per-component :active state */
+  button:not(:disabled) {
+    transition: transform 120ms ease, filter 120ms ease;
+  }
+  button:not(:disabled):active {
+    transform: scale(0.96);
+    filter: brightness(0.94);
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  button:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 }
 
