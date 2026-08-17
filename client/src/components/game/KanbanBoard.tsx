@@ -273,7 +273,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 120 }}
-                className="fixed inset-4 md:inset-8 z-[60] flex items-center justify-center bg-slate-950/85 backdrop-blur-2xl border border-white/10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] pointer-events-none blueprint-bg hud-corners text-cyan-500/30"
+                className="fixed inset-3 sm:inset-6 md:inset-10 lg:inset-16 z-[60] flex items-center justify-center bg-slate-950/75 backdrop-blur-xl border border-white/10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] pointer-events-none blueprint-bg hud-corners hud-tint-cyan"
             >
                 <div className="absolute inset-0 pointer-events-auto" onClick={onClose} />
                 

@@ -101,34 +101,34 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
             className="w-full max-w-6xl h-[90dvh] bg-slate-900/90 border border-slate-700/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col glass-panel"
           >
             {/* Header */}
-            <div className="p-6 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-blue-600/10 to-purple-600/10">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-500/20 rounded-2xl">
-                  <ClipboardList className="w-8 h-8 text-blue-400" />
+            <div className="p-4 sm:p-6 border-b border-white/10 flex items-center justify-between gap-3 bg-gradient-to-r from-blue-600/10 to-purple-600/10 shrink-0">
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div className="p-2.5 sm:p-3 bg-blue-500/20 rounded-2xl shrink-0">
+                  <ClipboardList className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-white tracking-tight">Project Status Sheet</h2>
-                  <p className="text-slate-400 text-sm font-medium">
+                <div className="min-w-0">
+                  <h2 className="text-lg sm:text-2xl font-bold text-white tracking-tight truncate">Project Status Sheet</h2>
+                  <p className="text-slate-400 text-xs sm:text-sm font-medium truncate">
                     {playerName} — {designation} | Project: Affordable Housing Villa
                   </p>
                 </div>
               </div>
-              <Button 
+              <Button
                 id="btn-close-project-sheet"
-                variant="ghost" 
-                size="icon" 
+                variant="ghost"
+                size="icon"
                 onClick={onClose}
-                className="rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                className="rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors shrink-0 min-w-[40px] min-h-[40px]"
               >
                 <X className="w-6 h-6" />
               </Button>
             </div>
 
             {/* Content Container */}
-            <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
-              
+            <div className="flex-1 overflow-y-auto md:overflow-hidden flex flex-col md:flex-row min-h-0">
+
               {/* Left Sidebar: Site Conditions & Metrics */}
-              <div className="w-full md:w-80 border-r border-white/5 bg-slate-900/40 p-6 space-y-6 overflow-y-auto">
+              <div className="w-full md:w-80 shrink-0 border-b md:border-b-0 md:border-r border-white/5 bg-slate-900/40 p-4 sm:p-6 space-y-5 sm:space-y-6 md:overflow-y-auto min-h-0">
                 <div>
                   <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
                     <AlertCircle className="w-3 h-3" /> Site Conditions
@@ -195,9 +195,9 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
               </div>
 
               {/* Main Content: Tasks Excel Table */}
-              <div className="flex-1 p-6 flex flex-col overflow-hidden bg-slate-900/20">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide">
+              <div className="flex-1 p-4 sm:p-6 flex flex-col md:overflow-hidden bg-slate-900/20 min-h-0">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                  <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide">
                     <LayoutGrid className="w-5 h-5 text-purple-400" /> Project Scope & Timeline
                   </h3>
                   <div className="flex items-center gap-3">
@@ -207,25 +207,87 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                   </div>
                 </div>
 
-                <div className="p-4 bg-slate-800/50 rounded-xl mb-4 border border-slate-700/50 shrink-0">
-                  <p className="text-sm text-slate-300 italic mb-3">Earned Value Management: Earned Value (EV) = % of planned work actually completed, valued in ₹.</p>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700 text-center">
-                       <div className="text-[10px] text-slate-400 uppercase font-bold">Planned Value (PV)</div>
-                       <div className="text-lg font-mono font-bold text-slate-200">{formatCurrency(PV, currency)}</div>
+                <div className="p-3 sm:p-4 bg-slate-800/50 rounded-xl mb-4 border border-slate-700/50 shrink-0">
+                  <p className="text-xs sm:text-sm text-slate-300 italic mb-3">Earned Value Management: Earned Value (EV) = % of planned work actually completed, valued in ₹.</p>
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                    <div className="bg-slate-900/50 p-2 sm:p-3 rounded-lg border border-slate-700 text-center">
+                       <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">Planned Value</div>
+                       <div className="text-xs sm:text-lg font-mono font-bold text-slate-200 truncate">{formatCurrency(PV, currency)}</div>
                     </div>
-                    <div className="bg-cyan-950/20 p-3 rounded-lg border border-cyan-800/50 text-center shadow-[0_0_15px_rgba(6,182,212,0.1)]">
-                       <div className="text-[10px] text-cyan-400 uppercase font-bold">Earned Value (EV)</div>
-                       <div className="text-lg font-mono font-black text-cyan-400">{formatCurrency(EV, currency)}</div>
+                    <div className="bg-cyan-950/20 p-2 sm:p-3 rounded-lg border border-cyan-800/50 text-center shadow-[0_0_15px_rgba(6,182,212,0.1)]">
+                       <div className="text-[9px] sm:text-[10px] text-cyan-400 uppercase font-bold">Earned Value</div>
+                       <div className="text-xs sm:text-lg font-mono font-black text-cyan-400 truncate">{formatCurrency(EV, currency)}</div>
                     </div>
-                    <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700 text-center">
-                       <div className="text-[10px] text-slate-400 uppercase font-bold">Actual Cost (AC)</div>
-                       <div className="text-lg font-mono font-bold text-slate-200">{formatCurrency(AC, currency)}</div>
+                    <div className="bg-slate-900/50 p-2 sm:p-3 rounded-lg border border-slate-700 text-center">
+                       <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">Actual Cost</div>
+                       <div className="text-xs sm:text-lg font-mono font-bold text-slate-200 truncate">{formatCurrency(AC, currency)}</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex-1 border border-white/5 rounded-2xl overflow-hidden bg-slate-900/50 backdrop-blur-sm">
+                {/* Mobile: card list, flows naturally so the outer panel scrolls as one column (table below is desktop-only) */}
+                <div className="md:hidden border border-white/5 rounded-2xl overflow-hidden bg-slate-900/50 backdrop-blur-sm">
+                  <div className="divide-y divide-white/5">
+                    {CONSTRUCTION_TASKS.map((task, idx) => {
+                        const plannedCost = task.costToStart || 0;
+                        const actualCost = calculateActualCost(plannedCost);
+                        const isOverBudget = actualCost > plannedCost;
+                        const pMonth = getPlannedMonth(idx + 1);
+                        const aMonth = getActualMonth(idx + 1);
+                        const isDelayed = aMonth > pMonth;
+
+                        return (
+                          <div key={task.id} className="p-4 space-y-2.5">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-start gap-2 min-w-0">
+                                <span className="text-[10px] text-slate-500 font-mono shrink-0 mt-0.5">{idx + 1}</span>
+                                <div className="min-w-0">
+                                  <div className="text-sm font-semibold text-slate-100 leading-snug">{task.title}</div>
+                                  <div className="text-xs text-slate-500 italic mt-0.5 leading-relaxed">{task.description}</div>
+                                </div>
+                              </div>
+                              {getStatusBadge(task.id)}
+                            </div>
+                            {task.materialsRequired && task.materialsRequired.length > 0 && (
+                              <div className="flex flex-wrap gap-1 pl-6">
+                                {task.materialsRequired.map((mat, i) => (
+                                  <span key={i} className="text-[9px] bg-slate-800 text-amber-200/80 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                    Req: {mat.amount} {mat.name}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between gap-2 pl-6 text-xs">
+                              <span className={`font-bold px-2 py-0.5 rounded uppercase text-[10px]
+                                ${task.type === 'Structural' ? 'bg-blue-500/10 text-blue-400' :
+                                  task.type === 'Interior' ? 'bg-purple-500/10 text-purple-400' :
+                                  task.type === 'Systems' ? 'bg-amber-500/10 text-amber-400' :
+                                  'bg-slate-500/10 text-slate-400'}
+                              `}>
+                                {task.type}
+                              </span>
+                              <div className="flex items-center gap-3 font-mono">
+                                <span className="text-slate-400">{formatCurrency(plannedCost, currency)}</span>
+                                <span className="text-slate-600">→</span>
+                                <span className={isOverBudget && chapter === 1 ? 'text-red-400 font-bold' : 'text-emerald-400 font-bold'}>
+                                  {formatCurrency(actualCost, currency)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="pl-6 flex items-center gap-2 text-[10px]">
+                              <span className="text-slate-500">Planned: Month {pMonth}</span>
+                              <span className={`font-bold ${isDelayed ? 'text-red-400' : 'text-emerald-400'}`}>
+                                Actual: Month {aMonth}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+
+                {/* Desktop: full table */}
+                <div className="flex-1 min-h-0 hidden md:block border border-white/5 rounded-2xl overflow-hidden bg-slate-900/50 backdrop-blur-sm">
                   <ScrollArea className="h-full">
                     <table className="w-full text-left border-collapse">
                       <thead className="sticky top-0 z-10 bg-slate-800 text-slate-400 text-[10px] uppercase tracking-widest font-bold shadow-md">
@@ -249,20 +311,20 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                           const isDelayed = aMonth > pMonth;
 
                           return (
-                          <tr key={task.id} className="group hover:bg-white/[0.02] transition-colors">
-                            <td className="px-4 py-4 text-xs text-slate-500 font-mono">{idx + 1}</td>
-                            <td className="px-4 py-4">
-                              <div className="flex flex-col">
-                                <span className="text-sm font-semibold text-slate-200 group-hover:text-white transition-colors">
+                          <tr key={task.id} className="group hover:bg-white/[0.02] transition-colors align-top">
+                            <td className="px-4 py-5 text-xs text-slate-500 font-mono">{idx + 1}</td>
+                            <td className="px-4 py-5">
+                              <div className="flex flex-col gap-1.5 max-w-sm">
+                                <span className="text-sm font-semibold text-slate-200 group-hover:text-white transition-colors leading-snug">
                                   {task.title}
                                 </span>
-                                <span className="text-[10px] text-slate-500 line-clamp-1 max-w-xs italic mb-1">
+                                <span className="text-xs text-slate-500 leading-relaxed">
                                   {task.description}
                                 </span>
                                 {task.materialsRequired && task.materialsRequired.length > 0 && (
-                                  <div className="flex flex-wrap gap-1 mt-1">
+                                  <div className="flex flex-wrap gap-1.5 mt-1">
                                     {task.materialsRequired.map((mat, i) => (
-                                      <span key={i} className="text-[9px] bg-slate-800 text-amber-200/80 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                      <span key={i} className="text-[10px] bg-slate-800 text-amber-200/80 px-1.5 py-0.5 rounded border border-amber-500/20">
                                         Req: {mat.amount} {mat.name}
                                       </span>
                                     ))}
@@ -270,30 +332,30 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                                 )}
                               </div>
                             </td>
-                            <td className="px-4 py-4">
+                            <td className="px-4 py-5">
                               <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase
-                                ${task.type === 'Structural' ? 'bg-blue-500/10 text-blue-400' : 
-                                  task.type === 'Interior' ? 'bg-purple-500/10 text-purple-400' : 
-                                  task.type === 'Systems' ? 'bg-amber-500/10 text-amber-400' : 
+                                ${task.type === 'Structural' ? 'bg-blue-500/10 text-blue-400' :
+                                  task.type === 'Interior' ? 'bg-purple-500/10 text-purple-400' :
+                                  task.type === 'Systems' ? 'bg-amber-500/10 text-amber-400' :
                                   'bg-slate-500/10 text-slate-400'}
                               `}>
                                 {task.type}
                               </span>
                             </td>
-                            <td className="px-4 py-4 text-right">
+                            <td className="px-4 py-5 text-right">
                               <span className="text-xs font-mono text-slate-300">
                                 {formatCurrency(plannedCost, currency)}
                               </span>
                             </td>
-                            <td className="px-4 py-4 text-right">
+                            <td className="px-4 py-5 text-right">
                               <span className={`text-xs font-mono font-bold ${isOverBudget && chapter === 1 ? 'text-red-400' : 'text-emerald-400'}`}>
                                 {formatCurrency(actualCost, currency)}
                               </span>
                               {isOverBudget && chapter === 1 && (
-                                <div className="text-[9px] text-red-500/70">Overrun!</div>
+                                <div className="text-[10px] text-red-500/70 mt-0.5">Overrun!</div>
                               )}
                             </td>
-                            <td className="px-4 py-4 text-center">
+                            <td className="px-4 py-5 text-center">
                               <div className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
                                 <span className="text-slate-400">P: Month {pMonth}</span>
                                 <span className={isDelayed ? "text-red-400 font-bold" : "text-emerald-400"}>
@@ -301,7 +363,7 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                                 </span>
                               </div>
                             </td>
-                            <td className="px-4 py-4">
+                            <td className="px-4 py-5">
                               <div className="flex justify-center">
                                 {getStatusBadge(task.id)}
                               </div>
@@ -316,8 +378,8 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
             </div>
 
             {/* Footer */}
-            <div className="p-4 px-6 border-t border-white/10 flex items-center justify-between bg-slate-900/60">
-              <div className="flex items-center gap-6">
+            <div className="p-3 sm:p-4 px-4 sm:px-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 shrink-0">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-6">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live Site Data</span>
@@ -329,9 +391,9 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                   </div>
                 )}
               </div>
-              <Button 
+              <Button
                 onClick={onClose}
-                className="bg-blue-600 hover:bg-blue-500 text-white rounded-xl px-8 font-bold border-b-4 border-blue-800 active:border-b-0 active:translate-y-1 transition-all"
+                className="bg-blue-600 hover:bg-blue-500 text-white rounded-xl px-8 font-bold border-b-4 border-blue-800 active:border-b-0 active:translate-y-1 transition-all w-full sm:w-auto"
               >
                 Close Sheet
               </Button>

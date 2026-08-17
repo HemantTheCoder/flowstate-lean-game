@@ -182,16 +182,16 @@ export default function ChapterSelect() {
                             bg: 'bg-slate-800/60',
                             glow: 'rgba(255,255,255,0)',
                             button: 'bg-slate-700',
-                            corner: 'text-slate-600/0'
+                            corner: ''
                         };
 
                         if (!isEffectivelyLocked) {
-                            if (chapter.id === 0) theme = { color: 'text-cyan-400', border: 'border-cyan-500/40', bg: 'bg-slate-800/80', glow: 'rgba(34,211,238,0.25)', button: 'bg-cyan-600', corner: 'text-cyan-500/60' };
-                            else if (chapter.id === 1) theme = { color: 'text-emerald-400', border: 'border-emerald-500/40', bg: 'bg-slate-800/80', glow: 'rgba(16,185,129,0.25)', button: 'bg-emerald-600', corner: 'text-emerald-500/60' };
-                            else if (chapter.id === 2) theme = { color: 'text-amber-400', border: 'border-amber-500/40', bg: 'bg-slate-800/80', glow: 'rgba(245,158,11,0.25)', button: 'bg-amber-600', corner: 'text-amber-500/60' };
-                            else if (chapter.id === 3) theme = { color: 'text-purple-400', border: 'border-purple-500/40', bg: 'bg-slate-800/80', glow: 'rgba(168,85,247,0.25)', button: 'bg-purple-600', corner: 'text-purple-500/60' };
+                            if (chapter.id === 0) theme = { color: 'text-cyan-400', border: 'border-cyan-500/40', bg: 'bg-slate-800/80', glow: 'rgba(34,211,238,0.25)', button: 'bg-cyan-600', corner: 'hud-tint-cyan' };
+                            else if (chapter.id === 1) theme = { color: 'text-emerald-400', border: 'border-emerald-500/40', bg: 'bg-slate-800/80', glow: 'rgba(16,185,129,0.25)', button: 'bg-emerald-600', corner: 'hud-tint-emerald' };
+                            else if (chapter.id === 2) theme = { color: 'text-amber-400', border: 'border-amber-500/40', bg: 'bg-slate-800/80', glow: 'rgba(245,158,11,0.25)', button: 'bg-amber-600', corner: 'hud-tint-amber' };
+                            else if (chapter.id === 3) theme = { color: 'text-purple-400', border: 'border-purple-500/40', bg: 'bg-slate-800/80', glow: 'rgba(168,85,247,0.25)', button: 'bg-purple-600', corner: 'hud-tint-purple' };
                         } else if (chapter.isComingSoon) {
-                            theme = { color: 'text-cyan-400', border: 'border-cyan-500/40', bg: 'bg-slate-800/60', glow: 'rgba(34,211,238,0.15)', button: 'bg-cyan-900/60', corner: 'text-cyan-500/40' };
+                            theme = { color: 'text-cyan-400', border: 'border-cyan-500/40', bg: 'bg-slate-800/60', glow: 'rgba(34,211,238,0.15)', button: 'bg-cyan-900/60', corner: 'hud-tint-cyan' };
                         }
 
                         return (

@@ -31,7 +31,8 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.5) 100%);
+    /* Kept deliberately subtle — should read as ambient depth, never as edges closing in on the player */
+    background: radial-gradient(ellipse at center, transparent 65%, rgba(0,0,0,0.22) 100%);
   }
 
   /* Subtle animated grain — breaks up flat gradients so panels read as physical surfaces */
@@ -50,9 +51,12 @@
     animation: grain-shift 1.5s steps(4) infinite;
   }
 
-  /* Sci-fi/strategy-game corner brackets. Set `color` (e.g. text-cyan-500/60) to tint. */
+  /* Sci-fi/strategy-game corner brackets. Tint via a `.hud-tint-*` class below —
+     deliberately uses a CSS custom property (not `color`/currentColor) so it can
+     never bleed into or collide with real text-color utility classes on the same element. */
   .hud-corners {
     position: relative;
+    --hud-color: rgba(148, 163, 184, 0.45);
   }
   .hud-corners::before {
     content: '';
@@ -60,15 +64,20 @@
     inset: 0;
     pointer-events: none;
     background:
-      linear-gradient(to right, currentColor 2px, transparent 2px) top left / 16px 16px no-repeat,
-      linear-gradient(to bottom, currentColor 2px, transparent 2px) top left / 16px 16px no-repeat,
-      linear-gradient(to left, currentColor 2px, transparent 2px) top right / 16px 16px no-repeat,
-      linear-gradient(to bottom, currentColor 2px, transparent 2px) top right / 16px 16px no-repeat,
-      linear-gradient(to right, currentColor 2px, transparent 2px) bottom left / 16px 16px no-repeat,
-      linear-gradient(to top, currentColor 2px, transparent 2px) bottom left / 16px 16px no-repeat,
-      linear-gradient(to left, currentColor 2px, transparent 2px) bottom right / 16px 16px no-repeat,
-      linear-gradient(to top, currentColor 2px, transparent 2px) bottom right / 16px 16px no-repeat;
+      linear-gradient(to right, var(--hud-color) 2px, transparent 2px) top left / 16px 16px no-repeat,
+      linear-gradient(to bottom, var(--hud-color) 2px, transparent 2px) top left / 16px 16px no-repeat,
+      linear-gradient(to left, var(--hud-color) 2px, transparent 2px) top right / 16px 16px no-repeat,
+      linear-gradient(to bottom, var(--hud-color) 2px, transparent 2px) top right / 16px 16px no-repeat,
+      linear-gradient(to right, var(--hud-color) 2px, transparent 2px) bottom left / 16px 16px no-repeat,
+      linear-gradient(to top, var(--hud-color) 2px, transparent 2px) bottom left / 16px 16px no-repeat,
+      linear-gradient(to left, var(--hud-color) 2px, transparent 2px) bottom right / 16px 16px no-repeat,
+      linear-gradient(to top, var(--hud-color) 2px, transparent 2px) bottom right / 16px 16px no-repeat;
   }
+  .hud-tint-cyan { --hud-color: rgba(6, 182, 212, 0.55); }
+  .hud-tint-emerald { --hud-color: rgba(16, 185, 129, 0.55); }
+  .hud-tint-amber { --hud-color: rgba(245, 158, 11, 0.55); }
+  .hud-tint-purple { --hud-color: rgba(168, 85, 247, 0.55); }
+  .hud-tint-white { --hud-color: rgba(255, 255, 255, 0.5); }
 
   /* Brushed-metal instrument panel: subtle sheen + inset bevel so panels feel physical, not flat */
   .metal-panel {

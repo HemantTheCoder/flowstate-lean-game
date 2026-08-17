@@ -187,7 +187,7 @@ export default function Home() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="flex flex-col justify-center text-center md:text-left"
         >
-          <div className="bg-slate-900/40 backdrop-blur-md p-5 sm:p-8 md:p-10 rounded-2xl md:rounded-3xl border border-slate-700/50 shadow-2xl inline-block w-fit mx-auto md:mx-0 hud-corners text-cyan-500/50">
+          <div className="bg-slate-900/40 backdrop-blur-md p-5 sm:p-8 md:p-10 rounded-2xl md:rounded-3xl border border-slate-700/50 shadow-2xl inline-block w-fit mx-auto md:mx-0 hud-corners hud-tint-cyan">
             {/* Tagline pill */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/90 border border-slate-700/50 mb-6 shadow-md shadow-slate-900/50">
               <HardHat className="w-4 h-4 text-cyan-400" />
@@ -232,7 +232,7 @@ export default function Home() {
               whileHover="hover"
               whileTap="tap"
               data-testid="button-play"
-              className="w-full relative px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-cyan-600 to-indigo-600 rounded-2xl flex items-center justify-between text-white font-black text-lg sm:text-xl uppercase tracking-wider shadow-[0_8px_30px_rgba(99,102,241,0.3),inset_0_1px_0_rgba(255,255,255,0.25),inset_0_-3px_0_rgba(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgba(34,211,238,0.5),inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-3px_0_rgba(0,0,0,0.2)] overflow-hidden group border border-cyan-400/40 hud-corners text-white/50"
+              className="w-full relative px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-cyan-600 to-indigo-600 rounded-2xl flex items-center justify-between text-white font-black text-lg sm:text-xl uppercase tracking-wider shadow-[0_8px_30px_rgba(99,102,241,0.3),inset_0_1px_0_rgba(255,255,255,0.25),inset_0_-3px_0_rgba(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgba(34,211,238,0.5),inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-3px_0_rgba(0,0,0,0.2)] overflow-hidden group border border-cyan-400/40 hud-corners hud-tint-white"
             >
               <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-[200%] transition-transform duration-700 ease-out z-0" />
               <span className="relative z-10 flex items-center gap-3 drop-shadow-md">
