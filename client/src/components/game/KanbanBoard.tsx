@@ -273,52 +273,53 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 120 }}
-                className="fixed inset-3 sm:inset-6 md:inset-10 lg:inset-16 z-[60] flex items-center justify-center bg-slate-950/75 backdrop-blur-xl border border-white/10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] pointer-events-none blueprint-bg hud-corners hud-tint-cyan"
+                className="fixed inset-2 sm:inset-4 md:inset-6 lg:inset-8 z-[60] flex items-center justify-center bg-slate-950/75 backdrop-blur-xl border border-white/10 rounded-3xl sm:rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9)] pointer-events-none blueprint-bg hud-corners hud-tint-cyan"
             >
                 <div className="absolute inset-0 pointer-events-auto" onClick={onClose} />
                 
                 <div className="w-full h-full max-w-[1700px] flex flex-col pointer-events-auto relative z-10 mx-auto overflow-hidden">
                     
                     {/* Header Section */}
-                    <div className="px-6 py-4 md:px-10 md:py-6 flex flex-col md:flex-row justify-between items-start md:items-center shrink-0 gap-4 bg-gradient-to-b from-slate-950/40 to-transparent">
-                        <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-3">
-                                <h2 className="text-2xl md:text-4xl font-black text-white tracking-tighter drop-shadow-md">
+                    <div className="px-4 py-3 md:px-8 md:py-4 flex flex-col md:flex-row justify-between items-start md:items-center shrink-0 gap-3 bg-gradient-to-b from-slate-950/40 to-transparent">
+                        <div className="flex flex-col gap-0.5 min-w-0">
+                            <div className="flex items-center gap-2.5">
+                                <h2 className="text-xl md:text-2xl font-black text-white tracking-tight drop-shadow-md">
                                     {chapter > 1 ? 'Weekly Execution' : 'Project Flux Board'}
                                 </h2>
-                                <div className="px-2 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[10px] uppercase font-black tracking-widest text-cyan-400">
+                                <div className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[9px] uppercase font-black tracking-widest text-cyan-400 whitespace-nowrap">
                                     Active Simulation
                                 </div>
                             </div>
-                            <p className="text-sm font-medium text-slate-400/80 max-w-xl">
+                            {/* Hidden on short viewports so the board itself gets the vertical space */}
+                            <p className="hidden lg:block text-xs font-medium text-slate-400/80 max-w-xl">
                                 {chapter > 1 ? 'Execute your committed Weekly Work Plan to ensure smooth site flow and zero downtime.' : 'Drag tasks through the construction flow. Maintain continuous throughput to avoid overhead waste.'}
                             </p>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-3 md:gap-6 metal-panel backdrop-blur-md p-2 rounded-2xl border border-slate-700/30">
-                            <div className="flex -space-x-1">
+                        <div className="relative flex flex-wrap items-center gap-2 md:gap-4 metal-panel backdrop-blur-md p-1.5 rounded-xl border border-slate-700/30">
+                            <div className="flex -space-x-1 pl-1">
                                 <LifeHearts />
                             </div>
-                            <div className="h-8 w-px bg-slate-700/50 hidden md:block" />
-                            <div className="flex items-center gap-4 px-2">
+                            <div className="h-7 w-px bg-slate-700/50 hidden md:block" />
+                            <div className="flex items-center gap-3 px-1">
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Available Funds</span>
-                                    <span className="text-lg font-black text-cyan-400 font-mono tracking-tight leading-none">
+                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Funds</span>
+                                    <span className="text-sm md:text-base font-black text-cyan-400 font-mono tracking-tight leading-tight">
                                         {formatCurrency(funds, useGameStore.getState().currency)}
                                     </span>
                                 </div>
-                                <div className="flex flex-col border-l border-slate-700/50 pl-4">
-                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Site Materials</span>
-                                    <span className="text-lg font-black text-amber-500 font-mono tracking-tight leading-none">
-                                        {materials.toLocaleString()} <span className="text-[10px] text-slate-600">UNITS</span>
+                                <div className="flex flex-col border-l border-slate-700/50 pl-3">
+                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Materials</span>
+                                    <span className="text-sm md:text-base font-black text-amber-500 font-mono tracking-tight leading-tight">
+                                        {materials.toLocaleString()} <span className="text-[9px] text-slate-600">UNITS</span>
                                     </span>
                                 </div>
                             </div>
                             <button
                                 onClick={onClose}
-                                className="px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/50 shadow-lg active:scale-95 shadow-black/20"
+                                className="px-4 py-2.5 min-h-[40px] rounded-lg font-black text-[11px] uppercase tracking-widest transition-all bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/50 shadow-lg active:scale-95 shadow-black/20 whitespace-nowrap"
                             >
-                                Close Management
+                                Close
                             </button>
                         </div>
                     </div>
@@ -327,11 +328,11 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
                     {/* Board Content */}
                     <DragDropContext onDragEnd={onDragEnd}>
-                        <div className="flex-1 relative min-h-0 px-4 md:px-8 pb-8">
+                        <div className="flex-1 relative min-h-0 px-3 md:px-6 pb-4">
                             <ScrollHint containerRef={scrollContainerRef} />
-                            <div 
-                                ref={scrollContainerRef} 
-                                className="flex flex-row gap-6 h-full overflow-x-auto overflow-y-hidden pb-4 pt-2 snap-x snap-mandatory no-scrollbar"
+                            <div
+                                ref={scrollContainerRef}
+                                className="flex flex-row gap-4 h-full overflow-x-auto overflow-y-hidden pb-2 pt-1 snap-x snap-mandatory no-scrollbar"
                             >
                                 {columns.map(col => {
                                     const isOverWip = col.id === 'doing' && col.tasks.length > col.wipLimit;
@@ -354,16 +355,16 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                     } ${isBlurred ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
                                                         
                                                         {/* Header */}
-                                                        <div className={`px-6 py-5 shrink-0 border-b border-white/5 flex items-center justify-between ${
-                                                            col.id === 'done' ? 'bg-emerald-500/5' : 
+                                                        <div className={`px-4 py-3 shrink-0 border-b border-white/5 flex items-center justify-between ${
+                                                            col.id === 'done' ? 'bg-emerald-500/5' :
                                                             col.id === 'doing' ? 'bg-cyan-500/5' : ''
                                                         }`}>
-                                                            <div className="flex items-center gap-3">
-                                                                <div className={`w-2 h-6 rounded-full ${
-                                                                    col.id === 'done' ? 'bg-emerald-500' : 
+                                                            <div className="flex items-center gap-2.5">
+                                                                <div className={`w-1.5 h-5 rounded-full ${
+                                                                    col.id === 'done' ? 'bg-emerald-500' :
                                                                     col.id === 'doing' ? 'bg-cyan-500' : 'bg-slate-500'
                                                                 }`} />
-                                                                <h3 className="font-black text-lg uppercase tracking-wider text-slate-100 italic">
+                                                                <h3 className="font-black text-base uppercase tracking-wider text-slate-100 italic">
                                                                     {day > 5 && col.id === 'backlog' ? 'Master Plan' : col.title}
                                                                 </h3>
                                                             </div>
@@ -397,7 +398,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                         <div
                                                             {...provided.droppableProps}
                                                             ref={provided.innerRef}
-                                                            className="flex-1 p-4 flex flex-col gap-4 overflow-y-auto custom-scrollbar-thin"
+                                                            className="flex-1 p-3 flex flex-col gap-2.5 overflow-y-auto custom-scrollbar-thin"
                                                         >
                                                             {col.tasks.map((task, index) => {
                                                                 const isWaste = task.id.includes('waste') || task.title === 'REWORK';
@@ -420,7 +421,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                     {...provided.draggableProps}
                                                                                     {...provided.dragHandleProps}
                                                                                     style={provided.draggableProps.style}
-                                                                                    className={`group relative bg-slate-800/90 backdrop-blur-xl p-5 rounded-2xl border transition-all duration-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_4px_10px_-4px_rgba(0,0,0,0.5)] ${
+                                                                                    className={`group relative bg-slate-800/90 backdrop-blur-xl p-3.5 rounded-xl border transition-all duration-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_4px_10px_-4px_rgba(0,0,0,0.5)] ${
                                                                                         snapshot.isDragging
                                                                                             ? 'bg-slate-700 border-cyan-400 shadow-[0_25px_60px_-15px_rgba(0,0,0,1)] ring-4 ring-cyan-500/20 z-50 scale-[1.05] cursor-grabbing'
                                                                                             : isDone ? 'border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-500/60 hover:shadow-xl hover:-translate-y-1'
@@ -432,18 +433,18 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                     <WasteTaskOverlay isWaste={isWaste} isInDone={isDone} />
                                                                                     <BottleneckPulse isBottleneck={isBottleneck && isDoing && index === 0} />
                                                                                     
-                                                                                    <div className="flex items-start gap-4">
-                                                                                        <div className="shrink-0 mt-1">
-                                                                                            <TaskIconDisplay 
-                                                                                                icon={task.icon} 
-                                                                                                type={task.type} 
-                                                                                                size="md" 
+                                                                                    <div className="flex items-start gap-3">
+                                                                                        <div className="shrink-0 mt-0.5">
+                                                                                            <TaskIconDisplay
+                                                                                                icon={task.icon}
+                                                                                                type={task.type}
+                                                                                                size="sm"
                                                                                                 className={`shadow-lg drop-shadow-[0_0_10px_rgba(0,0,0,0.3)] transition-transform duration-300 group-hover:scale-110 ${isDone ? 'opacity-50 grayscale' : ''}`} 
                                                                                             />
                                                                                         </div>
                                                                                         <div className="flex-1 min-w-0">
                                                                                             <div className="flex justify-between items-start gap-2">
-                                                                                                <h4 className={`text-base font-black tracking-tight leading-snug transition-colors truncate ${
+                                                                                                <h4 className={`text-sm font-black tracking-tight leading-snug transition-colors truncate ${
                                                                                                     isWaste ? 'text-red-400' : 
                                                                                                     isDone ? 'text-slate-500 line-through' :
                                                                                                     'text-slate-100 group-hover:text-cyan-400'
@@ -458,47 +459,45 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                                     </div>
                                                                                                 )}
                                                                                             </div>
-                                                                                            <p className={`text-xs mt-1.5 font-medium leading-relaxed line-clamp-2 transition-opacity ${isDone ? 'opacity-30' : 'text-slate-400/90'}`}>
+                                                                                            <p className={`text-[11px] mt-1 font-medium leading-snug line-clamp-2 transition-opacity ${isDone ? 'opacity-30' : 'text-slate-400/90'}`}>
                                                                                                 {task.description}
                                                                                             </p>
                                                                                         </div>
                                                                                     </div>
 
-                                                                                    {/* Tags & Meta */}
-                                                                                    <div className="mt-4 flex flex-col gap-2">
-                                                                                        {task.materialsRequired && task.materialsRequired.length > 0 && (
-                                                                                            <div className="flex flex-col gap-1 w-full bg-slate-900/50 rounded-lg p-2 border border-slate-700/50">
-                                                                                                {task.materialsRequired.map((m, i) => {
-                                                                                                    let MatIcon = Package;
-                                                                                                    if (m.name.includes('Concrete') || m.name.includes('Water') || m.name.includes('Chemicals') || m.name.includes('Paint')) MatIcon = Droplets;
-                                                                                                    else if (m.name.includes('Bricks') || m.name.includes('Tiles') || m.name.includes('Sand')) MatIcon = Cuboid;
-                                                                                                    else if (m.name.includes('Steel') || m.name.includes('Wood')) MatIcon = Hammer;
-                                                                                                    else if (m.name.includes('Wiring') || m.name.includes('Electrical')) MatIcon = Zap;
-                                                                                                    
-                                                                                                    return (
-                                                                                                    <div key={i} className="flex items-center gap-2 text-[10px]">
-                                                                                                        <MatIcon className="w-3.5 h-3.5 text-amber-500" />
-                                                                                                        <span className="text-slate-400">Req:</span>
-                                                                                                        <span className="font-bold text-amber-400">{m.amount} {m.name}</span>
-                                                                                                    </div>
-                                                                                                    );
-                                                                                                })}
-                                                                                            </div>
-                                                                                        )}
-                                                                                        <div className="flex flex-wrap gap-2 items-center">
-                                                                                            <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border ${
-                                                                                                task.type === 'Structural' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
-                                                                                                task.type === 'Systems' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                                                                                                task.type === 'Interior' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                                                                                                task.type === 'Management' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
-                                                                                                'bg-slate-700/30 text-slate-400 border-slate-700/50'
-                                                                                            }`}>
-                                                                                                {task.type}
-                                                                                            </span>
-                                                                                            <div className="flex items-center gap-1 bg-slate-900/40 rounded-lg px-2 py-1 border border-slate-700/30 text-[9px] font-black font-mono">
-                                                                                                <span className="text-red-400">-{formatCurrency(task.costToStart || task.cost || 0, currency)}</span>
-                                                                                            </div>
-                                                                                        </div>
+                                                                                    {/* Tags & Meta — kept on a single wrapping row so cards stay short
+                                                                                        and more of the queue is visible at once */}
+                                                                                    <div className="mt-2.5 flex flex-wrap gap-1.5 items-center">
+                                                                                        <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border ${
+                                                                                            task.type === 'Structural' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
+                                                                                            task.type === 'Systems' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                                                                            task.type === 'Interior' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                                                                            task.type === 'Management' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                                                                                            'bg-slate-700/30 text-slate-400 border-slate-700/50'
+                                                                                        }`}>
+                                                                                            {task.type}
+                                                                                        </span>
+                                                                                        <span className="flex items-center gap-1 bg-slate-900/40 rounded-md px-2 py-0.5 border border-slate-700/30 text-[9px] font-black font-mono text-red-400">
+                                                                                            -{formatCurrency(task.costToStart || task.cost || 0, currency)}
+                                                                                        </span>
+                                                                                        {task.materialsRequired && task.materialsRequired.length > 0 && (() => {
+                                                                                            const first = task.materialsRequired[0];
+                                                                                            let MatIcon = Package;
+                                                                                            if (first.name.includes('Concrete') || first.name.includes('Water') || first.name.includes('Chemicals') || first.name.includes('Paint')) MatIcon = Droplets;
+                                                                                            else if (first.name.includes('Bricks') || first.name.includes('Tiles') || first.name.includes('Sand')) MatIcon = Cuboid;
+                                                                                            else if (first.name.includes('Steel') || first.name.includes('Wood')) MatIcon = Hammer;
+                                                                                            else if (first.name.includes('Wiring') || first.name.includes('Electrical')) MatIcon = Zap;
+                                                                                            const summary = task.materialsRequired.map(m => `${m.amount} ${m.name}`).join(' · ');
+                                                                                            return (
+                                                                                                <span
+                                                                                                    className="flex items-center gap-1 min-w-0 bg-slate-900/40 rounded-md px-2 py-0.5 border border-amber-500/20 text-[9px] font-bold text-amber-400"
+                                                                                                    title={`Requires: ${summary}`}
+                                                                                                >
+                                                                                                    <MatIcon className="w-3 h-3 text-amber-500 shrink-0" />
+                                                                                                    <span className="truncate max-w-[10rem]">{summary}</span>
+                                                                                                </span>
+                                                                                            );
+                                                                                        })()}
                                                                                     </div>
 
                                                                                     {/* Replace Button */}

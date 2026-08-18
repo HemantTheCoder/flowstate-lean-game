@@ -187,7 +187,7 @@ export default function Home() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="flex flex-col justify-center text-center md:text-left"
         >
-          <div className="bg-slate-900/40 backdrop-blur-md p-5 sm:p-8 md:p-10 rounded-2xl md:rounded-3xl border border-slate-700/50 shadow-2xl inline-block w-fit mx-auto md:mx-0 hud-corners hud-tint-cyan">
+          <div className="relative bg-slate-900/40 backdrop-blur-md p-5 sm:p-8 md:p-10 rounded-2xl md:rounded-3xl border border-slate-700/50 shadow-2xl inline-block w-fit mx-auto md:mx-0 hud-corners hud-tint-cyan">
             {/* Tagline pill */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/90 border border-slate-700/50 mb-6 shadow-md shadow-slate-900/50">
               <HardHat className="w-4 h-4 text-cyan-400" />

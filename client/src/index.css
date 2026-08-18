@@ -53,9 +53,14 @@
 
   /* Sci-fi/strategy-game corner brackets. Tint via a `.hud-tint-*` class below —
      deliberately uses a CSS custom property (not `color`/currentColor) so it can
-     never bleed into or collide with real text-color utility classes on the same element. */
+     never bleed into or collide with real text-color utility classes on the same element.
+
+     NOTE: deliberately does NOT set `position`. Custom utilities emit after Tailwind's,
+     so declaring `position: relative` here silently overrode `fixed`/`absolute` on any
+     element that also used this class (it broke the Kanban board's fixed positioning).
+     The element must supply its own positioning context — add `relative` in the markup
+     when the element would otherwise be static. */
   .hud-corners {
-    position: relative;
     --hud-color: rgba(148, 163, 184, 0.45);
   }
   .hud-corners::before {
