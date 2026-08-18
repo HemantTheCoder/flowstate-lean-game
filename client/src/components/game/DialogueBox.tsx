@@ -100,6 +100,20 @@ const DialogueBoxInner: React.FC = () => {
 
     const portrait = imageMap[line.character];
 
+    /**
+     * Focal point (object-position) per portrait, because the source art is full scenes rather
+     * than busts and the subject sits in a different place in each one. A single shared
+     * object-position meant e.g. Mira's portrait framed sky and crane jibs instead of a face.
+     * Values below are eyeballed against the actual assets; default is a safe upper-centre.
+     */
+    const PORTRAIT_FOCUS: Record<string, string> = {
+        'mira.png': '68% 50%',
+        'rao.jpg': '50% 34%',
+        'architect.jpg': '52% 17%',
+        'architect_female.jpg': '52% 17%',
+    };
+    const focus = portrait ? (PORTRAIT_FOCUS[portrait] ?? '50% 24%') : '50% 24%';
+
     return (
         <AnimatePresence>
             <motion.div
@@ -121,13 +135,29 @@ const DialogueBoxInner: React.FC = () => {
                             initial={{ opacity: 0, x: -20, scale: 0.95 }}
                             animate={{ opacity: 1, x: 0, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className={`absolute bottom-20 sm:bottom-24 ${isPlayer ? 'right-2 sm:right-10' : 'left-0 sm:left-0 md:-left-10'} z-0 bg-transparent hidden sm:block`}
+                            className={`absolute bottom-16 sm:bottom-20 ${isPlayer ? 'right-2 sm:right-8' : 'left-2 sm:left-0 md:-left-6'} z-0 bg-transparent hidden sm:block`}
                         >
-                            <img
-                                src={`/assets/${portrait}`}
-                                alt={line.character}
-                                className={`h-40 sm:h-64 md:h-80 w-36 sm:w-56 md:w-72 object-cover ${line.character === 'Mira' ? 'object-bottom' : 'object-[center_top]'} rounded-t-3xl border-t border-x border-slate-700/50 drop-shadow-2xl bg-slate-900/50`}
-                            />
+                            {/* Framed bust rather than a tall full-figure crop: the source art is a
+                                full construction scene, so a large rectangle showed cranes and
+                                background workers competing with the real scene behind the UI.
+                                A tight round frame plus a soft edge fade keeps attention on the
+                                face and lets the busy background dissolve into the panel. */}
+                            <div className="relative">
+                                <div
+                                    className={`w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full overflow-hidden ring-2 ${isPlayer ? 'ring-cyan-400/50' : 'ring-slate-300/40'} shadow-[0_12px_30px_-8px_rgba(0,0,0,0.75)] bg-slate-800`}
+                                    style={{
+                                        WebkitMaskImage: 'radial-gradient(circle at 50% 45%, #000 62%, transparent 100%)',
+                                        maskImage: 'radial-gradient(circle at 50% 45%, #000 62%, transparent 100%)',
+                                    }}
+                                >
+                                    <img
+                                        src={`/assets/${portrait}`}
+                                        alt={line.character}
+                                        className="w-full h-full object-cover scale-[1.15]"
+                                        style={{ objectPosition: focus }}
+                                    />
+                                </div>
+                            </div>
                         </motion.div>
                     )}
 

@@ -5,6 +5,9 @@ export class MainScene extends Phaser.Scene {
     private workers: Phaser.GameObjects.Sprite[] = [];
     private completedStructures = 0;
     private unsubscribe?: () => void;
+    /** Floors of the progress tower, one per 10% of earnedValue. */
+    private progressFloors: Phaser.GameObjects.Rectangle[] = [];
+    private progressLabel?: Phaser.GameObjects.Text;
     private flowText!: Phaser.GameObjects.Text;
     private ground!: Phaser.GameObjects.TileSprite;
     private rainEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -62,6 +65,7 @@ export class MainScene extends Phaser.Scene {
         //    always mirrors the player's WIP decisions rather than a hard-coded headcount.
         const store = useGameStore;
         this.syncCrewsToDoing(store.getState().columns.find(c => c.id === 'doing')?.tasks.length || 0);
+        this.syncProgressTower(store.getState().earnedValue || 0);
 
         // 3.1 Spawn Initial Buildings (Persistent)
         const initialDone = store.getState().columns.find(c => c.id === 'done')?.tasks.length || 0;
@@ -81,6 +85,11 @@ export class MainScene extends Phaser.Scene {
             // Keep visible crew count in step with active work.
             if (currDoing !== prevDoing) {
                 this.syncCrewsToDoing(currDoing);
+            }
+
+            // Grow the structure as earned value accrues.
+            if (state.earnedValue !== prevState.earnedValue) {
+                this.syncProgressTower(state.earnedValue || 0);
             }
 
             if (currDone > prevDone) {
@@ -203,6 +212,14 @@ export class MainScene extends Phaser.Scene {
         if (this.flowText) {
             this.flowText.setPosition(width / 2, height * 0.62);
         }
+
+        // Rebuild the tower at the new anchor so it doesn't drift off-screen on rotate/resize.
+        if (this.progressFloors.length || this.progressLabel) {
+            const ev = useGameStore.getState().earnedValue || 0;
+            this.progressFloors.forEach(f => f.destroy());
+            this.progressFloors = [];
+            this.syncProgressTower(ev);
+        }
     }
 
     setupFlowText() {
@@ -217,6 +234,65 @@ export class MainScene extends Phaser.Scene {
             backgroundColor: 'rgba(2,6,23,0.55)',
             padding: { x: 10, y: 5 }
         }).setOrigin(0.5).setDepth(900);
+    }
+
+    /**
+     * A tower that literally rises as earned value accrues: one floor per 10% complete.
+     * Gives completion a cumulative, persistent shape instead of only a one-off burst per task,
+     * so the player can see overall project progress at a glance on the site itself.
+     */
+    syncProgressTower(earnedValue: number) {
+        const { width, height } = this.scale;
+        const targetFloors = Math.max(0, Math.min(10, Math.floor(earnedValue / 10)));
+
+        const floorH = 22;
+        const floorW = 84;
+        const baseX = width * 0.82;
+        const baseY = height * 0.66;
+
+        while (this.progressFloors.length > targetFloors) {
+            const f = this.progressFloors.pop();
+            if (f) f.destroy();
+        }
+
+        while (this.progressFloors.length < targetFloors) {
+            const i = this.progressFloors.length;
+            const y = baseY - i * floorH;
+            // Slight inset per floor so it tapers upward like a real frame.
+            const w = floorW - i * 3;
+            const rect = this.add
+                .rectangle(baseX, y, w, floorH - 3, 0x94a3b8, 0.9)
+                .setStrokeStyle(1, 0x475569, 1)
+                .setDepth(Math.round(y))
+                .setAlpha(0)
+                .setScale(1, 0.2);
+
+            this.tweens.add({
+                targets: rect,
+                alpha: 0.9,
+                scaleY: 1,
+                duration: 520,
+                ease: 'Back.out'
+            });
+            this.progressFloors.push(rect);
+        }
+
+        const pct = Math.round(earnedValue);
+        if (!this.progressLabel) {
+            this.progressLabel = this.add
+                .text(baseX, baseY + 22, '', {
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    fontSize: '11px',
+                    fontStyle: 'bold',
+                    color: '#cbd5e1',
+                    backgroundColor: 'rgba(2,6,23,0.55)',
+                    padding: { x: 6, y: 3 }
+                })
+                .setOrigin(0.5)
+                .setDepth(950);
+        }
+        this.progressLabel.setPosition(baseX, baseY + 22);
+        this.progressLabel.setText(`STRUCTURE ${pct}%`);
     }
 
     /**
@@ -446,13 +522,18 @@ export class MainScene extends Phaser.Scene {
         // Get State from Zustand
         const state = useGameStore.getState();
 
-        // Weather Check
-        if (state.flags['weather_rain']) {
+        // Weather: chapter 1 day 3 is the scripted monsoon day that blocks structural work, so
+        // reflect it on the site directly instead of only in the Kanban banner. The explicit
+        // flag still wins so other chapters/events can drive rain themselves.
+        const isRainDay = state.flags['weather_rain'] || (state.chapter === 1 && state.day === 3);
+        if (isRainDay) {
             this.rainEmitter.start();
-            this.ground.setTint(0x888888); // Darken ground
+            this.ground.setTint(0x64748b);
+            (this as any).bgImage?.setTint(0x94a3b8);
         } else {
             this.rainEmitter.stop();
             this.ground.clearTint();
+            (this as any).bgImage?.clearTint();
         }
 
         const doingCol = state.columns.find(c => c.id === 'doing');
