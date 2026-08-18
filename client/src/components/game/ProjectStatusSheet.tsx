@@ -58,10 +58,23 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
     return chapter === 1 && step > 2 ? getPlannedMonth(step) + 1 : getPlannedMonth(step);
   };
 
-  const calculateActualCost = (costToStart: number) => {
+  // Projected cost if current (non-lean) practices continue. This is a forecast used for
+  // unstarted work only — it is NOT what the game actually charges.
+  const projectedCost = (costToStart: number) => {
     if (chapter === 1) return costToStart * 1.15; // 15% overrun pre-Kanban
     return costToStart * 1.02; // Minor variance post-Kanban
   };
+
+  // moveTask deducts exactly `costToStart` from funds (gameStore.ts:1043), so real incurred
+  // cost per task is costToStart. Reporting a 1.15x "actual" here contradicted this panel's
+  // own top-line AC (15,000,000 - funds) — rows claimed more spend than the game charged.
+  const incurredCost = (costToStart: number) => costToStart;
+
+  // Work that hasn't entered Doing yet has no actual cost or actual finish month —
+  // those figures are a projection, so label them as such instead of reporting a
+  // confirmed "Overrun" on 22 untouched tasks.
+  const isStarted = (taskId: string) =>
+    doneTasks.some(t => t.originalId === taskId) || doingTasks.some(t => t.originalId === taskId);
 
   const getStatusBadge = (taskId: string) => {
     const cls = "text-[10px] px-2 py-0.5 whitespace-nowrap";
@@ -233,12 +246,14 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                   <div className="divide-y divide-white/5">
                     {CONSTRUCTION_TASKS.map((task, idx) => {
                         const plannedCost = task.costToStart || 0;
-                        const actualCost = calculateActualCost(plannedCost);
+                        const actualCost = incurredCost(plannedCost);
+                        const forecastCost = projectedCost(plannedCost);
                         const isOverBudget = actualCost > plannedCost;
                         const pMonth = getPlannedMonth(idx + 1);
                         const aMonth = getActualMonth(idx + 1);
                         const isDelayed = aMonth > pMonth;
 
+                        const started = isStarted(task.id);
                         const matSummary = (task.materialsRequired || [])
                           .map(m => `${m.amount} ${m.name}`)
                           .join(' · ');
@@ -270,13 +285,21 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                               <div className="flex items-center gap-1.5 font-mono text-[11px] whitespace-nowrap">
                                 <span className="text-slate-400">{formatCurrency(plannedCost, currency)}</span>
                                 <span className="text-slate-600">→</span>
-                                <span className={isOverBudget && chapter === 1 ? 'text-red-400 font-bold' : 'text-emerald-400 font-bold'}>
-                                  {formatCurrency(actualCost, currency)}
-                                </span>
+                                {started ? (
+                                  <span className={isOverBudget && chapter === 1 ? 'text-red-400 font-bold' : 'text-emerald-400 font-bold'}>
+                                    {formatCurrency(actualCost, currency)}
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-500 italic">~{formatCurrency(forecastCost, currency)}</span>
+                                )}
                                 <span className="text-slate-600 mx-0.5">|</span>
                                 <span className="text-slate-400">M{pMonth}</span>
                                 <span className="text-slate-600">/</span>
-                                <span className={isDelayed ? 'text-red-400 font-bold' : 'text-emerald-400 font-bold'}>M{aMonth}</span>
+                                {started ? (
+                                  <span className={isDelayed ? 'text-red-400 font-bold' : 'text-emerald-400 font-bold'}>M{aMonth}</span>
+                                ) : (
+                                  <span className="text-slate-500 italic">~M{aMonth}</span>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -295,7 +318,12 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                           <th className="px-3 py-2.5 border-b border-white/5">Task Name &amp; Materials</th>
                           <th className="px-3 py-2.5 border-b border-white/5 w-28">Category</th>
                           <th className="px-3 py-2.5 border-b border-white/5 text-right w-28">Planned (PV)</th>
-                          <th className="px-3 py-2.5 border-b border-white/5 text-right w-32">Actual (AC)</th>
+                          <th
+                            className="px-3 py-2.5 border-b border-white/5 text-right w-32"
+                            title="Actual cost for work that has started. Values prefixed with ~ are projections for work not yet begun."
+                          >
+                            Actual (AC)
+                          </th>
                           <th className="px-3 py-2.5 border-b border-white/5 text-center w-28">Month P/A</th>
                           <th className="px-3 py-2.5 border-b border-white/5 text-center w-28">Status</th>
                         </tr>
@@ -303,11 +331,13 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                       <tbody className="divide-y divide-white/5">
                         {CONSTRUCTION_TASKS.map((task, idx) => {
                           const plannedCost = task.costToStart || 0;
-                          const actualCost = calculateActualCost(plannedCost);
+                          const actualCost = incurredCost(plannedCost);
+                          const forecastCost = projectedCost(plannedCost);
                           const isOverBudget = actualCost > plannedCost;
                           const pMonth = getPlannedMonth(idx + 1);
                           const aMonth = getActualMonth(idx + 1);
                           const isDelayed = aMonth > pMonth;
+                          const started = isStarted(task.id);
                           const matSummary = (task.materialsRequired || [])
                             .map(m => `${m.amount} ${m.name}`)
                             .join(' · ');
@@ -356,20 +386,37 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                               </span>
                             </td>
                             <td className="px-3 py-2.5 text-right whitespace-nowrap">
-                              <span className={`text-[11px] font-mono font-bold ${isOverBudget && chapter === 1 ? 'text-red-400' : 'text-emerald-400'}`}>
-                                {formatCurrency(actualCost, currency)}
-                              </span>
-                              {isOverBudget && chapter === 1 && (
-                                <span className="text-[10px] text-red-500/70 ml-1.5">Overrun</span>
+                              {started ? (
+                                <>
+                                  <span className={`text-[11px] font-mono font-bold ${isOverBudget && chapter === 1 ? 'text-red-400' : 'text-emerald-400'}`}>
+                                    {formatCurrency(actualCost, currency)}
+                                  </span>
+                                  {isOverBudget && chapter === 1 && (
+                                    <span className="text-[10px] text-red-500/70 ml-1.5">Overrun</span>
+                                  )}
+                                </>
+                              ) : (
+                                <span
+                                  className="text-[11px] font-mono text-slate-500 italic"
+                                  title={`Projected cost if current practices continue — not yet incurred (${formatCurrency(forecastCost, currency)})`}
+                                >
+                                  ~{formatCurrency(forecastCost, currency)}
+                                </span>
                               )}
                             </td>
                             <td className="px-3 py-2.5 text-center">
                               <div className="flex items-center justify-center gap-1.5 text-[11px] font-medium whitespace-nowrap">
                                 <span className="text-slate-400">M{pMonth}</span>
                                 <span className="text-slate-600">/</span>
-                                <span className={isDelayed ? "text-red-400 font-bold" : "text-emerald-400"}>
-                                  M{aMonth}
-                                </span>
+                                {started ? (
+                                  <span className={isDelayed ? "text-red-400 font-bold" : "text-emerald-400"}>
+                                    M{aMonth}
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-500 italic" title="Projected finish month — work not started yet">
+                                    ~M{aMonth}
+                                  </span>
+                                )}
                               </div>
                             </td>
                             <td className="px-3 py-2.5">
