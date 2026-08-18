@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { useGameStore, formatCurrency } from '@/store/gameStore';
 import { motion } from 'framer-motion';
-import { TrendingUp, BookOpen, Lightbulb } from 'lucide-react';
+import { TrendingUp, BookOpen, Lightbulb, BarChart3 } from 'lucide-react';
+import { useLocation } from 'wouter';
 import soundManager from '@/lib/soundManager';
 import { ResponsiveContainer, AreaChart, Area, ReferenceLine } from 'recharts';
 import { GAME_CONSTANTS } from '@/config/constants';
@@ -102,6 +103,8 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
     const currency = useGameStore(s => s.currency);
     const dailyMetrics = useGameStore(s => s.dailyMetrics) ?? [];
     const columns = useGameStore(s => s.columns);
+    const dailyCommitments = useGameStore(s => s.dailyCommitments) ?? {};
+    const [, setLocation] = useLocation();
     
     const allTasks = columns.flatMap(c => c.tasks);
     const doneTasksList = columns.find(c => c.id === 'done')?.tasks || [];
@@ -182,6 +185,37 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                         <div className="text-slate-400 font-bold">Tasks Finished</div>
                         <div className="text-3xl font-black text-slate-200">{completedTasks}</div>
                     </div>
+
+                    {/* The reveal against the morning's promise. Kept adjacent to the raw count so the
+                        comparison — not the count — is what the player reads first. */}
+                    {(() => {
+                        const promised = dailyCommitments[displayDay];
+                        if (promised === undefined) return null;
+                        const kept = completedTasks >= promised;
+                        const reliability = promised > 0
+                            ? Math.min(100, Math.round((completedTasks / promised) * 100))
+                            : 0;
+                        return (
+                            <div className={`rounded-xl p-4 border ${kept ? 'bg-emerald-900/20 border-emerald-500/40' : 'bg-amber-900/20 border-amber-500/40'}`}>
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className={`text-[10px] font-black uppercase tracking-widest ${kept ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                        {kept ? 'Promise Kept' : 'Promise Missed'}
+                                    </span>
+                                    <span className={`text-lg font-black font-mono ${kept ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                        {reliability}%
+                                    </span>
+                                </div>
+                                <div className="text-sm text-slate-300 font-medium">
+                                    You promised <b>{promised}</b>, delivered <b>{completedTasks}</b>.
+                                </div>
+                                <p className="text-[11px] text-slate-400 mt-2 leading-snug">
+                                    {kept
+                                        ? 'This is reliability: a crew that hits its promise lets everyone downstream plan around it.'
+                                        : 'A missed promise stalls every trade waiting on you. Next time, promise less and finish it — a smaller reliable number beats a bigger hopeful one.'}
+                                </p>
+                            </div>
+                        );
+                    })()}
 
                     <div className="grid grid-cols-2 gap-3">
                         <div className="bg-blue-900/20 rounded-xl p-3 border border-blue-500/30 text-center flex flex-col justify-center">
@@ -317,6 +351,18 @@ export const DailySummary: React.FC<Props> = ({ isOpen, onClose, completedTasks 
                     >
                         {(displayDay >= 5 && chapter === 1) || (displayDay >= 11 && chapter === 2) || (displayDay >= 16 && chapter === 3) ? 'View Results' : `Start ${GAME_CONSTANTS.TIME_UNIT} ${displayDay + 1}`}
                     </button>
+
+                    {/* The full causal report. This page existed and was fully built but nothing in
+                        the app ever linked to it, so no player could reach it. */}
+                    {dailyMetrics.length >= 1 && (
+                        <button
+                            onClick={() => setLocation('/debrief')}
+                            data-testid="button-view-debrief"
+                            className="w-full mt-2 bg-slate-800/70 border border-slate-700 text-slate-300 py-3 rounded-xl font-bold text-sm hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center gap-2"
+                        >
+                            <BarChart3 className="w-4 h-4" /> Why did this happen? — Full report
+                        </button>
+                    )}
                 </div>
             </motion.div>
         </div>

@@ -8,7 +8,15 @@ import soundManager from '@/lib/soundManager';
 import { GAME_CONSTANTS } from '@/config/constants';
 
 export const DayBriefingModal: React.FC = () => {
-    const { day, chapter, flags, setFlag } = useGameStore();
+    const { day, chapter, flags, setFlag, columns, dailyCommitments, setDailyCommitment } = useGameStore();
+
+    // The player commits to a number of finishes before working — the Last Planner "will do"
+    // promise. Comparing promise against delivery at day close is what turns activity into a
+    // reliability lesson, so the commitment has to be made *before* they see the outcome.
+    const doingCol = columns.find(c => c.id === 'doing');
+    const wipLimit = doingCol?.wipLimit && doingCol.wipLimit > 0 ? doingCol.wipLimit : 3;
+    const existing = dailyCommitments[day];
+    const [promise, setPromise] = React.useState<number>(existing ?? Math.min(2, wipLimit));
 
     // Choose the correct schedule based on the chapter
     const currentSchedule = chapter === 1 ? WEEK_1_SCHEDULE :
@@ -27,6 +35,7 @@ export const DayBriefingModal: React.FC = () => {
 
     const handleAcknowledge = () => {
         soundManager.playSFX('click', 0.5);
+        setDailyCommitment(day, promise);
         setFlag(dayKey, true);
     };
 
@@ -61,6 +70,36 @@ export const DayBriefingModal: React.FC = () => {
                             <p className="text-white text-xs md:text-sm font-medium">{dayConfig.briefing.action}</p>
                         </div>
                     </div>
+                    {/* The promise. Deliberately asked before any work happens. */}
+                    <div className="bg-emerald-900/20 p-3 md:p-4 rounded-xl border border-emerald-700/50">
+                        <label className="text-xs font-bold text-emerald-300 uppercase mb-1 block">
+                            Your Commitment
+                        </label>
+                        <p className="text-slate-300 text-xs md:text-sm mb-3">
+                            How many tasks will you <b>finish</b> today? Promise only what you can actually
+                            deliver — at day's end we compare this against what really landed.
+                        </p>
+                        <div className="flex items-center gap-2">
+                            {Array.from({ length: Math.max(4, wipLimit + 1) }, (_, i) => i + 1).map(n => (
+                                <button
+                                    key={n}
+                                    onClick={() => { soundManager.playSFX('click', 0.35); setPromise(n); }}
+                                    data-testid={`button-commit-${n}`}
+                                    className={`min-w-[44px] min-h-[44px] flex-1 rounded-lg font-black text-base border transition-all ${
+                                        promise === n
+                                            ? 'bg-emerald-500 text-emerald-950 border-emerald-300 shadow-lg'
+                                            : 'bg-slate-800/70 text-slate-400 border-slate-700 hover:border-emerald-600/60 hover:text-white'
+                                    }`}
+                                >
+                                    {n}
+                                </button>
+                            ))}
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-2">
+                            Your crew can hold {wipLimit} task{wipLimit === 1 ? '' : 's'} at once. Promising more
+                            than you can finish is how schedules lose credibility.
+                        </p>
+                    </div>
                 </div>
 
                 <div className="p-4 md:p-6 shrink-0">
@@ -69,7 +108,7 @@ export const DayBriefingModal: React.FC = () => {
                         className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-blue-900/50"
                         data-testid="button-day-briefing-acknowledge"
                     >
-                        Let's Work
+                        Commit &amp; Start Work
                     </button>
                 </div>
             </motion.div>

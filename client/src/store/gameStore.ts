@@ -91,7 +91,21 @@ export interface GameState {
     potentialCapacity: number;
     cumulativeEfficiency: number; // Running total efficiency
     insight: string; // What happened this day
+    /** WIP left open at day close, and the limit it was measured against. Recorded so the
+     *  debrief can explain *why* a day went the way it did instead of only charting that it did. */
+    wipAtClose?: number;
+    wipLimit?: number;
+    /** What the player promised at day start vs what landed — the reliability (PPC) pair. */
+    committed?: number;
+    /** True count of value-adding tasks finished. Distinct from `tasksCompletedToday`, which is
+     *  rescaled for charting and is not a task count. Compare promises against this. */
+    deliveredActual?: number;
   }[];
+
+  /** Tasks the player promises to finish, per day. This is the Last Planner "will do" commitment;
+   *  comparing it against delivery is what teaches reliability rather than mere activity. */
+  dailyCommitments: Record<number, number>;
+  setDailyCommitment: (day: number, count: number) => void;
 
   // Track previous done count for delta calculation
   previousDoneCount: number;
@@ -294,6 +308,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   weeklyPlan: [],
   ppcHistory: [],
   dailyMetrics: [],
+  dailyCommitments: {},
   previousDoneCount: 0,
   previousWasteCount: 0,
   cumulativeTasksCompleted: 0,
@@ -383,6 +398,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         earnedValue: 0,
         totalSpent: 0,
         dailyMetrics: [],
+        dailyCommitments: {},
         previousDoneCount: 0,
         previousWasteCount: 0,
         cumulativePotentialCapacity: 0,
@@ -420,6 +436,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         earnedValue: 22.7, // 5 / 22 tasks completed
         totalSpent: 0,
         dailyMetrics: [],
+        dailyCommitments: {},
         previousDoneCount: 0,
         previousWasteCount: 0,
         cumulativeTasksCompleted: 0,
@@ -480,6 +497,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         ],
         depotScore: 0,
         dailyMetrics: [],
+        dailyCommitments: {},
         previousDoneCount: 0,
         previousWasteCount: 0,
         cumulativeTasksCompleted: 0,
@@ -514,6 +532,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         kanbanLimits: { carpentry: 3, finish: 2, electrical: 2 },
         deliveries: [],
         dailyMetrics: [],
+        dailyCommitments: {},
         previousDoneCount: 0,
         previousWasteCount: 0,
         cumulativeTasksCompleted: 0,
@@ -956,13 +975,22 @@ export const useGameStore = create<GameState>((set, get) => ({
     // Bonus Morale for Pull
     if (forceSafeFlow) moraleDelta += 10;
 
+    const doingColAtClose = state.columns.find(c => c.id === 'doing');
     const newDailyMetric = {
       day: state.day,
       efficiency: dailyEff,
       tasksCompletedToday: adjustedCompleted,
       potentialCapacity: adjustedPotential,
       cumulativeEfficiency: cumulativeEff,
-      insight: dayInsight
+      insight: dayInsight,
+      wipAtClose: doingColAtClose?.tasks.length ?? 0,
+      wipLimit: doingColAtClose?.wipLimit ?? 0,
+      committed: state.dailyCommitments[state.day],
+      // The real number of value-adding tasks finished. `tasksCompletedToday` above stores
+      // `adjustedCompleted`, which several branches deliberately rescale (often to `dailyEff`
+      // against a potential of 100) so the chart plots a clean percentage — it is therefore not
+      // a task count and must not be compared against the player's promise.
+      deliveredActual: tasksCompletedToday
     };
 
     return {
@@ -993,6 +1021,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   log: [],
 
   addLog: (msg) => set((state) => ({ log: [msg, ...state.log].slice(0, 50) })),
+
+  setDailyCommitment: (day, count) => set((state) => ({
+    dailyCommitments: { ...state.dailyCommitments, [day]: Math.max(0, count) }
+  })),
 
   setFlag: (key, value) => set((state) => ({
     flags: { ...state.flags, [key]: value }
@@ -1351,6 +1383,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       cumulativeTasksCompleted: ks.cumulativeTasksCompleted ?? data.cumulativeTasksCompleted ?? 0,
       cumulativePotentialCapacity: ks.cumulativePotentialCapacity ?? data.cumulativePotentialCapacity ?? 0,
       dailyMetrics: ks.dailyMetrics ?? data.dailyMetrics ?? state.dailyMetrics,
+      dailyCommitments: ks.dailyCommitments ?? data.dailyCommitments ?? state.dailyCommitments,
       tutorialActive: ks.tutorialActive ?? (restoredDay > 1 ? false : true),
       tutorialStep: ks.tutorialStep ?? (restoredDay > 1 ? 99 : 0),
       depotItems: ks.depotItems ?? data.depotItems ?? state.depotItems,

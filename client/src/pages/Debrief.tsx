@@ -4,21 +4,105 @@ import { Link, useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
 
+/** One concrete thing the player can try at work, per chapter. The point of the whole exercise
+ *  is transfer: a principle they can name but not apply on Monday hasn't landed. */
+const REAL_WORLD_ACTIONS: Record<number, { principle: string; action: string; watchFor: string }[]> = {
+  1: [
+    {
+      principle: 'Limit work in progress',
+      action: 'Count how many jobs your team currently has open at once. Pick a number you can actually finish, and start nothing new until something closes.',
+      watchFor: 'Things finishing sooner even though you started fewer of them.'
+    },
+    {
+      principle: 'Measure finishing, not starting',
+      action: 'For one week, track only completed items — not items touched, opened, or "in progress".',
+      watchFor: 'The gap between how busy the team feels and how much actually shipped.'
+    },
+    {
+      principle: 'Keep ready backup work',
+      action: 'Before your next likely disruption (late delivery, bad weather, absent approver), keep a short list of useful work that has no dependencies.',
+      watchFor: 'Nobody standing idle when the disruption arrives.'
+    },
+    {
+      principle: "Don't push unready work",
+      action: 'Next time you feel pressure to look busy, name the prerequisite that is missing out loud instead of starting anyway.',
+      watchFor: 'Rework you avoided by waiting.'
+    },
+  ],
+};
+
 export default function Debrief() {
-  const { lpi, chapter, week, dailyMetrics } = useGameStore();
+  const { lpi, chapter, week, dailyMetrics, dailyCommitments } = useGameStore();
   const [location, setLocation] = useLocation();
 
   const handleContinue = () => {
     setLocation('/game');
   };
 
-  const chartData = dailyMetrics.length > 0 ? dailyMetrics : [
-    { day: 1, efficiency: 40, tasksCompletedToday: 1, potentialCapacity: 2 },
-    { day: 2, efficiency: 50, tasksCompletedToday: 1, potentialCapacity: 2 },
-    { day: 3, efficiency: 100, tasksCompletedToday: 2, potentialCapacity: 2 },
-    { day: 4, efficiency: 75, tasksCompletedToday: 1, potentialCapacity: 2 },
-    { day: 5, efficiency: 100, tasksCompletedToday: 2, potentialCapacity: 2 },
-  ];
+  // No synthetic fallback: this page previously substituted invented numbers when no days had
+  // been played, which would present fabricated performance as the player's own report.
+  const chartData = dailyMetrics;
+  const hasData = chartData.length > 0;
+
+  /**
+   * Explains *why* each day went the way it did, from the player's own recorded numbers.
+   * Charting the outcome alone teaches nothing — naming the cause is what transfers.
+   */
+  const findings: { day: number; verdict: 'good' | 'bad' | 'neutral'; text: string }[] = [];
+  for (const m of chartData) {
+    const wip = m.wipAtClose ?? 0;
+    const limit = m.wipLimit ?? 0;
+    const promised = m.committed ?? dailyCommitments[m.day];
+    // Must be the true task count, not the chart-scaled `tasksCompletedToday`.
+    const delivered = m.deliveredActual ?? 0;
+
+    if (limit > 0 && wip > limit) {
+      findings.push({
+        day: m.day,
+        verdict: 'bad',
+        text: `Closed with ${wip} tasks open against a limit of ${limit}. Only ${delivered} finished — work spread thinner than the crew could absorb, so throughput fell. This is the WIP effect.`
+      });
+    } else if (limit > 0 && wip === 0 && delivered === 0) {
+      findings.push({
+        day: m.day,
+        verdict: 'bad',
+        text: `Nothing open and nothing finished. Idle capacity is as costly as congestion — overhead is charged either way.`
+      });
+    } else if (m.efficiency >= 80) {
+      findings.push({
+        day: m.day,
+        verdict: 'good',
+        text: `Held WIP at ${wip}${limit ? `/${limit}` : ''} and finished ${delivered}, hitting ${m.efficiency}% efficiency. Fewer things open, more things done.`
+      });
+    }
+
+    if (promised !== undefined) {
+      if (delivered >= promised) {
+        findings.push({
+          day: m.day,
+          verdict: 'good',
+          text: `Promised ${promised}, delivered ${delivered}. A promise you keep is what lets the next trade plan around you.`
+        });
+      } else {
+        findings.push({
+          day: m.day,
+          verdict: 'bad',
+          text: `Promised ${promised} but delivered ${delivered}. Over-promising is why schedules stop being believed — a smaller number you hit is worth more than a bigger one you miss.`
+        });
+      }
+    }
+  }
+
+  const overWipDays = chartData.filter(m => (m.wipLimit ?? 0) > 0 && (m.wipAtClose ?? 0) > (m.wipLimit ?? 0));
+  const avgEffOverWip = overWipDays.length
+    ? Math.round(overWipDays.reduce((a, m) => a + m.efficiency, 0) / overWipDays.length)
+    : null;
+  const withinDays = chartData.filter(m => (m.wipLimit ?? 0) > 0 && (m.wipAtClose ?? 0) <= (m.wipLimit ?? 0));
+  const avgEffWithin = withinDays.length
+    ? Math.round(withinDays.reduce((a, m) => a + m.efficiency, 0) / withinDays.length)
+    : null;
+
+  const actions = REAL_WORLD_ACTIONS[chapter] ?? [];
 
   return (
     <div className="w-full min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 md:p-8 text-white overflow-y-auto">
@@ -90,7 +174,7 @@ export default function Debrief() {
              <div className="bg-slate-800/30 p-5 rounded-2xl border border-slate-800/50 flex-1">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Daily Throughput</span>
-                  <span className="text-emerald-400 font-mono text-xs font-bold">{chartData.reduce((acc, d) => acc + (d.tasksCompletedToday || 0), 0)} Total</span>
+                  <span className="text-emerald-400 font-mono text-xs font-bold">{chartData.reduce((acc, d) => acc + (d.deliveredActual ?? 0), 0)} Total</span>
                 </div>
                 <div className="h-32 w-full">
                   <ResponsiveContainer width="100%" height="100%">
@@ -137,6 +221,80 @@ export default function Debrief() {
              </div>
           </div>
         </div>
+
+        {/* WHY it went that way — the part that actually teaches. */}
+        {hasData && (
+          <div className="mb-10 bg-slate-800/30 p-6 rounded-3xl border border-slate-800/50">
+            <h3 className="text-slate-400 font-black text-xs uppercase tracking-widest mb-5 flex items-center gap-2">
+              <span className="w-2 h-2 bg-amber-500 rounded-full"></span> What Caused It
+            </h3>
+
+            {avgEffOverWip !== null && avgEffWithin !== null && (
+              <div className="mb-5 grid grid-cols-2 gap-3">
+                <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-2xl p-4">
+                  <div className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Within WIP limit</div>
+                  <div className="text-3xl font-black text-emerald-400">{avgEffWithin}%</div>
+                  <div className="text-[11px] text-slate-400 mt-1">avg efficiency across {withinDays.length} day{withinDays.length === 1 ? '' : 's'}</div>
+                </div>
+                <div className="bg-red-900/20 border border-red-500/30 rounded-2xl p-4">
+                  <div className="text-[10px] font-black text-red-400 uppercase tracking-widest">Over WIP limit</div>
+                  <div className="text-3xl font-black text-red-400">{avgEffOverWip}%</div>
+                  <div className="text-[11px] text-slate-400 mt-1">avg efficiency across {overWipDays.length} day{overWipDays.length === 1 ? '' : 's'}</div>
+                </div>
+                <p className="col-span-2 text-xs text-slate-400 leading-relaxed">
+                  That difference is the entire lesson of this chapter, measured on your own site — not
+                  asserted at you in a tooltip.
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              {findings.length === 0 && (
+                <p className="text-sm text-slate-500">No notable events recorded yet.</p>
+              )}
+              {findings.map((f, i) => (
+                <div
+                  key={i}
+                  className={`flex gap-3 p-3 rounded-xl border text-sm leading-snug ${
+                    f.verdict === 'good'
+                      ? 'bg-emerald-900/10 border-emerald-500/25 text-emerald-100'
+                      : f.verdict === 'bad'
+                        ? 'bg-amber-900/10 border-amber-500/25 text-amber-100'
+                        : 'bg-slate-800/40 border-slate-700/50 text-slate-300'
+                  }`}
+                >
+                  <span className="shrink-0 font-black text-[10px] uppercase tracking-widest opacity-70 mt-0.5">
+                    Day {f.day}
+                  </span>
+                  <span>{f.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Transfer to the real job. */}
+        {actions.length > 0 && (
+          <div className="mb-10 bg-cyan-950/20 p-6 rounded-3xl border border-cyan-500/25">
+            <h3 className="text-cyan-300 font-black text-xs uppercase tracking-widest mb-2 flex items-center gap-2">
+              <span className="w-2 h-2 bg-cyan-400 rounded-full"></span> Try This At Work
+            </h3>
+            <p className="text-sm text-slate-400 mb-5">
+              You can only claim to have learned these once they change what you do. Pick one.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {actions.map((a, i) => (
+                <div key={i} className="bg-slate-900/60 border border-slate-700/50 rounded-2xl p-4">
+                  <div className="text-[10px] font-black text-cyan-400 uppercase tracking-widest mb-1.5">{a.principle}</div>
+                  <p className="text-sm text-slate-200 font-medium leading-snug mb-2">{a.action}</p>
+                  <p className="text-[11px] text-slate-400 leading-snug">
+                    <span className="font-bold text-slate-300">Watch for:</span> {a.watchFor}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col md:flex-row justify-between items-center bg-blue-600/5 p-8 rounded-[2rem] border border-blue-500/20 gap-6">
           <div className="flex items-center gap-6 text-center md:text-left">

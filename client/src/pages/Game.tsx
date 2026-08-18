@@ -304,6 +304,7 @@ export default function Game() {
         tutorialActive: state.tutorialActive,
         tutorialStep: state.tutorialStep,
         dailyMetrics: state.dailyMetrics,
+        dailyCommitments: state.dailyCommitments,
         previousDoneCount: state.previousDoneCount,
         previousWasteCount: state.previousWasteCount,
         cumulativeTasksCompleted: state.cumulativeTasksCompleted,
