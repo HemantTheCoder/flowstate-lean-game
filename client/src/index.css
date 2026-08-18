@@ -84,7 +84,10 @@
   .hud-tint-purple { --hud-color: rgba(168, 85, 247, 0.55); }
   .hud-tint-white { --hud-color: rgba(255, 255, 255, 0.5); }
 
-  /* Brushed-metal instrument panel: subtle sheen + inset bevel so panels feel physical, not flat */
+  /* Brushed-metal instrument panel: subtle sheen + inset bevel so panels feel physical, not flat.
+     NOTE: this owns `box-shadow` (bevel + elevation together). Custom utilities emit after
+     Tailwind's, so a `shadow-*` utility on the same element is silently dropped — don't pair
+     them, set elevation here or via an inline style instead. */
   .metal-panel {
     background-image:
       linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 35%),

@@ -206,7 +206,13 @@ export default function ChapterSelect() {
                                 data-testid={`chapter-card-${chapter.id}`}
                                 className={`group relative p-8 metal-panel backdrop-blur-xl border-2 rounded-3xl flex flex-col justify-between transition-all duration-500 cursor-pointer overflow-hidden hud-corners ${theme.bg} ${theme.border} ${theme.corner} ${isEffectivelyLocked && !chapter.isComingSoon ? 'opacity-70 hover:opacity-100 grayscale-[0.4] hover:grayscale-0' : ''}`}
                                 style={{
-                                    boxShadow: isHovered && (!isEffectivelyLocked || chapter.isComingSoon) ? `0 20px 40px -10px ${theme.glow}` : '0 10px 30px -10px rgba(0,0,0,0.5)'
+                                    // Inline box-shadow wins over .metal-panel, so re-state its inset bevel
+                                    // here or the cards lose their physical edge highlight.
+                                    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.5), ${
+                                        isHovered && (!isEffectivelyLocked || chapter.isComingSoon)
+                                            ? `0 20px 40px -10px ${theme.glow}`
+                                            : '0 10px 30px -10px rgba(0,0,0,0.5)'
+                                    }`
                                 }}
                             >
                                 {/* Internal Animated Gradient Glow */}

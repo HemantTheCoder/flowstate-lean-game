@@ -1161,7 +1161,7 @@ export default function Game() {
         <motion.div
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className={`relative flex flex-col md:flex-row items-stretch pointer-events-auto w-full max-w-6xl mx-auto metal-panel backdrop-blur-xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border-2 border-slate-700/50 overflow-hidden hud-corners hud-tint-cyan ${chapter >= 4 ? 'hidden' : ''}`}
+          className={`relative flex flex-col md:flex-row items-stretch pointer-events-auto w-full max-w-6xl mx-auto metal-panel backdrop-blur-xl rounded-xl border-2 border-slate-700/50 overflow-hidden hud-corners hud-tint-cyan ${chapter >= 4 ? 'hidden' : ''}`}
         >
           {/* Objective Section */}
           <div className="flex-1 p-3 md:p-4 border-b md:border-b-0 md:border-r border-slate-700/50 bg-slate-800/40 flex flex-col justify-center">
@@ -1246,7 +1246,7 @@ export default function Game() {
           style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}
         >
           {/* Stats Bar */}
-          <div className="relative flex items-center gap-3 sm:gap-6 metal-panel backdrop-blur-md px-4 sm:px-6 py-3 rounded-2xl border border-white/5 shadow-2xl hud-corners hud-tint-cyan">
+          <div className="relative flex items-center gap-3 sm:gap-6 metal-panel backdrop-blur-md px-4 sm:px-6 py-3 rounded-2xl border border-white/5 hud-corners hud-tint-cyan">
             <div id="lives-box">
               <LifeHearts />
             </div>
