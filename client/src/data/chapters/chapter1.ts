@@ -84,7 +84,12 @@ export const WEEK_1_SCHEDULE: DayConfig[] = [
         lesson: "Concept: Reliability (PPC).",
         dialogue: [
             { character: 'Isha', text: "She's here. The Inspector. Everyone look sharp.", emotion: 'stressed' },
-            { character: 'Rao', text: "Just smile and show her the activity.", emotion: 'neutral' }
+            { character: 'Rao', text: "Just smile and show her the activity.", emotion: 'neutral' },
+            { character: 'Old Foreman', text: "Forty years I've watched inspections. They never count what's started. Only what's standing.", emotion: 'neutral' },
+            { character: 'Isha', text: "So all those weeks of 'everyone busy on everything' were... what, exactly?", emotion: 'worried' },
+            { character: 'Engineer', text: "Motion without progress. A site can look fully occupied and still deliver nothing — that gap is the waste we've been cutting all week.", emotion: 'neutral' },
+            { character: 'Mira', text: "Then let the board speak for us. Whatever reached Done is real. Whatever's still mid-air isn't.", emotion: 'neutral' },
+            { character: 'Old Foreman', text: "Aye. The wall doesn't care how hard you meant to work.", emotion: 'neutral' }
         ],
         event: 'inspection',
         briefing: {
@@ -110,5 +115,14 @@ export const DAY_5_BAD: DialogueLine[] = [
     { character: 'Rao', text: "We... uh... we wanted to show progress!", emotion: 'stressed' },
     { character: 'Inspector', text: "This isn't progress. This is chaos. Now you have to redo the grading.", emotion: 'angry' },
     { character: 'Inspector', text: "I am flagging this project as 'At Risk'. Clean this up, or funding stops.", emotion: 'angry' },
-    { character: 'Rao', text: "You embarrassed me, Engineer! I told you to make it look GOOD, not messy!", emotion: 'angry' }
+    { character: 'Rao', text: "You embarrassed me, Engineer! I told you to make it look GOOD, not messy!", emotion: 'angry' },
+    // The losing path still has to teach, or it is only a punishment. Anil names the mechanism,
+    // Rajiv is allowed a crack of doubt rather than staying a cartoon, and the Inspector states
+    // the actual rule the player just broke.
+    { character: 'Old Foreman', text: "It did look good, Rajiv. For about an hour. Then it rained on open ground and we lost the week.", emotion: 'neutral' },
+    { character: 'Engineer', text: "We started work the site wasn't ready for. Every one of those tasks has to be undone before it can be redone — we paid twice for the same metre of ground.", emotion: 'neutral' },
+    { character: 'Rao', text: "...The Inspector counted finished work. Not busy work. I was counting the wrong thing.", emotion: 'worried' },
+    { character: 'Inspector', text: "Starting is free. Finishing is what you're paid for. Limit what's open at once and this doesn't happen.", emotion: 'neutral' },
+    { character: 'Mira', text: "We can recover this. But we do it by closing what's open, not by opening more.", emotion: 'stressed' },
+    { character: 'Engineer', text: "Understood. Fewer fronts, finished properly. That's the lesson, and it cost us to learn it.", emotion: 'neutral' }
 ];

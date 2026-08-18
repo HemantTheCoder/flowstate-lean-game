@@ -114,6 +114,49 @@ const DialogueBoxInner: React.FC = () => {
     };
     const focus = portrait ? (PORTRAIT_FOCUS[portrait] ?? '50% 24%') : '50% 24%';
 
+    /**
+     * Every dialogue line in the chapter data already carries an `emotion`, but nothing rendered
+     * it, so characters read as static regardless of what they were saying. There is only one
+     * portrait per character, so emotion is conveyed through colour grading, ring colour and
+     * idle motion rather than swapped art.
+     */
+    const emotion = line.emotion ?? 'neutral';
+    const EMOTION_STYLE: Record<string, {
+        filter: string; ring: string; label: string; anim: any;
+    }> = {
+        neutral: {
+            filter: 'none',
+            ring: isPlayer ? 'ring-cyan-400/50' : 'ring-slate-300/40',
+            label: '',
+            anim: { y: [0, -2, 0], transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' } },
+        },
+        happy: {
+            filter: 'saturate(1.15) brightness(1.08)',
+            ring: 'ring-emerald-400/70',
+            label: 'PLEASED',
+            anim: { y: [0, -6, 0], transition: { duration: 1.6, repeat: Infinity, ease: 'easeInOut' } },
+        },
+        stressed: {
+            filter: 'saturate(0.8) brightness(0.95)',
+            ring: 'ring-amber-400/70',
+            label: 'UNDER PRESSURE',
+            anim: { y: [0, -1.5, 0, 1.5, 0], transition: { duration: 0.45, repeat: Infinity, ease: 'linear' } },
+        },
+        angry: {
+            filter: 'saturate(1.25) brightness(0.95) hue-rotate(-8deg)',
+            ring: 'ring-red-500/80',
+            label: 'ANGRY',
+            anim: { x: [0, -3, 3, -2, 2, 0], transition: { duration: 0.4, repeat: Infinity, repeatDelay: 1.1 } },
+        },
+        worried: {
+            filter: 'saturate(0.7) brightness(0.93)',
+            ring: 'ring-indigo-400/70',
+            label: 'WORRIED',
+            anim: { rotate: [0, -1.5, 0, 1.5, 0], transition: { duration: 3.2, repeat: Infinity, ease: 'easeInOut' } },
+        },
+    };
+    const mood = EMOTION_STYLE[emotion] ?? EMOTION_STYLE.neutral;
+
     return (
         <AnimatePresence>
             <motion.div
@@ -142,9 +185,9 @@ const DialogueBoxInner: React.FC = () => {
                                 background workers competing with the real scene behind the UI.
                                 A tight round frame plus a soft edge fade keeps attention on the
                                 face and lets the busy background dissolve into the panel. */}
-                            <div className="relative">
+                            <motion.div className="relative" animate={mood.anim}>
                                 <div
-                                    className={`w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full overflow-hidden ring-2 ${isPlayer ? 'ring-cyan-400/50' : 'ring-slate-300/40'} shadow-[0_12px_30px_-8px_rgba(0,0,0,0.75)] bg-slate-800`}
+                                    className={`w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full overflow-hidden ring-2 ${mood.ring} shadow-[0_12px_30px_-8px_rgba(0,0,0,0.75)] bg-slate-800 transition-all duration-500`}
                                     style={{
                                         WebkitMaskImage: 'radial-gradient(circle at 50% 45%, #000 62%, transparent 100%)',
                                         maskImage: 'radial-gradient(circle at 50% 45%, #000 62%, transparent 100%)',
@@ -153,11 +196,16 @@ const DialogueBoxInner: React.FC = () => {
                                     <img
                                         src={`/assets/${portrait}`}
                                         alt={line.character}
-                                        className="w-full h-full object-cover scale-[1.15]"
-                                        style={{ objectPosition: focus }}
+                                        className="w-full h-full object-cover scale-[1.15] transition-[filter] duration-500"
+                                        style={{ objectPosition: focus, filter: mood.filter }}
                                     />
                                 </div>
-                            </div>
+                                {mood.label && (
+                                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-slate-950/85 border border-white/10 text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-slate-300 whitespace-nowrap">
+                                        {mood.label}
+                                    </div>
+                                )}
+                            </motion.div>
                         </motion.div>
                     )}
 
@@ -171,9 +219,15 @@ const DialogueBoxInner: React.FC = () => {
                             {dialogueIndex + 1} / {currentDialogue.length}
                         </div>
 
-                        {/* Character Name Tag */}
-                        <div className={`absolute -top-4 sm:-top-5 left-4 sm:left-8 px-3 sm:px-6 py-1 sm:py-2 rounded-xl text-white font-black text-sm sm:text-base md:text-lg shadow-lg transform -rotate-1 ${bgColor}`}>
+                        {/* Character Name Tag — carries the mood too, since the portrait is hidden
+                            on small screens and would otherwise be the only emotion cue. */}
+                        <div className={`absolute -top-4 sm:-top-5 left-4 sm:left-8 flex items-center gap-2 px-3 sm:px-6 py-1 sm:py-2 rounded-xl text-white font-black text-sm sm:text-base md:text-lg shadow-lg transform -rotate-1 ${bgColor}`}>
                             {displayName.toUpperCase()}
+                            {mood.label && (
+                                <span className="sm:hidden text-[8px] font-black uppercase tracking-widest opacity-80">
+                                    · {mood.label}
+                                </span>
+                            )}
                         </div>
 
                         {/* Text Content */}
