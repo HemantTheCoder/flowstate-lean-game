@@ -50,7 +50,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
             if (tutorialStep === 1.2) targetId = 'btn-close-project-sheet';
             if (tutorialStep === 1.5) targetId = 'btn-kanban';
             if (tutorialStep === 2) targetId = 'col-backlog';
-            if (tutorialStep === 3) targetId = 'col-ready';
+            // Was 'col-ready', which does not exist: chapter 1 renders backlog/doing/done only.
+            // The step teaches crew capacity, so it belongs on the In Progress column.
+            if (tutorialStep === 3) targetId = 'col-doing';
             if (tutorialStep === 4) targetId = 'col-doing';
             if (tutorialStep === 5) targetId = 'col-doing';
             if (tutorialStep === 6) targetId = 'smart-advisor-box';
@@ -81,6 +83,15 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                         }
                         return newPos;
                     });
+                } else {
+                    // Previously this branch did nothing, so a step whose target was missing kept
+                    // the *previous* step's rectangle — the spotlight and its tooltip stayed
+                    // anchored to the wrong element instead of the one being described. Clearing
+                    // is the honest failure mode, and it is loud in dev so missing ids get fixed.
+                    if (import.meta.env.DEV) {
+                        console.warn(`[Tutorial] step ${tutorialStep}: no element with id "${targetId}" — spotlight cleared.`);
+                    }
+                    setSpotlightPos(prev => (prev ? null : prev));
                 }
             } else {
                 setSpotlightPos(prev => prev ? null : prev);
@@ -99,18 +110,68 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
 
     if (!tutorialActive || tutorialStep === 0 || (chapter === 1 && day === 1 && !flags['master_plan_seen'])) return null;
 
+    const RADIUS = 14;
+
+    /**
+     * Dim path with a rounded cut-out for the target. Rounded corners plus the soft feather and
+     * pulsing ring below turn the previous hard rectangular hole into something that actually
+     * reads as a spotlight on the element being described.
+     */
     const getMaskPath = () => {
-        if (!spotlightPos) return `M0 0 h${window.innerWidth} v${window.innerHeight} h-${window.innerWidth} z`;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const outer = `M0 0 H${vw} V${vh} H0 Z`;
+        if (!spotlightPos) return outer;
         const { x, y, w, h } = spotlightPos;
-        return `M0 0 h${window.innerWidth} v${window.innerHeight} h-${window.innerWidth} z M${x} ${y} v${h} h${w} v-${h} z`;
+        const r = Math.max(0, Math.min(RADIUS, w / 2, h / 2));
+        const hole =
+            `M${x + r} ${y}` +
+            `H${x + w - r} A${r} ${r} 0 0 1 ${x + w} ${y + r}` +
+            `V${y + h - r} A${r} ${r} 0 0 1 ${x + w - r} ${y + h}` +
+            `H${x + r} A${r} ${r} 0 0 1 ${x} ${y + h - r}` +
+            `V${y + r} A${r} ${r} 0 0 1 ${x + r} ${y} Z`;
+        return `${outer} ${hole}`;
     };
 
     return (
         <div className="absolute inset-0 z-[70] pointer-events-none overflow-hidden text-white font-bold text-shadow-lg">
 
-            <svg className="absolute inset-0 w-full h-full opacity-60 pointer-events-none">
-                <path d={getMaskPath()} fill="black" fillRule="evenodd" />
+            <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                <defs>
+                    {/* Feathers the cut-out edge so the dim layer falls off gradually. */}
+                    <filter id="tut-feather" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="6" />
+                    </filter>
+                </defs>
+                <path
+                    d={getMaskPath()}
+                    fill="rgba(2,6,23,0.72)"
+                    fillRule="evenodd"
+                    filter={spotlightPos ? 'url(#tut-feather)' : undefined}
+                />
             </svg>
+
+            {/* Pulsing ring around the spotlit element, so the eye is drawn to the target itself
+                rather than just to a gap in the dimming. */}
+            {spotlightPos && (
+                <motion.div
+                    className="absolute rounded-2xl pointer-events-none"
+                    style={{
+                        left: spotlightPos.x,
+                        top: spotlightPos.y,
+                        width: spotlightPos.w,
+                        height: spotlightPos.h,
+                    }}
+                    animate={{
+                        boxShadow: [
+                            '0 0 0 2px rgba(34,211,238,0.85), 0 0 22px 4px rgba(34,211,238,0.30)',
+                            '0 0 0 3px rgba(34,211,238,1), 0 0 40px 10px rgba(34,211,238,0.50)',
+                            '0 0 0 2px rgba(34,211,238,0.85), 0 0 22px 4px rgba(34,211,238,0.30)',
+                        ],
+                    }}
+                    transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                />
+            )}
 
             <AnimatePresence>
 

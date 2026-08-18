@@ -1171,8 +1171,9 @@ export default function Game() {
           animate={{ y: 0, opacity: 1 }}
           className={`relative flex flex-col md:flex-row items-stretch pointer-events-auto w-full max-w-6xl mx-auto metal-panel backdrop-blur-xl rounded-xl border-2 border-slate-700/50 overflow-hidden hud-corners hud-tint-cyan ${chapter >= 4 ? 'hidden' : ''}`}
         >
-          {/* Objective Section */}
-          <div className="flex-1 p-3 md:p-4 border-b md:border-b-0 md:border-r border-slate-700/50 bg-slate-800/40 flex flex-col justify-center">
+          {/* Objective Section — this IS the Smart Advisor in ch1 (fed by getSmartObjective).
+              The id is what the tutorial spotlights on step 6. */}
+          <div id="smart-advisor-box" className="flex-1 p-3 md:p-4 border-b md:border-b-0 md:border-r border-slate-700/50 bg-slate-800/40 flex flex-col justify-center">
             <div className="flex items-center gap-2 mb-1">
               <Target className="w-4 h-4 text-cyan-500" />
               <h3 className="font-bold text-slate-400 text-[10px] md:text-xs tracking-widest uppercase">Active Objective</h3>
@@ -1185,8 +1186,8 @@ export default function Game() {
             </div>
           </div>
 
-          {/* Stats & Actions Section */}
-          <div className="flex items-center justify-between md:justify-end p-2 md:p-4 gap-3 md:gap-6 bg-slate-950/60">
+          {/* Stats & Actions Section — spotlighted by tutorial step 7 (Project Health). */}
+          <div id="stats-box" className="flex items-center justify-between md:justify-end p-2 md:p-4 gap-3 md:gap-6 bg-slate-950/60">
             <div className="text-center">
               <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Budget</div>
               <div className="font-mono font-bold text-emerald-400 text-sm md:text-base">{formatCurrency(funds, currency)}</div>
