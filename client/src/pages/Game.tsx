@@ -1153,9 +1153,14 @@ export default function Game() {
   }
 
   return (
-    <div className={`w-full h-screen min-h-[100dvh] relative overflow-hidden transition-colors duration-1000 bg-slate-950/60`}>
+    <div className={`w-full h-screen min-h-[100dvh] relative overflow-hidden transition-colors duration-1000 bg-slate-950`}>
       {/* 1. Phaser Layer (Background) */}
       <GameCanvas />
+
+      {/* Scrim: darkens only the top and bottom bands where the HUD bars sit, so panel text
+          stays legible while the middle of the construction site stays clearly visible.
+          Replaces the old flat 60% tint that dimmed the whole scene. */}
+      <div className="absolute inset-0 z-[1] pointer-events-none bg-gradient-to-b from-slate-950/70 via-slate-950/10 to-slate-950/70" />
 
       {/* 2. UI Overlay Layer (HUD, Dialogues, Windows) */}
       <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-4">

@@ -31,9 +31,11 @@ export const GameCanvas: React.FC = () => {
     }, []);
 
     return (
+        // z-0, not -z-10: at a negative z-index the canvas painted *behind* the game
+        // root's own background tint, which veiled the entire reactive site scene.
         <div
             id="phaser-container"
-            className="w-full h-full absolute top-0 left-0 -z-10 overflow-hidden"
+            className="w-full h-full absolute top-0 left-0 z-0 overflow-hidden"
         />
     );
 };

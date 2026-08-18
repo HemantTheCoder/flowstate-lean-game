@@ -42,32 +42,38 @@ function Router() {
   const [location] = useLocation();
 
   return (
-    <AnimatePresence mode="popLayout">
-      <motion.div
-        key={location}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
-        style={{ width: "100%", height: "100%" }}
-      >
-        <Switch location={location}>
-          <Route path="/" component={Home} />
-          <Route path="/chapters" component={ChapterSelect} />
-          <Route path="/game" component={Game} />
-          <Route path="/debrief" component={Debrief} />
-          <Route path="/dashboard" component={Dashboard} />
-          <Route path="/settings" component={Settings} />
-          <Route path="/leaderboard" component={Leaderboard} />
-          <Route path="/profile" component={Profile} />
-          <Route path="/auth" component={Auth} />
-          <Route path="/dev" component={DevDashboard} />
-          <Route path="/credits" component={Credits} />
-          <Route path="/feedback" component={Feedback} />
-          <Route component={NotFound} />
-        </Switch>
-      </motion.div>
-    </AnimatePresence>
+    // Pages are absolutely positioned so that, during the cross-fade, the outgoing and
+    // incoming page overlay each other instead of stacking in normal flow (two 100%-height
+    // divs in flow made the document briefly twice the viewport height and jumped the layout).
+    // The incoming page is later in DOM order, so it also receives the clicks.
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <AnimatePresence mode="popLayout">
+        <motion.div
+          key={location}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+        >
+          <Switch location={location}>
+            <Route path="/" component={Home} />
+            <Route path="/chapters" component={ChapterSelect} />
+            <Route path="/game" component={Game} />
+            <Route path="/debrief" component={Debrief} />
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/settings" component={Settings} />
+            <Route path="/leaderboard" component={Leaderboard} />
+            <Route path="/profile" component={Profile} />
+            <Route path="/auth" component={Auth} />
+            <Route path="/dev" component={DevDashboard} />
+            <Route path="/credits" component={Credits} />
+            <Route path="/feedback" component={Feedback} />
+            <Route component={NotFound} />
+          </Switch>
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 }
 

@@ -3,6 +3,7 @@ import { useGameStore } from '@/store/gameStore';
 
 export class MainScene extends Phaser.Scene {
     private workers: Phaser.GameObjects.Sprite[] = [];
+    private completedStructures = 0;
     private unsubscribe?: () => void;
     private flowText!: Phaser.GameObjects.Text;
     private ground!: Phaser.GameObjects.TileSprite;
@@ -57,63 +58,10 @@ export class MainScene extends Phaser.Scene {
             g.generateTexture('rain_drop', 2, 10);
         }
 
-        // 3. Add Workers - Distributed across the lower portion of screen (ground level)
-        const workerTypes = ['worker_blue', 'worker_orange', 'worker_green'];
-
-        for (let i = 0; i < 8; i++) {
-            // Position workers in the lower 40% of the screen (where ground would be)
-            const startX = Phaser.Math.Between(80, width - 80);
-            const startY = Phaser.Math.Between(height * 0.55, height - 100);
-            const type = Phaser.Math.RND.pick(workerTypes);
-
-            const worker = this.add.sprite(startX, startY, type);
-            worker.setScale(0.9);
-            worker.setDepth(startY); // Depth sorting based on Y position
-
-            // Interactivity
-            worker.setInteractive({ cursor: 'pointer' });
-            worker.on('pointerover', () => worker.setScale(1.1));
-            worker.on('pointerout', () => worker.setScale(0.9));
-            worker.on('pointerdown', () => {
-                const barks = ["Working hard!", "Almost done!", "Need more materials!", "Following the plan!"];
-                this.spawnWorkerBark(Phaser.Utils.Array.GetRandom(barks));
-                this.tweens.add({ targets: worker, y: '-=15', duration: 150, yoyo: true });
-            });
-
-            // Give each worker a work state and behavior
-            const workerData: any = worker;
-            workerData.vx = (Math.random() - 0.5) * 0.8;
-            workerData.vy = (Math.random() - 0.5) * 0.4;
-            workerData.workState = Math.random() > 0.3 ? 'working' : 'walking';
-            workerData.workTimer = Phaser.Math.Between(2000, 5000);
-            workerData.workStartTime = this.time.now;
-
-            // Working animation (bending/hammering motion)
-            if (workerData.workState === 'working') {
-                this.tweens.add({
-                    targets: worker,
-                    scaleY: 0.85,
-                    duration: 400,
-                    yoyo: true,
-                    repeat: -1,
-                    ease: 'Sine.easeInOut'
-                });
-            } else {
-                // Walking bobbing animation
-                this.tweens.add({
-                    targets: worker,
-                    y: '+=4',
-                    duration: 200,
-                    yoyo: true,
-                    repeat: -1
-                });
-            }
-
-            this.workers.push(worker);
-        }
-
-        // React to Store Changes (Zustand subscription)
+        // 3. Crews are driven by how many tasks are actually in Doing, so the site staffing
+        //    always mirrors the player's WIP decisions rather than a hard-coded headcount.
         const store = useGameStore;
+        this.syncCrewsToDoing(store.getState().columns.find(c => c.id === 'doing')?.tasks.length || 0);
 
         // 3.1 Spawn Initial Buildings (Persistent)
         const initialDone = store.getState().columns.find(c => c.id === 'done')?.tasks.length || 0;
@@ -129,6 +77,11 @@ export class MainScene extends Phaser.Scene {
 
             const prevDoing = prevState.columns.find(c => c.id === 'doing')?.tasks.length || 0;
             const currDoing = state.columns.find(c => c.id === 'doing')?.tasks.length || 0;
+
+            // Keep visible crew count in step with active work.
+            if (currDoing !== prevDoing) {
+                this.syncCrewsToDoing(currDoing);
+            }
 
             if (currDone > prevDone) {
                 this.spawnBuildingEffect();
@@ -245,24 +198,101 @@ export class MainScene extends Phaser.Scene {
             this.ground.setPosition(width / 2, height / 2);
             this.ground.setSize(width, height);
         }
+
+        // Keep the flow readout centred in the visible band after an orientation change.
+        if (this.flowText) {
+            this.flowText.setPosition(width / 2, height * 0.62);
+        }
     }
 
     setupFlowText() {
-        this.flowText = this.add.text(10, 10, 'Workflow: Stable', {
-            font: '20px Arial',
-            color: '#333',
-            backgroundColor: '#ffffff'
-        });
-        this.flowText.setPadding(10);
+        // Sits low-centre, between the top HUD panel and the bottom toolbar, so it is actually
+        // on screen. Previously at (10,10) it was completely hidden behind the HUD panel.
+        const { width, height } = this.scale;
+        this.flowText = this.add.text(width / 2, height * 0.62, 'SITE FLOW: SMOOTH', {
+            fontFamily: 'Inter, system-ui, sans-serif',
+            fontSize: '13px',
+            fontStyle: 'bold',
+            color: '#6ee7b7',
+            backgroundColor: 'rgba(2,6,23,0.55)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setDepth(900);
+    }
+
+    /**
+     * One visible crew per task in Doing — this is the core Lean lesson made visual.
+     * Respecting the WIP limit shows a calm site with a couple of focused crews; breaching it
+     * crowds the site with crews who then visibly slow down (see `update`).
+     */
+    syncCrewsToDoing(doingCount: number) {
+        const { width, height } = this.scale;
+        const workerTypes = ['worker_blue', 'worker_orange', 'worker_green'];
+        // Always keep a small baseline of ambient site presence so an empty board isn't a ghost town.
+        const target = Math.max(2, Math.min(doingCount, 10));
+
+        while (this.workers.length > target) {
+            const w = this.workers.pop();
+            if (!w) break;
+            this.tweens.add({
+                targets: w,
+                alpha: 0,
+                y: w.y - 20,
+                duration: 400,
+                onComplete: () => w.destroy()
+            });
+        }
+
+        while (this.workers.length < target) {
+            const i = this.workers.length;
+            // Spread crews across the mid-band; avoids the very bottom where the toolbar sits.
+            const startX = Phaser.Math.Between(90, Math.max(140, width - 90));
+            const startY = Phaser.Math.Between(Math.round(height * 0.42), Math.round(height * 0.66));
+            const type = workerTypes[i % workerTypes.length];
+
+            const worker = this.add.sprite(startX, startY, type);
+            worker.setScale(0.9).setDepth(Math.round(startY)).setAlpha(0);
+            this.tweens.add({ targets: worker, alpha: 1, duration: 400 });
+
+            worker.setInteractive({ cursor: 'pointer' });
+            worker.on('pointerover', () => worker.setScale(1.05));
+            worker.on('pointerout', () => worker.setScale(0.9));
+            worker.on('pointerdown', () => {
+                const barks = ['Working hard!', 'Almost done!', 'Need more materials!', 'Following the plan!'];
+                this.spawnWorkerBark(Phaser.Utils.Array.GetRandom(barks));
+                this.tweens.add({ targets: worker, y: '-=15', duration: 150, yoyo: true });
+            });
+
+            const wd: any = worker;
+            wd.vx = (Math.random() - 0.5) * 0.8;
+            wd.vy = (Math.random() - 0.5) * 0.4;
+            this.tweens.add({
+                targets: worker,
+                scaleY: 0.85,
+                duration: 400,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+
+            this.workers.push(worker);
+        }
     }
 
     spawnBuildingEffect() {
-        // Find a random spot on the isometric grid
-        const isoX = Math.floor(Math.random() * 10) * 64; // Grid size assumption
-        const isoY = Math.floor(Math.random() * 10) * 32;
+        // Lay completed structures left-to-right in a steady row along the build line, so the
+        // site visibly grows as work finishes. The previous version scattered them at random
+        // points on a notional iso grid, which read as noise rather than progress.
+        const { width, height } = this.scale;
+        const index = this.completedStructures++;
+        const perRow = 8;
+        const col = index % perRow;
+        const row = Math.floor(index / perRow);
 
-        const x = (this.scale.width / 2) + (isoX - isoY);
-        const y = (this.scale.height / 4) + ((isoX + isoY) / 2);
+        const margin = Math.min(120, width * 0.12);
+        const usable = Math.max(120, width - margin * 2);
+        const x = margin + (usable / perRow) * (col + 0.5);
+        // Later rows sit slightly higher and smaller, giving a cheap sense of depth.
+        const y = height * 0.66 - row * 46;
 
         // Create a "building" (using a tinted box or sprite for now if asset missing)
         // Since we don't have a building asset yet, lets use a particle burst or a 'foundation' sprite
@@ -426,24 +456,33 @@ export class MainScene extends Phaser.Scene {
         }
 
         const doingCol = state.columns.find(c => c.id === 'doing');
-        const wipRatio = doingCol ? doingCol.tasks.length / doingCol.wipLimit : 0.5;
+        // Guard the divisor: wipLimit can be 0/undefined (e.g. the dev jump helper builds
+        // columns without it), which previously produced Infinity/NaN here.
+        const wipLimit = doingCol?.wipLimit && doingCol.wipLimit > 0 ? doingCol.wipLimit : 0;
+        const doingCount = doingCol?.tasks.length ?? 0;
+        const wipRatio = wipLimit > 0 ? doingCount / wipLimit : 0;
 
-        // Update Flow Text
+        if (!this.flowText) return;
+
+        // Update Flow Text — names the actual cause so the player links cause to effect.
         if (wipRatio > 1) {
-            this.flowText.setText('Workflow: CONGESTED! (Over WIP)');
-            this.flowText.setColor('#ef4444');
+            this.flowText.setText(`SITE FLOW: CONGESTED — ${doingCount} crews, limit ${wipLimit}`);
+            this.flowText.setColor('#fca5a5');
 
             // Spawn Gremlins (Visual Waste)
             if (Math.random() > 0.95) {
                 this.spawnGremlin();
             }
 
-        } else if (wipRatio > 0.8) {
-            this.flowText.setText('Workflow: Busy');
-            this.flowText.setColor('#f59e0b');
+        } else if (wipRatio >= 0.8) {
+            this.flowText.setText(`SITE FLOW: AT CAPACITY — ${doingCount}/${wipLimit}`);
+            this.flowText.setColor('#fcd34d');
+        } else if (doingCount === 0) {
+            this.flowText.setText('SITE FLOW: IDLE — no work pulled');
+            this.flowText.setColor('#94a3b8');
         } else {
-            this.flowText.setText('Workflow: Smooth');
-            this.flowText.setColor('#10b981');
+            this.flowText.setText(`SITE FLOW: SMOOTH — ${doingCount}/${wipLimit}`);
+            this.flowText.setColor('#6ee7b7');
         }
 
         // Move Workers based on Flow
