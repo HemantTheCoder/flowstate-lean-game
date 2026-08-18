@@ -1266,6 +1266,21 @@ export const useGameStore = create<GameState>((set, get) => ({
   importState: (data: any) => set((state) => {
     const ks = data.kanbanState || {};
     const restoredDay = ks.day ?? data.day ?? state.day;
+    const restoredChapter = data.chapter ?? state.chapter;
+
+    // Saves written before earnedValue was persisted have no value to restore. Chapter 1
+    // starts from 0 with no baseline offset, so its progress can be rebuilt exactly by
+    // re-summing the completionWeight of whatever sits in Done. Later chapters start from a
+    // non-zero baseline (see startChapter), so deriving there would undercount — leave those.
+    const deriveEarnedValue = () => {
+      if (restoredChapter !== 1) return state.earnedValue;
+      const done = (ks.columns ?? state.columns)?.find((c: any) => c.id === 'done');
+      if (!done) return state.earnedValue;
+      return Math.min(
+        100,
+        done.tasks.reduce((sum: number, t: any) => sum + (t.completionWeight || 0), 0)
+      );
+    };
 
     // Sync custom tasks to local storage if provided by server
     const restoredCustomTasks = ks.customTasks ?? data.customTasks ?? state.customTasks;
@@ -1277,7 +1292,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       customTasks: restoredCustomTasks,
       taskModeSelected: ks.taskModeSelected ?? data.taskModeSelected ?? state.taskModeSelected,
       taskMode: ks.taskMode ?? data.taskMode ?? state.taskMode,
-      chapter: data.chapter ?? state.chapter,
+      chapter: restoredChapter,
       unlockedChapters: data.completedChapters
         ? [1, ...data.completedChapters.map((c: number) => c + 1)]
         : [1],
@@ -1291,7 +1306,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       playerGender: ks.playerGender ?? data.playerGender ?? state.playerGender,
       funds: data.resources?.budget ?? state.funds,
       materials: data.resources?.materials ?? data.materials ?? state.materials,
-      earnedValue: ks.earnedValue ?? data.earnedValue ?? state.earnedValue,
+      earnedValue: ks.earnedValue ?? data.earnedValue ?? deriveEarnedValue(),
       flags: data.flags ?? state.flags,
       columns: ks.columns ?? state.columns,
       lpi: data.metrics ?? state.lpi,

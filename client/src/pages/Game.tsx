@@ -296,6 +296,9 @@ export default function Game() {
       kanbanState: {
         columns: state.columns,
         day: state.day,
+        // importState restores this (gameStore.ts `ks.earnedValue`); without it here the
+        // HUD's "% Complete" resets to 0 on reload while completed tasks stay in Done.
+        earnedValue: state.earnedValue,
         playerGender: state.playerGender,
         tutorialActive: state.tutorialActive,
         tutorialStep: state.tutorialStep,
