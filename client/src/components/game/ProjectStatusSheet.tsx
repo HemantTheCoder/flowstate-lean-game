@@ -33,7 +33,8 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
     lpi,
     day,
     playerName,
-    designation
+    designation,
+    totalSpent
   } = useGameStore();
 
   const doneTasks = columns.find(c => c.id === 'done')?.tasks || [];
@@ -102,7 +103,10 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
     return acc + (origTask?.costToStart || 0);
   }, 0);
 
-  const AC = 15000000 - funds;
+  // EVM Actual Cost = gross outflow to date. This used to be derived as (start budget - funds),
+  // which only held while money moved one way; completions now pay revenue in, so that formula
+  // would make AC fall as work finished. totalSpent accumulates activation cost + daily overhead.
+  const AC = totalSpent;
 
   return (
     <AnimatePresence>

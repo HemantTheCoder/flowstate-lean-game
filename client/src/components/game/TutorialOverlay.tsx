@@ -344,9 +344,9 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                             <div className="absolute -top-3 left-6 w-6 h-6 bg-slate-900 border-t-4 border-l-4 border-green-500 transform rotate-45"></div>
                             <h3 className="font-black text-green-400 text-lg mb-1">Project Health</h3>
                             <ul className="text-sm font-medium mb-3 space-y-2 text-slate-300">
-                                <li><b>Funds</b>: You only earn money when tasks reach <b>Completed</b>. Each month you pay massive overheads. Don't run out!</li>
-                                <li><b>Morale</b>: Happy workers build faster. <span className="text-red-400">Drops</span> if you abuse them or bankrupt the site.</li>
-                                <li><b>Efficiency</b>: Measures how smoothly you are handing over work areas without delays.</li>
+                                <li><b>Funds</b>: Starting a task costs money up front. You are only paid back — with a margin — when it reaches <b>Completed</b>. Every day also charges overhead, so unfinished work bleeds cash.</li>
+                                <li><b>Morale</b>: <span className="text-red-400">Drops</span> when you exceed your crew's WIP limit, leave waste in Completed, or push unready work.</li>
+                                <li><b>% Complete</b>: Rises only as tasks reach Completed — starting work moves it not at all.</li>
                             </ul>
                             <button
                                 onClick={() => setTutorialStep(8)}

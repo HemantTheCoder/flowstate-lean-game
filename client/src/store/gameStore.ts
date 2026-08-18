@@ -116,6 +116,9 @@ export interface GameState {
 
   // EVM: Earned Value tracking (% completion weight accumulated on task done)
   earnedValue: number; // 0-100 cumulative completion %
+  /** Gross cumulative outflow (task activation + daily overhead). EVM Actual Cost only ever
+   *  accumulates, so it can't be inferred from remaining funds now that completions pay in. */
+  totalSpent: number;
 
   // Flags
   flags: Record<string, boolean>;
@@ -311,6 +314,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   funds: 5000000, // 50 Lakhs starting funds
   materials: 1000,
   earnedValue: 0,
+  totalSpent: 0,
 
   // Chapter 3 State Defaults
   depotItems: [],
@@ -377,6 +381,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         funds: 15000000,
         materials: 300,
         earnedValue: 0,
+        totalSpent: 0,
         dailyMetrics: [],
         previousDoneCount: 0,
         previousWasteCount: 0,
@@ -413,6 +418,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         funds: 25000000,
         materials: 500,
         earnedValue: 22.7, // 5 / 22 tasks completed
+        totalSpent: 0,
         dailyMetrics: [],
         previousDoneCount: 0,
         previousWasteCount: 0,
@@ -441,6 +447,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         funds: 40000000,
         materials: 1000,
         earnedValue: 54.5, // 12 / 22 tasks completed
+        totalSpent: 0,
         depotItems: [
           // Row 1
           { id: 'd-1', type: 'tool', name: 'Power Drill', idealZoneId: 'zone-tools', currentZoneId: 'unassigned' },
@@ -493,6 +500,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         funds: 10000,
         materials: 500,
         earnedValue: 77.2, // 17 / 22 tasks completed
+        totalSpent: 0,
         hoistSlots: 3,
         pdi: 0,
         reworkRate: 0,
@@ -527,6 +535,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         funds: 20000,
         materials: 1000,
         earnedValue: 100, // Project Complete Baseline
+        totalSpent: 0,
         trafficImpact: 0,
         segmentBuffers: {
           's1': 0, 's2': 0, 's3': 0, 's4': 0, 's5': 0, 's6': 0, 's7': 0, 's8': 0
@@ -961,6 +970,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       week: Math.ceil(nextDay / 5),
       materials: state.materials + 150,
       funds: state.funds - dailyCost,
+      totalSpent: state.totalSpent + dailyCost,
       columns: nextColumns,
       dailyMetrics: [...state.dailyMetrics, newDailyMetric],
       previousDoneCount: currentDoneCount,
@@ -1073,19 +1083,39 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     }
 
-    // EVM: When a task is completed, increment earnedValue by its completion weight.
-    // Budget only flows down (via costToStart on move-to-doing + daily overhead).
-    // earnedValue tracks % completion for Planned Value vs Earned Value analysis.
+    // EVM + revenue. Handled symmetrically on entering and leaving Done: cards can be dragged
+    // back out of Done, and previously earnedValue only ever incremented, so a
+    // done -> backlog -> done cycle inflated project progress (and would now mint money).
     let newEarnedValue = state.earnedValue;
+    let newTotalSpent = state.totalSpent;
+    const weight = (task as any).completionWeight || 0;
+    const reward = (task as any).reward || 0;
+
+    // Track gross outflow separately from cash. Actual Cost in EVM only ever accumulates, so it
+    // cannot be derived from remaining funds once completions start paying money back in.
+    if (destColId === 'doing' && sourceColId !== 'doing' && task.costToStart) {
+      newTotalSpent += task.costToStart;
+    }
+    if (sourceColId === 'doing' && destColId !== 'doing' && destColId !== 'done' && task.costToStart) {
+      newTotalSpent -= task.costToStart; // mirrors the existing undo refund above
+    }
+
     if (destColId === 'done' && sourceColId !== 'done') {
-      const weight = (task as any).completionWeight || 0;
       newEarnedValue = Math.min(100, newEarnedValue + weight);
+      // Completing work is what actually pays. Each task returns costToStart x 1.15, so starting
+      // work and never finishing it is a pure loss — the chapter's lesson with money attached.
+      // The tutorial already told players this happened; it just never did.
+      newFunds += reward;
+    } else if (sourceColId === 'done' && destColId !== 'done') {
+      newEarnedValue = Math.max(0, newEarnedValue - weight);
+      newFunds -= reward;
     }
 
     set({
       materials: newMaterials,
       funds: newFunds,
       earnedValue: newEarnedValue,
+      totalSpent: newTotalSpent,
       columns: state.columns.map(col => {
         if (col.id === sourceColId) {
           return { ...col, tasks: col.tasks.filter(t => t.id !== taskId) };
@@ -1307,6 +1337,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       funds: data.resources?.budget ?? state.funds,
       materials: data.resources?.materials ?? data.materials ?? state.materials,
       earnedValue: ks.earnedValue ?? data.earnedValue ?? deriveEarnedValue(),
+      // Older saves predate this field; fall back to the previous derivation (starting budget
+      // minus remaining funds), which was correct while money only ever flowed out.
+      totalSpent: ks.totalSpent ?? data.totalSpent
+        ?? Math.max(0, 15000000 - (data.resources?.budget ?? state.funds)),
       flags: data.flags ?? state.flags,
       columns: ks.columns ?? state.columns,
       lpi: data.metrics ?? state.lpi,

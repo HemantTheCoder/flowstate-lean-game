@@ -299,6 +299,7 @@ export default function Game() {
         // importState restores this (gameStore.ts `ks.earnedValue`); without it here the
         // HUD's "% Complete" resets to 0 on reload while completed tasks stay in Done.
         earnedValue: state.earnedValue,
+        totalSpent: state.totalSpent,
         playerGender: state.playerGender,
         tutorialActive: state.tutorialActive,
         tutorialStep: state.tutorialStep,
