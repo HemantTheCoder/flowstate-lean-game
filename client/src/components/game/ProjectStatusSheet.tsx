@@ -64,13 +64,14 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
   };
 
   const getStatusBadge = (taskId: string) => {
+    const cls = "text-[10px] px-2 py-0.5 whitespace-nowrap";
     if (doneTasks.some(t => t.originalId === taskId)) {
-      return <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">Completed</Badge>;
+      return <Badge className={`bg-emerald-500/20 text-emerald-400 border-emerald-500/30 ${cls}`}>Completed</Badge>;
     }
     if (doingTasks.some(t => t.originalId === taskId)) {
-      return <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 animate-pulse">In Progress</Badge>;
+      return <Badge className={`bg-amber-500/20 text-amber-400 border-amber-500/30 animate-pulse ${cls}`}>In Progress</Badge>;
     }
-    return <Badge variant="outline" className="text-slate-400 border-slate-700">Planned</Badge>;
+    return <Badge variant="outline" className={`text-slate-400 border-slate-700 ${cls}`}>Planned</Badge>;
   };
 
   // Calculate Planned Value (PV) time-phased by current day/month
@@ -93,22 +94,22 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-2 sm:p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="w-full max-w-6xl h-[90dvh] bg-slate-900/90 border border-slate-700/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col glass-panel"
+            className="w-full max-w-[1700px] h-[96dvh] sm:h-[94dvh] bg-slate-900/90 border border-slate-700/50 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col glass-panel"
           >
-            {/* Header */}
-            <div className="p-4 sm:p-6 border-b border-white/10 flex items-center justify-between gap-3 bg-gradient-to-r from-blue-600/10 to-purple-600/10 shrink-0">
-              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                <div className="p-2.5 sm:p-3 bg-blue-500/20 rounded-2xl shrink-0">
-                  <ClipboardList className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
+            {/* Header — kept compact so vertical space goes to the task list */}
+            <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-white/10 flex items-center justify-between gap-3 bg-gradient-to-r from-blue-600/10 to-purple-600/10 shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="p-2 sm:p-2.5 bg-blue-500/20 rounded-xl shrink-0">
+                  <ClipboardList className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-lg sm:text-2xl font-bold text-white tracking-tight truncate">Project Status Sheet</h2>
-                  <p className="text-slate-400 text-xs sm:text-sm font-medium truncate">
+                  <h2 className="text-base sm:text-xl font-bold text-white tracking-tight truncate">Project Status Sheet</h2>
+                  <p className="text-slate-400 text-[11px] sm:text-xs font-medium truncate">
                     {playerName} — {designation} | Project: Affordable Housing Villa
                   </p>
                 </div>
@@ -128,7 +129,7 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
             <div className="flex-1 overflow-y-auto md:overflow-hidden flex flex-col md:flex-row min-h-0">
 
               {/* Left Sidebar: Site Conditions & Metrics */}
-              <div className="w-full md:w-80 shrink-0 border-b md:border-b-0 md:border-r border-white/5 bg-slate-900/40 p-4 sm:p-6 space-y-5 sm:space-y-6 md:overflow-y-auto min-h-0">
+              <div className="w-full md:w-80 shrink-0 border-b md:border-b-0 md:border-r border-white/5 bg-slate-900/40 p-4 sm:p-5 space-y-5 md:overflow-y-auto md:min-h-0">
                 <div>
                   <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
                     <AlertCircle className="w-3 h-3" /> Site Conditions
@@ -194,34 +195,36 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                 </div>
               </div>
 
-              {/* Main Content: Tasks Excel Table */}
-              <div className="flex-1 p-4 sm:p-6 flex flex-col md:overflow-hidden bg-slate-900/20 min-h-0">
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                  <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide">
-                    <LayoutGrid className="w-5 h-5 text-purple-400" /> Project Scope & Timeline
+              {/* Main Content: Tasks Excel Table.
+                  flex-1/min-h-0 are md-only on purpose: on mobile this column must take its
+                  natural content height so the parent scroller can scroll it, otherwise
+                  flex-1 + min-h-0 inside the scrolling column collapses it to ~0 and clips the list. */}
+              <div className="md:flex-1 p-3 sm:p-5 flex flex-col md:overflow-hidden bg-slate-900/20 md:min-h-0">
+                {/* Title + EVM readout on one compact row, so the task list keeps the vertical space */}
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-3 shrink-0">
+                  <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2 uppercase tracking-wide">
+                    <LayoutGrid className="w-4 h-4 text-purple-400" /> Project Scope &amp; Timeline
                   </h3>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-800/50 rounded-lg text-xs font-medium text-slate-300 border border-slate-700">
-                      <IndianRupee className="w-3 h-3" /> Budget: {formatCurrency(15000000, currency)}
-                    </div>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 rounded-lg text-[11px] font-medium text-slate-300 border border-slate-700">
+                    <IndianRupee className="w-3 h-3" /> Budget: {formatCurrency(15000000, currency)}
                   </div>
                 </div>
 
-                <div className="p-3 sm:p-4 bg-slate-800/50 rounded-xl mb-4 border border-slate-700/50 shrink-0">
-                  <p className="text-xs sm:text-sm text-slate-300 italic mb-3">Earned Value Management: Earned Value (EV) = % of planned work actually completed, valued in ₹.</p>
-                  <div className="grid grid-cols-3 gap-2 sm:gap-4">
-                    <div className="bg-slate-900/50 p-2 sm:p-3 rounded-lg border border-slate-700 text-center">
-                       <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">Planned Value</div>
-                       <div className="text-xs sm:text-lg font-mono font-bold text-slate-200 truncate">{formatCurrency(PV, currency)}</div>
-                    </div>
-                    <div className="bg-cyan-950/20 p-2 sm:p-3 rounded-lg border border-cyan-800/50 text-center shadow-[0_0_15px_rgba(6,182,212,0.1)]">
-                       <div className="text-[9px] sm:text-[10px] text-cyan-400 uppercase font-bold">Earned Value</div>
-                       <div className="text-xs sm:text-lg font-mono font-black text-cyan-400 truncate">{formatCurrency(EV, currency)}</div>
-                    </div>
-                    <div className="bg-slate-900/50 p-2 sm:p-3 rounded-lg border border-slate-700 text-center">
-                       <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-bold">Actual Cost</div>
-                       <div className="text-xs sm:text-lg font-mono font-bold text-slate-200 truncate">{formatCurrency(AC, currency)}</div>
-                    </div>
+                <div
+                  className="flex items-stretch gap-2 mb-3 shrink-0"
+                  title="Earned Value Management: Earned Value (EV) = % of planned work actually completed, valued in ₹."
+                >
+                  <div className="flex-1 min-w-0 bg-slate-900/50 px-3 py-2 rounded-lg border border-slate-700 flex items-center justify-between gap-2">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold shrink-0">Planned (PV)</span>
+                    <span className="text-sm font-mono font-bold text-slate-200 truncate">{formatCurrency(PV, currency)}</span>
+                  </div>
+                  <div className="flex-1 min-w-0 bg-cyan-950/20 px-3 py-2 rounded-lg border border-cyan-800/50 flex items-center justify-between gap-2 shadow-[0_0_15px_rgba(6,182,212,0.1)]">
+                    <span className="text-[10px] text-cyan-400 uppercase font-bold shrink-0">Earned (EV)</span>
+                    <span className="text-sm font-mono font-black text-cyan-400 truncate">{formatCurrency(EV, currency)}</span>
+                  </div>
+                  <div className="flex-1 min-w-0 bg-slate-900/50 px-3 py-2 rounded-lg border border-slate-700 flex items-center justify-between gap-2">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold shrink-0">Actual (AC)</span>
+                    <span className="text-sm font-mono font-bold text-slate-200 truncate">{formatCurrency(AC, currency)}</span>
                   </div>
                 </div>
 
@@ -236,29 +239,27 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                         const aMonth = getActualMonth(idx + 1);
                         const isDelayed = aMonth > pMonth;
 
+                        const matSummary = (task.materialsRequired || [])
+                          .map(m => `${m.amount} ${m.name}`)
+                          .join(' · ');
+
                         return (
-                          <div key={task.id} className="p-4 space-y-2.5">
+                          <div key={task.id} className="px-3 py-2.5 space-y-1.5">
                             <div className="flex items-start justify-between gap-2">
                               <div className="flex items-start gap-2 min-w-0">
                                 <span className="text-[10px] text-slate-500 font-mono shrink-0 mt-0.5">{idx + 1}</span>
                                 <div className="min-w-0">
-                                  <div className="text-sm font-semibold text-slate-100 leading-snug">{task.title}</div>
-                                  <div className="text-xs text-slate-500 italic mt-0.5 leading-relaxed">{task.description}</div>
+                                  <div className="text-[13px] font-semibold text-slate-100 leading-snug">{task.title}</div>
+                                  <div className="text-[11px] text-slate-500 leading-snug line-clamp-2 mt-0.5">{task.description}</div>
                                 </div>
                               </div>
                               {getStatusBadge(task.id)}
                             </div>
-                            {task.materialsRequired && task.materialsRequired.length > 0 && (
-                              <div className="flex flex-wrap gap-1 pl-6">
-                                {task.materialsRequired.map((mat, i) => (
-                                  <span key={i} className="text-[9px] bg-slate-800 text-amber-200/80 px-1.5 py-0.5 rounded border border-amber-500/20">
-                                    Req: {mat.amount} {mat.name}
-                                  </span>
-                                ))}
-                              </div>
+                            {matSummary && (
+                              <div className="pl-6 text-[10px] text-amber-200/70 truncate">Req: {matSummary}</div>
                             )}
-                            <div className="flex items-center justify-between gap-2 pl-6 text-xs">
-                              <span className={`font-bold px-2 py-0.5 rounded uppercase text-[10px]
+                            <div className="flex items-center justify-between gap-2 pl-6">
+                              <span className={`font-bold px-1.5 py-0.5 rounded uppercase text-[9px] whitespace-nowrap
                                 ${task.type === 'Structural' ? 'bg-blue-500/10 text-blue-400' :
                                   task.type === 'Interior' ? 'bg-purple-500/10 text-purple-400' :
                                   task.type === 'Systems' ? 'bg-amber-500/10 text-amber-400' :
@@ -266,19 +267,17 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                               `}>
                                 {task.type}
                               </span>
-                              <div className="flex items-center gap-3 font-mono">
+                              <div className="flex items-center gap-1.5 font-mono text-[11px] whitespace-nowrap">
                                 <span className="text-slate-400">{formatCurrency(plannedCost, currency)}</span>
                                 <span className="text-slate-600">→</span>
                                 <span className={isOverBudget && chapter === 1 ? 'text-red-400 font-bold' : 'text-emerald-400 font-bold'}>
                                   {formatCurrency(actualCost, currency)}
                                 </span>
+                                <span className="text-slate-600 mx-0.5">|</span>
+                                <span className="text-slate-400">M{pMonth}</span>
+                                <span className="text-slate-600">/</span>
+                                <span className={isDelayed ? 'text-red-400 font-bold' : 'text-emerald-400 font-bold'}>M{aMonth}</span>
                               </div>
-                            </div>
-                            <div className="pl-6 flex items-center gap-2 text-[10px]">
-                              <span className="text-slate-500">Planned: Month {pMonth}</span>
-                              <span className={`font-bold ${isDelayed ? 'text-red-400' : 'text-emerald-400'}`}>
-                                Actual: Month {aMonth}
-                              </span>
                             </div>
                           </div>
                         );
@@ -292,13 +291,13 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                     <table className="w-full text-left border-collapse">
                       <thead className="sticky top-0 z-10 bg-slate-800 text-slate-400 text-[10px] uppercase tracking-widest font-bold shadow-md">
                         <tr>
-                          <th className="px-4 py-3 border-b border-white/5">#</th>
-                          <th className="px-4 py-3 border-b border-white/5">Task Name & Materials</th>
-                          <th className="px-4 py-3 border-b border-white/5">Category</th>
-                          <th className="px-4 py-3 border-b border-white/5 text-right w-32">Planned Value (PV)</th>
-                          <th className="px-4 py-3 border-b border-white/5 text-right w-32">Actual Cost (AC)</th>
-                          <th className="px-4 py-3 border-b border-white/5 text-center">Month (Plan vs Act)</th>
-                          <th className="px-4 py-3 border-b border-white/5 text-center">Status</th>
+                          <th className="px-3 py-2.5 border-b border-white/5 w-10">#</th>
+                          <th className="px-3 py-2.5 border-b border-white/5">Task Name &amp; Materials</th>
+                          <th className="px-3 py-2.5 border-b border-white/5 w-28">Category</th>
+                          <th className="px-3 py-2.5 border-b border-white/5 text-right w-28">Planned (PV)</th>
+                          <th className="px-3 py-2.5 border-b border-white/5 text-right w-32">Actual (AC)</th>
+                          <th className="px-3 py-2.5 border-b border-white/5 text-center w-28">Month P/A</th>
+                          <th className="px-3 py-2.5 border-b border-white/5 text-center w-28">Status</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5">
@@ -309,31 +308,40 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                           const pMonth = getPlannedMonth(idx + 1);
                           const aMonth = getActualMonth(idx + 1);
                           const isDelayed = aMonth > pMonth;
+                          const matSummary = (task.materialsRequired || [])
+                            .map(m => `${m.amount} ${m.name}`)
+                            .join(' · ');
 
                           return (
-                          <tr key={task.id} className="group hover:bg-white/[0.02] transition-colors align-top">
-                            <td className="px-4 py-5 text-xs text-slate-500 font-mono">{idx + 1}</td>
-                            <td className="px-4 py-5">
-                              <div className="flex flex-col gap-1.5 max-w-sm">
-                                <span className="text-sm font-semibold text-slate-200 group-hover:text-white transition-colors leading-snug">
+                          <tr key={task.id} className="group hover:bg-white/[0.03] transition-colors">
+                            <td className="px-3 py-2.5 text-[11px] text-slate-500 font-mono">{idx + 1}</td>
+                            <td className="px-3 py-2.5">
+                              {/* Single-line title + meta keeps rows dense so many tasks stay visible at once;
+                                  full text is available on hover via title attributes. */}
+                              <div className="max-w-[22rem] xl:max-w-[30rem]">
+                                <div
+                                  className="text-[13px] font-semibold text-slate-200 group-hover:text-white transition-colors truncate"
+                                  title={task.title}
+                                >
                                   {task.title}
-                                </span>
-                                <span className="text-xs text-slate-500 leading-relaxed">
-                                  {task.description}
-                                </span>
-                                {task.materialsRequired && task.materialsRequired.length > 0 && (
-                                  <div className="flex flex-wrap gap-1.5 mt-1">
-                                    {task.materialsRequired.map((mat, i) => (
-                                      <span key={i} className="text-[10px] bg-slate-800 text-amber-200/80 px-1.5 py-0.5 rounded border border-amber-500/20">
-                                        Req: {mat.amount} {mat.name}
-                                      </span>
-                                    ))}
+                                </div>
+                                <div className="flex items-center gap-2 text-[11px] leading-tight">
+                                  <span className="text-slate-500 truncate" title={task.description}>
+                                    {task.description}
+                                  </span>
+                                </div>
+                                {matSummary && (
+                                  <div
+                                    className="text-[10px] text-amber-200/70 truncate mt-0.5"
+                                    title={matSummary}
+                                  >
+                                    Req: {matSummary}
                                   </div>
                                 )}
                               </div>
                             </td>
-                            <td className="px-4 py-5">
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase
+                            <td className="px-3 py-2.5">
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase whitespace-nowrap
                                 ${task.type === 'Structural' ? 'bg-blue-500/10 text-blue-400' :
                                   task.type === 'Interior' ? 'bg-purple-500/10 text-purple-400' :
                                   task.type === 'Systems' ? 'bg-amber-500/10 text-amber-400' :
@@ -342,28 +350,29 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                                 {task.type}
                               </span>
                             </td>
-                            <td className="px-4 py-5 text-right">
-                              <span className="text-xs font-mono text-slate-300">
+                            <td className="px-3 py-2.5 text-right">
+                              <span className="text-[11px] font-mono text-slate-300 whitespace-nowrap">
                                 {formatCurrency(plannedCost, currency)}
                               </span>
                             </td>
-                            <td className="px-4 py-5 text-right">
-                              <span className={`text-xs font-mono font-bold ${isOverBudget && chapter === 1 ? 'text-red-400' : 'text-emerald-400'}`}>
+                            <td className="px-3 py-2.5 text-right whitespace-nowrap">
+                              <span className={`text-[11px] font-mono font-bold ${isOverBudget && chapter === 1 ? 'text-red-400' : 'text-emerald-400'}`}>
                                 {formatCurrency(actualCost, currency)}
                               </span>
                               {isOverBudget && chapter === 1 && (
-                                <div className="text-[10px] text-red-500/70 mt-0.5">Overrun!</div>
+                                <span className="text-[10px] text-red-500/70 ml-1.5">Overrun</span>
                               )}
                             </td>
-                            <td className="px-4 py-5 text-center">
-                              <div className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
-                                <span className="text-slate-400">P: Month {pMonth}</span>
+                            <td className="px-3 py-2.5 text-center">
+                              <div className="flex items-center justify-center gap-1.5 text-[11px] font-medium whitespace-nowrap">
+                                <span className="text-slate-400">M{pMonth}</span>
+                                <span className="text-slate-600">/</span>
                                 <span className={isDelayed ? "text-red-400 font-bold" : "text-emerald-400"}>
-                                  A: Month {aMonth}
+                                  M{aMonth}
                                 </span>
                               </div>
                             </td>
-                            <td className="px-4 py-5">
+                            <td className="px-3 py-2.5">
                               <div className="flex justify-center">
                                 {getStatusBadge(task.id)}
                               </div>
