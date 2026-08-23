@@ -85,7 +85,7 @@ const DialogueBoxInner: React.FC = () => {
 
     // Mapping for character images (filenames in public/assets)
     const imageMap: Record<string, string> = {
-        'Mira': 'mira.png',
+        'Mira': 'mira.jpg',
         'Rao': 'rao.jpg',
         'Engineer': playerGender === 'female' ? 'architect_female.jpg' : 'architect.jpg',
         'Architect': playerGender === 'female' ? 'architect_female.jpg' : 'architect.jpg',
@@ -101,18 +101,18 @@ const DialogueBoxInner: React.FC = () => {
     const portrait = imageMap[line.character];
 
     /**
-     * Focal point (object-position) per portrait, because the source art is full scenes rather
-     * than busts and the subject sits in a different place in each one. A single shared
-     * object-position meant e.g. Mira's portrait framed sky and crane jibs instead of a face.
-     * Values below are eyeballed against the actual assets; default is a safe upper-centre.
+     * Focal point (object-position) per portrait. The regenerated cast art (Aug 2026, see the
+     * NewGen prompt set) is consistently composed as a centered head-and-shoulders bust against
+     * a blurred background, unlike the old assets — which were full scenes with the subject in a
+     * different spot in each one (e.g. old Mira art needed 68% 50% just to find her face).
+     * Container/img here are square at every breakpoint (w-28 h-28, sm:w-36 h-36, md:w-44 h-44)
+     * and the source photos are landscape (~1.79:1), so object-cover always matches by height —
+     * full vertical extent is visible and only the horizontal (X) position ever crops anything.
+     * A shared centered default is therefore correct for the whole cast; kept as a per-file
+     * override map in case a future asset isn't centered.
      */
-    const PORTRAIT_FOCUS: Record<string, string> = {
-        'mira.png': '68% 50%',
-        'rao.jpg': '50% 34%',
-        'architect.jpg': '52% 17%',
-        'architect_female.jpg': '52% 17%',
-    };
-    const focus = portrait ? (PORTRAIT_FOCUS[portrait] ?? '50% 24%') : '50% 24%';
+    const PORTRAIT_FOCUS: Record<string, string> = {};
+    const focus = portrait ? (PORTRAIT_FOCUS[portrait] ?? '50% 50%') : '50% 50%';
 
     /**
      * Every dialogue line in the chapter data already carries an `emotion`, but nothing rendered

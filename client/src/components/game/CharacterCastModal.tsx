@@ -8,7 +8,7 @@ interface CharacterCastModalProps {
 }
 
 const CHARACTER_IMAGES: Record<string, string> = {
-  'Mira': 'mira.png',
+  'Mira': 'mira.jpg',
   'Rao': 'rao.jpg',
   'Old Foreman': 'foreman.jpg',
   'Isha': 'isha.jpg',
@@ -101,10 +101,17 @@ export const CharacterCastModal = ({ chapter, onContinue }: CharacterCastModalPr
                       transition={{ delay: 0.3 + index * 0.1 }}
                       className="flex flex-col items-center text-center p-2 md:p-3 rounded-xl bg-slate-800/30 border border-slate-700/50"
                     >
+                      {/* object-bottom was a Mira-only special case for the old mira.png, whose
+                          subject sat lower in the frame than every other character's portrait.
+                          The regenerated cast art is uniformly composed, and these avatars are
+                          square while every source photo is landscape (~1.79:1) — object-cover
+                          always matches by height, so the vertical (top/bottom/center) keyword
+                          has no visible effect regardless; only horizontal position ever crops
+                          anything. One shared value for the whole cast is correct now. */}
                       <img
                         src={`/assets/${imagePath}`}
                         alt={character.name}
-                        className={`w-16 h-16 md:w-24 md:h-24 object-cover ${charId === 'Mira' ? 'object-bottom' : 'object-top'} rounded-full border-2 border-slate-600/50 drop-shadow-lg bg-slate-900/50`}
+                        className="w-16 h-16 md:w-24 md:h-24 object-cover object-top rounded-full border-2 border-slate-600/50 drop-shadow-lg bg-slate-900/50"
                       />
                       <p className="text-white font-bold mt-2 md:mt-3 text-xs md:text-sm">{character.name}</p>
                       <p className="text-blue-400 text-[10px] md:text-xs">{character.role}</p>

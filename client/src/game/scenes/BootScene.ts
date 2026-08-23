@@ -10,7 +10,7 @@ export class BootScene extends Phaser.Scene {
         // this.load.image('logo', 'assets/logo.png');
         // For now, we will use placeholders/primitives
         // Character Portraits
-        this.load.image('mira', '/assets/mira.png');
+        this.load.image('mira', '/assets/mira.jpg');
         this.load.image('rao', '/assets/rao.jpg');
         this.load.image('architect', '/assets/architect.jpg');
         this.load.image('architect_female', '/assets/architect_female.jpg');
