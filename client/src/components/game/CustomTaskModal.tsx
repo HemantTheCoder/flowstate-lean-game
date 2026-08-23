@@ -157,7 +157,11 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
             {isOpen && (
                 <motion.div
                     key="modal-backdrop"
-                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+                    /* z-[120]: this modal opens on top of the Kanban board / Task Mode Selector
+                       (both z-[60]), so it only needs to clear that tier — 9999 was an arbitrary
+                       jump that broke the app's otherwise deliberate z-index scale (see
+                       CaseStudiesModal's z-[110] for the same nested-modal pattern). */
+                    className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}

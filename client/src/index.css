@@ -22,6 +22,15 @@
     padding-top: env(safe-area-inset-top, 0px);
   }
 
+  /* Every HUD readout (funds, %, WIP counts) already uses font-mono. Tailwind's .font-mono
+     utility only sets font-family, so this adds tabular figures without touching that class —
+     digits then hold a fixed width as they tick, instead of the whole number visibly reflowing
+     on every animation frame. */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
+
+
   /* Cinematic edge darkening — draws the eye to center content like a film frame */
   .vignette {
     position: relative;

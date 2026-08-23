@@ -162,7 +162,7 @@ export default function ChapterSelect() {
                             <ArrowLeft className="w-4 h-4" /> Go Back
                         </button>
                         <div>
-                            <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-200 tracking-tight drop-shadow-sm">Select Episode</h1>
+                            <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-200 tracking-tight drop-shadow-sm text-balance">Select Episode</h1>
                             <p className="text-blue-400 font-bold text-xs uppercase tracking-widest mt-1">Lean Construction Story</p>
                         </div>
                     </div>
@@ -202,9 +202,23 @@ export default function ChapterSelect() {
                                 transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
                                 onMouseEnter={() => setHoveredChapter(chapter.id)}
                                 onMouseLeave={() => setHoveredChapter(null)}
+                                onFocus={() => setHoveredChapter(chapter.id)}
+                                onBlur={() => setHoveredChapter(null)}
                                 onClick={() => handleSelectChapter(chapter.id, isEffectivelyLocked, chapter.isComingSoon)}
+                                onKeyDown={(e) => {
+                                    // This was a click-only div: a keyboard user could not select an
+                                    // episode at all, on the single most important screen for reaching
+                                    // any gameplay. Enter/Space now activate it like a real button.
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleSelectChapter(chapter.id, isEffectivelyLocked, chapter.isComingSoon);
+                                    }
+                                }}
+                                role="button"
+                                tabIndex={0}
+                                aria-disabled={isEffectivelyLocked && !chapter.isComingSoon}
                                 data-testid={`chapter-card-${chapter.id}`}
-                                className={`group relative p-8 metal-panel backdrop-blur-xl border-2 rounded-3xl flex flex-col justify-between transition-all duration-500 cursor-pointer overflow-hidden hud-corners ${theme.bg} ${theme.border} ${theme.corner} ${isEffectivelyLocked && !chapter.isComingSoon ? 'opacity-70 hover:opacity-100 grayscale-[0.4] hover:grayscale-0' : ''}`}
+                                className={`group relative p-8 metal-panel backdrop-blur-xl border-2 rounded-3xl flex flex-col justify-between transition-all duration-500 cursor-pointer overflow-hidden hud-corners focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${theme.bg} ${theme.border} ${theme.corner} ${isEffectivelyLocked && !chapter.isComingSoon ? 'opacity-70 hover:opacity-100 grayscale-[0.4] hover:grayscale-0' : ''}`}
                                 style={{
                                     // Inline box-shadow wins over .metal-panel, so re-state its inset bevel
                                     // here or the cards lose their physical edge highlight.
