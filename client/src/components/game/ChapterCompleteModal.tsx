@@ -683,7 +683,8 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                 </div>
                             ) : null}
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col gap-3">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 <button
                                     onClick={() => {
                                         const metrics = dailyMetrics as DayBreakdown[];
@@ -745,6 +746,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                     {submissionStatus === 'success' ? 'Score Submitted!' :
                                         submissionStatus === 'error' ? 'Try Again' : 'Submit Score'}
                                 </button>
+                            </div>
 
                                 <button
                                     onClick={handleContinue}
