@@ -1300,6 +1300,24 @@ export default function Game() {
           </div>
         </motion.div>
 
+        {/* Thumb-reachable End Day shortcut: the primary HUD's End Day button lives in the
+            top bar, which is a stretch to reach one-handed on a phone. Measured live: the
+            bottom toolbar pill is centered and only ~287px wide on a 375px viewport, so this
+            sits above it (clearing its 85px-tall pill) rather than beside it. */}
+        <button
+          onClick={handleEndDay}
+          className={`md:hidden fixed right-4 z-30 pointer-events-auto w-14 h-14 rounded-full bg-yellow-500 hover:bg-yellow-400 text-yellow-950 font-black shadow-[0_8px_24px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center leading-none active:scale-95 transition-transform touch-manipulation ${chapter >= 4 ? 'hidden' : ''} ${getSmartObjective().includes('End Day') || getSmartObjective().includes('Finish Chapter') || getSmartObjective().includes('Project Complete') ? 'animate-pulse ring-4 ring-yellow-400/50' : ''}`}
+          style={{ bottom: 'calc(7.5rem + env(safe-area-inset-bottom, 0px))' }}
+          aria-label={(((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 5 && chapter === 4) || (day === 14 && chapter === 5))) ? 'Finish Chapter' : 'End Day'}
+        >
+          <span className="text-[8px] uppercase tracking-wider">
+            {(((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 5 && chapter === 4) || (day === 14 && chapter === 5))) ? 'Finish' : 'End'}
+          </span>
+          <span className="text-[8px] uppercase tracking-wider">
+            {(((day === 5 && chapter === 1) || (day === 11 && chapter === 2) || (day === 16 && chapter === 3) || (day === 5 && chapter === 4) || (day === 14 && chapter === 5))) ? 'Chapter' : 'Day'}
+          </span>
+        </button>
+
         {/* Overlays */}
         {/* <CharacterCreationModal /> Moved to ChapterSelect */}
         <PlanningRoom onSave={() => handleSave()} />
@@ -1373,7 +1391,7 @@ export default function Game() {
                 <button
                   onClick={() => handleSave()}
                   disabled={saveGame.isPending}
-                  className="bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 p-1.5 rounded-lg shadow-sm transition-all active:scale-95"
+                  className="bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg shadow-sm transition-all active:scale-95 touch-manipulation"
                   title="Save Game"
                   data-testid="button-save-ch4"
                 >
@@ -1388,7 +1406,7 @@ export default function Game() {
                     soundManager.playSFX('click', audioSettings.sfxVolume);
                     setShowSettings(true);
                   }}
-                  className="bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 p-1.5 rounded-lg shadow-sm transition-all active:scale-95"
+                  className="bg-slate-700/50 hover:bg-slate-600/50 border border-slate-600/50 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg shadow-sm transition-all active:scale-95 touch-manipulation"
                   title="Settings"
                   data-testid="button-settings-ch4"
                 >
@@ -1397,7 +1415,7 @@ export default function Game() {
                 <button
                   onClick={handleEndDay}
                   data-testid="button-end-day-ch4"
-                  className={`${day === 5 ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 ring-2 ring-amber-300/50' : 'bg-cyan-600 hover:bg-cyan-500'} text-white font-bold px-4 py-1.5 rounded-xl shadow-md transition-colors text-sm whitespace-nowrap`}
+                  className={`${day === 5 ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 ring-2 ring-amber-300/50' : 'bg-cyan-600 hover:bg-cyan-500'} text-white font-bold px-4 min-h-[44px] rounded-xl shadow-md transition-colors text-sm whitespace-nowrap touch-manipulation`}
                 >
                   {day === 5 ? 'Finish Chapter' : 'End Day'}
                 </button>

@@ -78,16 +78,16 @@ export const JITScheduler: React.FC = () => {
                                 <div className="flex items-center gap-2 bg-slate-800 rounded-lg p-1 border border-slate-700 font-mono text-xs">
                                     <button
                                         onClick={() => { setBuffer(mat.id, Math.max(0, bufferTarget - 5)); soundManager.playSFX('click', 0.5); }}
-                                        className="p-1 hover:bg-slate-700 rounded text-slate-400"
+                                        className="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-700 rounded text-slate-400 touch-manipulation"
                                     >
-                                        <Minus className="w-3 h-3" />
+                                        <Minus className="w-3.5 h-3.5" />
                                     </button>
                                     <span className="w-6 text-center text-slate-300">{bufferTarget}</span>
                                     <button
                                         onClick={() => { setBuffer(mat.id, bufferTarget + 5); soundManager.playSFX('click', 0.5); }}
-                                        className="p-1 hover:bg-slate-700 rounded text-slate-400"
+                                        className="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-700 rounded text-slate-400 touch-manipulation"
                                     >
-                                        <Plus className="w-3 h-3" />
+                                        <Plus className="w-3.5 h-3.5" />
                                     </button>
                                 </div>
                             </div>
@@ -106,7 +106,7 @@ export const JITScheduler: React.FC = () => {
                     <div>
                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 block">Material</label>
                         <select
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-emerald-500"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 min-h-11 text-base md:text-sm text-slate-300 focus:outline-none focus:border-emerald-500"
                             value={selectedMat.id}
                             onChange={(e) => setSelectedMat(MATERIAL_TYPES.find(m => m.id === e.target.value)!)}
                         >
@@ -133,7 +133,7 @@ export const JITScheduler: React.FC = () => {
                             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 block">Logistics</label>
                             <button
                                 onClick={() => setIsExpediting(!isExpediting)}
-                                className={`w-full py-2 px-3 rounded-xl border text-xs font-bold transition-all ${isExpediting ? 'bg-amber-500/20 border-amber-500/50 text-amber-400' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}
+                                className={`w-full min-h-11 py-2 px-3 rounded-xl border text-xs font-bold transition-all ${isExpediting ? 'bg-amber-500/20 border-amber-500/50 text-amber-400' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}
                             >
                                 {isExpediting ? 'Expedite (1.5x Cost)' : 'Standard Delivery'}
                             </button>

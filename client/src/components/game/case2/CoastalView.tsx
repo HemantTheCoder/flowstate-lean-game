@@ -5,21 +5,34 @@ import { useGame } from '@/hooks/use-game';
 import {
     Map, Truck, Activity, Save, Settings,
     Layers, Zap, CheckCircle, Navigation,
-    Timer, AlertCircle
+    Timer, AlertCircle, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { CaseTutorialOverlay } from '../CaseTutorialOverlay';
 import { CaseSmartAdvisor } from '../CaseSmartAdvisor';
 import { SettingsModal } from './../SettingsModal';
 import soundManager from '@/lib/soundManager';
 
+// Same tab-bar-below-md pattern as PullSystemDashboard: this 3-column layout
+// had zero responsive breakpoint, so each column got ~1/3 of a phone's width.
+const tabs = [
+    { key: 'map' as const, label: 'Map', icon: Navigation, activeClass: 'bg-blue-600 text-white shadow-lg' },
+    { key: 'controls' as const, label: 'Dispatch', icon: Truck, activeClass: 'bg-cyan-600 text-white shadow-lg' },
+    { key: 'advisor' as const, label: 'Advisor', icon: Zap, activeClass: 'bg-amber-600 text-white shadow-lg' },
+] as const;
+
 export function CoastalView({ objective }: { objective?: string }) {
     const { day, trafficImpact, flags } = useGameStore();
     const { saveGame } = useGame();
     const [showSettings, setShowSettings] = useState(false);
+    const [activeTab, setActiveTab] = useState<'map' | 'controls' | 'advisor'>('map');
 
     // Derived flags for guidance
     const isDay1 = day === 1;
     const showGuidance = isDay1 && !flags.case2_tutorial_seen;
+
+    const activeIndex = tabs.findIndex(t => t.key === activeTab);
+    const swipePrev = () => { if (activeIndex > 0) { soundManager.playSFX('click'); setActiveTab(tabs[activeIndex - 1].key); } };
+    const swipeNext = () => { if (activeIndex < tabs.length - 1) { soundManager.playSFX('click'); setActiveTab(tabs[activeIndex + 1].key); } };
 
     return (
         <div className="flex-1 flex flex-col relative w-full h-full overflow-hidden bg-slate-950 text-slate-200">
@@ -81,10 +94,42 @@ export function CoastalView({ objective }: { objective?: string }) {
                 </div>
             </header>
 
-            {/* ── MAIN AREA (3-column layout) ── */}
-            <main className="relative z-10 flex-1 flex flex-row gap-0 overflow-hidden min-h-0">
+            {/* Mobile tab bar: below md, the three columns become swipeable full-width panels */}
+            <div className="md:hidden relative z-10 shrink-0 flex flex-col gap-2 px-3 pt-2">
+                <div className="flex gap-2 bg-slate-800/50 p-2 rounded-xl border border-slate-700/50">
+                    {tabs.map(tab => (
+                        <button
+                            key={tab.key}
+                            onClick={() => { soundManager.playSFX('click'); setActiveTab(tab.key); }}
+                            className={`flex-1 py-2.5 rounded-lg font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-1.5 transition-colors min-h-[44px] touch-manipulation ${activeTab === tab.key ? tab.activeClass : 'text-slate-400'}`}
+                        >
+                            <tab.icon className="w-4 h-4" /> {tab.label}
+                        </button>
+                    ))}
+                </div>
+                <div className="flex items-center justify-between px-1 pb-1">
+                    <button
+                        onClick={swipePrev}
+                        disabled={activeIndex === 0}
+                        className={`p-2 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation transition-opacity ${activeIndex === 0 ? 'opacity-30' : 'opacity-70'}`}
+                    >
+                        <ChevronLeft className="w-5 h-5 text-slate-400" />
+                    </button>
+                    <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{activeIndex + 1} / {tabs.length}</span>
+                    <button
+                        onClick={swipeNext}
+                        disabled={activeIndex === tabs.length - 1}
+                        className={`p-2 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation transition-opacity ${activeIndex === tabs.length - 1 ? 'opacity-30' : 'opacity-70'}`}
+                    >
+                        <ChevronRight className="w-5 h-5 text-slate-400" />
+                    </button>
+                </div>
+            </div>
+
+            {/* ── MAIN AREA (3-column layout on md:+, one tab visible at a time below it) ── */}
+            <main className="relative z-10 flex-1 flex flex-col md:flex-row gap-0 overflow-hidden min-h-0">
                 {/* COL 1: Map (40%) */}
-                <section className="flex-[40] flex flex-col border-r border-slate-700/40 min-h-0">
+                <section className={`flex-1 md:flex-[40] flex-col border-r border-slate-700/40 min-h-0 ${activeTab === 'map' ? 'flex' : 'hidden'} md:flex`}>
                     <div className="px-4 py-2.5 border-b border-slate-700/40 bg-slate-900/30 flex items-center gap-2 shrink-0">
                         <Navigation className="w-3.5 h-3.5 text-blue-400" />
                         <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Highway Segment Map</h2>
@@ -111,7 +156,7 @@ export function CoastalView({ objective }: { objective?: string }) {
                 </section>
 
                 {/* COL 2: Controls (35%) */}
-                <section className="flex-[35] flex flex-col border-r border-slate-700/40 min-h-0 overflow-hidden bg-slate-900/10">
+                <section className={`flex-1 md:flex-[35] flex-col border-r border-slate-700/40 min-h-0 overflow-hidden bg-slate-900/10 ${activeTab === 'controls' ? 'flex' : 'hidden'} md:flex`}>
                     {/* Logistics */}
                     <div className="flex-[45] flex flex-col border-b border-slate-700/40 min-h-0">
                         <div className="px-4 py-2.5 border-b border-slate-700/40 bg-slate-900/30 flex items-center gap-2 shrink-0">
@@ -160,7 +205,7 @@ export function CoastalView({ objective }: { objective?: string }) {
                 </section>
 
                 {/* COL 3: Advisor (25%) */}
-                <section className="flex-[25] flex flex-col min-h-0 overflow-hidden">
+                <section className={`flex-1 md:flex-[25] flex-col min-h-0 overflow-hidden ${activeTab === 'advisor' ? 'flex' : 'hidden'} md:flex`}>
                     <div className="px-4 py-2.5 border-b border-slate-700/40 bg-slate-900/30 shrink-0">
                         <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                             <Zap className="w-3 h-3 text-amber-400" /> Smart Advisor

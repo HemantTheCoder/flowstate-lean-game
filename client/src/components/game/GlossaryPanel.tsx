@@ -305,7 +305,7 @@ export const GlossaryPanel = ({ isOpen, onClose }: GlossaryPanelProps) => {
             exit={{ x: 500, opacity: 0 }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             data-testid="panel-glossary"
-            className="fixed right-0 top-0 h-screen w-full max-w-md z-[301] bg-slate-900 rounded-l-3xl shadow-2xl flex flex-col border-l border-slate-700/50"
+            className="fixed right-0 top-0 h-dvh w-full max-w-md z-[301] bg-slate-900 rounded-l-3xl shadow-2xl flex flex-col border-l border-slate-700/50"
           >
             <div className="flex items-center justify-between gap-2 p-6 border-b border-slate-800">
               <div className="flex items-center gap-3">
@@ -318,7 +318,7 @@ export const GlossaryPanel = ({ isOpen, onClose }: GlossaryPanelProps) => {
               <button
                 onClick={onClose}
                 data-testid="button-close-glossary"
-                className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-800 rounded-lg transition-colors touch-manipulation"
                 aria-label="Close glossary"
               >
                 <X className="w-6 h-6 text-slate-400" />

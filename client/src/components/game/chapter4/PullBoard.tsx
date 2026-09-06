@@ -44,34 +44,25 @@ export const PullBoard: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="relative z-10">
-                            <input
-                                type="range"
-                                min="1"
-                                max="10"
-                                value={currentLimit}
-                                onChange={(e) => handleLimitChange(trade.id, parseInt(e.target.value))}
-                                className="w-full accent-indigo-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer"
-                            />
-                            <div className="flex justify-between text-[10px] text-slate-500 mt-2 font-bold px-1">
-                                <span>1 (Strict)</span>
-                                <span>10 (Overcrowded)</span>
-                            </div>
-                        </div>
-
-                        {/* Visual Kanban Card Representation */}
-                        <div className="mt-4 flex gap-2">
+                        {/* Tappable 10-segment row (was a range slider - a 2px drag target
+                            is unreliable on touch; tapping a segment sets the limit directly) */}
+                        <div className="relative z-10 flex gap-1.5">
                             {Array.from({ length: 10 }).map((_, i) => (
-                                <div
+                                <button
                                     key={i}
-                                    className={`h-8 flex-1 rounded text-[10px] flex items-center justify-center font-bold transition-all ${i < currentLimit
+                                    onClick={() => handleLimitChange(trade.id, i + 1)}
+                                    className={`h-11 flex-1 rounded text-[10px] flex items-center justify-center font-bold transition-all touch-manipulation ${i < currentLimit
                                         ? `${trade.bg} ${trade.color} border ${trade.border}`
-                                        : 'bg-slate-900/50 border border-slate-800 text-slate-700'
+                                        : 'bg-slate-900/50 border border-slate-800 text-slate-700 hover:border-slate-600'
                                         }`}
                                 >
                                     {i < currentLimit && `#${i + 1}`}
-                                </div>
+                                </button>
                             ))}
+                        </div>
+                        <div className="flex justify-between text-[10px] text-slate-500 mt-2 font-bold px-1 relative z-10">
+                            <span>1 (Strict)</span>
+                            <span>10 (Overcrowded)</span>
                         </div>
                     </div>
                 );

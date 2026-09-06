@@ -200,7 +200,7 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
                             </div>
                             <button
                                 onClick={onClose}
-                                className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700/50 flex items-center justify-center hover:bg-slate-700 transition-colors"
+                                className="min-w-[44px] min-h-[44px] rounded-lg bg-slate-800 border border-slate-700/50 flex items-center justify-center hover:bg-slate-700 transition-colors touch-manipulation"
                             >
                                 <X className="w-4 h-4 text-slate-400" />
                             </button>
@@ -328,7 +328,7 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
                                         <button
                                             key={c.value}
                                             onClick={() => toggleConstraint(c.value)}
-                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${constraints.has(c.value)
+                                            className={`flex items-center gap-1.5 px-3 min-h-11 rounded-lg text-xs font-bold transition-all border ${constraints.has(c.value)
                                                 ? 'bg-red-500/20 border-red-500/40 text-red-300'
                                                 : 'bg-slate-800/50 border-slate-700/30 text-slate-500 hover:bg-slate-800'
                                                 }`}
@@ -381,7 +381,7 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
                             {isEditing ? (
                                 <button
                                     onClick={handleDelete}
-                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 transition-all"
+                                    className="flex items-center gap-1.5 px-3 min-h-11 rounded-xl text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 transition-all"
                                 >
                                     <Trash2 className="w-3.5 h-3.5" />
                                     Delete
@@ -392,13 +392,13 @@ export const CustomTaskModal: React.FC<CustomTaskModalProps> = ({
                             <div className="flex gap-2">
                                 <button
                                     onClick={onClose}
-                                    className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 bg-slate-800 border border-slate-700/50 hover:bg-slate-700 transition-all"
+                                    className="px-4 min-h-11 rounded-xl text-xs font-bold text-slate-400 bg-slate-800 border border-slate-700/50 hover:bg-slate-700 transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleSave}
-                                    className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-cyan-500 to-emerald-500 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:scale-105 transition-all"
+                                    className="flex items-center gap-1.5 px-5 min-h-11 rounded-xl text-xs font-black text-white bg-gradient-to-r from-cyan-500 to-emerald-500 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:scale-105 transition-all"
                                 >
                                     <Save className="w-3.5 h-3.5" />
                                     {isReplacing ? 'Replace Task' : isEditing ? 'Save Changes' : 'Add Task'}
