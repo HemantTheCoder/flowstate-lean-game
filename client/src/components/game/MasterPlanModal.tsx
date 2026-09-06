@@ -36,16 +36,16 @@ export const MasterPlanModal: React.FC = () => {
           transition={{ type: "spring", duration: 0.5 }}
         >
           {/* Header */}
-          <div className="p-6 border-b border-slate-800 bg-slate-800/50 flex items-center justify-between">
-            <div>
+          <div className="p-4 md:p-6 border-b border-slate-800 bg-slate-800/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="min-w-0">
               <h2 className="text-blue-400 font-bold text-sm tracking-wider uppercase mb-1 flex items-center gap-2">
                 <ClipboardList className="w-4 h-4" /> Project Initiation
               </h2>
-              <h1 className="text-2xl font-black text-white">Master Schedule & Baseline</h1>
+              <h1 className="text-xl md:text-2xl font-black text-white">Master Schedule & Baseline</h1>
             </div>
-            <div className="text-right">
+            <div className="text-left sm:text-right shrink-0">
               <div className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">Starting Budget (Baseline)</div>
-              <div className="text-2xl font-mono font-bold text-emerald-400 flex items-center gap-1 justify-end">
+              <div className="text-xl md:text-2xl font-mono font-bold text-emerald-400 flex items-center gap-1 sm:justify-end">
                 <IndianRupee className="w-5 h-5 opacity-50" />
                 {formatCurrency(startingBudget, currency)}
               </div>

@@ -272,29 +272,29 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
 
             {/* Header with Day Objective */}
             <div className="relative z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-700/50 shadow-lg">
-                <div className="h-14 flex items-center justify-between px-6 border-b border-slate-800">
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-slate-800/80 border border-slate-700/50 rounded-xl flex items-center justify-center">
+                <div className="min-h-14 flex flex-wrap items-center justify-between gap-y-2 px-3 md:px-6 py-2 md:py-0 border-b border-slate-800">
+                    <div className="flex items-center gap-3 md:gap-4">
+                        <div className="w-10 h-10 bg-slate-800/80 border border-slate-700/50 rounded-xl flex items-center justify-center shrink-0">
                             <Briefcase className="w-5 h-5 text-cyan-400" />
                         </div>
-                        <div>
-                            <h1 className="text-lg font-black text-white">The Planning Room</h1>
-                            <p className="text-xs text-slate-400">Week {week} - Last Planner System</p>
+                        <div className="min-w-0">
+                            <h1 className="text-base md:text-lg font-black text-white truncate">The Planning Room</h1>
+                            <p className="text-[11px] md:text-xs text-slate-400 truncate">Week {week} - Last Planner System</p>
                         </div>
                     </div>
-                    <div className="flex gap-4 text-sm items-center">
-                        <div className="flex flex-col items-center px-4 py-1 bg-slate-800/50 border border-slate-700/50 rounded-xl">
+                    <div className="flex flex-wrap gap-2 md:gap-4 text-sm items-center">
+                        <div className="flex flex-col items-center px-3 md:px-4 py-1 bg-slate-800/50 border border-slate-700/50 rounded-xl">
                             <span className="text-[10px] uppercase text-cyan-500 font-bold">Budget</span>
                             <span className="text-white font-mono font-bold">${funds}</span>
                         </div>
-                        <div className="flex flex-col items-center px-4 py-1 bg-slate-800/50 border border-slate-700/50 rounded-xl">
+                        <div className="flex flex-col items-center px-3 md:px-4 py-1 bg-slate-800/50 border border-slate-700/50 rounded-xl">
                             <span className="text-[10px] uppercase text-emerald-500 font-bold">Morale</span>
                             <span className="text-emerald-400 font-mono font-bold">{lpi.teamMorale}%</span>
                         </div>
                         <div className="relative group">
                             <button
                                 onClick={onSave}
-                                className="flex items-center gap-2 px-4 py-2 bg-slate-800/80 hover:bg-slate-700 text-cyan-400 font-bold rounded-xl shadow-lg transition-colors border border-slate-600/50"
+                                className="flex items-center gap-2 px-3 md:px-4 min-h-11 bg-slate-800/80 hover:bg-slate-700 text-cyan-400 font-bold rounded-xl shadow-lg transition-colors border border-slate-600/50 touch-manipulation"
                                 title="Save Game"
                             >
                                 <Save className="w-4 h-4" />
@@ -308,7 +308,7 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                                     if (canEndDay()) advanceDay();
                                 }}
                                 disabled={!canEndDay()}
-                                className={`flex items-center gap-2 px-4 py-2 font-bold rounded-xl shadow-lg transition-colors border ${canEndDay()
+                                className={`flex items-center gap-2 px-3 md:px-4 min-h-11 font-bold rounded-xl shadow-lg transition-colors border touch-manipulation ${canEndDay()
                                     ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border-amber-500/50'
                                     : 'bg-slate-800 text-slate-500 border-slate-700/50 cursor-not-allowed'
                                     }`}
@@ -327,15 +327,15 @@ export const PlanningRoom: React.FC<PlanningRoomProps> = ({ onSave }) => {
                 </div>
 
                 {/* Day Objective Banner */}
-                <div className="h-12 flex items-center px-6 gap-4 bg-slate-900/50 border-b border-slate-700/50">
-                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full border bg-slate-800/50 ${colorClassMap[dayObjective.color]?.border || 'border-cyan-500/50'}`}>
+                <div className="min-h-12 flex flex-wrap items-center px-3 md:px-6 py-2 md:py-0 gap-2 md:gap-4 bg-slate-900/50 border-b border-slate-700/50">
+                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full border bg-slate-800/50 shrink-0 ${colorClassMap[dayObjective.color]?.border || 'border-cyan-500/50'}`}>
                         <span className={`${dayObjective.color === 'orange' ? 'text-orange-400' : dayObjective.color === 'purple' ? 'text-purple-400' : dayObjective.color === 'green' ? 'text-emerald-400' : dayObjective.color === 'amber' ? 'text-amber-400' : 'text-cyan-400'}`}>{dayObjective.icon}</span>
                         <span className="text-white font-bold text-sm">
                             {GAME_CONSTANTS.TIME_UNIT} {day}
                         </span>
                     </div>
-                    <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                    <div className="flex-1 min-w-[140px]">
+                        <div className="flex flex-wrap items-center gap-x-2">
                             <span className="text-slate-200 font-bold">{dayObjective.title}:</span>
                             <span className="text-slate-400 text-sm">{dayObjective.objective}</span>
                         </div>

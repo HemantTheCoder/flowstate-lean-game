@@ -105,7 +105,7 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
                     </h1>
                 </div>
 
-                <div className="p-8 md:p-10 overflow-y-auto">
+                <div className="p-4 md:p-10 overflow-y-auto">
                     <div className="text-center mb-8">
                         <p className="text-lg text-slate-300 font-medium">
                             You brought order to chaos. By applying the 5S principles, you transformed a cluttered depot into a visual, high-performance workspace.
@@ -191,7 +191,7 @@ export const Chapter3CompleteModal: React.FC<Chapter3CompleteModalProps> = ({
                     </motion.div>
 
                     <div className="flex flex-col gap-3">
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             <button
                                 onClick={() => {
                                     const metricsData = (dailyMetrics as { day: number; efficiency: number; tasksCompletedToday?: number; potentialCapacity?: number; cumulativeEfficiency?: number; insight?: string }[]);

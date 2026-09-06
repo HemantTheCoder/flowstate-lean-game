@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Trophy, Medal, Star, Shield, ArrowLeft, Loader2, Sparkles, User, Target } from 'lucide-react';
+import { Trophy, Medal, Star, Shield, ArrowLeft, Loader2, Sparkles, User, Target, AlertTriangle } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { RewardsModal } from '@/components/game/RewardsModal';
 import soundManager from '@/lib/soundManager';
@@ -21,7 +21,7 @@ export default function Leaderboard() {
   const [, setLocation] = useLocation();
   const [showRewards, setShowRewards] = useState(false);
 
-  const { data: entries = [], isLoading } = useQuery<LeaderboardEntry[]>({
+  const { data: entries = [], isLoading, isError, refetch } = useQuery<LeaderboardEntry[]>({
     queryKey: ['/api/leaderboard'],
   });
 
@@ -138,6 +138,22 @@ export default function Leaderboard() {
             <div className="h-64 flex flex-col items-center justify-center gap-4">
               <Loader2 className="w-10 h-10 text-amber-500 animate-spin" />
               <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading Rankings...</p>
+            </div>
+          ) : isError ? (
+            <div className="h-64 flex flex-col items-center justify-center gap-4 text-center px-6 bg-slate-900/50">
+              <div className="w-16 h-16 bg-red-950/50 rounded-full flex items-center justify-center border border-red-500/30 mb-2">
+                <AlertTriangle className="w-8 h-8 text-red-400" />
+              </div>
+              <h3 className="text-xl font-bold text-white tracking-tight">Couldn't Load Rankings</h3>
+              <p className="text-slate-400 max-w-sm text-sm">
+                Something went wrong reaching the leaderboard. Check your connection and try again.
+              </p>
+              <button
+                onClick={() => refetch()}
+                className="px-5 min-h-11 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-bold text-sm transition-colors"
+              >
+                Retry
+              </button>
             </div>
           ) : entries.length === 0 ? (
             <div className="h-64 flex flex-col items-center justify-center gap-4 text-center px-6 bg-slate-900/50">

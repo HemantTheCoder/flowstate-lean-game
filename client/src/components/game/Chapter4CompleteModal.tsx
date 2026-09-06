@@ -94,7 +94,7 @@ export const Chapter4CompleteModal: React.FC<Chapter4CompleteModalProps> = ({
                     </h1>
                 </div>
 
-                <div className="p-8 md:p-10 overflow-y-auto">
+                <div className="p-4 md:p-10 overflow-y-auto">
                     <div className="text-center mb-8">
                         <p className="text-lg text-slate-300 font-medium">
                             The Midfield Terminal is live! By implementing Pull systems and JIT delivery, you synchronized the supply chain with site demand, eliminating the overproduction waste that threatened the project.
@@ -156,7 +156,7 @@ export const Chapter4CompleteModal: React.FC<Chapter4CompleteModalProps> = ({
                     </motion.div>
 
                     <div className="flex flex-col gap-3">
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             <button
                                 onClick={() => {
                                     const days = [1, 2, 3, 4, 5];

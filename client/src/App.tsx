@@ -24,9 +24,12 @@ function useDismissSplash() {
   useEffect(() => {
     const splash = document.getElementById("splash-screen");
     if (!splash) return;
+    // performance.now() is already elapsed-ms-since-navigation-start by spec, so it needs
+    // no subtraction - mixing it with Date.now() (epoch ms) as the old code did produced a
+    // huge bogus "elapsed" whenever performance.timing was unavailable, making remaining
+    // clamp to 0 and the splash dismiss instantly instead of honoring the minimum display time.
     const minDisplayTime = 3000;
-    const startTime = performance.timing?.navigationStart || performance.now();
-    const elapsed = Date.now() - startTime;
+    const elapsed = performance.now();
     const remaining = Math.max(0, minDisplayTime - elapsed);
 
     const timer = setTimeout(() => {

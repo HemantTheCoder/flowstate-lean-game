@@ -38,6 +38,14 @@ export default function Feedback() {
                 setLocation('/');
             }, 3000);
         },
+        onError: () => {
+            toast({
+                title: "Transmission Failed",
+                description: "Couldn't reach HQ. Check your connection and try again.",
+                variant: "destructive",
+                duration: 4000,
+            });
+        },
     });
 
     const handleSubmit = (e: React.FormEvent) => {
