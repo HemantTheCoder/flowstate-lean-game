@@ -149,6 +149,32 @@ const ConstraintBanner: React.FC<{ day: number; materials: number }> = ({ day, m
     return null;
 };
 
+// A title= attribute only shows on hover, which doesn't exist on touch - wrap the
+// explainer so tapping (as well as hovering, for desktop) reveals the same text.
+const InfoTag: React.FC<{ tooltip: string; className?: string; children: React.ReactNode }> = ({ tooltip, className, children }) => {
+    const [open, setOpen] = useState(false);
+    return (
+        <span className="relative inline-flex min-w-0">
+            <button
+                type="button"
+                title={tooltip}
+                onClick={(e) => { e.stopPropagation(); setOpen(o => !o); }}
+                className={`touch-manipulation min-w-0 ${className || ''}`}
+            >
+                {children}
+            </button>
+            {open && (
+                <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute z-40 bottom-full mb-2 right-0 w-56 max-w-[70vw] p-2.5 rounded-lg bg-slate-900 border border-slate-700 shadow-xl text-[10px] font-medium normal-case tracking-normal text-slate-300"
+                >
+                    {tooltip}
+                </div>
+            )}
+        </span>
+    );
+};
+
 const ScrollHint: React.FC<{ containerRef: React.RefObject<HTMLDivElement | null> }> = ({ containerRef }) => {
     const [showLeft, setShowLeft] = useState(false);
     const [showRight, setShowRight] = useState(true);
@@ -175,7 +201,7 @@ const ScrollHint: React.FC<{ containerRef: React.RefObject<HTMLDivElement | null
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-slate-950/90 to-transparent z-20 pointer-events-none flex items-center justify-start pl-3 hidden md:flex"
+                        className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-slate-950/90 to-transparent z-20 pointer-events-none flex items-center justify-start pl-3"
                     >
                         <ChevronLeft className="w-6 h-6 text-slate-500/50 animate-pulse" />
                     </motion.div>
@@ -187,7 +213,7 @@ const ScrollHint: React.FC<{ containerRef: React.RefObject<HTMLDivElement | null
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-slate-950/90 to-transparent z-20 pointer-events-none flex items-center justify-end pr-3 hidden md:flex"
+                        className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-slate-950/90 to-transparent z-20 pointer-events-none flex items-center justify-end pr-3"
                     >
                         <ChevronRight className="w-6 h-6 text-slate-500/50 animate-pulse" />
                     </motion.div>
@@ -437,12 +463,12 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                             WIP {col.tasks.length}/{col.wipLimit}
                                                                         </div>
                                                                         {col.tasks.length < col.wipLimit && (
-                                                                            <span 
-                                                                                className="text-[9px] text-cyan-400/80 font-bold uppercase tracking-wider cursor-help border-b border-dashed border-cyan-400/30 pb-0.5"
-                                                                                title="This board represents one crew's capacity. Real sites run many crews in parallel — but each crew shouldn't juggle more than a few active tasks at once, or quality and speed both suffer."
+                                                                            <InfoTag
+                                                                                tooltip="This board represents one crew's capacity. Real sites run many crews in parallel — but each crew shouldn't juggle more than a few active tasks at once, or quality and speed both suffer."
+                                                                                className="text-[9px] text-cyan-400/80 font-bold uppercase tracking-wider border-b border-dashed border-cyan-400/30 pb-0.5"
                                                                             >
                                                                                 Parallel tasks permitted
-                                                                            </span>
+                                                                            </InfoTag>
                                                                         )}
                                                                     </div>
                                                                 )}
@@ -549,13 +575,13 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                             else if (first.name.includes('Wiring') || first.name.includes('Electrical')) MatIcon = Zap;
                                                                                             const summary = task.materialsRequired.map(m => `${m.amount} ${m.name}`).join(' · ');
                                                                                             return (
-                                                                                                <span
-                                                                                                    className="flex items-center gap-1 min-w-0 bg-slate-900/40 rounded-md px-2 py-0.5 border border-amber-500/20 text-[9px] font-bold text-amber-400"
-                                                                                                    title={`Requires: ${summary}`}
+                                                                                                <InfoTag
+                                                                                                    tooltip={`Requires: ${summary}`}
+                                                                                                    className="flex items-center gap-1 bg-slate-900/40 rounded-md px-2 py-0.5 border border-amber-500/20 text-[9px] font-bold text-amber-400"
                                                                                                 >
                                                                                                     <MatIcon className="w-3 h-3 text-amber-500 shrink-0" />
                                                                                                     <span className="truncate max-w-[10rem]">{summary}</span>
-                                                                                                </span>
+                                                                                                </InfoTag>
                                                                                             );
                                                                                         })()}
                                                                                     </div>
