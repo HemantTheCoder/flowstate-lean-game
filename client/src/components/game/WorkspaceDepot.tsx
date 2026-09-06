@@ -233,7 +233,7 @@ export const WorkspaceDepot: React.FC<WorkspaceDepotProps> = ({ onClose }) => {
                                     <span className="sm:hidden">SELECT ZONE</span>
                                     <button
                                         onClick={() => setSelectedItemId(null)}
-                                        className="ml-2 bg-slate-800/80 p-1 md:p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-red-500/80 transition-colors"
+                                        className="ml-2 bg-slate-800/80 min-w-[36px] min-h-[36px] md:min-w-[40px] md:min-h-[40px] flex items-center justify-center rounded-lg text-slate-300 hover:text-white hover:bg-red-500/80 transition-colors touch-manipulation"
                                     >
                                         <X className="w-4 h-4 md:w-5 md:h-5" />
                                     </button>
