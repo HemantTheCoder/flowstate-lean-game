@@ -206,12 +206,21 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     const [droppedTaskId, setDroppedTaskId] = useState<string | null>(null);
     const { toast } = useToast();
 
-    const onDragEnd = (result: DropResult) => {
-        const { source, destination, draggableId } = result;
-        if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) return;
+    // Below md, drag-and-drop is disabled in favor of tap-to-select + tap-a-column-to-move:
+    // @hello-pangea/dnd (react-beautiful-dnd) explicitly doesn't support a scrollable Droppable
+    // nested inside another scrollable ancestor, which is exactly this board's structure
+    // (overflow-x-auto board + overflow-y-auto column), so touch drag here is flaky by design.
+    const [isMobile, setIsMobile] = useState(false);
+    const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 767px)');
+        const update = () => setIsMobile(mq.matches);
+        update();
+        mq.addEventListener('change', update);
+        return () => mq.removeEventListener('change', update);
+    }, []);
 
-        const sourceColId = source.droppableId;
-        const destColId = destination.droppableId;
+    const attemptMove = (sourceColId: string, destColId: string, draggableId: string) => {
         const sourceCol = columns.find(c => c.id === sourceColId);
         const task = sourceCol?.tasks.find(t => t.id === draggableId);
 
@@ -233,7 +242,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             setTimeout(() => setDroppedTaskId(null), 300);
             if (destColId === 'done') {
                 soundManager.playSFX('money', audioSettings.sfxVolume);
-                
+
                 // Deterministic Milestone Flavors
                 if (task.id === 'task-4') {
                     toast({ title: '👷 Foreman', description: 'Foundation poured! The site is officially taking shape.', duration: 5000 });
@@ -264,6 +273,26 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 setTimeout(() => setWipBlockedColId(null), 500);
             }
         }
+    };
+
+    const onDragEnd = (result: DropResult) => {
+        const { source, destination, draggableId } = result;
+        if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) return;
+        attemptMove(source.droppableId, destination.droppableId, draggableId);
+    };
+
+    const handleCardTap = (taskId: string) => {
+        if (!isMobile) return;
+        setSelectedTaskId(prev => prev === taskId ? null : taskId);
+    };
+
+    const handleColumnTap = (destColId: string) => {
+        if (!isMobile || !selectedTaskId) return;
+        const sourceCol = columns.find(c => c.tasks.some(t => t.id === selectedTaskId));
+        const taskId = selectedTaskId;
+        setSelectedTaskId(null);
+        if (!sourceCol || sourceCol.id === destColId) return;
+        attemptMove(sourceCol.id, destColId, taskId);
     };
 
     return (
@@ -326,13 +355,29 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
                     <ConstraintBanner day={day} materials={materials} />
 
+                    {isMobile && (
+                        <div className="md:hidden mx-3 mt-2 mb-1 px-4 py-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-between gap-3">
+                            <span className="text-[11px] font-bold text-cyan-300 leading-snug">
+                                {selectedTaskId ? 'Tap a column to move it there, or tap the card again to cancel.' : 'Tap a task to select it, then tap a column to move it.'}
+                            </span>
+                            {selectedTaskId && (
+                                <button
+                                    onClick={() => setSelectedTaskId(null)}
+                                    className="shrink-0 px-3 py-1.5 min-h-[36px] rounded-lg bg-slate-800 text-slate-300 text-[10px] font-black uppercase tracking-widest border border-slate-700"
+                                >
+                                    Cancel
+                                </button>
+                            )}
+                        </div>
+                    )}
+
                     {/* Board Content */}
                     <DragDropContext onDragEnd={onDragEnd}>
                         <div className="flex-1 relative min-h-0 px-3 md:px-6 pb-4">
                             <ScrollHint containerRef={scrollContainerRef} />
                             <div
                                 ref={scrollContainerRef}
-                                className="flex flex-row gap-4 h-full overflow-x-auto overflow-y-hidden pb-2 pt-1 snap-x snap-mandatory no-scrollbar"
+                                className="flex flex-row gap-4 h-full overflow-x-auto overflow-y-hidden pb-2 pt-1 snap-x snap-mandatory"
                             >
                                 {columns.map(col => {
                                     const isOverWip = col.id === 'doing' && col.tasks.length > col.wipLimit;
@@ -340,20 +385,30 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                     const isBottleneck = isOverWip || isAtWip;
                                     const isBlurred = day > 5 && col.id === 'backlog';
                                     const congestion = col.id === 'doing' ? Math.max(0, col.tasks.length - col.wipLimit) : 0;
+                                    const isTapMoveTarget = isMobile && !!selectedTaskId && col.tasks.every(t => t.id !== selectedTaskId);
 
                                     return (
                                         <Droppable key={col.id} droppableId={col.id} isDropDisabled={isBlurred}>
                                             {(provided, snapshot) => (
                                                 <div
                                                     id={`col-${col.id}`}
+                                                    onClick={() => handleColumnTap(col.id)}
                                                     className={`w-[320px] md:w-[420px] shrink-0 flex flex-col h-full snap-start transition-all duration-300 relative group ${wipBlockedColId === col.id ? 'animate-shake' : ''}`}
                                                 >
                                                     {/* Column Frame */}
                                                     <div className={`flex flex-col h-full bg-slate-900/60 backdrop-blur-md rounded-[28px] border-2 transition-all duration-500 relative overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_10px_30px_-10px_rgba(0,0,0,0.6)] ${
                                                         snapshot.isDraggingOver ? 'bg-cyan-500/5 border-cyan-500/40 shadow-[0_0_30px_rgba(6,182,212,0.1)]' :
+                                                        isTapMoveTarget ? 'border-cyan-400/70 shadow-[0_0_25px_rgba(6,182,212,0.15)]' :
                                                         isBottleneck ? 'border-red-500/40' : 'border-slate-800/60'
                                                     } ${isBlurred ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
-                                                        
+                                                        {isTapMoveTarget && (
+                                                            <div className="absolute inset-x-0 top-0 z-30 flex justify-center pt-2 pointer-events-none">
+                                                                <span className="px-3 py-1 rounded-full bg-cyan-500 text-cyan-950 text-[10px] font-black uppercase tracking-widest shadow-lg animate-bounce">
+                                                                    Tap to move here
+                                                                </span>
+                                                            </div>
+                                                        )}
+
                                                         {/* Header */}
                                                         <div className={`px-4 py-3 shrink-0 border-b border-white/5 flex items-center justify-between ${
                                                             col.id === 'done' ? 'bg-emerald-500/5' :
@@ -398,7 +453,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                         <div
                                                             {...provided.droppableProps}
                                                             ref={provided.innerRef}
-                                                            className="flex-1 p-3 flex flex-col gap-2.5 overflow-y-auto custom-scrollbar-thin"
+                                                            className="flex-1 p-3 flex flex-col gap-2.5 overflow-y-auto"
                                                         >
                                                             {col.tasks.map((task, index) => {
                                                                 const isWaste = task.id.includes('waste') || task.title === 'REWORK';
@@ -412,8 +467,10 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                 const isOnTrack = isDoing && !isDelayed;
                                                                 const isJustDropped = droppedTaskId === task.id;
 
+                                                                const isSelected = isMobile && selectedTaskId === task.id;
+
                                                                 return (
-                                                                    <Draggable key={task.id} draggableId={task.id} index={index}>
+                                                                    <Draggable key={task.id} draggableId={task.id} index={index} isDragDisabled={isMobile}>
                                                                         {(provided, snapshot) => {
                                                                             const child = (
                                                                                 <div
@@ -421,9 +478,12 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                     {...provided.draggableProps}
                                                                                     {...provided.dragHandleProps}
                                                                                     style={provided.draggableProps.style}
+                                                                                    onClick={(e) => { e.stopPropagation(); handleCardTap(task.id); }}
                                                                                     className={`group relative bg-slate-800/90 backdrop-blur-xl p-3.5 rounded-xl border transition-all duration-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_4px_10px_-4px_rgba(0,0,0,0.5)] ${
                                                                                         snapshot.isDragging
                                                                                             ? 'bg-slate-700 border-cyan-400 shadow-[0_25px_60px_-15px_rgba(0,0,0,1)] ring-4 ring-cyan-500/20 z-50 scale-[1.05] cursor-grabbing'
+                                                                                            : isSelected
+                                                                                            ? 'bg-slate-700/80 border-cyan-400 ring-4 ring-cyan-400/40 scale-[1.02]'
                                                                                             : isDone ? 'border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-500/60 hover:shadow-xl hover:-translate-y-1'
                                                                                             : isAtRisk ? 'border-amber-500/50 bg-amber-950/20 shadow-[0_0_15px_rgba(245,158,11,0.15)] hover:border-amber-500/80 hover:-translate-y-1'
                                                                                             : isOnTrack ? 'border-cyan-500/30 bg-cyan-950/20 hover:border-cyan-500/60 hover:shadow-xl hover:-translate-y-1'
@@ -455,7 +515,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                                                                 {isDone && <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />}
                                                                                                 {chapter === 1 && day === 1 && tutorialStep <= 3 && col.id === 'backlog' && index === 0 && (
                                                                                                     <div className="shrink-0 px-2 py-0.5 bg-amber-500 text-amber-950 text-[10px] font-black rounded-full animate-bounce shadow-[0_0_10px_rgba(245,158,11,0.5)]">
-                                                                                                        DRAG ME
+                                                                                                        {isMobile ? 'TAP ME' : 'DRAG ME'}
                                                                                                     </div>
                                                                                                 )}
                                                                                             </div>
@@ -520,7 +580,7 @@ export const KanbanBoard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                                             
                                                             {col.id === 'backlog' && (
                                                                 <button
-                                                                    onClick={() => { setReplaceTaskId(null); setShowCustomModal(true); }}
+                                                                    onClick={(e) => { e.stopPropagation(); setReplaceTaskId(null); setShowCustomModal(true); }}
                                                                     className="w-full py-6 mt-2 flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-700/40 text-slate-500 hover:border-cyan-500/40 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all group"
                                                                 >
                                                                     <div className="p-2 rounded-full bg-slate-800 border border-slate-700 group-hover:bg-cyan-500/20 group-hover:border-cyan-500/40 transition-colors">

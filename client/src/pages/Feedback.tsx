@@ -47,7 +47,10 @@ export default function Feedback() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 p-4 md:p-8 font-sans relative overflow-x-hidden text-slate-200 flex flex-col items-center justify-center">
+        // h-dvh + overflow-y-auto (not min-h-screen, which never scrolls internally — see
+        // Debrief.tsx/ChapterSelect.tsx for the full explanation). Measured live: this clipped
+        // the message textarea and Submit button entirely off-screen on a phone.
+        <div className="h-dvh overflow-y-auto bg-slate-900 p-4 md:p-8 font-sans relative overflow-x-hidden text-slate-200 flex flex-col items-center justify-center">
             {/* Background Ambience */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <motion.div

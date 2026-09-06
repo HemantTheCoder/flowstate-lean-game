@@ -19,7 +19,10 @@ export default function NotFound() {
 
           <div className="mt-8">
             <Link href="/">
-              <Button className="w-full rounded-full btn-primary">Return to Base</Button>
+              {/* no rounded-full here: .btn-primary (components layer) sets its own rounded-lg and
+                  wins the cascade tie over a co-applied Tailwind utility on this project's build -
+                  see the layer-ordering note on .hud-corners/.metal-panel in index.css. */}
+              <Button className="w-full btn-primary">Return to Base</Button>
             </Link>
           </div>
         </CardContent>

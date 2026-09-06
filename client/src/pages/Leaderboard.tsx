@@ -65,7 +65,10 @@ export default function Leaderboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-200 p-4 md:p-8 font-sans relative overflow-x-hidden">
+    // h-dvh + overflow-y-auto (not min-h-screen, which never scrolls internally — see
+    // Debrief.tsx for the full explanation). Only clips a little with today's row count, but
+    // scales with entries up to the stated "Top 50" and will get much worse with real data.
+    <div className="h-dvh overflow-y-auto bg-slate-900 text-slate-200 p-4 md:p-8 font-sans relative overflow-x-hidden">
 
       {/* Premium Twilight Industrial Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0">

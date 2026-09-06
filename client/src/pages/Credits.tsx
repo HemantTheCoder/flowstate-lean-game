@@ -51,7 +51,10 @@ const item = {
 
 export default function Credits() {
     return (
-        <div className="relative w-full min-h-screen overflow-x-hidden bg-slate-900 flex flex-col items-center p-4 md:p-8 font-sans">
+        // h-dvh + overflow-y-auto (not min-h-screen, which never scrolls internally — see
+        // Debrief.tsx for the full explanation). Measured live: this clipped the 4th team
+        // member and the footer quote off-screen on a phone.
+        <div className="relative w-full h-dvh overflow-y-auto overflow-x-hidden bg-slate-900 flex flex-col items-center p-4 md:p-8 font-sans">
 
             {/* Premium Twilight Industrial Ambient Background */}
             <div className="fixed inset-0 pointer-events-none z-0">

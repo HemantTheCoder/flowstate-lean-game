@@ -77,7 +77,11 @@ export const TaskModeSelector: React.FC<TaskModeSelectorProps> = ({ isOpen, onSe
         <>
             <AnimatePresence mode="wait">
                 <motion.div
-                    className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+                    // overflow-y-auto: this wrapper had no scroll/max-height at all, so on a short
+                    // viewport (iPhone SE, or any phone rotated to landscape) the two option
+                    // cards plus header (~700px+) could exceed the visible height with nothing to
+                    // scroll to reach the clipped one.
+                    className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-black/60 backdrop-blur-sm p-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}

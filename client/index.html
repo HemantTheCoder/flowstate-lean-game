@@ -3,7 +3,12 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <!-- viewport-fit=cover: without it, env(safe-area-inset-*) resolves to 0px everywhere in the app —
+       confirmed by mobile audit that every existing safe-area-inset usage was silently inert.
+       Dropped maximum-scale=1 (two independent mobile audits flagged it as blocking legitimate
+       pinch-zoom / WCAG 1.4.4 for low-vision players); iOS zoom-on-focus is handled at the input
+       level instead (16px+ font-size on every form control). -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" />
   <meta name="description" content="Master Lean Construction principles through an interactive visual novel game" />
   <meta name="apple-mobile-web-app-capable" content="yes" />

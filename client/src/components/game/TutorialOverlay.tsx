@@ -38,6 +38,16 @@ interface Props {
 export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
     const { chapter, day, flags, tutorialStep, tutorialActive, completeTutorial, setTutorialStep, setFlag } = useGameStore();
     const [spotlightPos, setSpotlightPos] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
+    // Below md, KanbanBoard swaps drag-and-drop for tap-to-select + tap-destination
+    // (nested-scroll drag is unsupported/flaky on touch) - mirror that in the copy.
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 767px)');
+        const update = () => setIsMobile(mq.matches);
+        update();
+        mq.addEventListener('change', update);
+        return () => mq.removeEventListener('change', update);
+    }, []);
 
     useEffect(() => {
         if (!tutorialActive) return;
@@ -232,7 +242,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 </div>
                                 <div className="bg-orange-500 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
                                     <p className="font-bold text-lg">Step 1: DISPATCH</p>
-                                    <p className="text-sm"><b>Drag</b> a task from the Backlog to <b>In Progress</b> to start building it.</p>
+                                    <p className="text-sm">{isMobile ? <><b>Tap</b> a task in the Backlog, then <b>tap</b> In Progress to start building it.</> : <><b>Drag</b> a task from the Backlog to <b>In Progress</b> to start building it.</>}</p>
                                 </div>
                             </motion.div>
                         )}
@@ -266,7 +276,7 @@ export const TutorialOverlay: React.FC<Props> = ({ showKanban }) => {
                                 </div>
                                 <div className="bg-green-600 text-white px-4 py-3 rounded-xl shadow-xl border-2 border-white">
                                     <p className="font-bold text-lg">Step 3: HANDOVER</p>
-                                    <p className="text-sm"><b>Drag</b> finished works to <b>Completed</b> to advance the schedule! <br />(Increases Efficiency)</p>
+                                    <p className="text-sm">{isMobile ? <><b>Tap</b> a finished task, then <b>tap</b> Completed to advance the schedule!</> : <><b>Drag</b> finished works to <b>Completed</b> to advance the schedule!</>} <br />(Increases Efficiency)</p>
                                 </div>
                             </motion.div>
                         )}

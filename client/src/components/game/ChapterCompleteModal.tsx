@@ -476,7 +476,7 @@ export const ChapterCompleteModal: React.FC<{ isOpen: boolean; onClose: () => vo
                                         Total Cost Avoidance: {formatCurrency(CONSTRUCTION_TASKS.reduce((acc, t) => acc + (t.costToStart || 0) * 0.13, 0), currency)}
                                     </div>
                                 </div>
-                                <div className="p-0 overflow-x-auto custom-scrollbar-thin">
+                                <div className="p-0 overflow-x-auto">
                                     <table className="w-full text-left border-collapse min-w-[600px]">
                                         <thead className="bg-slate-800/80 text-slate-400 text-[10px] uppercase tracking-widest font-bold">
                                             <tr>

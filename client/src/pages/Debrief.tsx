@@ -105,7 +105,13 @@ export default function Debrief() {
   const actions = REAL_WORLD_ACTIONS[chapter] ?? [];
 
   return (
-    <div className="w-full min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 md:p-8 text-white overflow-y-auto">
+    // h-dvh (not min-h-screen): min-h-screen is unbounded, so this div just grows to fit its
+    // content instead of ever scrolling internally — the overflow was clipped one level up at
+    // #root (which IS height-capped, see index.css), with no way to reach it. Measured live: this
+    // clipped the "Advance to Next Phase" button — the ONLY way to continue past this screen —
+    // entirely off-screen on a phone. h-dvh gives this div an actual bounded height so its own
+    // overflow-y-auto can do something.
+    <div className="w-full h-dvh bg-slate-950 flex flex-col items-center justify-center p-4 md:p-8 text-white overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

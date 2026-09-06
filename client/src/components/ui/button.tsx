@@ -25,11 +25,18 @@ const buttonVariants = cva(
       // Heights are set as "min" heights, because sometimes Ai will place large amount of content
       // inside buttons. With a min-height they will look appropriate with small amounts of content,
       // but will expand to fit large amounts of content.
+      //
+      // default/lg/icon are floored at 44px (Apple HIG / WCAG 2.5.5 touch-target minimum) — a
+      // mobile-first audit found every size variant under that floor, which was the single root
+      // cause behind dozens of individual "touch target too small" findings across the app,
+      // since this component underpins nearly every button. `sm` is intentionally still smaller,
+      // for dense secondary/desktop-only controls — it must not be used for a primary or
+      // frequently-tapped mobile action; use `default` there instead.
       size: {
-        default: "min-h-9 px-4 py-2",
+        default: "min-h-11 px-4 py-2",
         sm: "min-h-8 rounded-md px-3 text-xs",
-        lg: "min-h-10 rounded-md px-8",
-        icon: "h-9 w-9",
+        lg: "min-h-12 rounded-md px-8",
+        icon: "h-11 w-11",
       },
     },
     defaultVariants: {

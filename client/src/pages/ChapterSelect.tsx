@@ -119,7 +119,12 @@ export default function ChapterSelect() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-200 p-6 md:p-10 relative overflow-x-hidden font-sans vignette film-grain">
+        // h-dvh + overflow-y-auto (not min-h-screen): min-h-screen is unbounded, so on a short
+        // viewport this div grows past what's visible instead of scrolling, and the clip happens
+        // one level up at #root (height-capped, no scroll of its own) — a mobile audit found this
+        // could put Episodes 2-4 and the "Coming Soon" row out of reach with no way to scroll to
+        // them, on the single screen every player must pass through to reach any gameplay.
+        <div className="h-dvh overflow-y-auto bg-slate-900 text-slate-200 p-6 md:p-10 relative overflow-x-hidden font-sans vignette film-grain">
             {/* Character Creation for New Players */}
             <CharacterCreationModal />
 

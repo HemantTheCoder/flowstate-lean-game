@@ -93,7 +93,13 @@ export default function Profile() {
     const displayUsername = user?.username || localGameState.playerName || 'Guest Engineer';
 
     return (
-        <div className="h-screen bg-slate-900 p-4 md:p-4 font-sans relative overflow-hidden text-slate-200 flex flex-col">
+        // overflow-y-auto md:overflow-hidden: mobile audit found the two-independently-scrolling-
+        // columns layout below (Stats+Resume / Badges+History) squeezed each into ~35% of a
+        // 812px viewport once stacked at the base breakpoint — technically reachable, but a poor
+        // one-handed UX (easy to scroll the wrong nested box). At md:+ this keeps the deliberate
+        // side-by-side independent-scroll behavior; below md:, the whole page now scrolls as one
+        // natural column instead (see the h-full/min-h-0/overflow-y-auto -> md:-only changes below).
+        <div className="h-dvh md:h-screen bg-slate-900 p-4 md:p-4 font-sans relative overflow-y-auto md:overflow-hidden text-slate-200 flex flex-col">
 
             {/* Premium Twilight Industrial Ambient Background */}
             <div className="fixed inset-0 pointer-events-none z-0">
@@ -110,7 +116,7 @@ export default function Profile() {
                 <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-15 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
             </div>
 
-            <div className="max-w-6xl w-full mx-auto flex flex-col h-full space-y-4 relative z-10 min-h-0">
+            <div className="max-w-6xl w-full mx-auto flex flex-col md:h-full space-y-4 relative z-10 md:min-h-0">
 
                 {/* Header Section */}
                 <motion.div
@@ -165,10 +171,10 @@ export default function Profile() {
                     </div>
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 flex-1 min-h-0 min-w-0">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:flex-1 md:min-h-0 min-w-0">
 
                     {/* Left Column: Stats & Resume */}
-                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="md:col-span-5 space-y-4 overflow-y-auto pr-2 pb-4 scrollbar-thin scrollbar-thumb-slate-700">
+                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="md:col-span-5 space-y-4 md:overflow-y-auto pr-2 pb-4 scrollbar-thin scrollbar-thumb-slate-700">
 
                         {/* Current Game Card */}
                         <div className="bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 shadow-2xl rounded-3xl overflow-hidden relative">
@@ -339,7 +345,7 @@ export default function Profile() {
                     </motion.div>
 
                     {/* Right Column: Badges & History */}
-                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="md:col-span-7 space-y-4 overflow-y-auto pr-2 pb-4 scrollbar-thin scrollbar-thumb-slate-700">
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="md:col-span-7 space-y-4 md:overflow-y-auto pr-2 pb-4 scrollbar-thin scrollbar-thumb-slate-700">
 
                         {/* Achievements Section */}
                         <div className="bg-slate-800/60 backdrop-blur-2xl border border-slate-700/50 p-6 md:p-8 rounded-3xl shadow-xl">

@@ -77,7 +77,10 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-200 font-sans p-4 md:p-8 relative overflow-x-hidden">
+    // h-dvh + overflow-y-auto (not min-h-screen, which never scrolls internally — see
+    // Debrief.tsx for the full explanation). This page has the most content of any audited
+    // (KPI grid, two charts, a data table, decisions/log panels) — highest-risk for clipping.
+    <div className="h-dvh overflow-y-auto bg-slate-900 text-slate-200 font-sans p-4 md:p-8 relative overflow-x-hidden">
 
       {/* Premium Background Ambience */}
       <div className="fixed inset-0 pointer-events-none z-0">

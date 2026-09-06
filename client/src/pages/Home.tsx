@@ -61,7 +61,12 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-slate-900 flex flex-col items-center justify-center p-3 sm:p-6 font-sans vignette film-grain">
+    // overflow-y-auto (was overflow-hidden, fully blocking scroll): on a short viewport this
+    // could push the secondary menu (Case Studies/Lean AI/Multiplayer/Feedback/Credits/Dev
+    // Console) below the fold with no way to reach it. h-dvh (was h-screen) avoids a layout jump
+    // when a mobile browser's address bar collapses/expands mid-session. overflow-x stays hidden
+    // since this page's ambient background blurs intentionally bleed past the edges.
+    <div className="relative w-full h-dvh overflow-y-auto overflow-x-hidden bg-slate-900 flex flex-col items-center justify-center p-3 sm:p-6 font-sans vignette film-grain">
 
       {/* Premium Twilight Industrial Ambient Background */}
       <div

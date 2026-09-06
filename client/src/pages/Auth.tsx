@@ -68,7 +68,11 @@ export default function AuthPage() {
     }
 
     return (
-        <div className="min-h-screen w-full relative flex items-center justify-center overflow-hidden bg-slate-950 px-4 md:px-0 font-sans">
+        // h-dvh + overflow-y-auto (was min-h-screen + overflow-hidden: unbounded height plus fully
+        // blocked scroll is the worst combination of the app-wide clipping bug — see
+        // Debrief.tsx). The login/register card's content (header, tabs, two 56px inputs, submit,
+        // footer disclaimer) can exceed a phone's visible height on its own.
+        <div className="h-dvh w-full relative flex items-center justify-center overflow-y-auto bg-slate-950 px-4 md:px-0 font-sans">
 
             {/* Dark Construction Site Background */}
             <div className="absolute inset-0 z-0">
