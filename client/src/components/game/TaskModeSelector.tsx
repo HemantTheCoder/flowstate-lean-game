@@ -75,7 +75,11 @@ export const TaskModeSelector: React.FC<TaskModeSelectorProps> = ({ isOpen, onSe
 
     return (
         <>
-            <AnimatePresence mode="wait">
+            {/* popLayout, not wait: "wait" holds the next step (choose -> type -> tasks) off
+                until the previous one's exit animation completes, and that never fires if the
+                tab is backgrounded when the step changes (screen lock, app switch) - same
+                deadlock as the router fix in App.tsx and the quiz fix in ReflectionQuiz.tsx. */}
+            <AnimatePresence mode="popLayout">
                 <motion.div
                     // overflow-y-auto: this wrapper had no scroll/max-height at all, so on a short
                     // viewport (iPhone SE, or any phone rotated to landscape) the two option
@@ -131,7 +135,7 @@ export const TaskModeSelector: React.FC<TaskModeSelectorProps> = ({ isOpen, onSe
                                         </span>
                                         <span className="text-[10px] text-slate-500">Recommended for first play</span>
                                     </div>
-                                    <div className="flex items-center gap-1 mt-4 text-xs text-emerald-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="flex items-center gap-1 mt-4 text-xs text-emerald-400 font-bold opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                         Start with defaults <ArrowRight className="w-3 h-3" />
                                     </div>
                                 </motion.button>
@@ -156,7 +160,7 @@ export const TaskModeSelector: React.FC<TaskModeSelectorProps> = ({ isOpen, onSe
                                         </span>
                                         <span className="text-[10px] text-slate-500">For domain experts</span>
                                     </div>
-                                    <div className="flex items-center gap-1 mt-4 text-xs text-cyan-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="flex items-center gap-1 mt-4 text-xs text-cyan-400 font-bold opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                         Choose your project type <ArrowRight className="w-3 h-3" />
                                     </div>
                                 </motion.button>

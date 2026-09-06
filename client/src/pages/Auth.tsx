@@ -160,7 +160,7 @@ export default function AuthPage() {
                                 </TabsTrigger>
                             </TabsList>
 
-                            <AnimatePresence mode="wait">
+                            <AnimatePresence mode="popLayout">
                                 <motion.div
                                     key={activeTab}
                                     initial={{ opacity: 0, scale: 0.98 }}

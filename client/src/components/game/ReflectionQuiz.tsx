@@ -354,7 +354,13 @@ export const ReflectionQuiz: React.FC<ReflectionQuizProps> = ({ isOpen, onComple
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
-          <AnimatePresence mode="wait">
+          {/* popLayout, not wait: mode="wait" holds the incoming question off until the
+              outgoing one's exit animation calls back, and that rAF-driven callback never
+              fires if the tab is backgrounded mid-quiz (screen lock, app switch - an easy
+              thing to do mid-quiz on a phone) - the question would visibly freeze forever
+              while currentQuestionIndex keeps incrementing underneath it. Same root cause
+              and fix as the router deadlock in App.tsx. */}
+          <AnimatePresence mode="popLayout">
             {!quizComplete ? (
               <motion.div
                 key={currentQuestionIndex}

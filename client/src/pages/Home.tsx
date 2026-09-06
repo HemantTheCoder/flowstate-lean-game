@@ -249,7 +249,7 @@ export default function Home() {
 
           {/* Rotating Lean Tip Pill */}
           <div className="flex justify-center h-6 overflow-hidden">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="popLayout">
               <motion.div
                 key={tipIndex}
                 initial={{ opacity: 0, y: 10 }}

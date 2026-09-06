@@ -91,7 +91,10 @@ export const CharacterCreationModal: React.FC = () => {
                 ))}
             </div>
 
-            <AnimatePresence mode="wait">
+            {/* popLayout, not wait: "wait" holds the next screen off until the previous one's
+                exit animation completes, which never fires if the tab is backgrounded at the
+                moment showChoice flips - same deadlock as the router fix in App.tsx. */}
+            <AnimatePresence mode="popLayout">
                 {showChoice ? (
                     <motion.div
                         key="choice"
@@ -366,7 +369,7 @@ export const CharacterCreationModal: React.FC = () => {
                                 </div>
                             </motion.div>
 
-                            <AnimatePresence mode="wait">
+                            <AnimatePresence mode="popLayout">
                                 <motion.div
                                     key={gender}
                                     initial={{ opacity: 0, scale: 0.9 }}

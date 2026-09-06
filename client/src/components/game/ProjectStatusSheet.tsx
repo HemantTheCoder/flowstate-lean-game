@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { InfoTag } from './InfoTag';
 
 interface ProjectStatusSheetProps {
   isOpen: boolean;
@@ -227,10 +228,14 @@ export const ProjectStatusSheet: React.FC<ProjectStatusSheetProps> = ({ isOpen, 
                   </div>
                 </div>
 
-                <div
-                  className="flex items-stretch gap-2 mb-3 shrink-0"
-                  title="Earned Value Management: Earned Value (EV) = % of planned work actually completed, valued in ₹."
-                >
+                <div className="flex items-stretch gap-2 mb-3 shrink-0">
+                  <InfoTag
+                    tooltip="Earned Value Management: Earned Value (EV) = % of planned work actually completed, valued in ₹."
+                    className="shrink-0 w-7 h-7 rounded-lg bg-slate-800/50 border border-slate-700 text-slate-400 flex items-center justify-center text-[11px] font-black"
+                    panelClassName="absolute z-40 top-full mt-2 left-0 w-64 max-w-[80vw] p-2.5 rounded-lg bg-slate-900 border border-slate-700 shadow-xl text-[10px] font-medium text-slate-300"
+                  >
+                    i
+                  </InfoTag>
                   <div className="flex-1 min-w-0 bg-slate-900/50 px-3 py-2 rounded-lg border border-slate-700 flex items-center justify-between gap-2">
                     <span className="text-[10px] text-slate-400 uppercase font-bold shrink-0">Planned (PV)</span>
                     <span className="text-sm font-mono font-bold text-slate-200 truncate">{formatCurrency(PV, currency)}</span>
